@@ -1,6 +1,6 @@
 # MiniRxStore
 
-Minimalistic and lightweight Redux Store based on RxJS - State Management in Javascript Applications
+Minimalistic and lightweight Redux Store based on RxJS
 
 ## Showcase
 
@@ -81,3 +81,4 @@ this.products$ = MiniStore.select(getProducts);
 * Add Action Creator Functions
 * Work on the ReadMe and Documentation :)
 * Publish lib to npm
+* Nice To Have: Test lib in React, Vue, maybe even AngularJS
