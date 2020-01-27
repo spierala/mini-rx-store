@@ -4,14 +4,15 @@ Minimalistic and lightweight Redux Store based on RxJS - State Management in Jav
 
 ## Showcase
 
-Run `ng serve mini-rx-store-showcase` for a dev server. Navigate to `http://localhost:4200/` to see `mini-rx-store` in action. 
-The app will automatically reload if you change any of the source files.
+Run `ng serve mini-rx-store-showcase` for a dev server.
+
+Navigate to `http://localhost:4200/` to see `mini-rx-store` in action. 
 
 The showcase is based on the NgRX example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
 
 I did a refactor from NgRX to `mini-rx-store` and the app still works :)
 
-The lib itself lives in projects/mini-rx-store
+The lib itself lives in [projects/mini-rx-store/src/lib](https://github.com/spierala/mini-rx-store/tree/master/projects/mini-rx-store/src/lib)
 
 The lib is still a **work in progress** and should **not** yet be used in production.
 I will publish to npm as soon as I think that the lib is stable enough.
