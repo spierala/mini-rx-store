@@ -1,0 +1,7 @@
+{
+  "name": "mini-rx-store",
+  "version": "0.0.1",
+  "dependencies": {
+    "memoize-one": "^5.1.1"
+  }
+}
