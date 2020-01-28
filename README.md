@@ -1,11 +1,13 @@
 # Mini Rx Store
 
 Minimalistic and lightweight Redux Store based on RxJS.
+
 **Mini Rx Store** provides Reactive State Management for Javascript Applications.
 
 ## Showcase
 
 Run `npm i`
+
 Run `ng serve mini-rx-store-showcase --open` to see `mini-rx-store` in action. 
 
 The showcase is based on the NgRX example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
@@ -26,6 +28,9 @@ Although being minimalist, `mini-rx-store` supports many of the core Redux princ
 * Reducer
 * Memoized Selectors
 * Effects
+
+The API of MiniRX is very similar to NgRX.
+If you realize to need the full blown state management solution of [NgRX](https://ngrx.io/guide/store) then a refactor from to NgRX would be very easy. 
 
 ### Usage (in Angular)
 Create a feature store (with registering the reducer function and optional effects):
