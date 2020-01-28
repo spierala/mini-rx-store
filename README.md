@@ -1,6 +1,7 @@
-# MiniRxStore
+# Mini Rx Store
 
-Minimalistic and lightweight Redux Store based on RxJS
+Minimalistic and lightweight Redux Store based on RxJS.
+Reactive State Management for Javascript Applications.
 
 ## Showcase
 
@@ -42,6 +43,8 @@ export class ProductStoreService extends FeatureStore<ProductState, ProductActio
 
 Write an effect: 
 ```
+import { Action, actions$, ofType } from 'mini-rx-store';
+
 private loadProducts$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.Load),
     mergeMap(action =>
@@ -79,6 +82,8 @@ this.products$ = MiniStore.select(getProducts);
 ## TODO
 * Integrate Redux Dev Tools
 * Add Action Creator Functions
-* Work on the ReadMe and Documentation :)
-* Publish lib to npm
+* Work on the ReadMe and Documentation
 * Nice To Have: Test lib in React, Vue, maybe even AngularJS
+* Add Unit Tests
+* Expose NgModule for easier Angular Integration
+* Publish lib to npm
