@@ -63,12 +63,12 @@ export class ProductEditComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit(): void {
     // Define the form group
     this.productForm = this.fb.group({
-      productName: ['', [Validators.required,
-                         Validators.minLength(3),
-                         Validators.maxLength(50)]],
-      productCode: ['', Validators.required],
-      starRating: ['', NumberValidators.range(1, 5)],
-      description: ''
+      productName: [this.product ? this.product.productName : '', [Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50)]],
+      productCode: [this.product ? this.product.productCode : '', Validators.required],
+      starRating: [this.product ? this.product.starRating : '', NumberValidators.range(1, 5)],
+      description: this.product ? this.product.description : ''
     });
 
     // Watch for value changes
