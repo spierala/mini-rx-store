@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { FeatureStore } from 'mini-rx-store';
-import { reducer, UserState } from './user.reducer';
-import { UserActions } from './user.actions';
+import { MiniStore } from 'mini-rx-store';
+import { reducer } from './user.reducer';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserStoreService extends FeatureStore<UserState, UserActions> {
+export class UserStoreService {
 
   constructor() {
-    super('users', reducer);
+    MiniStore.addFeature('users', reducer);
   }
 }

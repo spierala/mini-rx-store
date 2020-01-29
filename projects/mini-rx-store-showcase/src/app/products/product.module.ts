@@ -6,7 +6,10 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './containers/product-shell/product-shell.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-import { ProductStoreService } from './state/product-store.service';
+import { MiniStore } from 'mini-rx-store';
+import { reducer } from './state/product.reducer';
+import { Load } from './state/product.actions';
+import { ProductEffects } from './state/product.effects';
 
 const productRoutes: Routes = [
   { path: '', component: ProductShellComponent }
@@ -25,8 +28,11 @@ const productRoutes: Routes = [
 })
 export class ProductModule {
   constructor(
-    private productStore: ProductStoreService // Initializes feature state, do not remove!
+    private productEffects: ProductEffects
   ) {
+      MiniStore.addFeature('products', reducer);
+      MiniStore.addEffects(this.productEffects.effects$);
 
+      MiniStore.dispatch(new Load());
   }
 }

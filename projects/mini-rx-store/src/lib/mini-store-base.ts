@@ -1,6 +1,6 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
 import { Action } from './mini-store.utils';
-import { distinctUntilChanged, map, publishReplay, refCount, share, switchMap, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, publishReplay, refCount, scan, share, switchMap, tap } from 'rxjs/operators';
 
 class MiniStoreBase {
 
@@ -23,14 +23,15 @@ class MiniStoreBase {
     refCount()
   );
 
+  private featureStores: FeatureStore<any, Action>[] = [];
+
   constructor() {
     this.effectActions.pipe(
       tap(action => this.dispatch(action))
     ).subscribe();
   }
 
-  // TODO remove from public MiniStore API, should only be used by FeatureStore
-  updateState(state, featureName) {
+  private updateState(state, featureName) {
     const currentState = this.stateSource.getValue();
     const newState = {
       ...currentState
@@ -48,10 +49,19 @@ class MiniStoreBase {
     );
   }
 
-  addFeature(featureName: string) {
+  addFeature<StateType, ActionType extends Action>(
+    featureName: string,
+    reducer: (state: StateType, action: ActionType) => StateType
+  ) {
     const currentState = this.stateSource.getValue();
     if (!currentState.hasOwnProperty(featureName)) {
+
+      // Initialize feature state
       currentState[featureName] = {};
+
+      // Create Feature Store instance
+      const featureStore: FeatureStore<StateType, ActionType> = new FeatureStore(featureName, reducer, this.updateState.bind(this));
+      this.featureStores.push(featureStore);
     }
     // TODO throw if feature already exists
   }
@@ -59,6 +69,33 @@ class MiniStoreBase {
   addEffects(effects: Observable<Action>[]) {
     this.effects$.next([...this.effects$.getValue(), ...effects]);
   }
+}
+
+class FeatureStore<StateType, ActionType extends Action> {
+
+    constructor(
+        featureName: string,
+        reducer: (state: StateType, action: ActionType) => StateType,
+        updateStateFn: (state: StateType, featureName: string) => void
+    ) {
+        const updateFn = updateStateFn;
+
+        if (featureName && reducer) {
+            console.log('MINI STORE READY', featureName); // TODO remove
+
+            actions$.pipe(
+                tap((action => console.log(featureName.toUpperCase(), 'Action: ', action.type, action.payload))), // TODO remove
+                scan<ActionType, StateType>(reducer, undefined),
+                distinctUntilChanged(),
+                tap(newState => {
+                    console.log(featureName.toUpperCase(), 'New State: ', newState); // TODO remove
+                    updateFn(newState, featureName);
+                })
+            ).subscribe(); // TODO get rid of subscription?
+        }
+    }
+
+    // TODO Add clean up logic ?
 }
 
 // Created once to initialize singleton
