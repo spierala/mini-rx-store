@@ -4,16 +4,19 @@ import { distinctUntilChanged, map, publishReplay, refCount, share, switchMap, t
 
 class MiniStoreBase {
 
+  // Actions
   private actionsSource: Subject<Action> = new Subject();
   actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
     share()
   );
 
+  // Effects
   private effects$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
   private effectActions: Observable<Action> = this.effects$.pipe(
     switchMap(effects => merge(...effects)),
   );
 
+  // State
   private stateSource: BehaviorSubject<any> = new BehaviorSubject({});
   private state$: Observable<any> = this.stateSource.asObservable().pipe(
     publishReplay(1),
@@ -26,6 +29,7 @@ class MiniStoreBase {
     ).subscribe();
   }
 
+  // TODO remove from public MiniStore API, should only be used by FeatureStore
   updateState(state, featureName) {
     const currentState = this.stateSource.getValue();
     const newState = {
@@ -49,6 +53,7 @@ class MiniStoreBase {
     if (!currentState.hasOwnProperty(featureName)) {
       currentState[featureName] = {};
     }
+    // TODO throw if feature already exists
   }
 
   addEffects(effects: Observable<Action>[]) {
