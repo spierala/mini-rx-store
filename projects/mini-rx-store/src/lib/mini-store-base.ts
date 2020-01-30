@@ -1,6 +1,7 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { Action } from './mini-store.utils';
+import { Action, createFeatureSelector } from './mini-store.utils';
 import { distinctUntilChanged, map, publishReplay, refCount, scan, share, switchMap, tap } from 'rxjs/operators';
+type Reducer<StateType, ActionType> = (state: StateType, action: ActionType) => StateType;
 
 class MiniStoreBase {
 
@@ -51,8 +52,8 @@ class MiniStoreBase {
 
   addFeature<StateType, ActionType extends Action>(
     featureName: string,
-    reducer: (state: StateType, action: ActionType) => StateType
-  ) {
+    reducer?: Reducer<StateType, ActionType>
+  ): FeatureStore<StateType, ActionType> {
     const currentState = this.stateSource.getValue();
     if (!currentState.hasOwnProperty(featureName)) {
 
@@ -62,6 +63,7 @@ class MiniStoreBase {
       // Create Feature Store instance
       const featureStore: FeatureStore<StateType, ActionType> = new FeatureStore(featureName, reducer, this.updateState.bind(this));
       this.featureStores.push(featureStore);
+      return featureStore;
     }
     // TODO throw if feature already exists
   }
@@ -71,31 +73,75 @@ class MiniStoreBase {
   }
 }
 
-class FeatureStore<StateType, ActionType extends Action> {
+export class FeatureStore<StateType, ActionType extends Action = any> {
+
+    defaultActionClass: new(payload: any) => Action;
+    state$: Observable<StateType>;
 
     constructor(
         featureName: string,
-        reducer: (state: StateType, action: ActionType) => StateType,
+        featureReducer: Reducer<StateType, ActionType>,
         updateStateFn: (state: StateType, featureName: string) => void
     ) {
-        const updateFn = updateStateFn;
 
-        if (featureName && reducer) {
+        this.state$ =  MiniStore.select(createFeatureSelector(featureName));
+
+        const updateActionType = `UPDATE_FEATURE_${featureName.toUpperCase()}`;
+
+        this.defaultActionClass = class {
+            type = updateActionType;
+            constructor(public payload: StateType) { }
+        };
+
+        const defaultReducer: Reducer<StateType, ActionType> = createDefaultReducer(updateActionType);
+        const reducers: Reducer<StateType, ActionType>[] = [defaultReducer];
+
+        if (featureReducer) {
+            reducers.push(featureReducer);
+        }
+
+        const combinedReducer: Reducer<StateType, ActionType> = combineReducers(reducers)
+
+        if (featureName) {
             console.log('MINI STORE READY', featureName); // TODO remove
 
             actions$.pipe(
-                tap((action => console.log(featureName.toUpperCase(), 'Action: ', action.type, action.payload))), // TODO remove
-                scan<ActionType, StateType>(reducer, undefined),
+                tap((action => console.log(featureName.toUpperCase(), 'Action: ', action.type, 'PayLoad', action.payload))), // TODO remove
+                scan<ActionType, StateType>(combinedReducer, undefined),
                 distinctUntilChanged(),
                 tap(newState => {
                     console.log(featureName.toUpperCase(), 'New State: ', newState); // TODO remove
-                    updateFn(newState, featureName);
+                    updateStateFn(newState, featureName);
                 })
             ).subscribe(); // TODO get rid of subscription?
         }
     }
 
+    setState(state: StateType) {
+        MiniStore.dispatch(new this.defaultActionClass(state));
+    }
+
     // TODO Add clean up logic ?
+}
+
+function createDefaultReducer<ActionType extends Action, StateType>(type: string): Reducer<StateType, ActionType> {
+    return (state= {} as StateType, action: ActionType) => {
+        if (action.type === type) {
+            return {
+                ...state,
+                ...action.payload
+            };
+        }
+        return state;
+    };
+}
+
+function combineReducers<StateType, ActionType>(reducers: Reducer<StateType, ActionType>[]): Reducer<StateType, ActionType> {
+    return (state, action: ActionType): StateType => {
+        return reducers.reduce((currState, reducer) => {
+            return reducer(currState, action);
+        }, state);
+    };
 }
 
 // Created once to initialize singleton
