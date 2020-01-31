@@ -1,6 +1,16 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
 import { Action, createFeatureSelector } from './mini-store.utils';
-import { distinctUntilChanged, map, publishReplay, refCount, scan, share, switchMap, tap } from 'rxjs/operators';
+import {
+    distinctUntilChanged,
+    map,
+    publishReplay,
+    refCount,
+    scan,
+    share,
+    switchMap,
+    tap,
+    withLatestFrom
+} from 'rxjs/operators';
 type Reducer<StateType, ActionType> = (state: StateType, action: ActionType) => StateType;
 
 class MiniStoreBase {
@@ -54,7 +64,9 @@ class MiniStoreBase {
     featureName: string,
     reducer?: Reducer<StateType, ActionType>
   ): FeatureStore<StateType, ActionType> {
+
     const currentState = this.stateSource.getValue();
+
     if (!currentState.hasOwnProperty(featureName)) {
 
       // Initialize feature state
@@ -65,6 +77,7 @@ class MiniStoreBase {
       this.featureStores.push(featureStore);
       return featureStore;
     }
+
     // TODO throw if feature already exists
   }
 
@@ -75,7 +88,8 @@ class MiniStoreBase {
 
 export class FeatureStore<StateType, ActionType extends Action = any> {
 
-    defaultActionClass: new(payload: any) => Action;
+    private readonly DefaultActionClass: new(payload: any) => Action;
+    private updateSource: Subject<(state: StateType) => StateType> = new Subject(); // TODO better name
     state$: Observable<StateType>;
 
     constructor(
@@ -88,7 +102,7 @@ export class FeatureStore<StateType, ActionType extends Action = any> {
 
         const updateActionType = `UPDATE_FEATURE_${featureName.toUpperCase()}`;
 
-        this.defaultActionClass = class {
+        this.DefaultActionClass = class {
             type = updateActionType;
             constructor(public payload: StateType) { }
         };
@@ -115,10 +129,18 @@ export class FeatureStore<StateType, ActionType extends Action = any> {
                 })
             ).subscribe(); // TODO get rid of subscription?
         }
+
+        this.updateSource.pipe(
+            withLatestFrom(this.state$),
+            map(([setStateFn, state]) => {
+                return setStateFn(state);
+            }),
+            tap((state) => MiniStore.dispatch(new this.DefaultActionClass(state)))
+        ).subscribe();
     }
 
-    setState(state: StateType) {
-        MiniStore.dispatch(new this.defaultActionClass(state));
+    setState(stateFn: (state: StateType) => StateType) {
+        this.updateSource.next(stateFn)
     }
 
     // TODO Add clean up logic ?

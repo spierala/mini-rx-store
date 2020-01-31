@@ -18,12 +18,10 @@ export class UserStoreService {
     }
 
     test() {
-        this.feature.setState({
-            maskUserName: true,
-            currentUser: {
-                id: 12,
-                userName: 'Flo',
-                isAdmin: true
+        this.feature.setState((state) => {
+            return {
+                ...state,
+                maskUserName: true
             }
         });
     }
