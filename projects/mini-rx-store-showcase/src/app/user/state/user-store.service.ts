@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FeatureStore, MiniStore } from 'mini-rx-store';
+import { Feature, MiniStore } from 'mini-rx-store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User } from '../user';
@@ -20,7 +20,7 @@ const initialState: UserState = {
 export class UserStoreService {
 
     // Create Feature Store
-    private feature: FeatureStore<UserState> = MiniStore.addFeature('users', initialState);
+    private feature: Feature<UserState> = MiniStore.addFeature<UserState>('users', initialState);
 
     maskUserName$: Observable<boolean> = this.feature.state$.pipe(map(state => state.maskUserName));
 

@@ -11,6 +11,7 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
+
 type Reducer<StateType, ActionType> = (state: StateType, action: ActionType) => StateType;
 
 class MiniStoreBase {
@@ -34,7 +35,8 @@ class MiniStoreBase {
     refCount()
   );
 
-  private featureStores: FeatureStore<any, Action>[] = [];
+  // Features
+  private features: Map<string, Feature<any, Action>> = new Map();
 
   constructor() {
     console.log('MINI STORE INIT'); // TODO remove
@@ -44,7 +46,7 @@ class MiniStoreBase {
     ).subscribe();
   }
 
-  private updateFeatureState(featureState, featureName) {
+  private updateFeatureState(featureName, featureState) {
     const state = this.stateSource.getValue();
     state[featureName] = featureState;
     this.stateSource.next(state);
@@ -59,24 +61,21 @@ class MiniStoreBase {
     );
   }
 
-  addFeature<StateType, ActionType extends Action>(
+  addFeature<StateType, ActionType extends Action = any>(
     featureName: string,
     initialState: StateType = {} as StateType,
     reducer?: Reducer<StateType, ActionType>
-  ): FeatureStore<StateType, ActionType> {
+  ): Feature<StateType, ActionType> {
 
-    const currentState = this.stateSource.getValue();
-
-    if (!currentState.hasOwnProperty(featureName)) {
+    if (!this.features.has(featureName)) {
       // Create Feature Store instance
-      const featureStore: FeatureStore<StateType, ActionType> = new FeatureStore(featureName, initialState, reducer, this.updateFeatureState.bind(this));
-      this.featureStores.push(featureStore);
-      return featureStore;
+      const feature: Feature<StateType, ActionType> = new Feature(featureName, initialState, reducer, this.updateFeatureState.bind(this));
+      this.features.set(featureName, feature);
     } else {
         console.warn(`Feature "${featureName}" already exists`);
         // TODO throw error ?
-        // TODO return existing Feature Instance?
     }
+    return this.features.get(featureName);
   }
 
   addEffects(effects: Observable<Action>[]) {
@@ -84,10 +83,10 @@ class MiniStoreBase {
   }
 }
 
-export class FeatureStore<StateType, ActionType extends Action = any> { // TODO rename to FeatureState? Feature?
+export class Feature<StateType, ActionType extends Action = any> {
 
     private readonly UpdateFeatureState: new(payload: StateType) => Action;
-    private stateFnSource: Subject<(state: StateType) => StateType> = new Subject(); // TODO better name
+    private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
 
     state$: Observable<StateType>;
 
@@ -95,7 +94,7 @@ export class FeatureStore<StateType, ActionType extends Action = any> { // TODO 
         featureName: string,
         initialState: StateType,
         featureReducer: Reducer<StateType, ActionType>,
-        updateFeatureStateFn: (state: StateType, featureName: string) => void,
+        updateFeatureStateFn: (featureName: string, state: StateType) => void,
     ) {
 
         console.log('FEATURE STORE INIT', featureName); // TODO remove
@@ -122,9 +121,9 @@ export class FeatureStore<StateType, ActionType extends Action = any> { // TODO 
             distinctUntilChanged(),
             tap(newState => {
                 console.log(featureName.toUpperCase(), 'New State: ', newState); // TODO remove
-                updateFeatureStateFn(newState, featureName);
+                updateFeatureStateFn(featureName, newState);
             })
-        ).subscribe(); // TODO get rid of subscription?
+        ).subscribe();
 
         this.stateFnSource.pipe(
             withLatestFrom(this.state$),
