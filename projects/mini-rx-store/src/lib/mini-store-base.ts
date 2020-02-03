@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { Action, createFeatureSelector } from './mini-store.utils';
+import { Action, AppState, createFeatureSelector, Feature, Reducer } from './mini-store.utils';
 import {
     distinctUntilChanged,
     map,
@@ -12,79 +12,76 @@ import {
     withLatestFrom
 } from 'rxjs/operators';
 
-type Reducer<StateType, ActionType> = (state: StateType, action: ActionType) => StateType;
-export interface AppState { [key: string]: string; };
-
 class MiniStoreBase {
 
-  // Actions
-  private actionsSource: Subject<Action> = new Subject();
-  actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
-    share()
-  );
-
-  // Effects
-  private effects$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
-  private effectActions: Observable<Action> = this.effects$.pipe(
-    switchMap(effects => merge(...effects)),
-  );
-
-  // State
-  private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({});
-  private state$: Observable<AppState> = this.stateSource.asObservable().pipe(
-    publishReplay(1),
-    refCount()
-  );
-
-  // Features
-  private features: Map<string, Feature<any, Action>> = new Map();
-
-  constructor() {
-    console.log('MINI STORE INIT'); // TODO remove
-
-    this.effectActions.pipe(
-      tap(action => this.dispatch(action))
-    ).subscribe();
-  }
-
-  private updateFeatureState(featureName: string, featureState: any) {
-    const state: AppState = this.stateSource.getValue();
-    state[featureName] = featureState;
-    this.stateSource.next(state);
-  }
-
-  dispatch = (action: Action) => this.actionsSource.next(action);
-
-  select(mapFn: ((state: AppState) => any)) {
-    return this.state$.pipe(
-      map((state: AppState) => mapFn(state)),
-      distinctUntilChanged()
+    // Actions
+    private actionsSource: Subject<Action> = new Subject();
+    actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
+        share()
     );
-  }
 
-  addFeature<StateType, ActionType extends Action = any>( // TODO remove ActionType from GenericTypes
-    featureName: string,
-    initialState: StateType = {} as StateType,
-    reducer?: Reducer<StateType, ActionType>
-  ): Feature<StateType, ActionType> {
+    // Effects
+    private effects$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
+    private effectActions: Observable<Action> = this.effects$.pipe(
+        switchMap(effects => merge(...effects)),
+    );
 
-    if (!this.features.has(featureName)) {
-      // Create Feature Store instance
-      const feature: Feature<StateType, ActionType> = new Feature(featureName, initialState, reducer, this.updateFeatureState.bind(this));
-      this.features.set(featureName, feature);
-    } else {
-        console.warn(`Feature "${featureName}" already exists`);
-        // TODO throw error ?
+    // App State
+    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
+    private state$: Observable<AppState> = this.stateSource.asObservable().pipe(
+        publishReplay(1),
+        refCount()
+    );
+
+    // Features
+    private features: Map<string, MiniFeature<any>> = new Map();
+
+    constructor() {
+        console.log('MINI STORE INIT'); // TODO remove
+
+        this.effectActions.pipe(
+            tap(action => this.dispatch(action))
+        ).subscribe();
     }
-    return this.features.get(featureName);
-  }
 
-  addEffects(effects: Observable<Action>[]) {
-    this.effects$.next([...this.effects$.getValue(), ...effects]);
-  }
+    private updateFeatureState(featureName: string, featureState: any) {
+        const state: AppState = this.stateSource.getValue();
+        state[featureName] = featureState;
+        this.stateSource.next(state);
+    }
+
+    dispatch = (action: Action) => this.actionsSource.next(action);
+
+    select(mapFn: ((state: AppState) => any)) {
+        return this.state$.pipe(
+            map((state: AppState) => mapFn(state)),
+            distinctUntilChanged()
+        );
+    }
+
+    addFeature<StateType>(
+        featureName: string,
+        initialState: StateType = {} as StateType,
+        reducer?: Reducer<StateType>
+    ): MiniFeature<StateType> {
+
+        if (!this.features.has(featureName)) {
+            // Create Feature Store instance
+            const feature: MiniFeature<StateType> = new MiniFeature(featureName, initialState, reducer, this.updateFeatureState.bind(this));
+            this.features.set(featureName, feature);
+        } else {
+            console.warn(`Feature "${featureName}" already exists`);
+            // TODO throw error ?
+        }
+        return this.features.get(featureName);
+    }
+
+    addEffects(effects: Observable<Action>[]) {
+        this.effects$.next([...this.effects$.getValue(), ...effects]);
+    }
 }
 
-export class Feature<StateType, ActionType extends Action = any> {
+export class MiniFeature<StateType> implements Feature<StateType> {
 
     private readonly UpdateFeatureState: new(payload: StateType) => Action;
     private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
@@ -94,34 +91,37 @@ export class Feature<StateType, ActionType extends Action = any> {
     constructor(
         featureName: string,
         initialState: StateType,
-        featureReducer: Reducer<StateType, ActionType>,
-        updateFeatureStateFn: (featureName: string, state: StateType) => void,
+        featureReducer: Reducer<StateType>,
+        updateFeatureStateFn: (featureName: string, state: StateType) => void
     ) {
 
         console.log('FEATURE STORE INIT', featureName); // TODO remove
 
-        this.state$ =  MiniStore.select(createFeatureSelector(featureName));
+        this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
         // Create Default Action and Reducer for Update Feature State (used for setState)
         const updateActionType = `UPDATE_FEATURE_${featureName.toUpperCase()}`;
         this.UpdateFeatureState = class {
             type = updateActionType;
-            constructor(public payload: StateType) { }
+
+            constructor(public payload: StateType) {
+            }
         };
-        const defaultReducer: Reducer<StateType, ActionType> = createDefaultReducer(updateActionType);
+        const defaultReducer: Reducer<StateType> = createDefaultReducer(updateActionType);
 
         // Combine reducers
-        const reducers: Reducer<StateType, ActionType>[] = featureReducer ? [defaultReducer, featureReducer] : [defaultReducer];
-        const combinedReducer: Reducer<StateType, ActionType> = combineReducers(reducers);
+        const reducers: Reducer<StateType>[] = featureReducer ? [defaultReducer, featureReducer] : [defaultReducer];
+        const combinedReducer: Reducer<StateType> = combineReducers(reducers);
 
-        // Listen to the actions stream let the reducers update the state
+        // Listen to the actions stream, reducers update the state
         actions$.pipe(
             tap((action => console.log(featureName.toUpperCase(), 'Action: ', action.type, 'PayLoad', action.payload))),
             startWith(initialState),
-            scan<ActionType, StateType>(combinedReducer),
+            scan<Action, StateType>(combinedReducer),
             distinctUntilChanged(),
             tap(newState => {
                 console.log(featureName.toUpperCase(), 'New State: ', newState); // TODO remove
+                // Push the new feature state to the App State
                 updateFeatureStateFn(featureName, newState);
             })
         ).subscribe();
@@ -140,8 +140,8 @@ export class Feature<StateType, ActionType extends Action = any> {
     }
 }
 
-function createDefaultReducer<ActionType extends Action, StateType>(type: string): Reducer<StateType, ActionType> {
-    return (state= {} as StateType, action: ActionType) => {
+function createDefaultReducer<StateType>(type: string): Reducer<StateType> {
+    return (state: StateType, action: Action) => {
         if (action.type === type) {
             return {
                 ...state,
@@ -152,8 +152,8 @@ function createDefaultReducer<ActionType extends Action, StateType>(type: string
     };
 }
 
-function combineReducers<StateType, ActionType>(reducers: Reducer<StateType, ActionType>[]): Reducer<StateType, ActionType> {
-    return (state, action: ActionType): StateType => {
+function combineReducers<StateType, ActionType>(reducers: Reducer<StateType>[]): Reducer<StateType> {
+    return (state: StateType, action: Action): StateType => {
         return reducers.reduce((currState, reducer) => {
             return reducer(currState, action);
         }, state);
