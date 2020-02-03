@@ -1,6 +1,7 @@
 import {MonoTypeOperatorFunction} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import memoizeOne from 'memoize-one';
+import { AppState } from './mini-store-base';
 
 export interface Action {
   type: string;
@@ -24,11 +25,11 @@ export function createSelector(...args: any[]) {
   };
 }
 
-export function createFeatureSelector(
-  featureName: any
+export function createFeatureSelector<T>(
+  featureName: string
 ) {
-  return createSelector((state: any) => {
+  return createSelector((state: AppState) => {
     const featureState = state[featureName];
     return featureState;
-  }, (featureState: any) => featureState);
+  }, (featureState: T) => featureState);
 }

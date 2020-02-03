@@ -7,8 +7,8 @@ import { ProductShellComponent } from './containers/product-shell/product-shell.
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
 import { MiniStore } from 'mini-rx-store';
-import { initialState, reducer } from './state/product.reducer';
-import { Load } from './state/product.actions';
+import { initialState, ProductState, reducer } from './state/product.reducer';
+import { Load, ProductActions } from './state/product.actions';
 import { ProductEffects } from './state/product.effects';
 
 const productRoutes: Routes = [
@@ -30,7 +30,7 @@ export class ProductModule {
   constructor(
     private productEffects: ProductEffects
   ) {
-      MiniStore.addFeature('products', initialState, reducer);
+      MiniStore.addFeature<ProductState, ProductActions>('products', initialState, reducer);
       MiniStore.addEffects(this.productEffects.effects$);
 
       MiniStore.dispatch(new Load());

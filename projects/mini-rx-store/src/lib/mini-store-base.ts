@@ -13,6 +13,7 @@ import {
 } from 'rxjs/operators';
 
 type Reducer<StateType, ActionType> = (state: StateType, action: ActionType) => StateType;
+export interface AppState { [key: string]: string; };
 
 class MiniStoreBase {
 
@@ -29,8 +30,8 @@ class MiniStoreBase {
   );
 
   // State
-  private stateSource: BehaviorSubject<any> = new BehaviorSubject({});
-  private state$: Observable<any> = this.stateSource.asObservable().pipe(
+  private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({});
+  private state$: Observable<AppState> = this.stateSource.asObservable().pipe(
     publishReplay(1),
     refCount()
   );
@@ -46,22 +47,22 @@ class MiniStoreBase {
     ).subscribe();
   }
 
-  private updateFeatureState(featureName, featureState) {
-    const state = this.stateSource.getValue();
+  private updateFeatureState(featureName: string, featureState: any) {
+    const state: AppState = this.stateSource.getValue();
     state[featureName] = featureState;
     this.stateSource.next(state);
   }
 
   dispatch = (action: Action) => this.actionsSource.next(action);
 
-  select(mapFn: ((state: any) => any)) {
+  select(mapFn: ((state: AppState) => any)) {
     return this.state$.pipe(
-      map(state => mapFn(state)),
+      map((state: AppState) => mapFn(state)),
       distinctUntilChanged()
     );
   }
 
-  addFeature<StateType, ActionType extends Action = any>(
+  addFeature<StateType, ActionType extends Action = any>( // TODO remove ActionType from GenericTypes
     featureName: string,
     initialState: StateType = {} as StateType,
     reducer?: Reducer<StateType, ActionType>
@@ -135,7 +136,7 @@ export class Feature<StateType, ActionType extends Action = any> {
     }
 
     setState(stateFn: (state: StateType) => StateType) {
-        this.stateFnSource.next(stateFn)
+        this.stateFnSource.next(stateFn);
     }
 }
 
