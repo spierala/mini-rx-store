@@ -1,4 +1,7 @@
 {
   "name": "mini-rx-store",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "peerDependencies": {
+    "rxjs": "~6.4.0"
+  }
 }

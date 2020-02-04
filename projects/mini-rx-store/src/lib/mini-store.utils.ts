@@ -11,7 +11,7 @@ export interface Action {
     payload?: any;
 }
 
-export interface Feature<StateType> {
+export interface MiniFeature<StateType> {
     state$: Observable<StateType>;
     setState: (stateFn: (state: StateType) => StateType) => void;
 }

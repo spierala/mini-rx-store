@@ -30,8 +30,8 @@ export class ProductModule {
   constructor(
     private productEffects: ProductEffects
   ) {
-      MiniStore.addFeature<ProductState>('products', initialState, reducer);
-      MiniStore.addEffects(this.productEffects.effects$);
+      MiniStore.feature<ProductState>('products', initialState, reducer);
+      MiniStore.effects(this.productEffects.effects$);
 
       MiniStore.dispatch(new Load());
   }

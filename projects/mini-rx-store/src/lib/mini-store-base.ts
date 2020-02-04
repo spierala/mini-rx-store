@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { Action, AppState, createFeatureSelector, Feature, Reducer } from './mini-store.utils';
+import { Action, AppState, createFeatureSelector, MiniFeature, Reducer } from './mini-store.utils';
 import {
     distinctUntilChanged,
     map,
@@ -59,7 +59,7 @@ class MiniStoreBase {
         );
     }
 
-    addFeature<StateType>(
+    feature<StateType>(
         featureName: string,
         initialState: StateType = {} as StateType,
         reducer?: Reducer<StateType>
@@ -67,7 +67,7 @@ class MiniStoreBase {
 
         if (!this.features.has(featureName)) {
             // Create Feature Store instance
-            const feature: MiniFeature<StateType> = new MiniFeature(featureName, initialState, reducer, this.updateFeatureState.bind(this));
+            const feature: MiniFeature<StateType> = new Feature(featureName, initialState, reducer, this.updateFeatureState.bind(this));
             this.features.set(featureName, feature);
         } else {
             console.warn(`Feature "${featureName}" already exists`);
@@ -76,12 +76,12 @@ class MiniStoreBase {
         return this.features.get(featureName);
     }
 
-    addEffects(effects: Observable<Action>[]) {
+    effects(effects: Observable<Action>[]) {
         this.effects$.next([...this.effects$.getValue(), ...effects]);
     }
 }
 
-export class MiniFeature<StateType> implements Feature<StateType> {
+export class Feature<StateType> implements MiniFeature<StateType> {
 
     private readonly UpdateFeatureState: new(payload: StateType) => Action;
     private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
