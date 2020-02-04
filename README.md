@@ -14,9 +14,9 @@ Although being a lightweight library, MiniRX supports many of the core features 
     * Reducers
     * Memoized Selectors
     * Effects
-* Lightweight 
+* MiniRX is lightweight - check the source code :)
+* The source code is easy to understand if you know some RxJS :)
 * RxJS is the one and only (peer) dependency
-* Source Code is easy to understand if you know some RxJS :)
 * Framework agnostic
 
 ### Usage (in Angular)
@@ -81,7 +81,7 @@ The code above creates an Effect. As soon as the `Load` Action is dispatched the
 You need to register the effect before it can take action... (see next section).
 #### Register one or many effects: 
 ```
-  MiniStore.effects([loadProducts$]);
+MiniStore.effects([loadProducts$]);
 ```
  
 #### Dispatch an Action: 
@@ -108,6 +108,8 @@ export const getProducts = createSelector(
 #### Select Observable State (with a selector): 
 ```
 import { MiniStore } from 'mini-rx-store';
+import { getProducts } from '../../state';
+
 this.products$ = MiniStore.select(getProducts);
 ```
 
