@@ -26,6 +26,9 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
       };
 
     case ProductActionTypes.SetCurrentProduct:
+      if (state.currentProductId === action.payload.id) {
+          return state;
+      }
       return {
         ...state,
         currentProductId: action.payload.id
