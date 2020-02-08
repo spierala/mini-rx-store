@@ -21,8 +21,9 @@ Although being a lightweight library, MiniRX supports many of the core features 
 
 ### Usage (in Angular)
 ####Create the MiniStore (App State):
-You have to do nothing :)
-The `MiniStore` is created as soon as you create the first `MiniFeature`... (see next section).
+The `MiniStore` is created as soon as you import MiniStore.
+
+```import { MiniStore } from 'mini-rx-store';```
 
 ####Create a MiniFeature (Feature State):
 A `MiniFeature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
@@ -131,6 +132,15 @@ updateMaskUserName(maskUserName: boolean) {
 }
 ```
 Behind the scenes the `MiniFeature` creates a default reducer and a default action. When you use `setState()` then the default action is dispatched the default reducer will update the feature state for you.
+
+#### Enable Logging of Actions and State Changes in the Browser Console: 
+```
+import { MiniStoreSettings } from 'mini-rx-store';
+
+MiniStoreSettings.enableLogging = true;
+```
+The code above adjusts the Global MiniStore Settings.
+Typically you would set the settings when bootstrapping the app and before the store is used.
 
 ## Showcase
 

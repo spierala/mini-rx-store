@@ -27,7 +27,7 @@ export function ofType<T extends Action>(
 export function createSelector(...args: any[]) {
     const selectors = args.slice(0, args.length - 1);
     const projector = args[args.length - 1];
-    const memoizedProjector = memoizeOne(projector); // TODO add memoize function to src ?
+    const memoizedProjector = memoizeOne(projector);
 
     return (state) => {
         const selectorResults = selectors.map(fn => fn(state));

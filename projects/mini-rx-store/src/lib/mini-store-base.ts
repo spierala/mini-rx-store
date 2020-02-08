@@ -11,6 +11,7 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
+import { MiniStoreSettings } from './mini-store-settings-base';
 
 class MiniStoreBase {
 
@@ -37,8 +38,6 @@ class MiniStoreBase {
     private features: Map<string, MiniFeature<any>> = new Map();
 
     constructor() {
-        console.log('MINI STORE INIT'); // TODO remove
-
         this.effectActions.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
@@ -71,7 +70,6 @@ class MiniStoreBase {
             this.features.set(featureName, feature);
         } else {
             console.warn(`Feature "${featureName}" already exists`);
-            // TODO throw error ?
         }
         return this.features.get(featureName);
     }
@@ -87,25 +85,23 @@ export class Feature<StateType> implements MiniFeature<StateType> {
     private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
 
     state$: Observable<StateType>;
+    actionToLog: Action;
 
     constructor(
-        featureName: string,
+        private featureName: string,
         initialState: StateType,
         featureReducer: Reducer<StateType>,
         updateFeatureStateFn: (featureName: string, state: StateType) => void
     ) {
 
-        console.log('FEATURE STORE INIT', featureName); // TODO remove
-
+        this.log('INIT');
         this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
         // Create Default Action and Reducer for Update Feature State (used for setState)
         const updateActionType = `UPDATE_FEATURE_${featureName.toUpperCase()}`;
         this.UpdateFeatureState = class {
             type = updateActionType;
-
-            constructor(public payload: StateType) {
-            }
+            constructor(public payload: StateType) {}
         };
         const defaultReducer: Reducer<StateType> = createDefaultReducer(updateActionType);
 
@@ -115,12 +111,15 @@ export class Feature<StateType> implements MiniFeature<StateType> {
 
         // Listen to the actions stream, reducers update the state
         actions$.pipe(
-            tap((action => console.log(featureName.toUpperCase(), 'Action: ', action.type, 'PayLoad', action.payload))),
+            tap(action => this.actionToLog = action),
             startWith(initialState),
             scan<Action, StateType>(combinedReducer),
             distinctUntilChanged(),
             tap(newState => {
-                console.log(featureName.toUpperCase(), 'New State: ', newState); // TODO remove
+                if (this.actionToLog) {
+                    this.log( 'ACTION:', `"${this.actionToLog.type}"`, 'PAYLOAD:', this.actionToLog.payload);
+                }
+                this.log( 'NEW STATE: ', newState); // TODO remove
                 // Push the new feature state to the App State
                 updateFeatureStateFn(featureName, newState);
             })
@@ -137,6 +136,13 @@ export class Feature<StateType> implements MiniFeature<StateType> {
 
     setState(stateFn: (state: StateType) => StateType) {
         this.stateFnSource.next(stateFn);
+    }
+
+    private log(...args) {
+        if (!MiniStoreSettings.enableLogging) {
+            return;
+        }
+        console.log(`FEATURE: "${this.featureName.toUpperCase()}"`, ...args);
     }
 }
 
