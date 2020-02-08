@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 
 import { AuthService } from './auth.service';
 
-import { takeWhile } from 'rxjs/operators';
 import { UserStoreService } from './state/user-store.service';
 import { Subscription } from 'rxjs';
 
@@ -15,7 +14,6 @@ import { Subscription } from 'rxjs';
 export class LoginComponent implements OnInit, OnDestroy {
   pageTitle = 'Log In';
   errorMessage: string;
-  componentActive = true;
 
   maskUserName: boolean;
   sub: Subscription;
@@ -26,15 +24,14 @@ export class LoginComponent implements OnInit, OnDestroy {
               private userStoreService: UserStoreService) { }
 
   ngOnInit(): void {
-    this.sub = this.userStoreService.maskUserName$.pipe(
-      takeWhile(() => this.componentActive)
-    ).subscribe(
-      maskUserName => this.maskUserName = maskUserName
+    this.sub = this.userStoreService.maskUserName$.subscribe(
+      maskUserName => {
+          this.maskUserName = maskUserName
+      }
     );
   }
 
   ngOnDestroy(): void {
-    this.componentActive = false;
     this.sub.unsubscribe();
   }
 
