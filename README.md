@@ -133,9 +133,9 @@ updateMaskUserName(maskUserName: boolean) {
     });
 }
 ```
-`state$` is a Observable which will emit the current state of the feature
+`state$` is an Observable which will emit the current state of the feature.
 
-`setState` takes a function which specifies how the state is supposed to be updated. That function has access to the current State of the feature (see `currState` parameter). 
+`setState` takes a function which specifies how the feature state is supposed to be updated. That function has access to the current state of the feature (see `currState` parameter). 
 
 Behind the scenes the `MiniFeature` creates a default reducer and a default action. When you use `setState()` then the default action is dispatched the default reducer will update the feature state for you.
 
