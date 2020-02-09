@@ -1,14 +1,36 @@
 import { Injectable } from '@angular/core';
-import { FeatureStore } from 'mini-rx-store';
-import { reducer, UserState } from './user.reducer';
-import { UserActions } from './user.actions';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { User } from '../user';
+import { MiniFeature, MiniStore } from 'mini-rx-store';
+
+export interface UserState {
+    maskUserName: boolean;
+    currentUser: User;
+}
+
+const initialState: UserState = {
+    maskUserName: true,
+    currentUser: null
+};
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class UserStoreService extends FeatureStore<UserState, UserActions> {
+export class UserStoreService {
 
-  constructor() {
-    super('users', reducer);
-  }
+    // Create Feature Store
+    private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
+
+    maskUserName$: Observable<boolean> = this.feature.state$.pipe(map(state => state.maskUserName));
+
+    updateMaskUserName(maskUserName: boolean) {
+        // Update State
+        this.feature.setState((state) => {
+            return {
+                ...state,
+                maskUserName
+            }
+        });
+    }
 }

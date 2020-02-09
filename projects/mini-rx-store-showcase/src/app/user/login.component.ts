@@ -4,12 +4,8 @@ import { Router } from '@angular/router';
 
 import { AuthService } from './auth.service';
 
-import { takeWhile } from 'rxjs/operators';
-import * as userActions from './state/user.actions';
 import { UserStoreService } from './state/user-store.service';
 import { Subscription } from 'rxjs';
-import { getMaskUserName } from './state';
-import { MiniStore } from 'mini-rx-store';
 
 @Component({
   templateUrl: './login.component.html',
@@ -18,25 +14,24 @@ import { MiniStore } from 'mini-rx-store';
 export class LoginComponent implements OnInit, OnDestroy {
   pageTitle = 'Log In';
   errorMessage: string;
-  componentActive = true;
 
   maskUserName: boolean;
   sub: Subscription;
 
   constructor(private store: UserStoreService,
               private authService: AuthService,
-              private router: Router) { }
+              private router: Router,
+              private userStoreService: UserStoreService) { }
 
   ngOnInit(): void {
-    this.sub = MiniStore.select(getMaskUserName).pipe(
-      takeWhile(() => this.componentActive)
-    ).subscribe(
-      maskUserName => this.maskUserName = maskUserName
+    this.sub = this.userStoreService.maskUserName$.subscribe(
+      maskUserName => {
+          this.maskUserName = maskUserName
+      }
     );
   }
 
   ngOnDestroy(): void {
-    this.componentActive = false;
     this.sub.unsubscribe();
   }
 
@@ -45,7 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   checkChanged(value: boolean): void {
-    MiniStore.dispatch(new userActions.MaskUserName(value));
+    this.userStoreService.updateMaskUserName(value);
   }
 
   login(loginForm: NgForm): void {

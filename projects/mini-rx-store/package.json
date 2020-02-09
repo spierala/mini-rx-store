@@ -2,6 +2,6 @@
   "name": "mini-rx-store",
   "version": "0.0.1",
   "peerDependencies": {
-    "memoize-one": "^5.1.1"
+    "rxjs": "~6.4.0"
   }
 }

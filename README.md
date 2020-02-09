@@ -1,8 +1,152 @@
-# Mini Rx Store
+# MiniRx: The Lightweight RxJS Redux Store
 
-Minimalistic and lightweight Redux Store based on RxJS.
+**MiniRx Store** provides Reactive State Management for Javascript Applications.
 
-**Mini Rx Store** provides Reactive State Management for Javascript Applications.
+## Features
+
+* Minimal configuration and setup
+* Simplified API for basic state management per feature: 
+    * `setState()` for updating the feature state, 
+    * `$state` for accessing the current feature state
+* Advanced "Redux / NgRX" API:
+Although being a lightweight library, MiniRX supports many of the core features from the popular [NgRX](https://ngrx.io/) library for Angular:
+    * Actions
+    * Reducers
+    * Memoized Selectors
+    * Effects
+* MiniRX is lightweight - check the source code :)
+* The source code is easy to understand if you know some RxJS :)
+* RxJS is the one and only (peer) dependency
+* Framework agnostic
+
+### Usage (in Angular)
+#### Create the MiniStore (App State):
+The `MiniStore` is created as soon as you import MiniStore.
+
+```import { MiniStore } from 'mini-rx-store';```
+
+#### Create a MiniFeature (Feature State):
+A `MiniFeature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
+The Feature States live inside the AppState.
+```
+import { MiniStore } from 'mini-rx-store';
+import { initialState, ProductState, reducer } from './state/product.reducer';
+...
+export class ProductStoreService {
+    constructor() {
+      MiniStore.feature<ProductState>('products', initialState, reducer);
+    }
+}
+```
+The code above creates a new feature state for _products_.
+Its initial state is set and the reducer function defines how the feature state changes with an incoming Action.
+
+A reducer function typically looks like this:
+```
+export function reducer(state: ProductState, action: ProductActions): ProductState {
+  switch (action.type) {
+    case ProductActionTypes.ToggleProductCode:
+      return {
+        ...state,
+        showProductCode: action.payload
+      };
+
+    default:
+      return state;
+  }
+}
+```
+
+
+Usually you would create a new `MiniFeature` inside long living Modules/Services.
+
+#### Write an effect: 
+Effects handle code that triggers side effects like API calls.
+```
+import { Action, actions$, ofType } from 'mini-rx-store';
+import { LoadFail, LoadSuccess, ProductActionTypes } from './product.actions';
+
+private loadProducts$: Observable<Action> = actions$.pipe(
+    ofType(ProductActionTypes.Load),
+    mergeMap(action =>
+      this.productService.getProducts().pipe(
+        map(products => (new LoadSuccess(products))),
+        catchError(err => of(new LoadFail(err)))
+      )
+    )
+);
+```
+The code above creates an Effect. As soon as the `Load` Action is dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new Action will be dispatched:
+`LoadSuccess` or `LoadFail`.
+
+You need to register the effect before it can take action... (see next section).
+#### Register one or many effects: 
+```
+MiniStore.effects([loadProducts$]);
+```
+ 
+#### Dispatch an Action: 
+```
+import { MiniStore } from 'mini-rx-store';
+import { CreateProduct } from 'product.actions';
+
+MiniStore.dispatch(new CreateProduct(product));
+```
+
+#### Create Selectors:
+Selectors are used to select and combine state. 
+```
+import { createFeatureSelector, createSelector } from 'mini-rx-store';
+
+const getProductFeatureState = createFeatureSelector('products');
+
+export const getProducts = createSelector(
+    getProductFeatureState,
+    state => state.products
+);
+``` 
+
+#### Select Observable State (with a selector): 
+```
+import { MiniStore } from 'mini-rx-store';
+import { getProducts } from '../../state';
+
+this.products$ = MiniStore.select(getProducts);
+```
+
+#### Make simple things simple: 
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance which is returned by `MiniStore.feature()`
+```
+private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
+
+// get state via the state$ Observable
+// use th RxJS map operator to get a specific piece of the feature state
+maskUserName$: Observable<boolean> = this.feature.state$.pipe(map(state => state.maskUserName));
+
+updateMaskUserName(maskUserName: boolean) {
+    // Update State
+    this.feature.setState((currState) => {
+        return {
+            ...currState,
+            maskUserName
+        }
+    });
+}
+```
+`state$` is a Observable which will emit the current state of the feature
+
+`setState` takes a function which specifies how the state is supposed to be updated. That function has access to the current State of the feature (see `currState` parameter). 
+
+Behind the scenes the `MiniFeature` creates a default reducer and a default action. When you use `setState()` then the default action is dispatched the default reducer will update the feature state for you.
+
+#### Enable Logging of Actions and State Changes in the Browser Console: 
+```
+import { MiniStoreSettings } from 'mini-rx-store';
+
+MiniStoreSettings.enableLogging = true;
+```
+The code above adjusts the Global MiniStore Settings.
+Typically you would set the settings when bootstrapping the app and before the store is used.
 
 ## Showcase
 
@@ -22,72 +166,8 @@ The API might still change till then.
 
 Please let me know if you have ideas for improvement.
 
-## Features
-Although being minimalistic, MiniRX supports many of the core Redux principles from the NgRX library for Angular:
-* Actions
-* Reducer
-* Memoized Selectors
-* Effects
-
-The API of MiniRX is very similar to NgRX.
-If you realize during the project to need the full blown state management from [NgRX](https://ngrx.io/guide/store) then a refactor from MiniRX to NgRX would be very easy. 
-
-### Usage (in Angular)
-Create a feature store (with registering the reducer function and optional effects):
-```
-import { FeatureStore } from 'mini-rx-store';
-import { ProductEffects } from './product.effects';
-...
-export class ProductStoreService extends FeatureStore<ProductState, ProductActions> {
-    constructor(
-    productEffects: ProductEffects
-    ) {
-    super('products', reducer, productEffects.effects$);
-    }
-}
-```
-
-Write an effect: 
-```
-import { Action, actions$, ofType } from 'mini-rx-store';
-
-private loadProducts$: Observable<Action> = actions$.pipe(
-    ofType(productActions.ProductActionTypes.Load),
-    mergeMap(action =>
-      this.productService.getProducts().pipe(
-        map(products => (new productActions.LoadSuccess(products))),
-        catchError(err => of(new productActions.LoadFail(err)))
-      )
-    )
-);
-```
-Create Selectors:
-```
-import { createFeatureSelector, createSelector } from 'mini-rx-store';
-
-const getProductFeatureState = createFeatureSelector('products');
-
-export const getProducts = createSelector(
-    getProductFeatureState,
-    state => state.products
-);
-``` 
- 
-Dispatch an Action: 
-```
-import { MiniStore } from 'mini-rx-store';
-MiniStore.dispatch(new productActions.CreateProduct(product));
-```
-
-Select Observable State: 
-```
-import { MiniStore } from 'mini-rx-store';
-this.products$ = MiniStore.select(getProducts);
-```
-
 ## TODO
 * Integrate Redux Dev Tools
-* Add Action Creator Functions
 * Work on the ReadMe and Documentation
 * Nice To Have: Test lib in React, Vue, maybe even AngularJS
 * Add Unit Tests
