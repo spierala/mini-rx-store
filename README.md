@@ -115,7 +115,7 @@ this.products$ = MiniStore.select(getProducts);
 ```
 
 #### Make simple things simple: 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance which is returned by `MiniStore.feature()`
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (returned by `MiniStore.feature()`)
 ```
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
 
