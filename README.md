@@ -1,4 +1,4 @@
-# MiniRx: Lightweight RxJS Redux Store
+# MiniRx: The Lightweight RxJS Redux Store
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
@@ -20,14 +20,14 @@ Although being a lightweight library, MiniRX supports many of the core features 
 * Framework agnostic
 
 ### Usage (in Angular)
-####Create the MiniStore (App State):
+#### Create the MiniStore (App State):
 The `MiniStore` is created as soon as you import MiniStore.
 
 ```import { MiniStore } from 'mini-rx-store';```
 
-####Create a MiniFeature (Feature State):
+#### Create a MiniFeature (Feature State):
 A `MiniFeature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
-The FeatureState lives inside the AppState.
+The Feature States live inside the AppState.
 ```
 import { MiniStore } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './state/product.reducer';
@@ -41,7 +41,7 @@ export class ProductStoreService {
 The code above creates a new feature state for _products_.
 Its initial state is set and the reducer function defines how the feature state changes with an incoming Action.
 
-A reducer function looks like this:
+A reducer function typically looks like this:
 ```
 export function reducer(state: ProductState, action: ProductActions): ProductState {
   switch (action.type) {
@@ -115,22 +115,28 @@ this.products$ = MiniStore.select(getProducts);
 ```
 
 #### Make simple things simple: 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance returned by `MiniStore.feature()`
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance which is returned by `MiniStore.feature()`
 ```
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
 
+// get state via the state$ Observable
+// use th RxJS map operator to get a specific piece of the feature state
 maskUserName$: Observable<boolean> = this.feature.state$.pipe(map(state => state.maskUserName));
 
 updateMaskUserName(maskUserName: boolean) {
     // Update State
-    this.feature.setState((state) => {
+    this.feature.setState((currState) => {
         return {
-            ...state,
+            ...currState,
             maskUserName
         }
     });
 }
 ```
+`state$` is a Observable which will emit the current state of the feature
+
+`setState` takes a function which specifies how the state is supposed to be updated. That function has access to the current State of the feature (see `currState` parameter). 
+
 Behind the scenes the `MiniFeature` creates a default reducer and a default action. When you use `setState()` then the default action is dispatched the default reducer will update the feature state for you.
 
 #### Enable Logging of Actions and State Changes in the Browser Console: 
