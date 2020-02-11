@@ -4,7 +4,7 @@ import memoizeOne from './memoize-one/src/memoize-one';
 
 export interface AppState {
     [key: string]: string;
-};
+}
 
 export interface Action {
     type: string;
@@ -14,6 +14,10 @@ export interface Action {
 export interface MiniFeature<StateType> {
     state$: Observable<StateType>;
     setState: (stateFn: (state: StateType) => StateType) => void;
+}
+
+export interface Settings {
+    enableLogging: boolean;
 }
 
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
@@ -39,7 +43,6 @@ export function createFeatureSelector<T>(
     featureName: string
 ) {
     return createSelector((state: AppState) => {
-        const featureState = state[featureName];
-        return featureState;
+        return state[featureName];
     }, (featureState: T) => featureState);
 }

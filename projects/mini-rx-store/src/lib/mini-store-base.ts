@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { Action, AppState, createFeatureSelector, MiniFeature, Reducer } from './mini-store.utils';
+import { Action, AppState, createFeatureSelector, MiniFeature, Reducer, Settings } from './mini-store.utils';
 import {
     distinctUntilChanged,
     map,
@@ -11,31 +11,70 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
-import { MiniStoreSettings } from './mini-store-settings-base';
 
 class MiniStoreBase {
 
-    // Actions
+    // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
     actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
         share()
     );
 
-    // Effects
+    // EFFECTS
     private effects$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
     private effectActions: Observable<Action> = this.effects$.pipe(
         switchMap(effects => merge(...effects)),
     );
 
-    // App State
+    // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
     private state$: Observable<AppState> = this.stateSource.asObservable().pipe(
         publishReplay(1),
         refCount()
     );
+    private get state(): AppState {
+        return this.stateSource.getValue();
+    }
+    private set state(state: AppState) {
+        this.stateSource.next(state);
+    }
 
-    // Features
+    // FEATURE STATES
     private features: Map<string, MiniFeature<any>> = new Map();
+
+    // SETTINGS
+    // tslint:disable-next-line:variable-name
+    private _settings: Partial<Settings>;
+    private defaultSettings: Settings = {
+        enableLogging: false,
+    };
+
+    set settings(settings: Partial<Settings>) {
+        if (this._settings) {
+            // Set settings only once
+            console.warn(`MiniStore settings are already set.`);
+            return;
+        }
+
+        this._settings = {
+            ...this.defaultSettings,
+            ...settings
+        };
+
+        if (this._settings.enableLogging) {
+            this.actions$.pipe(
+                tap((action) => console.log(
+                    '%cACTION', 'font-weight: bold; color: #ff9900',
+                    `\r\nType: "${action.type}" \r\nPayload: `,
+                    action.payload)
+                )
+            ).subscribe();
+        }
+    }
+
+    get settings(): Partial<Settings> {
+        return this._settings;
+    }
 
     constructor() {
         this.effectActions.pipe(
@@ -44,9 +83,14 @@ class MiniStoreBase {
     }
 
     private updateFeatureState(featureName: string, featureState: any) {
-        const state: AppState = this.stateSource.getValue();
-        state[featureName] = featureState;
-        this.stateSource.next(state);
+        this.state = {
+            ...this.state,
+            [featureName]: featureState
+        };
+
+        if (this.settings && this.settings.enableLogging) {
+            console.log(`Feature State "${featureName}":`, featureState);
+        }
     }
 
     dispatch = (action: Action) => this.actionsSource.next(action);
@@ -69,7 +113,7 @@ class MiniStoreBase {
             const feature: MiniFeature<StateType> = new Feature(featureName, initialState, reducer, this.updateFeatureState.bind(this));
             this.features.set(featureName, feature);
         } else {
-            console.warn(`Feature "${featureName}" already exists`);
+            console.warn(`Feature "${featureName}" already exists.`);
         }
         return this.features.get(featureName);
     }
@@ -85,7 +129,6 @@ export class Feature<StateType> implements MiniFeature<StateType> {
     private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
 
     state$: Observable<StateType>;
-    actionToLog: Action;
 
     constructor(
         private featureName: string,
@@ -93,34 +136,26 @@ export class Feature<StateType> implements MiniFeature<StateType> {
         featureReducer: Reducer<StateType>,
         updateFeatureStateFn: (featureName: string, state: StateType) => void
     ) {
-
-        this.log('INIT');
         this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
         // Create Default Action and Reducer for Update Feature State (used for setState)
-        const updateActionType = `UPDATE_FEATURE_${featureName.toUpperCase()}`;
+        const updateActionType = `[${featureName}] Update Feature State`;
         this.UpdateFeatureState = class {
             type = updateActionType;
             constructor(public payload: StateType) {}
         };
         const defaultReducer: Reducer<StateType> = createDefaultReducer(updateActionType);
 
-        // Combine reducers
+        // Combine feature and default reducer
         const reducers: Reducer<StateType>[] = featureReducer ? [defaultReducer, featureReducer] : [defaultReducer];
         const combinedReducer: Reducer<StateType> = combineReducers(reducers);
 
         // Listen to the actions stream, reducers update the state
         actions$.pipe(
-            tap(action => this.actionToLog = action),
             startWith(initialState),
             scan<Action, StateType>(combinedReducer),
             distinctUntilChanged(),
             tap(newState => {
-                if (this.actionToLog) {
-                    this.log( 'ACTION:', `"${this.actionToLog.type}"`, 'PAYLOAD:', this.actionToLog.payload);
-                }
-                this.log( 'NEW STATE: ', newState); // TODO remove
-                // Push the new feature state to the App State
                 updateFeatureStateFn(featureName, newState);
             })
         ).subscribe();
@@ -136,13 +171,6 @@ export class Feature<StateType> implements MiniFeature<StateType> {
 
     setState(stateFn: (state: StateType) => StateType) {
         this.stateFnSource.next(stateFn);
-    }
-
-    private log(...args) {
-        if (!MiniStoreSettings.enableLogging) {
-            return;
-        }
-        console.log(`FEATURE: "${this.featureName.toUpperCase()}"`, ...args);
     }
 }
 

@@ -141,11 +141,12 @@ Behind the scenes the `MiniFeature` creates a default reducer and a default acti
 
 #### Enable Logging of Actions and State Changes in the Browser Console: 
 ```
-import { MiniStoreSettings } from 'mini-rx-store';
+import { MiniStore } from 'mini-rx-store';
 
-MiniStoreSettings.enableLogging = true;
+MiniStore.settings = {enableLogging: true};
 ```
-The code above adjusts the Global MiniStore Settings.
+The code above sets the global MiniStore Settings.
+`enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
 
 ## TODO
@@ -153,5 +154,3 @@ Typically you would set the settings when bootstrapping the app and before the s
 * Work on the ReadMe and Documentation
 * Nice To Have: Test lib in React, Vue, maybe even AngularJS
 * Add Unit Tests
-* Expose NgModule for easier Angular Integration
-* Publish lib to npm
