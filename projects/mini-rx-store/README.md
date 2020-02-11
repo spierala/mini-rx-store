@@ -2,7 +2,7 @@
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
-**Attention**: MiniRX is currently in public beta. The API might still change. 
+**Attention**: MiniRx is currently in public beta. The API might still change. 
 
 If you have a bug or an idea, feel free to open an issue on GitHub.
 
@@ -12,22 +12,22 @@ If you have a bug or an idea, feel free to open an issue on GitHub.
 * Simplified API for basic state management per feature: 
     * `setState()` for updating the feature state, 
     * `$state` for accessing the current feature state
-* Advanced "Redux / NgRX" API:
-Although being a lightweight library, MiniRX supports many of the core features from the popular [NgRX](https://ngrx.io/) library for Angular:
+* Advanced "Redux / NgRx" API:
+Although being a lightweight library, MiniRx supports many of the core features from the popular [NgRx](https://ngrx.io/) library for Angular:
     * Actions
     * Reducers
     * Memoized Selectors
     * Effects
-* MiniRX is lightweight - check the source code :)
+* MiniRx is lightweight - check the source code :)
 * The source code is easy to understand if you know some RxJS :)
 * RxJS is the one and only (peer) dependency
 * Framework agnostic
 
-## When should you use MiniRX?
+## When should you use MiniRx?
 
 * If you have a small or medium sized application.
 * If you tried to manage state yourself (e.g. with [Observable Services](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)) and you created state soup :)
-* If you have the feeling that your app is not big / complex enough to justify a full-blown state management solution like NgRX then MiniRX is an easy choice.
+* If you have the feeling that your app is not big / complex enough to justify a full-blown state management solution like NgRx then MiniRx is an easy choice.
 
 ### Usage
 #### Installation:
@@ -174,8 +174,8 @@ The code above sets the global MiniStore Settings.
 Typically you would set the settings when bootstrapping the app and before the store is used.
 
 ## References
-These projects and articles helped and inspired me to create MiniRX:
-* [NgRX](https://ngrx.io/)
+These projects and articles helped and inspired me to create MiniRx:
+* [NgRx](https://ngrx.io/)
 * [Observable Store](https://github.com/DanWahlin/Observable-Store)
 * [RxJS Observable Store](https://github.com/jurebajt/rxjs-observable-store)
 * [Basic State Managment with an Observable Service](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)
