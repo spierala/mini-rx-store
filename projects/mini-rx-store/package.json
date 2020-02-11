@@ -1,14 +1,14 @@
 {
     "name": "mini-rx-store",
-    "version": "1.0.0-beta.0",
+    "version": "1.0.0-beta.1",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "peerDependencies": {
         "rxjs": "~6.4.0"
     },
-    "license": "MIT"`,
+    "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
     "readme": "https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/README.md",
     "description": "MiniRx: The Lightweight RxJS Redux Store",
-    "keywords": ["RxJS", "Redux", "State Management", "Angular", "React", "Vue"],
+    "keywords": ["RxJS", "Redux", "State Management", "Angular", "React", "Vue", "Observable", "Store", "JavaScript"],
     "repository": "https://github.com/spierala/mini-rx-store"
 }
