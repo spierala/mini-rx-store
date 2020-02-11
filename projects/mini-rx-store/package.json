@@ -5,5 +5,10 @@
     "peerDependencies": {
         "rxjs": "~6.4.0"
     },
-    "license": "MIT"
+    "license": "MIT"`,
+    "homepage": "https://github.com/spierala/mini-rx-store",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/README.md",
+    "description": "MiniRx: The Lightweight RxJS Redux Store",
+    "keywords": ["RxJS", "Redux", "State Management", "Angular", "React", "Vue"],
+    "repository": "https://github.com/spierala/mini-rx-store"
 }

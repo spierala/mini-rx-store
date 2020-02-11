@@ -2,6 +2,10 @@
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
+**Attention**: MiniRX is currently in public beta. The API might still change. 
+
+If you have a bug or an idea, feel free to open an issue on GitHub.
+
 ## Features
 
 * Minimal configuration and setup
@@ -19,9 +23,19 @@ Although being a lightweight library, MiniRX supports many of the core features 
 * RxJS is the one and only (peer) dependency
 * Framework agnostic
 
-### Usage (in Angular)
+## When should you use MiniRX?
+
+* If you have a small or medium sized application.
+* If you tried to manage state yourself (e.g. with [Observable Services](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)) and you created state soup :)
+* If you have the feeling that your app is not big / complex enough to justify a full-blown state management solution like NgRX then MiniRX is an easy choice.
+
+### Usage
+#### Installation:
+
+`npm i mini-rx-store`
+
 #### Create the MiniStore (App State):
-The `MiniStore` is created as soon as you import MiniStore.
+The `MiniStore` is created and ready to use as soon as you import MiniStore.
 
 ```import { MiniStore } from 'mini-rx-store';```
 
@@ -40,6 +54,16 @@ export class ProductStoreService {
 ```
 The code above creates a new feature state for _products_.
 Its initial state is set and the reducer function defines how the feature state changes with an incoming Action.
+
+Initial state example:
+```
+export const initialState: ProductState = {
+  showProductCode: true,
+  currentProductId: null,
+  products: [],
+  error: ''
+};
+```
 
 A reducer function typically looks like this:
 ```
@@ -115,7 +139,7 @@ this.products$ = MiniStore.select(getProducts);
 ```
 
 #### Make simple things simple: 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (returned by `MiniStore.feature()`)
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (returned by the `MiniStore.feature` function)
 ```
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
 
@@ -148,6 +172,15 @@ MiniStore.settings = {enableLogging: true};
 The code above sets the global MiniStore Settings.
 `enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
+
+## References
+These projects and articles helped and inspired me to create MiniRX:
+* [NgRX](https://ngrx.io/)
+* [Observable Store](https://github.com/DanWahlin/Observable-Store)
+* [RxJS Observable Store](https://github.com/jurebajt/rxjs-observable-store)
+* [Basic State Managment with an Observable Service](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)
+* [Redux From Scratch With Angular and RxJS](https://angularfirebase.com/lessons/redux-from-scratch-angular-rxjs/)
+* [How I wrote NgRx Store in 63 lines of code](https://medium.com/angular-in-depth/how-i-wrote-ngrx-store-in-63-lines-of-code-dfe925fe979b)
 
 ## TODO
 * Integrate Redux Dev Tools
