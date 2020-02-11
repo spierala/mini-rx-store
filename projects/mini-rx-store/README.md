@@ -173,6 +173,18 @@ The code above sets the global MiniStore Settings.
 `enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
 
+## Showcase
+
+The [MiniRx GitHub Repo](https://github.com/spierala/mini-rx-store) contains also an Angular showcase project.
+
+Run `npm i`
+
+Run `ng serve mini-rx-store-showcase --open` to see MiniRX in action. 
+
+The showcase is based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
+
+I did a refactor from NgRx to MiniRx and the app still works :)
+
 ## References
 These projects and articles helped and inspired me to create MiniRx:
 * [NgRx](https://ngrx.io/)
