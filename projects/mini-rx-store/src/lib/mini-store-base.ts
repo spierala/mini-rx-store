@@ -7,7 +7,6 @@ import {
     refCount,
     scan,
     share,
-    startWith,
     switchMap,
     tap,
     withLatestFrom
@@ -24,8 +23,8 @@ class MiniStoreBase {
 
     // COMBINED REDUCER
     private reducerSource: Subject<Reducer<any>> = new Subject();
-    private combinedReducer$: Observable<Reducer<any>> = this.reducerSource.pipe(
-        scan<Reducer<any>>((acc, reducer) => {
+    private combinedReducer$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
+        scan<Reducer<any>, Reducer<AppState>>((acc, reducer) => {
             if (acc) {
                 return combineReducers([acc, reducer]);
             }
@@ -88,19 +87,21 @@ class MiniStoreBase {
         if (this.devtoolsExtension) {
             this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect();
 
-            this.devtoolsConnection.subscribe(message => {
-                if (message.type === 'DISPATCH' && message.payload && (message.payload.type === 'JUMP_TO_STATE' || message.payload.type === 'JUMP_TO_ACTION')) {
-                    if (this.angularExtension) {
-                        console.log('Dev Tools State', message.state);
-                        this.angularExtension.runInZone(() => this.stateFromDevToolsSource.next(JSON.parse(message.state)));
-                        return;
-                    }
-                }
-            });
-
             win.addEventListener('DOMContentLoaded', () => {
                 if (win.ng) {
                     this.angularExtension = new AngularDevToolsExtension();
+                }
+            });
+
+            this.devtoolsConnection.subscribe(message => {
+                if (message.type === 'DISPATCH' && message.payload
+                    && (message.payload.type === 'JUMP_TO_STATE' || message.payload.type === 'JUMP_TO_ACTION')) {
+                    if (this.angularExtension) {
+                        this.angularExtension.runInZone(() => {
+                            this.stateFromDevToolsSource.next(JSON.parse(message.state));
+                        });
+                        return;
+                    }
                 }
             });
         }
@@ -110,9 +111,8 @@ class MiniStoreBase {
         ).subscribe();
 
         this.actions$.pipe(
-            startWith({}),
             withLatestFrom(this.combinedReducer$),
-            scan((acc, [action, reducer]: [Action, Reducer<any>]) => {
+            scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
                 const newState = reducer(acc, action);
                 if (this.devtoolsConnection) {
                     this.devtoolsConnection.send(action.type, newState);
@@ -123,7 +123,7 @@ class MiniStoreBase {
                         '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', newState);
                 }
                 return newState;
-            }),
+            }, {}),
             tap(state => {
                 this.stateSource.next(state);
             }),
@@ -221,7 +221,7 @@ function createDefaultReducer<StateType>(type: string): Reducer<StateType> {
     };
 }
 
-function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<any> {
+function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
     return (state: AppState, action: Action): AppState => {
         return {
             ...state,
