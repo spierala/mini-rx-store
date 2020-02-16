@@ -24,7 +24,14 @@ class MiniStoreBase {
 
     // COMBINED REDUCER
     private reducerSource: Subject<Reducer<any>> = new Subject();
-    private combinedReducer: Reducer<any>;
+    private combinedReducer$: Observable<Reducer<any>> = this.reducerSource.pipe(
+        scan<Reducer<any>>((acc, reducer) => {
+            if (acc) {
+                return combineReducers([acc, reducer]);
+            }
+            return reducer;
+        })
+    );
 
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
@@ -98,30 +105,19 @@ class MiniStoreBase {
             });
         }
 
-        this.reducerSource.pipe(
-            scan<Reducer<any>>((acc, reducer) => {
-                if (acc) {
-                    return combineReducers([acc, reducer])
-                }
-                return reducer;
-            }),
-            tap(red => {
-                this.combinedReducer = red;
-            })
-        ).subscribe();
-
         this.effectActions.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
 
         this.actions$.pipe(
             startWith({}),
-            scan((acc: AppState, action: Action) => {
-                const newState = this.combinedReducer(acc, action);
+            withLatestFrom(this.combinedReducer$),
+            scan((acc, [action, reducer]: [Action, Reducer<any>]) => {
+                const newState = reducer(acc, action);
                 if (this.devtoolsConnection) {
                     this.devtoolsConnection.send(action.type, newState);
                 }
-                if (this._settings.enableLogging) {
+                if (this.settings.enableLogging) {
                     console.log(
                         '%cACTION', 'font-weight: bold; color: #ff9900',
                         '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', newState);
