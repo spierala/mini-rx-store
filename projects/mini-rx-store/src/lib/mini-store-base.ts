@@ -17,9 +17,11 @@ const win = window as any;
 
 class MiniStoreBase {
 
+    // REDUX DEV TOOLS
     private angularExtension: AngularDevToolsExtension;
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
+    private stateFromDevToolsSource: Subject<AppState> = new Subject();
 
     // COMBINED REDUCER
     private reducerSource: Subject<Reducer<any>> = new Subject();
@@ -39,12 +41,10 @@ class MiniStoreBase {
     );
 
     // EFFECTS
-    private effects$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
-    private effectActions: Observable<Action> = this.effects$.pipe(
+    private effectsSource: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
+    private effectActions$: Observable<Action> = this.effectsSource.pipe(
         switchMap(effects => merge(...effects)),
     );
-
-    private stateFromDevToolsSource: Subject<AppState> = new Subject();
 
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
@@ -106,7 +106,7 @@ class MiniStoreBase {
             });
         }
 
-        this.effectActions.pipe(
+        this.effectActions$.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
 
@@ -156,7 +156,7 @@ class MiniStoreBase {
     }
 
     effects(effects: Observable<Action>[]) {
-        this.effects$.next([...this.effects$.getValue(), ...effects]);
+        this.effectsSource.next([...this.effectsSource.getValue(), ...effects]);
     }
 
     addReducer(reducer: Reducer<any>) {
