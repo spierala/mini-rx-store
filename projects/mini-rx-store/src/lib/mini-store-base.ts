@@ -12,19 +12,19 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
+import { AngularDevToolsExtension } from './angular/angular-devtools-extension';
+
+const win = window as any;
 
 class MiniStoreBase {
 
+    private angularExtension: AngularDevToolsExtension;
+    private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
+    private devtoolsConnection: any;
+
     // COMBINED REDUCER
-    private reducerSource: BehaviorSubject<Reducer<any>> = new BehaviorSubject(undefined);
-    private reducer$: Observable<Reducer<any>> = this.reducerSource.pipe(
-        scan<Reducer<any>>((acc, reducer) => {
-            if (acc) {
-                return combineReducers([acc, reducer])
-            }
-            return reducer;
-        })
-    );
+    private reducerSource: Subject<Reducer<any>> = new Subject();
+    private combinedReducer: Reducer<any>;
 
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
@@ -38,9 +38,11 @@ class MiniStoreBase {
         switchMap(effects => merge(...effects)),
     );
 
+    private stateFromDevToolsSource: Subject<AppState> = new Subject();
+
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
-    private state$: Observable<AppState> = this.stateSource.asObservable().pipe(
+    private state$: Observable<AppState> = merge(this.stateFromDevToolsSource, this.stateSource).pipe(
         publishReplay(1),
         refCount()
     );
@@ -66,34 +68,69 @@ class MiniStoreBase {
             ...this.defaultSettings,
             ...settings
         };
-
-        if (this._settings.enableLogging) {
-            this.actions$.pipe(
-                tap((action) => console.log(
-                    '%cACTION', 'font-weight: bold; color: #ff9900',
-                    `\r\nType: "${action.type}" \r\nPayload: `,
-                    action.payload)
-                )
-            ).subscribe();
-        }
     }
 
     get settings(): Partial<Settings> {
         return this._settings;
     }
 
-    constructor() {
+    constructor(
+
+    ) {
+        // Redux Dev Tools
+        if (this.devtoolsExtension) {
+            this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect();
+
+            this.devtoolsConnection.subscribe(message => {
+                if (message.type === 'DISPATCH' && message.payload && (message.payload.type === 'JUMP_TO_STATE' || message.payload.type === 'JUMP_TO_ACTION')) {
+                    if (this.angularExtension) {
+                        console.log('Dev Tools State', message.state);
+                        this.angularExtension.runInZone(() => this.stateFromDevToolsSource.next(JSON.parse(message.state)));
+                        return;
+                    }
+                }
+            });
+
+            win.addEventListener('DOMContentLoaded', () => {
+                if (win.ng) {
+                    this.angularExtension = new AngularDevToolsExtension();
+                }
+            });
+        }
+
+        this.reducerSource.pipe(
+            scan<Reducer<any>>((acc, reducer) => {
+                if (acc) {
+                    return combineReducers([acc, reducer])
+                }
+                return reducer;
+            }),
+            tap(red => {
+                this.combinedReducer = red;
+            })
+        ).subscribe();
+
         this.effectActions.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
 
         this.actions$.pipe(
             startWith({}),
-            withLatestFrom(this.reducer$),
-            scan((acc, [action, reducer]) => {
-                return reducer(acc, action as Action);
+            scan((acc: AppState, action: Action) => {
+                const newState = this.combinedReducer(acc, action);
+                if (this.devtoolsConnection) {
+                    this.devtoolsConnection.send(action.type, newState);
+                }
+                if (this._settings.enableLogging) {
+                    console.log(
+                        '%cACTION', 'font-weight: bold; color: #ff9900',
+                        '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', newState);
+                }
+                return newState;
             }),
-            tap(state => this.stateSource.next(state)),
+            tap(state => {
+                this.stateSource.next(state);
+            }),
         ).subscribe();
     }
 
@@ -146,7 +183,7 @@ export class Feature<StateType> implements MiniFeature<StateType> {
         this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
         // Create Default Action and Reducer for Update Feature State (used for setState)
-        const updateActionType = `[${featureName}] UPDATE FEATURE STATE`;
+        const updateActionType = `@mini-rx/feature/update/${featureName}`;
         this.UpdateFeatureState = class {
             type = updateActionType;
             constructor(public payload: StateType) {}
@@ -160,7 +197,7 @@ export class Feature<StateType> implements MiniFeature<StateType> {
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, combinedReducerWithInitialState);
 
         MiniStore.addReducer(featureReducer);
-        MiniStore.dispatch({type: `[${featureName}] INIT FEATURE STATE`});
+        MiniStore.dispatch({type: `@mini-rx/feature/init/${featureName}`});
 
         this.stateFnSource.pipe(
             withLatestFrom(this.state$),
@@ -193,14 +230,15 @@ function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reduc
         return {
             ...state,
             [featureName]: reducer(state[featureName], action)
-        }
-    }}
+        };
+    };
+}
 
 function createReducerWithInitialState<StateType>(reducer: Reducer<StateType>, initialState: any): Reducer<StateType> {
     return (state: StateType, action: Action): StateType => {
         state = state === undefined ? initialState : state;
         return reducer(state, action);
-    }
+    };
 }
 
 function combineReducers<StateType, ActionType>(reducers: Reducer<StateType>[]): Reducer<StateType> {
