@@ -78,7 +78,7 @@ class MiniStoreBase {
     }
 
     get settings(): Partial<Settings> {
-        return this._settings;
+        return this._settings ? this._settings : this.defaultSettings;
     }
 
     constructor(
