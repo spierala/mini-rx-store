@@ -12,8 +12,8 @@ export interface Action {
 }
 
 export interface MiniFeature<StateType> {
-    state$: Observable<StateType>;
-    setState: (stateFn: (state: StateType) => StateType) => void;
+    setState: (mapFn: (state: StateType) => StateType) => void;
+    select: (mapFn: (state: StateType) => any) => Observable<any>;
 }
 
 export interface Settings {
@@ -40,9 +40,12 @@ export function createSelector(...args: any[]) {
 }
 
 export function createFeatureSelector<T>(
-    featureName: string
+    featureName?: string
 ) {
     return createSelector((state: AppState) => {
-        return state[featureName];
+        if (featureName) {
+            return state[featureName];
+        }
+        return state;
     }, (featureState: T) => featureState);
 }

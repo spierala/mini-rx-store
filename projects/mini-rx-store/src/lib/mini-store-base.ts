@@ -166,10 +166,9 @@ class MiniStoreBase {
 
 export class Feature<StateType> implements MiniFeature<StateType> {
 
-    private readonly UpdateFeatureState: new(payload: StateType) => Action;
+    private state$: Observable<StateType>;
+    private UpdateFeatureState: new(payload: StateType) => Action;
     private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
-
-    state$: Observable<StateType>;
 
     constructor(
         private featureName: string,
@@ -189,7 +188,9 @@ export class Feature<StateType> implements MiniFeature<StateType> {
         // Combine feature and default reducer
         const reducers: Reducer<StateType>[] = reducer ? [defaultReducer, reducer] : [defaultReducer];
         const combinedReducer: Reducer<StateType> = combineReducers(reducers);
+        // Add initial state to combined reducer
         const combinedReducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(combinedReducer, initialState);
+        // Reducer must know the feature
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, combinedReducerWithInitialState);
 
         MiniStore.addReducer(featureReducer);
@@ -206,6 +207,13 @@ export class Feature<StateType> implements MiniFeature<StateType> {
 
     setState(stateFn: (state: StateType) => StateType) {
         this.stateFnSource.next(stateFn);
+    }
+
+    select(mapFn: ((state: StateType) => any)) {
+        return this.state$.pipe(
+            map((state: StateType) => mapFn(state)),
+            distinctUntilChanged()
+        );
     }
 }
 
