@@ -1,5 +1,13 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { Action, AppState, createFeatureSelector, MiniFeature, Reducer, Settings } from './mini-store.utils';
+import {
+    Action,
+    AppState,
+    createFeatureSelector,
+    MiniFeature,
+    MiniStoreExtension,
+    Reducer,
+    Settings
+} from './mini-store.utils';
 import {
     distinctUntilChanged,
     map,
@@ -11,17 +19,10 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
-import { AngularDevToolsExtension } from './angular/angular-devtools-extension';
-
-const win = window as any;
 
 class MiniStoreBase {
 
-    // REDUX DEV TOOLS
-    private angularExtension: AngularDevToolsExtension;
-    private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
-    private devtoolsConnection: any;
-    private stateFromDevToolsSource: Subject<AppState> = new Subject();
+    private extensions: MiniStoreExtension[] = [];
 
     // COMBINED REDUCER
     private reducerSource: Subject<Reducer<any>> = new Subject();
@@ -48,7 +49,7 @@ class MiniStoreBase {
 
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
-    private state$: Observable<AppState> = merge(this.stateFromDevToolsSource, this.stateSource).pipe(
+    private state$: Observable<AppState> = this.stateSource.pipe(
         publishReplay(1),
         refCount()
     );
@@ -81,31 +82,7 @@ class MiniStoreBase {
     }
 
     constructor(
-
     ) {
-        // Redux Dev Tools
-        if (this.devtoolsExtension) {
-            this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect();
-
-            win.addEventListener('DOMContentLoaded', () => {
-                if (win.ng) {
-                    this.angularExtension = new AngularDevToolsExtension();
-                }
-            });
-
-            this.devtoolsConnection.subscribe(message => {
-                if (message.type === 'DISPATCH' && message.payload
-                    && (message.payload.type === 'JUMP_TO_STATE' || message.payload.type === 'JUMP_TO_ACTION')) {
-                    if (this.angularExtension) {
-                        this.angularExtension.runInZone(() => {
-                            this.stateFromDevToolsSource.next(JSON.parse(message.state));
-                        });
-                        return;
-                    }
-                }
-            });
-        }
-
         this.effectActions$.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
@@ -113,16 +90,9 @@ class MiniStoreBase {
         this.actions$.pipe(
             withLatestFrom(this.combinedReducer$),
             scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
-                const newState = reducer(acc, action);
-                if (this.devtoolsConnection) {
-                    this.devtoolsConnection.send(action.type, newState);
-                }
-                if (this.settings.enableLogging) {
-                    console.log(
-                        '%cACTION', 'font-weight: bold; color: #ff9900',
-                        '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', newState);
-                }
-                return newState;
+                const state = reducer(acc, action);
+                this.log({action, state});
+                return state;
             }, {}),
             tap(state => {
                 this.stateSource.next(state);
@@ -162,9 +132,23 @@ class MiniStoreBase {
     addReducer(reducer: Reducer<any>) {
         this.reducerSource.next(reducer);
     }
+
+    addExtension(extension: MiniStoreExtension) {
+        extension.init((state) => this.stateSource.next(state));
+        this.extensions.push(extension);
+    }
+
+    private log({action, state}) {
+        if (this.settings.enableLogging) {
+            console.log(
+                '%cACTION', 'font-weight: bold; color: #ff9900',
+                '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', state
+            );
+        }
+    }
 }
 
-export class Feature<StateType> implements MiniFeature<StateType> {
+class Feature<StateType> implements MiniFeature<StateType> {
 
     private state$: Observable<StateType>;
     private UpdateFeatureState: new(payload: StateType) => Action;

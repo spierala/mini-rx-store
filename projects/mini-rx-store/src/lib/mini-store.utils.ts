@@ -20,6 +20,10 @@ export interface Settings {
     enableLogging: boolean;
 }
 
+export interface MiniStoreExtension {
+    init(stateUpdateFn?: (state: AppState) => void): void;
+}
+
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
 export function ofType<T extends Action>(
