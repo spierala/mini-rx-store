@@ -9,12 +9,25 @@
     "homepage": "https://github.com/spierala/mini-rx-store",
     "readme": "https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/README.md",
     "description": "MiniRx: The Lightweight RxJS Redux Store",
-    "keywords": ["RxJS", "Redux", "State Management", "Angular", "React", "Vue", "Observable", "Store", "JavaScript"],
+    "keywords": [
+        "RxJS",
+        "Redux",
+        "State Management",
+        "Angular",
+        "React",
+        "Vue",
+        "Observable",
+        "Store",
+        "JavaScript"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/spierala/mini-rx-store.git"
     },
     "bugs": {
         "url": "https://github.com/spierala/mini-rx-store/issues"
+    },
+    "dependencies": {
+        "memoize-one": "^5.1.1"
     }
 }

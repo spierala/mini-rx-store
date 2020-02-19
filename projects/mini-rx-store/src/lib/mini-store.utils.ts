@@ -1,7 +1,7 @@
 import { MonoTypeOperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import memoizeOne from './memoize-one/src/memoize-one';
 import { Action, AppState } from './interfaces';
+import memoizeOne from 'memoize-one';
 
 export function ofType<T extends Action>(
     type: string
