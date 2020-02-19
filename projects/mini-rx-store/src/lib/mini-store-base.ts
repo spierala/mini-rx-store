@@ -81,8 +81,7 @@ class MiniStoreBase {
         return this._settings ? this._settings : this.defaultSettings;
     }
 
-    constructor(
-    ) {
+    constructor() {
         this.effectActions$.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
@@ -117,7 +116,7 @@ class MiniStoreBase {
 
         if (!this.features.has(featureName)) {
             // Create Feature Store instance
-            const feature: MiniFeature<StateType> = new Feature(featureName, initialState, reducer);
+            const feature: MiniFeature<StateType> = new Feature(featureName, initialState, reducer, this.reducerSource);
             this.features.set(featureName, feature);
         } else {
             console.warn(`Feature "${featureName}" already exists.`);
@@ -127,10 +126,6 @@ class MiniStoreBase {
 
     effects(effects: Observable<Action>[]) {
         this.effectsSource.next([...this.effectsSource.getValue(), ...effects]);
-    }
-
-    addReducer(reducer: Reducer<any>) {
-        this.reducerSource.next(reducer);
     }
 
     addExtension(extension: MiniStoreExtension) {
@@ -158,6 +153,7 @@ class Feature<StateType> implements MiniFeature<StateType> {
         private featureName: string,
         initialState: StateType,
         reducer: Reducer<StateType>,
+        reducerSource: Subject<Reducer<any>>
     ) {
         this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
@@ -174,10 +170,12 @@ class Feature<StateType> implements MiniFeature<StateType> {
         const combinedReducer: Reducer<StateType> = combineReducers(reducers);
         // Add initial state to combined reducer
         const combinedReducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(combinedReducer, initialState);
-        // Reducer must know the feature
+        // The reducer must know to which feature it belongs to reduce feature state
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, combinedReducerWithInitialState);
 
-        MiniStore.addReducer(featureReducer);
+        // Add reducer to MiniStore
+        reducerSource.next(featureReducer);
+        // Dispatch initial action to let reducers create the initial state
         MiniStore.dispatch({type: `@mini-rx/feature/init/${featureName}`});
 
         this.stateFnSource.pipe(
