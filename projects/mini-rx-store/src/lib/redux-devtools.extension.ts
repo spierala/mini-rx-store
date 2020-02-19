@@ -1,24 +1,25 @@
-import { actions$, MiniStore } from './mini-store-base';
-import { AppState, MiniStoreExtension } from './mini-store.utils';
+import { Action, AppState, MiniStoreExtension } from './mini-store.utils';
 import { tap, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 const win = window as any;
 
 export class ReduxDevtoolsExtension implements MiniStoreExtension {
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
-    protected stateUpdateFn: (state: AppState) => void;
+    protected stateSource: Subject<AppState>;
 
     constructor() {
     }
 
-    init(stateUpdateFn?: (state: AppState) => void) {
+    init(stateSource: BehaviorSubject<AppState>, state$: Observable<AppState>, actions$: Observable<Action>) {
+        this.stateSource = stateSource;
+
         if (this.devtoolsExtension) {
-            this.stateUpdateFn = stateUpdateFn;
             this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect();
 
             actions$.pipe(
-                withLatestFrom(MiniStore.select(state => state)),
+                withLatestFrom(state$),
                 tap(([action, state]) => this.devtoolsConnection.send(action, state))
             ).subscribe();
 
@@ -35,7 +36,7 @@ export class ReduxDevtoolsExtension implements MiniStoreExtension {
     }
 
     updateState(state: AppState) {
-        this.stateUpdateFn(state);
+        this.stateSource.next(state);
     }
 }
 

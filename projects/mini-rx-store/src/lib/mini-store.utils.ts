@@ -1,4 +1,4 @@
-import { MonoTypeOperatorFunction, Observable } from 'rxjs';
+import { BehaviorSubject, MonoTypeOperatorFunction, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import memoizeOne from './memoize-one/src/memoize-one';
 
@@ -21,7 +21,11 @@ export interface Settings {
 }
 
 export interface MiniStoreExtension {
-    init(stateUpdateFn?: (state: AppState) => void): void;
+    init(
+        stateSource: BehaviorSubject<AppState>,
+        state$: Observable<AppState>,
+        actions$: Observable<Action>
+    ): void;
 }
 
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;

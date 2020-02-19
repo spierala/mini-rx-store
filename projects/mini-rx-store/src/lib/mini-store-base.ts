@@ -134,7 +134,7 @@ class MiniStoreBase {
     }
 
     addExtension(extension: MiniStoreExtension) {
-        extension.init((state) => this.stateSource.next(state));
+        extension.init(this.stateSource, this.state$, this.actions$);
         this.extensions.push(extension);
     }
 
