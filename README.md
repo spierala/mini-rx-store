@@ -11,7 +11,7 @@ If you have a bug or an idea, feel free to open an issue on GitHub.
 * Minimal configuration and setup
 * Simplified API for basic state management per feature: 
     * `setState()` for updating the feature state, 
-    * `$state` for accessing the current feature state
+    * `select()` for accessing the current feature state
 * Advanced "Redux / NgRx" API:
 Although being a lightweight library, MiniRx supports many of the core features from the popular [NgRx](https://ngrx.io/) library for Angular:
     * Actions
@@ -143,9 +143,7 @@ If a Feature in your application requires only simple state management, then you
 ```
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
 
-// get state via the state$ Observable
-// use th RxJS map operator to get a specific piece of the feature state
-maskUserName$: Observable<boolean> = this.feature.state$.pipe(map(state => state.maskUserName));
+maskUserName$: Observable<boolean> = this.feature.select(currState => currState.maskUserName);
 
 updateMaskUserName(maskUserName: boolean) {
     // Update State
@@ -157,9 +155,9 @@ updateMaskUserName(maskUserName: boolean) {
     });
 }
 ```
-`state$` is an Observable which will emit the current state of the feature.
+`select` expects a map function to give you access to the current feature state (see `currState`). That way you can easily get the piece of state that you are interested in. 
 
-`setState` takes a function which specifies how the feature state is supposed to be updated. That function has access to the current state of the feature (see `currState` parameter). 
+`setState` expects a map function to specify how the feature state is supposed to be updated. That function has access to the current state of the feature (see `currState`). 
 
 Behind the scenes the `MiniFeature` creates a default reducer and a default action. When you use `setState()` then the default action is dispatched the default reducer will update the feature state for you.
 
@@ -172,6 +170,37 @@ MiniStore.settings = {enableLogging: true};
 The code above sets the global MiniStore Settings.
 `enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
+
+#### Redux Dev Tools (experimental):
+![Alt text](.github/images/redux-dev-tools.gif?raw=true "Title")
+
+MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
+You need to install the Browser Plugin to make it work. 
+
+* [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+* [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
+
+Register the Redux Dev Tools with MiniRX:
+
+```
+import { MiniStore, ReduxDevtoolsExtension } from 'mini-rx-store';
+
+MiniStore.addExtension(new ReduxDevtoolsExtension());
+```
+
+If you use Angular then you must import `NgReduxDevtoolsModule` from MiniRX to your root/app module.
+Behind the scenes it will run `MiniStore.addExtension(new ReduxDevtoolsExtension());` for you, but most importantly it connects the Redux Dev Tools PlugIn with the Angular Change Detection. 
+```
+import { NgReduxDevtoolsModule } from 'mini-rx-store';
+
+@NgModule({
+    imports: [
+        NgReduxDevtoolsModule
+    ]
+    ...
+})
+export class AppModule {}
+```
 
 ## Showcase
 
@@ -195,7 +224,7 @@ These projects and articles helped and inspired me to create MiniRx:
 * [How I wrote NgRx Store in 63 lines of code](https://medium.com/angular-in-depth/how-i-wrote-ngrx-store-in-63-lines-of-code-dfe925fe979b)
 
 ## TODO
-* Integrate Redux Dev Tools
+* Further Integrate Redux Dev Tools
 * Work on the ReadMe and Documentation
 * Nice To Have: Test lib in React, Vue, maybe even AngularJS
 * Add Unit Tests

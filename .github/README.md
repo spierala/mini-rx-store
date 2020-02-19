@@ -1,1 +1,0 @@
-../projects/mini-rx-store/README.md

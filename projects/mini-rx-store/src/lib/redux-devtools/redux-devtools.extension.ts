@@ -7,7 +7,7 @@ const win = window as any;
 export class ReduxDevtoolsExtension implements MiniStoreExtension {
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
-    protected stateSource: Subject<AppState>;
+    private stateSource: Subject<AppState>;
 
     constructor() {
     }

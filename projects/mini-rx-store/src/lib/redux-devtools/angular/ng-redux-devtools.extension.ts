@@ -12,7 +12,7 @@ export class NgReduxDevtoolsExtension extends ReduxDevtoolsExtension {
 
     updateState(state) {
         this.ngZone.run(() => {
-            super.stateSource.next(state);
+            super.updateState(state);
         });
     }
 }

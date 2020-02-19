@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../user';
-import { createFeatureSelector, createSelector, MiniFeature, MiniStore } from 'mini-rx-store';
+import { createFeatureSelector, createSelector, MiniFeature, MiniStore, ReduxDevtoolsExtension } from 'mini-rx-store';
 
 export interface UserState {
     maskUserName: boolean;
