@@ -1,13 +1,5 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import {
-    Action,
-    AppState,
-    createFeatureSelector,
-    MiniFeature,
-    MiniStoreExtension,
-    Reducer,
-    Settings
-} from './mini-store.utils';
+import { createFeatureSelector } from './mini-store.utils';
 import {
     distinctUntilChanged,
     map,
@@ -19,6 +11,9 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
+import { Action, AppState, MiniFeature, MiniStoreExtension, Settings } from './interfaces';
+
+type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
 class MiniStoreBase {
 

@@ -1,6 +1,6 @@
-import { Action, AppState, MiniStoreExtension } from './mini-store.utils';
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Action, AppState, MiniStoreExtension } from '../interfaces';
 
 const win = window as any;
 

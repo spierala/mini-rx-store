@@ -1,5 +1,5 @@
 import { Injector, NgModule } from '@angular/core';
-import { MiniStore } from '../mini-store-base';
+import { MiniStore } from '../../mini-store-base';
 import { NgReduxDevtoolsExtension } from './ng-redux-devtools.extension';
 
 @NgModule({

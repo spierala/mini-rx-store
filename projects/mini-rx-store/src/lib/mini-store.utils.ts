@@ -1,34 +1,7 @@
-import { BehaviorSubject, MonoTypeOperatorFunction, Observable } from 'rxjs';
+import { MonoTypeOperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import memoizeOne from './memoize-one/src/memoize-one';
-
-export interface AppState {
-    [key: string]: string;
-}
-
-export interface Action {
-    type: string;
-    payload?: any;
-}
-
-export interface MiniFeature<StateType> {
-    setState: (mapFn: (state: StateType) => StateType) => void;
-    select: (mapFn: (state: StateType) => any) => Observable<any>;
-}
-
-export interface Settings {
-    enableLogging: boolean;
-}
-
-export interface MiniStoreExtension {
-    init(
-        stateSource: BehaviorSubject<AppState>,
-        state$: Observable<AppState>,
-        actions$: Observable<Action>
-    ): void;
-}
-
-export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
+import { Action, AppState } from './interfaces';
 
 export function ofType<T extends Action>(
     type: string
