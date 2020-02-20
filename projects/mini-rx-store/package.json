@@ -1,13 +1,13 @@
 {
     "name": "mini-rx-store",
-    "version": "1.0.0-beta.2",
+    "version": "1.0.0-beta.5",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "peerDependencies": {
         "rxjs": "~6.4.0"
     },
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
-    "readme": "https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/README.md",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
     "description": "MiniRx: The Lightweight RxJS Redux Store",
     "keywords": [
         "RxJS",
