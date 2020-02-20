@@ -219,15 +219,7 @@ You need to install the Browser Plugin to make it work.
 * [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 * [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
-Register the Redux Dev Tools with MiniRx:
-
-Coming Soon:
-~~Everyone, but Angular:~~ 
-```
-~~import { MiniStore, ReduxDevtoolsExtension } from 'mini-rx-store';
-
-MiniStore.addExtension(new ReduxDevtoolsExtension());~~
-```
+Register the Redux Dev Tools with MiniRx (currently implemented for Angular only):
 
 If you use Angular then you must import `NgReduxDevtoolsModule` from MiniRx to your root/app module.
 Behind the scenes it will run `MiniStore.addExtension(new ReduxDevtoolsExtension());` for you, but most importantly it connects the Redux Dev Tools PlugIn with the Angular Change Detection. 
