@@ -17,8 +17,6 @@ type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
 class MiniStoreBase {
 
-    private extensions: MiniStoreExtension[] = [];
-
     // COMBINED REDUCER
     private reducerSource: Subject<Reducer<any>> = new Subject();
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
@@ -76,11 +74,16 @@ class MiniStoreBase {
         return this._settings ? this._settings : this.defaultSettings;
     }
 
+    // EXTENSIONS
+    private extensions: MiniStoreExtension[] = [];
+
     constructor() {
+        // Listen to Actions which are emitted by Effects
         this.effectActions$.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
 
+        // Listen to the Actions Stream and update state accordingly
         this.actions$.pipe(
             withLatestFrom(this.combinedReducer$),
             scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
@@ -142,7 +145,7 @@ class Feature<StateType> implements MiniFeature<StateType> {
 
     private state$: Observable<StateType>;
     private UpdateFeatureState: new(payload: StateType) => Action;
-    private stateFnSource: Subject<(state: StateType) => StateType> = new Subject();
+    private setStateFn$: Subject<(state: StateType) => StateType> = new Subject();
 
     constructor(
         private featureName: string,
@@ -150,9 +153,10 @@ class Feature<StateType> implements MiniFeature<StateType> {
         reducer: Reducer<StateType>,
         reducerSource: Subject<Reducer<any>>
     ) {
+        // Feature State
         this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
-        // Create Default Action and Reducer for Update Feature State (used for setState)
+        // Create Default Action and Reducer for Update Feature State (needed for setState())
         const updateActionType = `@mini-rx/feature/update/${featureName}`;
         this.UpdateFeatureState = class {
             type = updateActionType;
@@ -165,15 +169,15 @@ class Feature<StateType> implements MiniFeature<StateType> {
         const combinedReducer: Reducer<StateType> = combineReducers(reducers);
         // Add initial state to combined reducer
         const combinedReducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(combinedReducer, initialState);
-        // The reducer must know to which feature it belongs to reduce feature state
+        // The reducer must know its feature to reduce feature state only...
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, combinedReducerWithInitialState);
 
         // Add reducer to MiniStore
         reducerSource.next(featureReducer);
-        // Dispatch initial action to let reducers create the initial state
+        // Dispatch an initial action to let reducers create the initial state
         MiniStore.dispatch({type: `@mini-rx/feature/init/${featureName}`});
 
-        this.stateFnSource.pipe(
+        this.setStateFn$.pipe(
             withLatestFrom(this.state$),
             map(([setStateFn, state]) => {
                 return setStateFn(state);
@@ -183,7 +187,7 @@ class Feature<StateType> implements MiniFeature<StateType> {
     }
 
     setState(stateFn: (state: StateType) => StateType) {
-        this.stateFnSource.next(stateFn);
+        this.setStateFn$.next(stateFn);
     }
 
     select(mapFn: ((state: StateType) => any)) {
@@ -206,19 +210,19 @@ function createDefaultReducer<StateType>(type: string): Reducer<StateType> {
     };
 }
 
+function createReducerWithInitialState<StateType>(reducer: Reducer<StateType>, initialState: any): Reducer<StateType> {
+    return (state: StateType, action: Action): StateType => {
+        state = state === undefined ? initialState : state;
+        return reducer(state, action);
+    };
+}
+
 function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
     return (state: AppState, action: Action): AppState => {
         return {
             ...state,
             [featureName]: reducer(state[featureName], action)
         };
-    };
-}
-
-function createReducerWithInitialState<StateType>(reducer: Reducer<StateType>, initialState: any): Reducer<StateType> {
-    return (state: StateType, action: Action): StateType => {
-        state = state === undefined ? initialState : state;
-        return reducer(state, action);
     };
 }
 
