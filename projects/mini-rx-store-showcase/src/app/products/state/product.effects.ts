@@ -50,28 +50,5 @@ export class ProductEffects {
     )
   );
 
-  deleteProduct$: Observable<Action> = actions$.pipe(
-    ofType(productActions.ProductActionTypes.DeleteProduct),
-    map((action: productActions.DeleteProduct) => action.payload),
-    mergeMap((productId: number) =>
-      this.productService.deleteProduct(productId).pipe(
-        map(() => new UpdateFeatureStateAction<ProductState>(state => {
-            return {
-                ...state,
-                products: state.products.filter(product => product.id !== productId),
-                currentProductId: null,
-                error: ''
-            }
-        })),
-        catchError(err => of(new UpdateFeatureStateAction<ProductState>(state => {
-            return {
-                ...state,
-                error: err
-            };
-        })))
-      )
-    )
-  );
-
   effects$: Observable<Action>[] = [this.loadProducts$, this.updateProduct$, this.createProduct$];
 }

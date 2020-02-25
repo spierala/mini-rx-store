@@ -41,7 +41,7 @@ export class ProductShellComponent implements OnInit {
   }
 
   deleteProduct(product: Product): void {
-    MiniStore.dispatch(new productActions.DeleteProduct(product.id));
+    // MiniStore.dispatch(new productActions.DeleteProduct(product.id));
   }
 
   clearProduct(): void {

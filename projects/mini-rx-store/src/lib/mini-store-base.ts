@@ -197,12 +197,34 @@ export class MiniFeature<StateType> {
         );
     }
 
-    createMiniEffect(effect$: Observable<Action>) {
-        let newEffect: Observable<Action> = effect$.pipe(
-            ofType(MiniStoreTypes.UpdateFeatureState),
+    // createMiniEffectAction(name: string): Action {
+    //     const startActionType = `@mini-rx/feature/mini-effect/start/${name}`;
+    //     const StartAction = class {
+    //         type = startActionType;
+    //         constructor(public payload: any) {}
+    //     };
+    //
+    //     return StartAction;
+    // }
+
+    createMiniEffect(
+        name: string,
+        fn: (payload) => Observable<any>
+        // effect$: Observable<Action>
+    ) {
+        const startActionType = `@mini-rx/feature/mini-effect/start/${name}`;
+        const StartAction = class {
+            type = startActionType;
+            constructor(public payload: any) {}
+        };
+
+        let newEffect: Observable<Action> = actions$.pipe(
+            ofType(startActionType),
             tap((action) => {
                 console.log('Test', action)
             }),
+            map(action => action.payload),
+            fn,
             withLatestFrom(this.state$),
             map(([action, state]) => {
                 return action.payload(state);
@@ -211,6 +233,10 @@ export class MiniFeature<StateType> {
         );
 
         MiniStore.effects([newEffect]);
+
+        return (payload: any) => {
+            MiniStore.dispatch(new StartAction(payload));
+        }
     }
 }
 
