@@ -17,11 +17,6 @@ export interface Action {
     payload?: any;
 }
 
-export interface MiniFeature<StateType> {
-    setState: (mapFn: (state: StateType) => StateType) => void;
-    select: (mapFn: (state: StateType) => any) => Observable<any>;
-}
-
 export interface Settings {
     enableLogging: boolean;
 }

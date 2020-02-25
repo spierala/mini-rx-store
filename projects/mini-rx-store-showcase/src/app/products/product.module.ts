@@ -6,7 +6,7 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './containers/product-shell/product-shell.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-import { MiniStore } from 'mini-rx-store';
+import { MiniFeature, MiniStore } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './state/product.reducer';
 import { Load } from './state/product.actions';
 import { ProductEffects } from './state/product.effects';
@@ -30,7 +30,10 @@ export class ProductModule {
   constructor(
     private productEffects: ProductEffects
   ) {
-      MiniStore.feature<ProductState>('products', initialState, reducer);
+      const feature: MiniFeature<ProductState> = MiniStore.feature<ProductState>('products', initialState, reducer);
+
+      feature.createMiniEffect(this.productEffects.deleteProduct$);
+
       MiniStore.effects(this.productEffects.effects$);
 
       MiniStore.dispatch(new Load());

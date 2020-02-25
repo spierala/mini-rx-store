@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
-import { createFeatureSelector } from './mini-store.utils';
+import { createFeatureSelector, ofType } from './mini-store.utils';
 import {
     distinctUntilChanged,
     map,
@@ -11,7 +11,7 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
-import { Action, AppState, MiniFeature, MiniStoreExtension, Settings } from './interfaces';
+import { Action, AppState, MiniStoreExtension, Settings } from './interfaces';
 
 type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
@@ -114,7 +114,7 @@ class MiniStoreBase {
 
         if (!this.features.has(featureName)) {
             // Create Feature Store instance
-            const feature: MiniFeature<StateType> = new Feature(featureName, initialState, reducer, this.reducerSource);
+            const feature: MiniFeature<StateType> = new MiniFeature(featureName, initialState, reducer, this.reducerSource);
             this.features.set(featureName, feature);
         } else {
             console.warn(`Feature "${featureName}" already exists.`);
@@ -141,7 +141,7 @@ class MiniStoreBase {
     }
 }
 
-class Feature<StateType> implements MiniFeature<StateType> {
+export class MiniFeature<StateType> {
 
     private state$: Observable<StateType>;
     private UpdateFeatureState: new(payload: StateType) => Action;
@@ -196,6 +196,22 @@ class Feature<StateType> implements MiniFeature<StateType> {
             distinctUntilChanged()
         );
     }
+
+    createMiniEffect(effect$: Observable<Action>) {
+        let newEffect: Observable<Action> = effect$.pipe(
+            ofType(MiniStoreTypes.UpdateFeatureState),
+            tap((action) => {
+                console.log('Test', action)
+            }),
+            withLatestFrom(this.state$),
+            map(([action, state]) => {
+                return action.payload(state);
+            }),
+            map((newState) => new this.UpdateFeatureState(newState))
+        );
+
+        MiniStore.effects([newEffect]);
+    }
 }
 
 function createDefaultReducer<StateType>(type: string): Reducer<StateType> {
@@ -237,3 +253,13 @@ function combineReducers<StateType, ActionType>(reducers: Reducer<StateType>[]):
 // Created once to initialize singleton
 export const MiniStore = new MiniStoreBase();
 export const actions$ = MiniStore.actions$;
+
+
+export enum MiniStoreTypes {
+    UpdateFeatureState = '[MiniStore] Update Feature State'
+}
+
+export class UpdateFeatureStateAction<StateType> implements Action {
+    readonly type = MiniStoreTypes.UpdateFeatureState;
+    constructor(public payload: (state: StateType) => StateType) { }
+}

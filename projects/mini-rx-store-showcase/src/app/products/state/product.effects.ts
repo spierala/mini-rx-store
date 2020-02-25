@@ -8,6 +8,8 @@ import { Product } from '../product';
 
 import * as productActions from './product.actions';
 import { Action, actions$, ofType } from 'mini-rx-store';
+import { UpdateFeatureStateAction } from '../../../../../mini-rx-store/src/lib/mini-store-base';
+import { ProductState } from './product.reducer';
 
 @Injectable({
   providedIn: 'root'
@@ -48,16 +50,28 @@ export class ProductEffects {
     )
   );
 
-  private deleteProduct$: Observable<Action> = actions$.pipe(
+  deleteProduct$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.DeleteProduct),
     map((action: productActions.DeleteProduct) => action.payload),
     mergeMap((productId: number) =>
       this.productService.deleteProduct(productId).pipe(
-        map(() => (new productActions.DeleteProductSuccess(productId))),
-        catchError(err => of(new productActions.DeleteProductFail(err)))
+        map(() => new UpdateFeatureStateAction<ProductState>(state => {
+            return {
+                ...state,
+                products: state.products.filter(product => product.id !== productId),
+                currentProductId: null,
+                error: ''
+            }
+        })),
+        catchError(err => of(new UpdateFeatureStateAction<ProductState>(state => {
+            return {
+                ...state,
+                error: err
+            };
+        })))
       )
     )
   );
 
-  effects$: Observable<Action>[] = [this.loadProducts$, this.updateProduct$, this.createProduct$, this.deleteProduct$];
+  effects$: Observable<Action>[] = [this.loadProducts$, this.updateProduct$, this.createProduct$];
 }

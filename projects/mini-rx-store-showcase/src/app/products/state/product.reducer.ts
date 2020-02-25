@@ -91,21 +91,6 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
         error: action.payload
       };
 
-    // After a delete, the currentProduct is null.
-    case ProductActionTypes.DeleteProductSuccess:
-      return {
-        ...state,
-        products: state.products.filter(product => product.id !== action.payload),
-        currentProductId: null,
-        error: ''
-      };
-
-    case ProductActionTypes.DeleteProductFail:
-      return {
-        ...state,
-        error: action.payload
-      };
-
     default:
       return state;
   }
