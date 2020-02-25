@@ -11,9 +11,9 @@ import { initialState, ProductState, reducer } from './state/product.reducer';
 import { Load } from './state/product.actions';
 import { ProductEffects } from './state/product.effects';
 import { ProductService } from './product.service';
-import { of } from 'rxjs';
-import { mergeMap, catchError, map } from 'rxjs/operators';
-import { UpdateFeatureStateAction } from '../../../../mini-rx-store/src/lib/mini-store-base';
+import { of, pipe } from 'rxjs';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
+import { SetStateAction } from '../../../../mini-rx-store/src/lib/mini-store-base';
 
 const productRoutes: Routes = [
     {path: '', component: ProductShellComponent}
@@ -36,59 +36,44 @@ export class ProductModule {
         private productService: ProductService
     ) {
         const feature: MiniFeature<ProductState> = MiniStore.feature<ProductState>('products', initialState, reducer);
-
-        // const testDeleteProduct$: Observable<Action> = actions$.pipe(
-        //     ofType(productActions.ProductActionTypes.DeleteProduct),
-        //     map((action: productActions.DeleteProduct) => action.payload),
-        //     mergeMap((productId: number) =>
-        //         this.productService.deleteProduct(productId).pipe(
-        //             map(() => new UpdateFeatureStateAction<ProductState>(state => {
-        //                 return {
-        //                     ...state,
-        //                     products: state.products.filter(product => product.id !== productId),
-        //                     currentProductId: null,
-        //                     error: ''
-        //                 }
-        //             })),
-        //             catchError(err => of(new UpdateFeatureStateAction<ProductState>(state => {
-        //                 return {
-        //                     ...state,
-        //                     error: err
-        //                 };
-        //             })))
-        //         )
-        //     )
-        // );
-
-        const deleteEffect = feature.createMiniEffect(
+        const deleteFn = feature.createMiniEffect<number>(
             'delete',
-            mergeMap((productId: number) => {
-
-                debugger
-
-                return this.productService.deleteProduct(productId).pipe(
-                    map(() => new UpdateFeatureStateAction<ProductState>(state => {
+            pipe(
+                tap((productId) => {
+                    // Optimistic Update
+                    feature.setState(state => {
                         return {
                             ...state,
-                            products: state.products.filter(product => product.id !== productId),
-                            currentProductId: null,
-                            error: ''
+                            showProductCode: false,
+                            currentProductId: productId
                         }
-                    })),
-                    catchError(err => of(new UpdateFeatureStateAction<ProductState>(state => {
-                        return {
-                            ...state,
-                            error: err
-                        };
-                    })))
-                )
-            })
+                    })
+                }),
+                mergeMap((productId) => {
+                    return this.productService.deleteProduct(productId).pipe(
+                        map(() => new SetStateAction<ProductState>(state => {
+                            return {
+                                ...state,
+                                products: state.products.filter(product => product.id !== productId),
+                                currentProductId: null,
+                                error: ''
+                            }
+                        })),
+                        catchError(err => of(new SetStateAction<ProductState>(state => {
+                            return {
+                                ...state,
+                                error: err
+                            };
+                        })))
+                    )
+                })
+            )
         );
 
         MiniStore.effects(this.productEffects.effects$);
 
         MiniStore.dispatch(new Load());
 
-        setTimeout(() => deleteEffect(1), 5000);
+        setTimeout(() => deleteFn(1), 5000);
     }
 }

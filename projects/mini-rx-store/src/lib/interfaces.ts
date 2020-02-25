@@ -12,7 +12,7 @@ export interface MiniStoreExtension {
     ): void;
 }
 
-export interface Action {
+export interface Action<PayLoadType = any> {
     type: string;
     payload?: any;
 }

@@ -197,44 +197,30 @@ export class MiniFeature<StateType> {
         );
     }
 
-    // createMiniEffectAction(name: string): Action {
-    //     const startActionType = `@mini-rx/feature/mini-effect/start/${name}`;
-    //     const StartAction = class {
-    //         type = startActionType;
-    //         constructor(public payload: any) {}
-    //     };
-    //
-    //     return StartAction;
-    // }
-
-    createMiniEffect(
+    createMiniEffect<PayLoadType>(
         name: string,
-        fn: (payload) => Observable<any>
-        // effect$: Observable<Action>
+        pipeFn: (payload: Observable<PayLoadType>) => Observable<SetStateAction<StateType>>
     ) {
         const startActionType = `@mini-rx/feature/mini-effect/start/${name}`;
         const StartAction = class {
             type = startActionType;
-            constructor(public payload: any) {}
+            constructor(public payload: PayLoadType) {}
         };
 
         let newEffect: Observable<Action> = actions$.pipe(
             ofType(startActionType),
-            tap((action) => {
-                console.log('Test', action)
-            }),
-            map(action => action.payload),
-            fn,
+            map((action) => action.payload),
+            pipeFn,
             withLatestFrom(this.state$),
             map(([action, state]) => {
-                return action.payload(state);
+                const newState: StateType =  action.setStateFn(state);
+                return new this.UpdateFeatureState(newState);
             }),
-            map((newState) => new this.UpdateFeatureState(newState))
         );
 
         MiniStore.effects([newEffect]);
 
-        return (payload: any) => {
+        return (payload: PayLoadType) => {
             MiniStore.dispatch(new StartAction(payload));
         }
     }
@@ -285,7 +271,7 @@ export enum MiniStoreTypes {
     UpdateFeatureState = '[MiniStore] Update Feature State'
 }
 
-export class UpdateFeatureStateAction<StateType> implements Action {
+export class SetStateAction<StateType> implements Action {
     readonly type = MiniStoreTypes.UpdateFeatureState;
-    constructor(public payload: (state: StateType) => StateType) { }
+    constructor(public setStateFn: (state: StateType) => StateType) { }
 }
