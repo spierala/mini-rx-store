@@ -20,12 +20,12 @@ import { NgReduxDevtoolsModule } from 'mini-rx-store';
 
 @NgModule({
   imports: [
+    NgReduxDevtoolsModule,
     BrowserModule,
     HttpClientModule,
     HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
     UserModule,
     AppRoutingModule,
-    NgReduxDevtoolsModule
   ],
   declarations: [
     AppComponent,

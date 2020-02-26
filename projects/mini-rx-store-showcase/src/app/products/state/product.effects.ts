@@ -16,16 +16,6 @@ export class ProductEffects {
 
   constructor(private productService: ProductService) { }
 
-  private loadProducts$: Observable<Action> = actions$.pipe(
-    ofType(productActions.ProductActionTypes.Load),
-    mergeMap(action =>
-      this.productService.getProducts().pipe(
-        map(products => (new productActions.LoadSuccess(products))),
-        catchError(err => of(new productActions.LoadFail(err)))
-      )
-    )
-  );
-
   private updateProduct$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.UpdateProduct),
     map((action: productActions.UpdateProduct) => action.payload),
@@ -48,5 +38,5 @@ export class ProductEffects {
     )
   );
 
-  effects$: Observable<Action>[] = [this.loadProducts$, this.updateProduct$, this.createProduct$];
+  effects$: Observable<Action>[] = [this.updateProduct$, this.createProduct$];
 }

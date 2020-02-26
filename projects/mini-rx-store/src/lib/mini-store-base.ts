@@ -145,7 +145,8 @@ class MiniStoreBase {
 export class MiniFeature<StateType> {
 
     private state$: Observable<StateType>;
-    SetStateAction: new(setStateFn: SetStateFn<StateType>) => Action<StateType>;
+    private setStateFn$: Subject<(state: StateType) => StateType> = new Subject();
+    SetStateAction: new(payload: Partial<StateType> | SetStateFn<StateType>) => Action;
 
     constructor(
         private featureName: string,
@@ -157,10 +158,10 @@ export class MiniFeature<StateType> {
         this.state$ = MiniStore.select(createFeatureSelector(featureName));
 
         // Create Default Action and Reducer for Update Feature State (needed for setState())
-        const updateActionType = `@mini-rx/feature/update/${featureName}`;
+        const updateActionType = `@mini-rx/feature/${featureName}/set-state`;
         this.SetStateAction = class {
             type = updateActionType;
-            constructor(public setStateFn: SetStateFn<StateType>) {}
+            constructor(public payload: StateType | SetStateFn<StateType>) {}
         };
         const defaultReducer: Reducer<StateType> = createDefaultReducer(updateActionType);
 
@@ -176,10 +177,18 @@ export class MiniFeature<StateType> {
         reducerSource.next(featureReducer);
         // Dispatch an initial action to let reducers create the initial state
         MiniStore.dispatch({type: `@mini-rx/feature/${featureName}/init`});
+
+        this.setStateFn$.pipe(
+            withLatestFrom(this.state$),
+            map(([setStateFn, state]) => {
+                return setStateFn(state);
+            }),
+            tap((newState) => MiniStore.dispatch(new this.SetStateAction(newState)))
+        ).subscribe();
     }
 
-    setState(setStateFn: SetStateFn<StateType>) {
-        MiniStore.dispatch(new this.SetStateAction(setStateFn))
+    setState(stateFn: (state: StateType) => StateType) {
+        this.setStateFn$.next(stateFn);
     }
 
     select(mapFn: ((state: StateType) => any)) {
@@ -193,7 +202,7 @@ export class MiniFeature<StateType> {
         effectName: string,
         effectPipeFn: (payload: Observable<PayLoadType>) => Observable<Action>
     ) {
-        const effectStartActionType = `@mini-rx/feature/${this.featureName}/mini-effect/${effectName}`;
+        const effectStartActionType = `@mini-rx/feature/${this.featureName}/effect/${effectName}`;
         const EffectStartAction = class {
             type = effectStartActionType;
             constructor(public payload: PayLoadType) {}
@@ -202,23 +211,37 @@ export class MiniFeature<StateType> {
         let newEffect: Observable<Action> = actions$.pipe(
             ofType(effectStartActionType),
             map((action) => action.payload),
-            effectPipeFn
+            effectPipeFn,
+            withLatestFrom(this.state$),
+            map(([action, state]) => {
+                switch (typeof action.payload) {
+                    case 'function':
+                        const newState = action.payload(state);;
+                        return newState;
+                    case 'object':
+                        return action.payload;
+                        break;
+                    default:
+                        throw Error('Pass an object or a function.');
+                }
+            }),
+            map((newState) => new this.SetStateAction(newState))
         );
 
         MiniStore.effects([newEffect]);
 
-        return (payload: PayLoadType) => {
+        return (payload?: PayLoadType) => {
             MiniStore.dispatch(new EffectStartAction(payload));
         }
     }
 }
 
 function createDefaultReducer<StateType>(type: string): Reducer<StateType> {
-    return (state: StateType, action: SetStateAction<StateType>) => {
+    return (state: StateType, action: Action) => {
         if (action.type === type) {
             return {
                 ...state,
-                ...action.setStateFn(state)
+                ...action.payload
             };
         }
         return state;

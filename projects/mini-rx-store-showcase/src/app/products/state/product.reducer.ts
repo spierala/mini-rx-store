@@ -46,20 +46,6 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
         currentProductId: 0
       };
 
-    case ProductActionTypes.LoadSuccess:
-      return {
-        ...state,
-        products: action.payload,
-        error: ''
-      };
-
-    case ProductActionTypes.LoadFail:
-      return {
-        ...state,
-        products: [],
-        error: action.payload
-      };
-
     case ProductActionTypes.UpdateProductSuccess:
       const updatedProducts = state.products.map(
         item => action.payload.id === item.id ? action.payload : item);
