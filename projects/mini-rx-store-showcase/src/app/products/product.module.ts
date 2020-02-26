@@ -11,9 +11,8 @@ import { initialState, ProductState, reducer } from './state/product.reducer';
 import { Load } from './state/product.actions';
 import { ProductEffects } from './state/product.effects';
 import { ProductService } from './product.service';
-import { of, pipe } from 'rxjs';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { SetStateAction } from '../../../../mini-rx-store/src/lib/mini-store-base';
+import { of } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 
 const productRoutes: Routes = [
     {path: '', component: ProductShellComponent}
@@ -38,37 +37,32 @@ export class ProductModule {
         const feature: MiniFeature<ProductState> = MiniStore.feature<ProductState>('products', initialState, reducer);
         const deleteFn = feature.createMiniEffect<number>(
             'delete',
-            pipe(
-                tap((productId) => {
-                    // Optimistic Update
-                    feature.setState(state => {
+            mergeMap((productId) => {
+                feature.setState(state => {
+                   return {
+                       ...state,
+                       products: state.products.filter(item => item.id !== productId)
+                   }
+                });
+
+                return this.productService.deleteProduct(productId).pipe(
+                    map(() => new feature.SetStateAction(state => {
                         return {
                             ...state,
-                            showProductCode: false,
-                            currentProductId: productId
+                            products: state.products.filter(product => product.id !== productId),
+                            currentProductId: null,
+                            error: ''
                         }
-                    })
-                }),
-                mergeMap((productId) => {
-                    return this.productService.deleteProduct(productId).pipe(
-                        map(() => new SetStateAction<ProductState>(state => {
-                            return {
-                                ...state,
-                                products: state.products.filter(product => product.id !== productId),
-                                currentProductId: null,
-                                error: ''
-                            }
-                        })),
-                        catchError(err => of(new SetStateAction<ProductState>(state => {
-                            return {
-                                ...state,
-                                error: err
-                            };
-                        })))
-                    )
-                })
-            )
-        );
+                    })),
+                    catchError(err => of(new feature.SetStateAction(state => {
+                        return {
+                            ...state,
+                            error: err
+                        };
+                    })))
+                )
+            }
+        ));
 
         MiniStore.effects(this.productEffects.effects$);
 

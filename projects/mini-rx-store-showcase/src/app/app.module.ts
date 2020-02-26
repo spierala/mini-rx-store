@@ -22,7 +22,7 @@ import { NgReduxDevtoolsModule } from 'mini-rx-store';
   imports: [
     BrowserModule,
     HttpClientModule,
-    HttpClientInMemoryWebApiModule.forRoot(ProductData),
+    HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
     UserModule,
     AppRoutingModule,
     NgReduxDevtoolsModule

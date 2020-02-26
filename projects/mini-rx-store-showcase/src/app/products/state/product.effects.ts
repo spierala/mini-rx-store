@@ -8,8 +8,6 @@ import { Product } from '../product';
 
 import * as productActions from './product.actions';
 import { Action, actions$, ofType } from 'mini-rx-store';
-import { SetStateAction } from '../../../../../mini-rx-store/src/lib/mini-store-base';
-import { ProductState } from './product.reducer';
 
 @Injectable({
   providedIn: 'root'
