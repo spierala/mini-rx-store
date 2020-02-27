@@ -214,18 +214,11 @@ export class MiniFeature<StateType> {
             effectPipeFn,
             withLatestFrom(this.state$),
             map(([action, state]) => {
-                switch (typeof action.payload) {
-                    case 'function':
-                        const newState = action.payload(state);;
-                        return newState;
-                    case 'object':
-                        return action.payload;
-                        break;
-                    default:
-                        throw Error('Pass an object or a function.');
+                if (action instanceof this.SetStateAction && typeof action.payload === 'function') {
+                    return new this.SetStateAction(action.payload(state))
                 }
-            }),
-            map((newState) => new this.SetStateAction(newState))
+                return action;
+            })
         );
 
         MiniStore.effects([newEffect]);

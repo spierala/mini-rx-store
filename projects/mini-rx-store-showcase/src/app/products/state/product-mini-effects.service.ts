@@ -32,11 +32,20 @@ export class ProductMiniEffectsService {
                     })))
                 )
             }
-        ));
+        )
+    );
 
     deleteFn = this.feature.createMiniEffect<number>(
         'delete',
-        mergeMap((productId) => {
+        payload$ => payload$.pipe(
+            // Optimistic update
+            // tap(payload => this.feature.setState(state => {
+            //     return {
+            //         ...state,
+            //         showProductCode: false
+            //     }
+            // })),
+            mergeMap((productId) => {
                 return this.productService.deleteProduct(productId).pipe(
                     map(() => new this.feature.SetStateAction(state => {
                         return {
@@ -54,7 +63,7 @@ export class ProductMiniEffectsService {
                     })))
                 )
             }
-        ));
+        )));
 
     constructor(
         private productService: ProductService
