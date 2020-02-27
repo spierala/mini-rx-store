@@ -232,13 +232,13 @@ The code above creates a MiniEffect for _deleting a product_ from the list. Ther
    
    Also a MiniEffect needs to return a new Action as soon as the Side Effect did its job.
    `effectFn` returns that new Action.
-   As you can see you can return any Action of type `Action`. Or you can return `this.feature.SetStateAction`... 
+   You can return any Action of type `Action`. Or you can return `this.feature.SetStateAction`... 
    
    `SetStateAction` is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
    Its payload is a mapping function which gives you access to the current feature state. Inside of that function you can compose the new feature state. 
    Feature State is updated when the MiniEffect dispatches `SetStateAction`.
 
-FYI
+### FYI
 Behind the scenes the `MiniFeature` creates a default reducer and a default action in order to update the feature state.
 When you use `setState()` or dispatch the `SetStateAction` then the default action is dispatched and the default reducer will update the feature state for you.
 
