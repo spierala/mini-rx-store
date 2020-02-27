@@ -42,7 +42,7 @@ export class ProductShellComponent implements OnInit {
   }
 
   deleteProduct(product: Product): void {
-      this.productMiniEffects.deleteFn(product.id);
+      this.productMiniEffects.deleteProductFn(product.id);
   }
 
   clearProduct(): void {

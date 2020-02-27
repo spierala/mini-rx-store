@@ -14,7 +14,8 @@ export class ProductMiniEffectsService {
 
     loadFn = this.feature.createMiniEffect(
         'load',
-        mergeMap(() => {
+        payload$ => payload$.pipe(
+            mergeMap(() => {
                 return this.productService.getProducts().pipe(
                     map((products) => new this.feature.SetStateAction(state => {
                         return {
@@ -31,20 +32,13 @@ export class ProductMiniEffectsService {
                         };
                     })))
                 )
-            }
+            })
         )
     );
 
-    deleteFn = this.feature.createMiniEffect<number>(
+    deleteProductFn = this.feature.createMiniEffect<number>(
         'delete',
         payload$ => payload$.pipe(
-            // Optimistic update
-            // tap(payload => this.feature.setState(state => {
-            //     return {
-            //         ...state,
-            //         showProductCode: false
-            //     }
-            // })),
             mergeMap((productId) => {
                 return this.productService.deleteProduct(productId).pipe(
                     map(() => new this.feature.SetStateAction(state => {
@@ -62,8 +56,9 @@ export class ProductMiniEffectsService {
                         };
                     })))
                 )
-            }
-        )));
+            })
+        )
+    );
 
     constructor(
         private productService: ProductService

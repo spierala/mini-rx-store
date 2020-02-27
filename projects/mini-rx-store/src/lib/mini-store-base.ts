@@ -12,7 +12,7 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
-import { Action, AppState, MiniStoreExtension, SetStateAction, Settings } from './interfaces';
+import { Action, AppState, MiniStoreExtension, Settings } from './interfaces';
 
 type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 type SetStateFn<StateType> = (state: StateType) => StateType;
@@ -202,8 +202,8 @@ export class MiniFeature<StateType> {
 
     createMiniEffect<PayLoadType>(
         effectName: string,
-        effectPipeFn: (payload: Observable<PayLoadType>) => Observable<Action>
-    ) {
+        effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
+    ): (payload: PayLoadType) => void {
         const effectStartActionType = `@mini-rx/feature/${this.featureName}/effect/${effectName}`;
         const EffectStartAction = class {
             type = effectStartActionType;
@@ -213,7 +213,7 @@ export class MiniFeature<StateType> {
         let newEffect: Observable<Action> = actions$.pipe(
             ofType(effectStartActionType),
             map((action) => action.payload),
-            effectPipeFn,
+            effectFn,
             withLatestFrom(this.state$),
             map(([action, state]) => {
                 if (action instanceof this.SetStateAction && typeof action.payload === 'function') {
