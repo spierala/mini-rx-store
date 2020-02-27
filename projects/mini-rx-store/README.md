@@ -4,14 +4,15 @@
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
-**Attention**: MiniRx is currently in public beta. The API might still change. 
+**Attention**: MiniRx is currently in beta phase. The API might still change. 
 
 If you have a bug or an idea, feel free to open an issue on GitHub.
 
+## Redux
 MiniRx uses the Redux Pattern to make state management easy and predictable.
 The Redux Pattern is based on this 3 key principles:
 * Single source of truth (the store)
-* State is read-only and only changed by dispatching actions
+* State is read-only and is only changed by dispatching actions
 * Changes are made using pure functions called reducers
 
 ## Features
@@ -24,12 +25,13 @@ Although being a lightweight library, MiniRx supports many of the core features 
     * Reducers
     * Memoized Selectors
     * Effects
-* Simplified API for basic state management per feature. This API works directly on the feature state: 
+* Simplified "shortcut" API for basic state management per feature... You can update state without writing Actions and Reducers! This API operates directly on the feature state: 
     * `setState()` to update the feature state
-    * `select()` to read state from a feature
+    * `select()` to read feature state
+    * `createMiniEffect()` create an effect with a minimum amount of code
 * The source code is easy to understand if you know some RxJS :)
 * [RxJS](https://github.com/ReactiveX/rxjs) is the one and only (peer) dependency
-* Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension) (currently implemented for Angular only)
+* Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
 * Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## When should you use MiniRx?
@@ -38,7 +40,7 @@ Although being a lightweight library, MiniRx supports many of the core features 
 * If you tried to manage state yourself (e.g. with [Observable Services](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)) and you created state soup :)
 * If you have the feeling that your app is not big / complex enough to justify a full-blown state management solution like NgRx then MiniRx is an easy choice.
 
-### Usage
+## Usage
 #### Installation:
 
 `npm i mini-rx-store`
@@ -62,15 +64,13 @@ export class ProductStoreService {
 }
 ```
 The code above creates a new feature state for _products_.
-Its initial state is set and the reducer function defines how the feature state changes with an incoming Action.
+Its initial state is set and the reducer function defines how the feature state changes along with an incoming Action.
 
 Initial state example:
 ```
 export const initialState: ProductState = {
   showProductCode: true,
-  currentProductId: null,
   products: [],
-  error: ''
 };
 ```
 
@@ -153,8 +153,8 @@ export const getProducts = createSelector(
     state => state.products
 );
 ``` 
-`createSelector` creates a memoized selector. This is good for performance if your selectors do some heavier computation.
-If the selector is called with the same arguments again, it will just return the previous cached result. 
+`createSelector` creates a memoized selector. This improves performance especially if your selectors perform expensive computation.
+If the selector is called with the same arguments again, it will just return the previously calculated result. 
 
 #### Select Observable State (with a selector): 
 ```
@@ -163,20 +163,24 @@ import { getProducts } from '../../state';
 
 this.products$ = MiniStore.select(getProducts);
 ```
-`select` runs the selector on the App State and returns an Observable which will emit as soon as _products_ data changes. 
+`select` runs the selector on the App State and returns an Observable which will emit as soon as the _products_ data changes. 
 
-#### Make simple things simple: 
+## Make simple things simple - The `MiniFeature` API 
 If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (which is returned by the `MiniStore.feature` function)
+#### Get hold of the MiniFeature instance
 ```
-// Get hold of the MiniFeature instance
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
-
-// Create an Observable which will emit a specific piece of feature state
+```
+#### Select state with `select`
+```
 maskUserName$: Observable<boolean> = this.feature.select(currState => currState.maskUserName);
-
-// Update a specific piece of feature state
+```
+`select` takes a mapping function which gives you access to the current feature state (see `currState`).
+Inside of that function you can pick a certain piece of state.
+The returned Observable will emit the selected data over time. 
+#### Update state with `setState`
+```
 updateMaskUserName(maskUserName: boolean) {
-    // Update State
     this.feature.setState((currState) => {
         return {
             ...currState,
@@ -185,16 +189,58 @@ updateMaskUserName(maskUserName: boolean) {
     });
 }
 ```
-`select` takes a mapping function which gives you access to the current feature state (see `currState`).
-Inside of that function you can pick a piece of state.
-The returned Observable will emit the selected data over time. 
-
 `setState` takes also a mapping function which gives you access to the current feature state (see `currState`).
 Inside of that function you can compose the new feature state.
 
-FYI
+#### Create an MiniEffect with `createMiniEffect`
+```
+deleteProductFn = this.feature.createMiniEffect<number>(
+    'delete',
+    payload$ => payload$.pipe(
+        mergeMap((productId) => {
+            return this.productService.deleteProduct(productId).pipe(
+                map(() => new this.feature.SetStateAction(currState => {
+                    return {
+                        ...currState,
+                        products: state.products.filter(product => product.id !== productId),
+                        currentProductId: null,
+                        error: ''
+                    }
+                })),
+                catchError(err => of(new this.feature.SetStateAction(currState => {
+                    return {
+                        ...currState,
+                        error: err
+                    };
+                })))
+            )
+        })
+    )
+);
+
+// Run the effect
+deleteProductFn(123);
+```
+The code above creates a MiniEffect for _deleting a product_ from the list. Therefore this API call `this.productService.deleteProduct(productId)` needs to be performed.
+`createMiniEffect` returns a function which can be called later with an optional payload to start the MiniEffect. 
+
+`createMiniEffect` takes 2 arguments:
+   * `effectName: string`: ID which needs to be unique per feature. That ID will also show up in the logging (Redux Dev Tools / JS console).
+   
+   * `effectFn: (payload: Observable<PayLoadType>) => Observable<Action>`: With the `effectFn` you can access the `payload` Observable. That Observable is triggered by MiniRx as soon as the Effect is started (e.g. by calling ` deleteProductFn(123)`). 
+   You can directly `pipe` on the `payload$` Observable and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc). 
+   
+   Also a MiniEffect needs to return a new Action as soon as the Side Effect did its job.
+   `effectFn` returns that new Action.
+   You can return any Action of type `Action`. Or you can return `this.feature.SetStateAction`... 
+   
+   `SetStateAction` is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
+   Its payload is a mapping function which gives you access to the current feature state. Inside of that function you can compose the new feature state. 
+   Feature State is updated when the MiniEffect dispatches `SetStateAction`.
+
+### FYI
 Behind the scenes the `MiniFeature` creates a default reducer and a default action in order to update the feature state.
-When you use `setState()` then the default action is dispatched and the default reducer will update the feature state for you.
+When you use `setState()` or dispatch the `SetStateAction` then the default action is dispatched and the default reducer will update the feature state for you.
 
 See the default Action in the Redux Dev Tools:
 
