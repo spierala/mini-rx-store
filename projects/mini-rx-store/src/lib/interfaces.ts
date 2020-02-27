@@ -17,11 +17,6 @@ export interface Action<PayLoadType = any> {
     payload?: any;
 }
 
-export interface SetStateAction<StateType> {
-    type: string;
-    setStateFn: (state: StateType) => StateType;
-}
-
 export interface Settings {
     enableLogging: boolean;
 }

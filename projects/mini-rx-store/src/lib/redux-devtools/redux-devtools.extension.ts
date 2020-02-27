@@ -20,10 +20,7 @@ export class ReduxDevtoolsExtension implements MiniStoreExtension {
 
             actions$.pipe(
                 withLatestFrom(state$),
-                tap(([action, state]) => {
-                    console.log('test', action, state);
-                    this.devtoolsConnection.send(action, state);
-                })
+                tap(([action, state]) => this.devtoolsConnection.send(action, state))
             ).subscribe();
 
             this.devtoolsConnection.subscribe(message => {
