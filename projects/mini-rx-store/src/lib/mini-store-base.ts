@@ -1,13 +1,14 @@
-import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { createFeatureSelector, ofType } from './mini-store.utils';
 import {
+    concatMap,
     distinctUntilChanged,
     map,
+    mergeAll,
     publishReplay,
     refCount,
     scan,
     share,
-    switchMap,
     tap,
     withLatestFrom
 } from 'rxjs/operators';
@@ -36,9 +37,10 @@ class MiniStoreBase {
     );
 
     // EFFECTS
-    private effectsSource: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
-    private effectActions$: Observable<Action> = this.effectsSource.pipe(
-        switchMap(effects => merge(...effects)),
+    private effectsSource$$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
+    private effectActions$: Observable<Action> = this.effectsSource$$.pipe(
+        concatMap(x => x), // Emit each array item separately
+        mergeAll() // Merge the effects into one single stream of (effect) actions
     );
 
     // APP STATE
@@ -124,7 +126,7 @@ class MiniStoreBase {
     }
 
     effects(effects: Observable<Action>[]) {
-        this.effectsSource.next([...this.effectsSource.getValue(), ...effects]);
+        this.effectsSource$$.next(effects);
     }
 
     addExtension(extension: MiniStoreExtension) {
