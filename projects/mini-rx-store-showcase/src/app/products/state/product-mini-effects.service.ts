@@ -20,9 +20,9 @@ export class ProductMiniEffectsService {
                     map((products) => new this.feature.SetStateAction(state => {
                         return {
                             ...state,
-                            products: products,
+                            products,
                             error: ''
-                        }
+                        };
                     })),
                     catchError(err => of(new this.feature.SetStateAction(state => {
                         return {
@@ -31,7 +31,7 @@ export class ProductMiniEffectsService {
                             error: err
                         };
                     })))
-                )
+                );
             })
         )
     );
@@ -47,7 +47,7 @@ export class ProductMiniEffectsService {
                             products: state.products.filter(product => product.id !== productId),
                             currentProductId: null,
                             error: ''
-                        }
+                        };
                     })),
                     catchError(err => of(new this.feature.SetStateAction(state => {
                         return {
@@ -55,7 +55,7 @@ export class ProductMiniEffectsService {
                             error: err
                         };
                     })))
-                )
+                );
             })
         )
     );
