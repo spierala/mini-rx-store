@@ -232,7 +232,7 @@ The code above creates a MiniEffect for _deleting a product_ from the list. The 
    * **`effectFn: (payload: Observable<PayLoadType>) => Observable<Action>`**: 
    With the `effectFn` you can access the `payload` Observable. 
    That Observable emits as soon as the Effect is started (e.g. by calling ` deleteProductFn(123)`). 
-   You can directly `pipe` on the `payload$` Observable and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc). 
+   You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc). 
    
    Also a MiniEffect needs to return a new Action as soon as the side effect did its job.
    `effectFn` needs to return that new Action.
@@ -244,7 +244,7 @@ The code above creates a MiniEffect for _deleting a product_ from the list. The 
 ### FYI
 Also the simplified API sets on Redux: 
 Behind the scenes `MiniFeature` is creating a default reducer and a default action in order to update the feature state.
-When you use `setState()` or `SetStateAction` then MiniRx dispatches that default action and the default reducer will update the feature state for you.
+When you use `setState()` or `SetStateAction` then MiniRx dispatches the default action and the default reducer will update the feature accordingly.
 
 See the default Action in the Redux Dev Tools:
 
