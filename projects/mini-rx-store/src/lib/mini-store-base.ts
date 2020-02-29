@@ -200,17 +200,17 @@ export class MiniFeature<StateType> {
         );
     }
 
-    createMiniEffect<PayLoadType>(
+    createMiniEffect<PayLoadType = any>(
         effectName: string,
         effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
-    ): (payload: PayLoadType) => void {
+    ): (payload?: PayLoadType) => void {
         const effectStartActionType = `@mini-rx/feature/${this.featureName}/effect/${effectName}`;
         const EffectStartAction = class {
             type = effectStartActionType;
             constructor(public payload: PayLoadType) {}
         };
 
-        let newEffect: Observable<Action> = actions$.pipe(
+        const newEffect: Observable<Action> = actions$.pipe(
             ofType(effectStartActionType),
             map((action) => action.payload),
             effectFn,
@@ -227,7 +227,7 @@ export class MiniFeature<StateType> {
 
         return (payload?: PayLoadType) => {
             MiniStore.dispatch(new EffectStartAction(payload));
-        }
+        };
     }
 }
 
