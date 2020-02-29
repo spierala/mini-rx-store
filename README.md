@@ -173,6 +173,9 @@ If a Feature in your application requires only simple state management, then you
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
 ```
 #### Select state with `select`
+**`select(mapFn: ((state: StateType) => any)): Observable<any>`**
+
+Example:
 ```
 maskUserName$: Observable<boolean> = this.feature.select(currState => currState.maskUserName);
 ```
@@ -180,6 +183,9 @@ maskUserName$: Observable<boolean> = this.feature.select(currState => currState.
 Inside of that function you can pick a certain piece of state.
 The returned Observable will emit the selected data over time. 
 #### Update state with `setState`
+**`setState(stateFn: (state: StateType) => StateType): vod`**
+
+Example:
 ```
 updateMaskUserName(maskUserName: boolean) {
     this.feature.setState((currState) => {
@@ -194,6 +200,14 @@ updateMaskUserName(maskUserName: boolean) {
 Inside of that function you can compose the new feature state.
 
 #### Create an MiniEffect with `createMiniEffect`
+```
+createMiniEffect<PayLoadType = any>(
+    effectName: string,
+    effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
+): (payload?: PayLoadType) => void
+```
+
+Example:
 ```
 deleteProductFn = this.feature.createMiniEffect<number>(
     'delete',
