@@ -183,7 +183,7 @@ maskUserName$: Observable<boolean> = this.feature.select(currState => currState.
 Inside of that function you can pick a certain piece of state.
 The returned Observable will emit the selected data over time. 
 #### Update state with `setState`
-**`setState(stateFn: (state: StateType) => StateType): vod`**
+**`setState(stateFn: (state: StateType) => StateType): void`**
 
 Example:
 ```
@@ -200,12 +200,10 @@ updateMaskUserName(maskUserName: boolean) {
 Inside of that function you can compose the new feature state.
 
 #### Create an MiniEffect with `createMiniEffect`
-```
-createMiniEffect<PayLoadType = any>(
+**```createMiniEffect<PayLoadType = any>(
     effectName: string,
     effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
-): (payload?: PayLoadType) => void
-```
+): (payload?: PayLoadType) => void```**
 
 Example:
 ```
@@ -243,8 +241,8 @@ The code above creates a MiniEffect for _deleting a product_ from the list. The 
    * **`effectName: string`**: 
    ID which needs to be unique per feature. That ID will also show up in the logging (Redux Dev Tools / JS console).
    
-   * **`effectFn: (payload: Observable<PayLoadType>) => Observable<Action>`**: 
-   With the `effectFn` you can access the `payload` Observable. 
+   * **`effectFn: (payload$: Observable<PayLoadType>) => Observable<Action>`**: 
+   With the `effectFn` you can access the `payload$` Observable. 
    That Observable emits as soon as the Effect is started (e.g. by calling ` deleteProductFn(123)`). 
    You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc). 
    
@@ -258,7 +256,7 @@ The code above creates a MiniEffect for _deleting a product_ from the list. The 
 ### FYI
 Also the simplified API sets on Redux: 
 Behind the scenes `MiniFeature` is creating a default reducer and a default action in order to update the feature state.
-When you use `setState()` or `SetStateAction` then MiniRx dispatches the default action and the default reducer will update the feature accordingly.
+When you use `setState()` or `SetStateAction` MiniRx dispatches the default action and the default reducer will update the feature accordingly.
 
 See the default Action in the Redux Dev Tools:
 
