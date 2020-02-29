@@ -189,11 +189,11 @@ export class MiniFeature<StateType> {
         ).subscribe();
     }
 
-    setState(stateFn: (state: StateType) => StateType) {
+    setState(stateFn: (state: StateType) => StateType): void {
         this.setStateFn$.next(stateFn);
     }
 
-    select(mapFn: ((state: StateType) => any)) {
+    select(mapFn: ((state: StateType) => any)): Observable<any> {
         return this.state$.pipe(
             map((state: StateType) => mapFn(state)),
             distinctUntilChanged()
