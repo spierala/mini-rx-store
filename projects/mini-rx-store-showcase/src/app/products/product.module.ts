@@ -8,8 +8,7 @@ import { ProductListComponent } from './components/product-list/product-list.com
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
 import { MiniStore } from 'mini-rx-store';
 import { ProductEffects } from './state/product.effects';
-import { initialState, ProductState, reducer } from './state/product.reducer';
-import { ProductMiniEffectsService } from './state/product-mini-effects.service';
+import { ProductStateService } from './state/product-state.service';
 
 const productRoutes: Routes = [
     {path: '', component: ProductShellComponent}
@@ -29,11 +28,11 @@ const productRoutes: Routes = [
 export class ProductModule {
     constructor(
         private productEffects: ProductEffects,
-        private productMiniEffects: ProductMiniEffectsService
+        private productStateService: ProductStateService
     ) {
         MiniStore.effects(this.productEffects.effects$);
 
         // DEMO MiniEffects
-        this.productMiniEffects.loadFn();
+        this.productStateService.loadFn();
     }
 }

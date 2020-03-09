@@ -4,7 +4,7 @@ import * as productActions from './../../state/product.actions';
 import { Product } from '../../product';
 import { getCurrentProduct, getError, getProducts, getShowProductCode } from '../../state';
 import { MiniStore } from 'mini-rx-store';
-import { ProductMiniEffectsService } from '../../state/product-mini-effects.service';
+import { ProductStateService } from '../../state/product-state.service';
 
 @Component({
   templateUrl: './product-shell.component.html',
@@ -17,7 +17,7 @@ export class ProductShellComponent implements OnInit {
   errorMessage$: Observable<string>;
 
   constructor(
-      private productMiniEffects: ProductMiniEffectsService
+      private productStateService: ProductStateService
   ) {
 
   }
@@ -42,7 +42,7 @@ export class ProductShellComponent implements OnInit {
   }
 
   deleteProduct(product: Product): void {
-      this.productMiniEffects.deleteProductFn(product.id);
+      this.productStateService.deleteProductFn(product.id);
   }
 
   clearProduct(): void {

@@ -8,7 +8,7 @@ import { of } from 'rxjs';
 @Injectable({
     providedIn: 'root'
 })
-export class ProductMiniEffectsService extends MiniFeature<ProductState>{
+export class ProductStateService extends MiniFeature<ProductState>{
 
     constructor(
         private productService: ProductService
