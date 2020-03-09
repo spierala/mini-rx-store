@@ -12,16 +12,16 @@ If you have a bug or an idea, feel free to open an issue on GitHub.
 MiniRx uses the Redux Pattern to make state management easy and predictable.
 
 The Redux Pattern is based on this 3 key principles:
-* Single source of truth (the store)
+* Single source of truth (the Store)
 * State is read-only and is only changed by dispatching actions
 * Changes are made using pure functions called reducers
 
 ## MiniRx Features
 
 * Minimal configuration and setup
-* MiniRx is lightweight - check the [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib/mini-store-base.ts) :)
-* Advanced "Redux / NgRx" API:
-Although being a lightweight library, MiniRx supports many of the core features from the popular [NgRx](https://ngrx.io/) library for Angular:
+* MiniRx is lightweight - check the [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib) :)
+* Advanced "Redux / NgRx Store" API:
+Although being a lightweight library, MiniRx supports many of the core features from the popular [@ngrx/store](https://ngrx.io/guide/store) library for Angular:
     * Actions
     * Reducers
     * Memoized Selectors
@@ -30,7 +30,7 @@ Although being a lightweight library, MiniRx supports many of the core features 
     * `setState()` to update the feature state
     * `select()` to read feature state
     * `createMiniEffect()` create an effect with a minimum amount of code
-* The [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib/mini-store-base.ts) is easy to understand if you know some RxJS :)
+* The [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib) is easy to understand if you know some RxJS :)
 * [RxJS](https://github.com/ReactiveX/rxjs) is the one and only (peer) dependency
 * Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
 * Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
@@ -58,10 +58,9 @@ The Feature States together form the App State (Single Source of Truth).
 import { MiniStore } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './state/product.reducer';
 ...
-export class ProductStoreService {
-    constructor() {
-      MiniStore.feature<ProductState>('products', initialState, reducer);
-    }
+// Inside long living Module / Service
+constructur() {
+    MiniStore.feature<ProductState>('products', initialState, reducer);
 }
 ```
 The code above creates a new feature state for _products_.
@@ -172,31 +171,43 @@ If a Feature in your application requires only simple state management, then you
 ```
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
 ```
+Alternatively you can extend MiniFeature:
+```
+export class ProductStateService extends MiniFeature<ProductState>{
+    constructor(
+        private productService: ProductService
+    ) {
+        super('products', initialState, reducer);
+    }
+}
+```
+The following examples use the `extends` variant.
+
 #### Select state with `select`
-**`select(mapFn: ((state: StateType) => any)): Observable<any>`**
+**`select(mapFn: ((state: S) => any)): Observable<any>`**
 
 Example:
 ```
-maskUserName$: Observable<boolean> = this.feature.select(currState => currState.maskUserName);
+maskUserName$: Observable<boolean> = this.select(state => state.maskUserName);
 ```
-`select` takes a mapping function which gives you access to the current feature state (see `currState`).
+`select` takes a mapping function which gives you access to the current feature state (see the `state` parameter).
 Inside of that function you can pick a certain piece of state.
 The returned Observable will emit the selected data over time. 
 #### Update state with `setState`
-**`setState(stateFn: (state: StateType) => StateType): void`**
+**`setState(stateFn: (state: S) => S): void`**
 
 Example:
 ```
 updateMaskUserName(maskUserName: boolean) {
-    this.feature.setState((currState) => {
+    this.setState((state) => {
         return {
-            ...currState,
+            ...state,
             maskUserName
         }
     });
 }
 ```
-`setState` takes also a mapping function which gives you access to the current feature state (see `currState`).
+`setState` takes also a mapping function which gives you access to the current feature state (see the `state` parameter).
 Inside of that function you can compose the new feature state.
 
 #### Create an MiniEffect with `createMiniEffect`
@@ -207,12 +218,12 @@ Inside of that function you can compose the new feature state.
 
 Example:
 ```
-deleteProductFn = this.feature.createMiniEffect<number>(
+deleteProductFn = this.createMiniEffect<number>(
     'delete',
     payload$ => payload$.pipe(
         mergeMap((productId) => {
             return this.productService.deleteProduct(productId).pipe(
-                map(() => new this.feature.SetStateAction(currState => {
+                map(() => new this.SetStateAction(currState => {
                     return {
                         ...currState,
                         products: state.products.filter(product => product.id !== productId),
@@ -220,7 +231,7 @@ deleteProductFn = this.feature.createMiniEffect<number>(
                         error: ''
                     }
                 })),
-                catchError(err => of(new this.feature.SetStateAction(currState => {
+                catchError(err => of(new this.SetStateAction(currState => {
                     return {
                         ...currState,
                         error: err
@@ -248,7 +259,7 @@ The code above creates a MiniEffect for _deleting a product_ from the list. The 
    
    Also a MiniEffect needs to return a new Action as soon as the side effect did its job.
    `effectFn` needs to return that new Action.
-   You can return any Action of type `Action`. Or you can return `this.feature.SetStateAction`... 
+   You can return any Action of type `Action`. Or you can return `this.SetStateAction`... 
    
    **`SetStateAction`** is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
    Its payload is a mapping function which gives you access to the current feature state. Inside of that function you can compose the new feature state. 
