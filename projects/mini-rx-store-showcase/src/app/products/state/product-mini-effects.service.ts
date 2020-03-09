@@ -8,23 +8,27 @@ import { of } from 'rxjs';
 @Injectable({
     providedIn: 'root'
 })
-export class ProductMiniEffectsService {
+export class ProductMiniEffectsService extends MiniFeature<ProductState>{
 
-    private feature: MiniFeature<ProductState> = MiniStore.feature<ProductState>('products', initialState, reducer);
+    constructor(
+        private productService: ProductService
+    ) {
+        super('products', initialState, reducer);
+    }
 
-    loadFn = this.feature.createMiniEffect(
+    loadFn = this.createMiniEffect(
         'load',
         payload$ => payload$.pipe(
             mergeMap(() => {
                 return this.productService.getProducts().pipe(
-                    map((products) => new this.feature.SetStateAction(state => {
+                    map((products) => new this.SetStateAction(state => {
                         return {
                             ...state,
                             products,
                             error: ''
                         };
                     })),
-                    catchError(err => of(new this.feature.SetStateAction(state => {
+                    catchError(err => of(new this.SetStateAction(state => {
                         return {
                             ...state,
                             products: [],
@@ -36,12 +40,12 @@ export class ProductMiniEffectsService {
         )
     );
 
-    deleteProductFn = this.feature.createMiniEffect<number>(
+    deleteProductFn = this.createMiniEffect<number>(
         'delete',
         payload$ => payload$.pipe(
             mergeMap((productId) => {
                 return this.productService.deleteProduct(productId).pipe(
-                    map(() => new this.feature.SetStateAction(state => {
+                    map(() => new this.SetStateAction(state => {
                         return {
                             ...state,
                             products: state.products.filter(product => product.id !== productId),
@@ -49,7 +53,7 @@ export class ProductMiniEffectsService {
                             error: ''
                         };
                     })),
-                    catchError(err => of(new this.feature.SetStateAction(state => {
+                    catchError(err => of(new this.SetStateAction(state => {
                         return {
                             ...state,
                             error: err
@@ -59,10 +63,4 @@ export class ProductMiniEffectsService {
             })
         )
     );
-
-    constructor(
-        private productService: ProductService
-    ) {
-
-    }
 }

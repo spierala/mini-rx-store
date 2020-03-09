@@ -2,6 +2,7 @@ import { MonoTypeOperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Action, AppState } from './interfaces';
 import memoizeOne from 'memoize-one';
+import { Reducer } from './mini-store-core';
 
 export function ofType<T extends Action>(
     type: string
@@ -29,4 +30,12 @@ export function createFeatureSelector<T>(
         }
         return state;
     }, (featureState: T) => featureState);
+}
+
+export function combineReducers<StateType, ActionType>(reducers: Reducer<StateType>[]): Reducer<StateType> {
+    return (state: StateType, action: Action): StateType => {
+        return reducers.reduce((currState, reducer) => {
+            return reducer(currState, action);
+        }, state);
+    };
 }

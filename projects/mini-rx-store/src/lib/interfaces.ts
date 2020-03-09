@@ -1,15 +1,9 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-
 export interface AppState {
     [key: string]: string;
 }
 
 export interface MiniStoreExtension {
-    init(
-        stateSource: BehaviorSubject<AppState>,
-        state$: Observable<AppState>,
-        actions$: Observable<Action>
-    ): void;
+    init(): void;
 }
 
 export interface Action<PayLoadType = any> {
