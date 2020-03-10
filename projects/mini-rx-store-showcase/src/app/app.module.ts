@@ -16,7 +16,7 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 
 /* Feature Modules */
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule } from 'mini-rx-store';
+import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 
 @NgModule({
   imports: [

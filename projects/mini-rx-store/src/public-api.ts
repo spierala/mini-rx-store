@@ -8,5 +8,4 @@ export { MiniStore } from './lib/mini-store';
 export { MiniFeature } from './lib/mini-feature';
 export { createFeatureSelector, createSelector, ofType } from './lib/mini-store.utils';
 export { ReduxDevtoolsExtension } from './lib/redux-devtools/redux-devtools.extension';
-export { NgReduxDevtoolsModule } from './lib/redux-devtools/angular/ng-redux-devtools.module';
 

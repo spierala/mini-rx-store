@@ -223,17 +223,16 @@ deleteProductFn = this.createMiniEffect<number>(
     payload$ => payload$.pipe(
         mergeMap((productId) => {
             return this.productService.deleteProduct(productId).pipe(
-                map(() => new this.SetStateAction(currState => {
+                map(() => new this.SetStateAction(state => {
                     return {
-                        ...currState,
+                        ...state,
                         products: state.products.filter(product => product.id !== productId),
-                        currentProductId: null,
                         error: ''
                     }
                 })),
-                catchError(err => of(new this.SetStateAction(currState => {
+                catchError(err => of(new this.SetStateAction(state => {
                     return {
-                        ...currState,
+                        ...state,
                         error: err
                     };
                 })))
@@ -264,7 +263,7 @@ The code above creates a MiniEffect for _deleting a product_ from the list. The 
    **`SetStateAction`** is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
    Its payload is a mapping function which gives you access to the current feature state. Inside of that function you can compose the new feature state. 
 
-### FYI
+#### FYI
 Also the simplified API sets on Redux: 
 Behind the scenes `MiniFeature` is creating a default reducer and a default action in order to update the feature state.
 When you use `setState()` or `SetStateAction` MiniRx dispatches the default action and the default reducer will update the feature accordingly.
@@ -273,6 +272,7 @@ See the default Action in the Redux Dev Tools:
 
 ![Redux Dev Tools for MiniRx](.github/images/default-action.gif)
 
+## Settings
 #### Enable Logging of Actions and State Changes in the Browser Console: 
 ```
 import { MiniStore } from 'mini-rx-store';
@@ -283,7 +283,7 @@ The code above sets the global MiniStore Settings.
 `enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
 
-#### Redux Dev Tools (experimental):
+## Redux Dev Tools (experimental):
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
 
 MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
@@ -292,12 +292,13 @@ You need to install the Browser Plugin to make it work.
 * [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 * [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
-Register the Redux Dev Tools with MiniRx (currently implemented for Angular only):
+#### Installation (Angular):
 
-If you use Angular then you must import `NgReduxDevtoolsModule` from MiniRx to your root/app module.
-Behind the scenes it will run `MiniStore.addExtension(new ReduxDevtoolsExtension());` for you, but most importantly it connects the Redux Dev Tools PlugIn with the Angular Change Detection. 
+`npm i mini-rx-ng-devtools`
+
+#### Add DevTools to Angular
 ```
-import { NgReduxDevtoolsModule } from 'mini-rx-store';
+import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 
 @NgModule({
     imports: [
@@ -306,6 +307,13 @@ import { NgReduxDevtoolsModule } from 'mini-rx-store';
     ...
 })
 export class AppModule {}
+```
+
+#### If you do not use Angular
+```
+import { MiniStore, ReduxDevtoolsExtension } from 'mini-rx-store';
+
+MiniStore.addExtension(new ReduxDevtoolsExtension());
 ```
 
 ## Showcase

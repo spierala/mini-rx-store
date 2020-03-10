@@ -24,6 +24,12 @@
       ],
       "mini-rx-store/*": [
         "dist/mini-rx-store/*"
+      ],
+      "mini-rx-ng-devtools": [
+        "dist/mini-rx-ng-devtools"
+      ],
+      "mini-rx-ng-devtools/*": [
+        "dist/mini-rx-ng-devtools/*"
       ]
     }
   },
