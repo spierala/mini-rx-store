@@ -59,7 +59,7 @@ import { MiniStore } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './state/product.reducer';
 ...
 // Inside long living Module / Service
-constructur() {
+constructor() {
     MiniStore.feature<ProductState>('products', initialState, reducer);
 }
 ```
