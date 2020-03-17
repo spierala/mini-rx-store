@@ -166,7 +166,9 @@ this.products$ = MiniStore.select(getProducts);
 `select` runs the selector on the App State and returns an Observable which will emit as soon as the _products_ data changes. 
 
 ## Make simple things simple - The `MiniFeature` API 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (which is returned by the `MiniStore.feature` function)
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (which is returned by the `MiniStore.feature` function).
+
+You can update state without writing Actions and Reducers!
 #### Get hold of the MiniFeature instance
 ```
 private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
@@ -177,7 +179,7 @@ export class ProductStateService extends MiniFeature<ProductState>{
     constructor(
         private productService: ProductService
     ) {
-        super('products', initialState, reducer);
+        super('products', initialState);
     }
 }
 ```
