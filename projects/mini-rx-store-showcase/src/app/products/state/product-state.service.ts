@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { MiniFeature, MiniStore } from 'mini-rx-store';
+import { MiniFeature } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './product.reducer';
 import { ProductService } from '../product.service';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Injectable({
@@ -16,19 +16,19 @@ export class ProductStateService extends MiniFeature<ProductState>{
         super('products', initialState, reducer);
     }
 
-    loadFn = this.createMiniEffect(
+    loadFn = this.createEffect(
         'load',
         payload$ => payload$.pipe(
             mergeMap(() => {
                 return this.productService.getProducts().pipe(
-                    map((products) => new this.SetStateAction(state => {
+                    map((products) => this.setStateAction(state => {
                         return {
                             ...state,
                             products,
                             error: ''
                         };
                     })),
-                    catchError(err => of(new this.SetStateAction(state => {
+                    catchError(err => of(this.setStateAction(state => {
                         return {
                             ...state,
                             products: [],
@@ -40,12 +40,13 @@ export class ProductStateService extends MiniFeature<ProductState>{
         )
     );
 
-    deleteProductFn = this.createMiniEffect<number>(
+    deleteProductFn = this.createEffect<number>(
         'delete',
         payload$ => payload$.pipe(
-            mergeMap((productId) => {
+            withLatestFrom(this.state$),
+            mergeMap(([productId, lastState]) => {
                 return this.productService.deleteProduct(productId).pipe(
-                    map(() => new this.SetStateAction(state => {
+                    map(() => this.setStateAction(state => {
                         return {
                             ...state,
                             products: state.products.filter(product => product.id !== productId),
@@ -53,12 +54,20 @@ export class ProductStateService extends MiniFeature<ProductState>{
                             error: ''
                         };
                     })),
-                    catchError(err => of(new this.SetStateAction(state => {
+                    catchError(err => of(this.setStateAction(state => {
                         return {
                             ...state,
+                            products: lastState.products, // Restore State before Optimistic Update
                             error: err
                         };
-                    })))
+                    }))),
+                    // Optimistic Update
+                    startWith(this.setStateAction(state => {
+                        return {
+                            ...state,
+                            products: state.products.filter(product => product.id !== productId)
+                        };
+                    }))
                 );
             })
         )

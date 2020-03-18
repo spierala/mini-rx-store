@@ -8,9 +8,9 @@ type SetStateFn<StateType> = (state: StateType) => StateType;
 
 export class MiniFeature<StateType> {
 
-    private state$: Observable<StateType>;
+    state$: Observable<StateType>;
     private setStateFn$: Subject<(state: StateType) => StateType> = new Subject();
-    SetStateAction: new(payload: Partial<StateType> | SetStateFn<StateType>) => Action;
+    private SetStateAction: new(payload: Partial<StateType> | SetStateFn<StateType>) => Action;
 
     constructor(
         private featureName: string,
@@ -69,7 +69,7 @@ export class MiniFeature<StateType> {
         );
     }
 
-    createMiniEffect<PayLoadType = any>(
+    createEffect<PayLoadType = any>(
         effectName: string,
         effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
     ): (payload?: PayLoadType) => void {
@@ -97,6 +97,10 @@ export class MiniFeature<StateType> {
         return (payload?: PayLoadType) => {
             Store.dispatch(new EffectStartAction(payload));
         };
+    }
+
+    setStateAction(payload: StateType | SetStateFn<StateType>): Action {
+        return new this.SetStateAction(payload);
     }
 }
 
