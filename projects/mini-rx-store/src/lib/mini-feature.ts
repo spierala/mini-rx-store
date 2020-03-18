@@ -4,12 +4,12 @@ import { MiniStoreCore as Store, Reducer } from './mini-store-core';
 import { combineReducers, createFeatureSelector, ofType } from './mini-store.utils';
 import { distinctUntilChanged, map, tap, withLatestFrom } from 'rxjs/operators';
 
-type SetStateFn<StateType> = (state: StateType) => StateType;
+type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 
 export class MiniFeature<StateType> {
 
     state$: Observable<StateType>;
-    private setStateFn$: Subject<(state: StateType) => StateType> = new Subject();
+    private stateOrCallback$: Subject<Partial<StateType> | SetStateFn<StateType>> = new Subject();
     private SetStateAction: new(payload: Partial<StateType> | SetStateFn<StateType>) => Action;
 
     constructor(
@@ -49,17 +49,26 @@ export class MiniFeature<StateType> {
         // Dispatch an initial action to let reducers create the initial state
         Store.dispatch({type: `@mini-rx/feature/${featureName}/init`});
 
-        this.setStateFn$.pipe(
+        this.stateOrCallback$.pipe(
             withLatestFrom(this.state$),
-            map(([setStateFn, state]) => {
-                return setStateFn(state);
-            }),
-            tap((newState) => Store.dispatch(new this.SetStateAction(newState)))
-        ).subscribe();
-    }
+            tap(([stateOrCallback, state]) => {
+                let newState: Partial<StateType>;
 
-    setState(stateFn: (state: StateType) => StateType): void {
-        this.setStateFn$.next(stateFn);
+                if (typeof stateOrCallback === 'function') {
+                    newState = {
+                        ...state,
+                        ...stateOrCallback(state)
+                    };
+                } else {
+                    newState = {
+                        ...state,
+                        ...stateOrCallback
+                    };
+                }
+
+                Store.dispatch(new this.SetStateAction(newState));
+            })
+        ).subscribe();
     }
 
     select(mapFn: ((state: StateType) => any)): Observable<any> {
@@ -85,10 +94,21 @@ export class MiniFeature<StateType> {
             effectFn,
             withLatestFrom(this.state$),
             map(([action, state]) => {
-                if (action instanceof this.SetStateAction && typeof action.payload === 'function') {
-                    return new this.SetStateAction(action.payload(state))
+                const stateOrCallback: Partial<StateType> | SetStateFn<StateType> = action.payload;
+                let newState: Partial<StateType>;
+
+                if (action instanceof this.SetStateAction && typeof stateOrCallback === 'function') {
+                    newState = {
+                        ...state,
+                        ...stateOrCallback(state)
+                    };
+                } else {
+                    newState = {
+                        ...state,
+                        ...stateOrCallback
+                    };
                 }
-                return action;
+                return new this.SetStateAction(newState);
             })
         );
 
@@ -99,8 +119,14 @@ export class MiniFeature<StateType> {
         };
     }
 
-    setStateAction(payload: StateType | SetStateFn<StateType>): Action {
-        return new this.SetStateAction(payload);
+    setState(stateOrCallback: Partial<StateType> | SetStateFn<StateType>): void {
+        throwErrorIfWrongType(stateOrCallback);
+        this.stateOrCallback$.next(stateOrCallback);
+    }
+
+    setStateAction(stateOrCallback: Partial<StateType> | SetStateFn<StateType>): Action {
+        throwErrorIfWrongType(stateOrCallback);
+        return new this.SetStateAction(stateOrCallback);
     }
 }
 
@@ -130,4 +156,10 @@ function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reduc
             [featureName]: reducer(state[featureName], action)
         };
     };
+}
+
+function throwErrorIfWrongType(state: any) {
+    if (typeof state !== 'function' && typeof state !== 'object') {
+        throw new Error('MiniRx: Pass an object or a function for the state parameter when calling setState().');
+    }
 }

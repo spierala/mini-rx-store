@@ -21,19 +21,13 @@ export class ProductStateService extends MiniFeature<ProductState>{
         payload$ => payload$.pipe(
             mergeMap(() => {
                 return this.productService.getProducts().pipe(
-                    map((products) => this.setStateAction(state => {
-                        return {
-                            ...state,
-                            products,
-                            error: ''
-                        };
+                    map((products) => this.setStateAction({
+                        products,
+                        error: ''
                     })),
-                    catchError(err => of(this.setStateAction(state => {
-                        return {
-                            ...state,
-                            products: [],
-                            error: err
-                        };
+                    catchError(error => of(this.setStateAction({
+                        error,
+                        products: []
                     })))
                 );
             })
@@ -48,23 +42,20 @@ export class ProductStateService extends MiniFeature<ProductState>{
                 return this.productService.deleteProduct(productId).pipe(
                     map(() => this.setStateAction(state => {
                         return {
-                            ...state,
                             products: state.products.filter(product => product.id !== productId),
                             currentProductId: null,
                             error: ''
                         };
                     })),
-                    catchError(err => of(this.setStateAction(state => {
-                        return {
-                            ...state,
+                    catchError(err => of(this.setStateAction(
+                        {
                             products: lastState.products, // Restore State before Optimistic Update
                             error: err
-                        };
-                    }))),
+                        }
+                    ))),
                     // Optimistic Update
                     startWith(this.setStateAction(state => {
                         return {
-                            ...state,
                             products: state.products.filter(product => product.id !== productId)
                         };
                     }))

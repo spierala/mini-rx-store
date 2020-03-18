@@ -5,11 +5,6 @@ import { Product } from '../product';
 // Selector functions
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
-export const getShowProductCode = createSelector(
-    getProductFeatureState,
-    (state: ProductState) => state.showProductCode
-);
-
 export const getCurrentProductId = createSelector(
     getProductFeatureState,
     (state: ProductState) => state.currentProductId

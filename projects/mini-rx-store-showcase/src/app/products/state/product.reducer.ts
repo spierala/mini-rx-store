@@ -19,12 +19,6 @@ export const initialState: ProductState = {
 export function reducer(state: ProductState, action: ProductActions): ProductState {
 
   switch (action.type) {
-    case ProductActionTypes.ToggleProductCode:
-      return {
-        ...state,
-        showProductCode: action.payload
-      };
-
     case ProductActionTypes.SetCurrentProduct:
       if (state.currentProductId === action.payload.id) {
           return state;

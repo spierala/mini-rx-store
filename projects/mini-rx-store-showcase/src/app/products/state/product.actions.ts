@@ -15,12 +15,6 @@ export enum ProductActionTypes {
 }
 
 // Action Creators
-export class ToggleProductCode implements Action {
-  readonly type = ProductActionTypes.ToggleProductCode;
-
-  constructor(public payload: boolean) { }
-}
-
 export class SetCurrentProduct implements Action {
   readonly type = ProductActionTypes.SetCurrentProduct;
 
@@ -72,8 +66,7 @@ export class CreateProductFail implements Action {
 }
 
 // Union the valid types
-export type ProductActions = ToggleProductCode
-  | SetCurrentProduct
+export type ProductActions = SetCurrentProduct
   | ClearCurrentProduct
   | InitializeCurrentProduct
   | UpdateProduct

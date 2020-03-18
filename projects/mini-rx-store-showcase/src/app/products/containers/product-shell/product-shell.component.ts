@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as productActions from './../../state/product.actions';
 import { Product } from '../../product';
-import { getCurrentProduct, getError, getProducts, getShowProductCode } from '../../state';
+import { getCurrentProduct, getError, getProducts } from '../../state';
 import { MiniStore } from 'mini-rx-store';
 import { ProductStateService } from '../../state/product-state.service';
 
@@ -26,11 +26,14 @@ export class ProductShellComponent implements OnInit {
     this.products$ = MiniStore.select(getProducts);
     this.errorMessage$ = MiniStore.select(getError);
     this.selectedProduct$ = MiniStore.select(getCurrentProduct);
-    this.displayCode$ = MiniStore.select(getShowProductCode);
+
+    // Demonstrate how to select state via the MiniFeature API
+    this.displayCode$ = this.productStateService.select(state => state.showProductCode);
   }
 
   checkChanged(value: boolean): void {
-    MiniStore.dispatch(new productActions.ToggleProductCode(value));
+    // Demonstrate how to change state without Action
+    this.productStateService.setState({showProductCode: value});
   }
 
   newProduct(): void {
