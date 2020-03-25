@@ -264,8 +264,11 @@ The code above creates an Effect for _deleting a product_ from the list. The API
    Effects return a new Action as soon as the side effect did its job.
    You can return any Action of type `Action`. Or you can return `this.setStateAction`... 
    
-   **`setStateAction`** is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
-   Its payload is a mapping function which gives you access to the current feature state. Inside of that function you can compose the new feature state. 
+   * **`setStateAction(stateFn: (state: S) => S | state: Partial<S>): Action`**: 
+   Use `setStateAction` to update the feature state directly without creating any custom Actions. `setStateAction` creates a new Action for you.
+   `setStateAction` takes also a mapping function which gives you access to the current feature state (see the `state` parameter).
+   Inside of that function you can compose the new feature state.
+   
    Alternatively `setStateAction` accepts a new state object directly.
 
 #### FYI
