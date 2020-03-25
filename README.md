@@ -29,7 +29,7 @@ Although being a lightweight library, MiniRx supports many of the core features 
 * Simplified API for basic state management per feature... You can update state without writing Actions and Reducers! This API operates directly on the feature state: 
     * `setState()` to update the feature state
     * `select()` to read feature state
-    * `createMiniEffect()` create an effect with a minimum amount of code
+    * `createEffect()` create an effect with a minimum amount of code
 * The [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib) is easy to understand if you know some RxJS :)
 * [RxJS](https://github.com/ReactiveX/rxjs) is the one and only (peer) dependency
 * Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
@@ -183,7 +183,7 @@ export class ProductStateService extends MiniFeature<ProductState>{
     }
 }
 ```
-The following examples use the `extends` variant.
+The following examples are based on the `extends` variant.
 
 #### Select state with `select`
 **`select(mapFn: ((state: S) => any)): Observable<any>`**
@@ -196,10 +196,11 @@ maskUserName$: Observable<boolean> = this.select(state => state.maskUserName);
 Inside of that function you can pick a certain piece of state.
 The returned Observable will emit the selected data over time. 
 #### Update state with `setState`
-**`setState(stateFn: (state: S) => S): void`**
+**`setState(stateFn: (state: S) => S | state: Partial<S>): void`**
 
 Example:
 ```
+// Pass callback to setState
 updateMaskUserName(maskUserName: boolean) {
     this.setState((state) => {
         return {
@@ -208,36 +209,38 @@ updateMaskUserName(maskUserName: boolean) {
         }
     });
 }
+
+// Or pass the new state object directly (in case the current state is not needed to calculate the new state)
+updateMaskUserName(maskUserName: boolean) {
+    this.setState({maskUserName});
+}
 ```
 `setState` takes also a mapping function which gives you access to the current feature state (see the `state` parameter).
 Inside of that function you can compose the new feature state.
 
-#### Create an MiniEffect with `createMiniEffect`
-**```createMiniEffect<PayLoadType = any>(
+Alternatively `setState` accepts a new state object directly.
+
+#### Create an Effect with `createEffect`
+**```createEffect<PayLoadType = any>(
     effectName: string,
     effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
 ): (payload?: PayLoadType) => void```**
 
 Example:
 ```
-deleteProductFn = this.createMiniEffect<number>(
+deleteProductFn = this.createEffect<number>(
     'delete',
     payload$ => payload$.pipe(
         mergeMap((productId) => {
             return this.productService.deleteProduct(productId).pipe(
-                map(() => new this.SetStateAction(state => {
+                map(() => this.setStateAction(state => { // Pass callback to setStateAction
                     return {
                         ...state,
                         products: state.products.filter(product => product.id !== productId),
                         error: ''
                     }
                 })),
-                catchError(err => of(new this.SetStateAction(state => {
-                    return {
-                        ...state,
-                        error: err
-                    };
-                })))
+                catchError(err => of(this.setStateAction({error: err}))) // Or pass the new state object directly to setStateAction
             )
         })
     )
@@ -246,29 +249,29 @@ deleteProductFn = this.createMiniEffect<number>(
 // Run the effect
 deleteProductFn(123);
 ```
-The code above creates a MiniEffect for _deleting a product_ from the list. The API call `this.productService.deleteProduct(productId)` is the side effect which needs to be performed.
-`createMiniEffect` returns a function which can be called later with an optional payload to start the MiniEffect (see `deleteProductFn(123)`). 
+The code above creates an Effect for _deleting a product_ from the list. The API call `this.productService.deleteProduct(productId)` is the side effect which needs to be performed.
+`createEffect` returns a function which can be called later to start the Effect with an optional payload (see `deleteProductFn(123)`). 
 
-`createMiniEffect` takes 2 arguments:
+`createEffect` takes 2 arguments:
    * **`effectName: string`**: 
    ID which needs to be unique per feature. That ID will also show up in the logging (Redux Dev Tools / JS console).
    
    * **`effectFn: (payload$: Observable<PayLoadType>) => Observable<Action>`**: 
-   With the `effectFn` you can access the `payload$` Observable. 
+   Within the `effectFn` you can access the `payload$` Observable. 
    That Observable emits as soon as the Effect is started (e.g. by calling ` deleteProductFn(123)`). 
    You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc). 
    
-   Also a MiniEffect needs to return a new Action as soon as the side effect did its job.
-   `effectFn` needs to return that new Action.
-   You can return any Action of type `Action`. Or you can return `this.SetStateAction`... 
+   Effects return a new Action as soon as the side effect did its job.
+   You can return any Action of type `Action`. Or you can return `this.setStateAction`... 
    
-   **`SetStateAction`** is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
+   **`setStateAction`** is available on the `MiniFeature` instance. Use it to update the feature state directly without creating any custom Actions. 
    Its payload is a mapping function which gives you access to the current feature state. Inside of that function you can compose the new feature state. 
+   Alternatively `setStateAction` accepts a new state object directly.
 
 #### FYI
 Also the simplified API sets on Redux: 
 Behind the scenes `MiniFeature` is creating a default reducer and a default action in order to update the feature state.
-When you use `setState()` or `SetStateAction` MiniRx dispatches the default action and the default reducer will update the feature accordingly.
+When you use `setState()` or `setStateAction()` MiniRx dispatches the default action and the default reducer will update the feature accordingly.
 
 See the default Action in the Redux Dev Tools:
 
