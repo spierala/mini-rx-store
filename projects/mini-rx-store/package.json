@@ -1,6 +1,6 @@
 {
     "name": "mini-rx-store",
-    "version": "1.0.0-beta.9",
+    "version": "1.0.0-beta.10",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "peerDependencies": {
         "rxjs": "~6.4.0"

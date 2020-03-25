@@ -268,7 +268,6 @@ The code above creates an Effect for _deleting a product_ from the list. The API
    Use `setStateAction` to update the feature state directly without creating any custom Actions. `setStateAction` creates a new Action for you.
    `setStateAction` takes also a mapping function which gives you access to the current feature state (see the `state` parameter).
    Inside of that function you can compose the new feature state.
-   
    Alternatively `setStateAction` accepts a new state object directly.
 
 #### FYI
