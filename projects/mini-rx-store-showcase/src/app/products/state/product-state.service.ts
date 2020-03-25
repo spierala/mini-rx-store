@@ -24,11 +24,11 @@ export class ProductStateService extends MiniFeature<ProductState>{
                     map((products) => this.setStateAction({
                         products,
                         error: ''
-                    })),
+                    }, 'success')),
                     catchError(error => of(this.setStateAction({
                         error,
                         products: []
-                    })))
+                    }, 'error')))
                 );
             })
         )
@@ -46,19 +46,19 @@ export class ProductStateService extends MiniFeature<ProductState>{
                             currentProductId: null,
                             error: ''
                         };
-                    })),
+                    }, 'success')),
                     catchError(err => of(this.setStateAction(
                         {
                             products: lastState.products, // Restore State before Optimistic Update
                             error: err
-                        }
+                        }, 'error'
                     ))),
                     // Optimistic Update
                     startWith(this.setStateAction(state => {
                         return {
                             products: state.products.filter(product => product.id !== productId)
                         };
-                    }))
+                    }, 'optimistic'))
                 );
             })
         )

@@ -33,7 +33,7 @@ export class ProductShellComponent implements OnInit {
 
   checkChanged(value: boolean): void {
     // Demonstrate how to change state without Action
-    this.productStateService.setState({showProductCode: value});
+    this.productStateService.setState({showProductCode: value}, 'showProductCode');
   }
 
   newProduct(): void {
