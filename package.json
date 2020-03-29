@@ -8,7 +8,8 @@
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "analyze": "ng build  mini-rx-store-showcase --outputPath=dist --prod --stats-json && webpack-bundle-analyzer dist/stats-es2015.json --port 4201",
+        "build-minirx": "ng build mini-rx-store && copy LICENSE dist/mini-rx-store && copy README.md dist/mini-rx-store",
+        "analyze-showcase": "ng build  mini-rx-store-showcase --outputPath=dist --prod --stats-json && webpack-bundle-analyzer dist/stats-es2015.json --port 4201",
         "pretty-quick": "pretty-quick"
     },
     "private": true,
@@ -38,6 +39,7 @@
         "@types/jasminewd2": "~2.0.3",
         "@types/node": "~8.9.4",
         "codelyzer": "^5.0.0",
+        "copy": "^0.3.2",
         "husky": "^4.2.3",
         "jasmine-core": "~3.4.0",
         "jasmine-spec-reporter": "~4.2.1",
