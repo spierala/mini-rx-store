@@ -1,37 +1,38 @@
 import { Observable } from 'rxjs';
-import { Action, AppState, MiniStoreExtension, Settings } from './interfaces';
-import { MiniStoreCore as Store, Reducer } from './mini-store-core';
+import { Action, AppState, MiniStoreExtension, Reducer, Settings } from './interfaces';
+import MiniStoreCore from './mini-store-core';
 import { MiniFeature } from './mini-feature';
 
-namespace MiniRx {
-    // Expose public store API
-    export class MiniStore {
-        feature<StateType>(
-            featureName: string,
-            initialState: StateType = {} as StateType,
-            reducer?: Reducer<StateType>
-        ): MiniFeature<StateType> {
-            return new MiniFeature(featureName, initialState, reducer);
-        }
+// Expose public store API
+class MiniStore {
+    feature<StateType>(
+        featureName: string,
+        initialState: StateType = {} as StateType,
+        reducer?: Reducer<StateType>
+    ): MiniFeature<StateType> {
+        return new MiniFeature(featureName, initialState, reducer);
+    }
 
-        effects(effects: Observable<Action>[]) {
-            Store.addEffects(effects);
-        }
+    effects(effects: Observable<Action>[]) {
+        MiniStoreCore.addEffects(effects);
+    }
 
-        addExtension(extension: MiniStoreExtension) {
-            Store.addExtension(extension);
-        }
+    addExtension(extension: MiniStoreExtension) {
+        MiniStoreCore.addExtension(extension);
+    }
 
-        set settings(settings: Partial<Settings>) {
-            Store.settings = settings;
-        }
+    set settings(settings: Partial<Settings>) {
+        MiniStoreCore.settings = settings;
+    }
 
-        dispatch = (action: Action) => Store.dispatch(action);
+    dispatch = (action: Action) => MiniStoreCore.dispatch(action);
 
-        select(mapFn: ((state: AppState) => any)): Observable<any> {
-            return Store.select(mapFn);
-        }
+    select(mapFn: ((state: AppState) => any)): Observable<any> {
+        return MiniStoreCore.select(mapFn);
     }
 }
 
-export const MiniStore = new MiniRx.MiniStore(); // Created once to initialize singleton
+// Created once to initialize singleton
+export default new MiniStore();
+
+export const actions$ = MiniStoreCore.actions$;

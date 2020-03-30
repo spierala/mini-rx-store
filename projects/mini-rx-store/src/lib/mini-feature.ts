@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rxjs';
-import { Action, AppState } from './interfaces';
-import { MiniStoreCore as Store, Reducer } from './mini-store-core';
+import { Action, AppState, Reducer } from './interfaces';
+import { default as Store } from './mini-store-core';
 import { combineReducers, createFeatureSelector, ofType } from './mini-store.utils';
 import { distinctUntilChanged, map, tap, withLatestFrom } from 'rxjs/operators';
 

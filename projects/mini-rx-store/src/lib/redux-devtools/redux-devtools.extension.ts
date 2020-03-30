@@ -1,6 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { AppState, MiniStoreExtension } from '../interfaces';
-import { actions$, MiniStoreCore as Store } from '../mini-store-core';
+import { actions$ } from '../mini-store';
+import { default as Store } from '../mini-store-core';
 
 const win = window as any;
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../user';
-import { createFeatureSelector, createSelector, MiniFeature, MiniStore, ReduxDevtoolsExtension } from 'mini-rx-store';
+import { createFeatureSelector, createSelector, Feature, Store, ReduxDevtoolsExtension } from 'mini-rx-store';
 
 export interface UserState {
     maskUserName: boolean;
@@ -19,7 +19,7 @@ const initialState: UserState = {
 export class UserStoreService {
 
     // Create Feature Store
-    private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
+    private feature: Feature<UserState> = Store.feature<UserState>('users', initialState);
 
     // maskUserName$: Observable<boolean> = this.feature.select(state => state.maskUserName);
     maskUserName$: Observable<boolean> = this.feature.select(getMaskUser);

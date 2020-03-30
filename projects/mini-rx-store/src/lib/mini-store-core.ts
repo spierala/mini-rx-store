@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, MiniStoreExtension, Settings } from './interfaces';
+import { Action, AppState, MiniStoreExtension, Reducer, Settings } from './interfaces';
 import {
     concatMap,
     distinctUntilChanged,
@@ -15,127 +15,123 @@ import {
 import { combineReducers } from './mini-store.utils';
 import { MiniFeature } from './mini-feature';
 
-export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
+class MiniStoreCore {
+    // FEATURE STATES
+    features: Map<string, MiniFeature<any>> = new Map();
 
-namespace MiniRx {
-    export class MiniStoreCore {
-        // FEATURE STATES
-        features: Map<string, MiniFeature<any>> = new Map();
+    // ACTIONS
+    private actionsSource: Subject<Action> = new Subject();
+    actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
+        share()
+    );
 
-        // ACTIONS
-        private actionsSource: Subject<Action> = new Subject();
-        actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
-            share()
-        );
+    // EFFECTS
+    private effectsSource$$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
+    private effectActions$: Observable<Action> = this.effectsSource$$.pipe(
+        concatMap(x => x), // Emit each array item separately
+        mergeAll() // Merge the effects into one single stream of (effect) actions
+    );
 
-        // EFFECTS
-        private effectsSource$$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
-        private effectActions$: Observable<Action> = this.effectsSource$$.pipe(
-            concatMap(x => x), // Emit each array item separately
-            mergeAll() // Merge the effects into one single stream of (effect) actions
-        );
+    // APP STATE
+    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
+    state$: Observable<AppState> = this.stateSource.pipe(
+        publishReplay(1),
+        refCount()
+    );
 
-        // APP STATE
-        private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
-        state$: Observable<AppState> = this.stateSource.pipe(
-            publishReplay(1),
-            refCount()
-        );
+    // COMBINED REDUCER
+    private reducerSource: Subject<Reducer<any>> = new Subject();
+    combinedReducer$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
+        scan<Reducer<any>, Reducer<AppState>>((acc, reducer) => {
+            if (acc) {
+                return combineReducers([acc, reducer]);
+            }
+            return reducer;
+        })
+    );
 
-        // COMBINED REDUCER
-        private reducerSource: Subject<Reducer<any>> = new Subject();
-        combinedReducer$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
-            scan<Reducer<any>, Reducer<AppState>>((acc, reducer) => {
-                if (acc) {
-                    return combineReducers([acc, reducer]);
-                }
-                return reducer;
-            })
-        );
+    // SETTINGS
+    // tslint:disable-next-line:variable-name
+    private _settings: Partial<Settings>;
+    private defaultSettings: Settings = {
+        enableLogging: false,
+    };
 
-        // SETTINGS
-        // tslint:disable-next-line:variable-name
-        private _settings: Partial<Settings>;
-        private defaultSettings: Settings = {
-            enableLogging: false,
+    set settings(settings: Partial<Settings>) {
+        if (this._settings) {
+            // Set settings only once
+            console.warn(`MiniRx: MiniStore settings are already set.`);
+            return;
+        }
+
+        this._settings = {
+            ...this.defaultSettings,
+            ...settings
         };
+    }
 
-        set settings(settings: Partial<Settings>) {
-            if (this._settings) {
-                // Set settings only once
-                console.warn(`MiniRx: MiniStore settings are already set.`);
-                return;
-            }
+    get settings(): Partial<Settings> {
+        return this._settings ? this._settings : this.defaultSettings;
+    }
 
-            this._settings = {
-                ...this.defaultSettings,
-                ...settings
-            };
-        }
+    // EXTENSIONS
+    private extensions: MiniStoreExtension[] = [];
 
-        get settings(): Partial<Settings> {
-            return this._settings ? this._settings : this.defaultSettings;
-        }
+    constructor() {
+        // Listen to Actions which are emitted by Effects
+        this.effectActions$.pipe(
+            tap(action => this.dispatch(action))
+        ).subscribe();
 
-        // EXTENSIONS
-        private extensions: MiniStoreExtension[] = [];
+        // Listen to the Actions Stream and update state accordingly
+        this.actions$.pipe(
+            withLatestFrom(this.combinedReducer$),
+            scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
+                const state = reducer(acc, action);
+                this.log({action, state});
+                return state;
+            }, {}),
+            tap(state => {
+                this.updateState(state);
+            }),
+        ).subscribe();
+    }
 
-        constructor() {
-            // Listen to Actions which are emitted by Effects
-            this.effectActions$.pipe(
-                tap(action => this.dispatch(action))
-            ).subscribe();
+    addFeatureReducer(reducer: Reducer<any>) {
+        this.reducerSource.next(reducer);
+    }
 
-            // Listen to the Actions Stream and update state accordingly
-            this.actions$.pipe(
-                withLatestFrom(this.combinedReducer$),
-                scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
-                    const state = reducer(acc, action);
-                    this.log({action, state});
-                    return state;
-                }, {}),
-                tap(state => {
-                    this.updateState(state);
-                }),
-            ).subscribe();
-        }
+    addEffects(effects: Observable<Action>[]) {
+        this.effectsSource$$.next(effects);
+    }
 
-        addFeatureReducer(reducer: Reducer<any>) {
-            this.reducerSource.next(reducer);
-        }
+    dispatch = (action: Action) => this.actionsSource.next(action);
 
-        addEffects(effects: Observable<Action>[]) {
-            this.effectsSource$$.next(effects);
-        }
+    updateState(state: AppState) {
+        this.stateSource.next(state)
+    }
 
-        dispatch = (action: Action) => this.actionsSource.next(action);
+    select(mapFn: ((state: AppState) => any)) {
+        return this.state$.pipe(
+            map((state: AppState) => mapFn(state)),
+            distinctUntilChanged()
+        );
+    }
 
-        updateState(state: AppState) {
-            this.stateSource.next(state)
-        }
+    addExtension(extension: MiniStoreExtension) {
+        extension.init();
+        this.extensions.push(extension);
+    }
 
-        select(mapFn: ((state: AppState) => any)) {
-            return this.state$.pipe(
-                map((state: AppState) => mapFn(state)),
-                distinctUntilChanged()
+    private log({action, state}) {
+        if (this.settings.enableLogging) {
+            console.log(
+                '%cACTION', 'font-weight: bold; color: #ff9900',
+                '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', state
             );
-        }
-
-        addExtension(extension: MiniStoreExtension) {
-            extension.init();
-            this.extensions.push(extension);
-        }
-
-        private log({action, state}) {
-            if (this.settings.enableLogging) {
-                console.log(
-                    '%cACTION', 'font-weight: bold; color: #ff9900',
-                    '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', state
-                );
-            }
         }
     }
 }
 
-export const MiniStoreCore = new MiniRx.MiniStoreCore(); // Created once to initialize singleton
-export const actions$ = MiniStoreCore.actions$;
+// Created once to initialize singleton
+export default new MiniStoreCore();

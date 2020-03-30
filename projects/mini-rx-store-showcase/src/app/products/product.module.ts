@@ -6,7 +6,7 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './containers/product-shell/product-shell.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-import { MiniStore } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 import { ProductEffects } from './state/product.effects';
 import { ProductStateService } from './state/product-state.service';
 
@@ -30,7 +30,7 @@ export class ProductModule {
         private productEffects: ProductEffects,
         private productStateService: ProductStateService
     ) {
-        MiniStore.effects(this.productEffects.effects$);
+        Store.effects(this.productEffects.effects$);
 
         // DEMO MiniEffects
         this.productStateService.loadFn();

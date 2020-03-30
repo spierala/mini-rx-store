@@ -1,8 +1,7 @@
 import { MonoTypeOperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { Action, AppState } from './interfaces';
+import { Action, AppState, Reducer } from './interfaces';
 import memoizeOne from 'memoize-one';
-import { Reducer } from './mini-store-core';
 
 export function ofType<T extends Action>(
     type: string

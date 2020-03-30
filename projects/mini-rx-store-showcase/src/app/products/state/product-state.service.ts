@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MiniFeature } from 'mini-rx-store';
+import { Feature } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './product.reducer';
 import { ProductService } from '../product.service';
 import { catchError, map, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
@@ -8,7 +8,7 @@ import { of } from 'rxjs';
 @Injectable({
     providedIn: 'root'
 })
-export class ProductStateService extends MiniFeature<ProductState>{
+export class ProductStateService extends Feature<ProductState>{
 
     constructor(
         private productService: ProductService

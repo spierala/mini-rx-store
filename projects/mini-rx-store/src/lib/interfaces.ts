@@ -14,3 +14,5 @@ export interface Action<PayLoadType = any> {
 export interface Settings {
     enableLogging: boolean;
 }
+
+export type Reducer<StateType> = (state: StateType, action: Action) => StateType;

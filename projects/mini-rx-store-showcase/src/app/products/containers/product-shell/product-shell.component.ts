@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import * as productActions from './../../state/product.actions';
 import { Product } from '../../product';
 import { getCurrentProduct, getError, getProducts } from '../../state';
-import { MiniStore } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 import { ProductStateService } from '../../state/product-state.service';
 
 @Component({
@@ -23,11 +23,11 @@ export class ProductShellComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.products$ = MiniStore.select(getProducts);
-    this.errorMessage$ = MiniStore.select(getError);
-    this.selectedProduct$ = MiniStore.select(getCurrentProduct);
+    this.products$ = Store.select(getProducts);
+    this.errorMessage$ = Store.select(getError);
+    this.selectedProduct$ = Store.select(getCurrentProduct);
 
-    // Demonstrate how to select state via the MiniFeature API
+    // Demonstrate how to select state via the Feature API
     this.displayCode$ = this.productStateService.select(state => state.showProductCode);
   }
 
@@ -37,11 +37,11 @@ export class ProductShellComponent implements OnInit {
   }
 
   newProduct(): void {
-    MiniStore.dispatch(new productActions.InitializeCurrentProduct());
+    Store.dispatch(new productActions.InitializeCurrentProduct());
   }
 
   productSelected(product: Product): void {
-    MiniStore.dispatch(new productActions.SetCurrentProduct(product));
+    Store.dispatch(new productActions.SetCurrentProduct(product));
   }
 
   deleteProduct(product: Product): void {
@@ -49,13 +49,13 @@ export class ProductShellComponent implements OnInit {
   }
 
   clearProduct(): void {
-    MiniStore.dispatch(new productActions.ClearCurrentProduct());
+    Store.dispatch(new productActions.ClearCurrentProduct());
   }
   saveProduct(product: Product): void {
-    MiniStore.dispatch(new productActions.CreateProduct(product));
+    Store.dispatch(new productActions.CreateProduct(product));
   }
 
   updateProduct(product: Product): void {
-    MiniStore.dispatch(new productActions.UpdateProduct(product));
+    Store.dispatch(new productActions.UpdateProduct(product));
   }
 }
