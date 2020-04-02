@@ -1,26 +1,23 @@
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
 import { ProductState } from './product.reducer';
-import { Product } from '../product';
 
 // Selector functions
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
 export const getCurrentProductId = createSelector(
     getProductFeatureState,
-    (state: ProductState) => state.currentProductId
+    state => state.currentProductId
 );
 
 export const getProducts = createSelector(
     getProductFeatureState,
-    (state: ProductState) => {
-        return state.products
-    }
+    state => state.products
 );
 
 export const getCurrentProduct = createSelector(
     getProducts,
     getCurrentProductId,
-    (products: Product[], currentProductId: number) => {
+    (products, currentProductId) => {
         if (currentProductId === 0) {
             return {
                 id: 0,
@@ -35,7 +32,12 @@ export const getCurrentProduct = createSelector(
     }
 );
 
+export const getProductById = (id: number) => createSelector(
+    getProducts,
+    products => products.find(item => item.id === id)
+);
+
 export const getError = createSelector(
     getProductFeatureState,
-    (state: ProductState) => state.error
+    state => state.error
 );

@@ -27,7 +27,8 @@ class MiniStore {
 
     dispatch = (action: Action) => MiniStoreCore.dispatch(action);
 
-    select(mapFn: ((state: AppState) => any)): Observable<any> {
+
+    select<K>(mapFn: (state: AppState) => K): Observable<K> {
         return MiniStoreCore.select(mapFn);
     }
 }

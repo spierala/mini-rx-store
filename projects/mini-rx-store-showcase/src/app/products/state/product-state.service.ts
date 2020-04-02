@@ -3,18 +3,20 @@ import { Feature } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './product.reducer';
 import { ProductService } from '../product.service';
 import { catchError, map, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
-export class ProductStateService extends Feature<ProductState>{
+export class ProductStateService extends Feature<ProductState> {
 
     constructor(
         private productService: ProductService
     ) {
         super('products', initialState, reducer);
     }
+
+    displayCode$: Observable<boolean> = this.select(state => state.showProductCode);
 
     loadFn = this.createEffect(
         'load',

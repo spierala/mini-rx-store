@@ -109,7 +109,7 @@ class MiniStoreCore {
         this.stateSource.next(state);
     }
 
-    select(mapFn: ((state: AppState) => any)) {
+    select<K>(mapFn: (state: AppState) => K): Observable<K> {
         return this.state$.pipe(
             map((state: AppState) => mapFn(state)),
             distinctUntilChanged()

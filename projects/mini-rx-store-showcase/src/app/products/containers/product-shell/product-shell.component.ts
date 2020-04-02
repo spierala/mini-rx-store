@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as productActions from './../../state/product.actions';
 import { Product } from '../../product';
-import { getCurrentProduct, getError, getProducts } from '../../state';
+import { getCurrentProduct, getError, getProductById, getProducts } from '../../state';
 import { Store } from 'mini-rx-store';
 import { ProductStateService } from '../../state/product-state.service';
 
@@ -15,6 +15,7 @@ export class ProductShellComponent implements OnInit {
   selectedProduct$: Observable<Product>;
   products$: Observable<Product[]>;
   errorMessage$: Observable<string>;
+  productById$: Observable<Product>
 
   constructor(
       private productStateService: ProductStateService
@@ -28,7 +29,10 @@ export class ProductShellComponent implements OnInit {
     this.selectedProduct$ = Store.select(getCurrentProduct);
 
     // Demonstrate how to select state via the Feature API
-    this.displayCode$ = this.productStateService.select(state => state.showProductCode);
+    this.displayCode$ = this.productStateService.displayCode$;
+
+    // Demonstrate selector with static parameter
+    this.productById$ = Store.select(getProductById(1));
   }
 
   checkChanged(value: boolean): void {

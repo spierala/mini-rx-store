@@ -1,21 +1,28 @@
 <div class='row'>
-  <div class='col-md-4'>
-    <pm-product-list
-    [displayCode]="displayCode$ | async"
-    [products]="products$ | async"
-    [selectedProduct]="selectedProduct$ | async"
-	  [errorMessage]="errorMessage$ | async"
-    (checked)="checkChanged($event)"
-    (initializeNewProduct)="(newProduct())"
-    (selected)="productSelected($event)"></pm-product-list>
-  </div>
-  <div class='col-md-8'>
-    <pm-product-edit
-    [selectedProduct]="selectedProduct$ | async"
-	  [errorMessage]="errorMessage$ | async"
-    (clearCurrent)="clearProduct()"
-    (update)="updateProduct($event)"
-    (delete)="deleteProduct($event)"
-    (create)="saveProduct($event)"></pm-product-edit>
-  </div>
+    <div class='col-md-4'>
+        <pm-product-list
+            [displayCode]="displayCode$ | async"
+            [products]="products$ | async"
+            [selectedProduct]="selectedProduct$ | async"
+            [errorMessage]="errorMessage$ | async"
+            (checked)="checkChanged($event)"
+            (initializeNewProduct)="(newProduct())"
+            (selected)="productSelected($event)"></pm-product-list>
+    </div>
+    <div class='col-md-8'>
+        <pm-product-edit
+            [selectedProduct]="selectedProduct$ | async"
+            [errorMessage]="errorMessage$ | async"
+            (clearCurrent)="clearProduct()"
+            (update)="updateProduct($event)"
+            (delete)="deleteProduct($event)"
+            (create)="saveProduct($event)"></pm-product-edit>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h6>Other tests</h6>
+
+    <p>Selector with static parameter (get product with ID 1)</p>
+    <pre>{{productById$ | async | json}}</pre>
 </div>

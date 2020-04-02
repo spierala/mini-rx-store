@@ -81,7 +81,7 @@ export class MiniFeature<StateType> {
         };
     }
 
-    select(mapFn: ((state: StateType) => any)): Observable<any> {
+    select<K>(mapFn: (state: StateType) => K): Observable<K> {
         return this.state$.pipe(
             map((state: StateType) => mapFn(state)),
             distinctUntilChanged()
