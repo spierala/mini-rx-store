@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, MiniStoreExtension, Reducer, Settings } from './interfaces';
+import { Action, AppState, StoreExtension, Reducer, Settings } from './interfaces';
 import {
     distinctUntilChanged,
     map,
@@ -11,12 +11,12 @@ import {
     tap,
     withLatestFrom
 } from 'rxjs/operators';
-import { combineReducers } from './mini-store.utils';
-import { MiniFeature } from './mini-feature';
+import { combineReducers } from './utils';
+import { Feature } from './feature';
 
-class MiniStoreCore {
+class StoreCore {
     // FEATURE STATES
-    features: Map<string, MiniFeature<any>> = new Map();
+    features: Map<string, Feature<any>> = new Map();
 
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
@@ -58,7 +58,7 @@ class MiniStoreCore {
     set settings(settings: Partial<Settings>) {
         if (this._settings) {
             // Set settings only once
-            console.warn(`MiniRx: MiniStore settings are already set.`);
+            console.warn(`MiniRx: Settings are already set.`);
             return;
         }
 
@@ -73,7 +73,7 @@ class MiniStoreCore {
     }
 
     // EXTENSIONS
-    private extensions: MiniStoreExtension[] = [];
+    private extensions: StoreExtension[] = [];
 
     constructor() {
         // Listen to Actions which are emitted by Effects
@@ -116,7 +116,7 @@ class MiniStoreCore {
         );
     }
 
-    addExtension(extension: MiniStoreExtension) {
+    addExtension(extension: StoreExtension) {
         extension.init();
         this.extensions.push(extension);
     }
@@ -132,4 +132,4 @@ class MiniStoreCore {
 }
 
 // Created once to initialize singleton
-export default new MiniStoreCore();
+export default new StoreCore();

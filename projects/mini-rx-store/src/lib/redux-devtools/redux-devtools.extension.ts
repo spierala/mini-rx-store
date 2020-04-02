@@ -1,11 +1,11 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, MiniStoreExtension } from '../interfaces';
-import { actions$ } from '../mini-store';
-import { default as Store } from '../mini-store-core';
+import { AppState, StoreExtension } from '../interfaces';
+import { actions$ } from '../store';
+import { default as Store } from '../store-core';
 
 const win = window as any;
 
-export class ReduxDevtoolsExtension implements MiniStoreExtension {
+export class ReduxDevtoolsExtension implements StoreExtension {
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
 

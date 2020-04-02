@@ -1,15 +1,16 @@
 import { Observable, Subject } from 'rxjs';
 import { Action, AppState, Reducer } from './interfaces';
-import { default as Store } from './mini-store-core';
-import { combineReducers, createFeatureSelector, ofType } from './mini-store.utils';
+import { default as Store } from './store-core';
+import { combineReducers, ofType } from './utils';
 import { distinctUntilChanged, map, tap, withLatestFrom } from 'rxjs/operators';
+import { createFeatureSelector } from './selector';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
 const nameUpdateAction = 'set-state';
 
-export class MiniFeature<StateType> {
+export class Feature<StateType> {
 
     state$: Observable<StateType>;
     private stateOrCallbackWithName$: Subject<{
@@ -49,7 +50,7 @@ export class MiniFeature<StateType> {
         // The reducer must know its feature to reduce feature state only...
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, combinedReducerWithInitialState);
 
-        // Add reducer to MiniStore
+        // Add reducer to Store
         Store.addFeatureReducer(featureReducer);
         // Dispatch an initial action to let reducers create the initial state
         Store.dispatch({type: `${this.actionTypePrefix}/init`});

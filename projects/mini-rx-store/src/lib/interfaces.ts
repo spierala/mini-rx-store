@@ -2,7 +2,7 @@ export interface AppState {
     [key: string]: string;
 }
 
-export interface MiniStoreExtension {
+export interface StoreExtension {
     init(): void;
 }
 

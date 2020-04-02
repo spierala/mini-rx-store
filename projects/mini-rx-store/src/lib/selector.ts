@@ -1,14 +1,7 @@
-import { MonoTypeOperatorFunction } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { Action, AppState, Reducer } from './interfaces';
 import memoizeOne from 'memoize-one';
 
-export function ofType<T extends Action>(
-    type: string
-): MonoTypeOperatorFunction<T> {
-    return filter((action) => type === action.type);
-}
-
+// Credits for the Typing of createSelector go to NgRx!
+// https://github.com/ngrx/platform/blob/master/modules/store/src/selector.ts
 export type Selector<T, V> = (state: T) => V;
 
 export function createSelector<State, S1, Result>(
@@ -88,6 +81,7 @@ export function createSelector<State, S1, S2, S3, S4, S5, S6, S7, S8, Result>(
     ) => Result
 ): Selector<State, Result>;
 
+
 export function createSelector(...args: any[]): Selector<any, any> {
     const selectors = args.slice(0, args.length - 1);
     const projector = args[args.length - 1];
@@ -98,6 +92,7 @@ export function createSelector(...args: any[]): Selector<any, any> {
         return memoizedProjector.apply(null, selectorResults);
     };
 }
+
 
 export function createFeatureSelector<T>(
     featureName?: string
@@ -110,12 +105,4 @@ export function createFeatureSelector(featureName?: string): Selector<any, any> 
         }
         return state;
     }, (featureState) => featureState);
-}
-
-export function combineReducers<StateType, ActionType>(reducers: Reducer<StateType>[]): Reducer<StateType> {
-    return (state: StateType, action: Action): StateType => {
-        return reducers.reduce((currState, reducer) => {
-            return reducer(currState, action);
-        }, state);
-    };
 }
