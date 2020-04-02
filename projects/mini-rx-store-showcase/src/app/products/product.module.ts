@@ -30,8 +30,6 @@ export class ProductModule {
         private productEffects: ProductEffects,
         private productStateService: ProductStateService
     ) {
-        Store.effects(this.productEffects.effects$);
-
         // DEMO MiniEffects
         this.productStateService.loadFn();
     }

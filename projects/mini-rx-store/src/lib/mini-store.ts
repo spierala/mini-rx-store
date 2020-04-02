@@ -13,8 +13,8 @@ class MiniStore {
         return new MiniFeature(featureName, initialState, reducer);
     }
 
-    effects(effects: Observable<Action>[]) {
-        MiniStoreCore.addEffects(effects);
+    createEffect(effect: Observable<Action>) {
+        MiniStoreCore.createEffect(effect);
     }
 
     addExtension(extension: MiniStoreExtension) {

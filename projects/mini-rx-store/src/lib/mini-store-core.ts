@@ -1,7 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, AppState, MiniStoreExtension, Reducer, Settings } from './interfaces';
 import {
-    concatMap,
     distinctUntilChanged,
     map,
     mergeAll,
@@ -26,9 +25,8 @@ class MiniStoreCore {
     );
 
     // EFFECTS
-    private effectsSource$$: BehaviorSubject<Observable<Action>[]> = new BehaviorSubject([]);
-    private effectActions$: Observable<Action> = this.effectsSource$$.pipe(
-        concatMap(x => x), // Emit each array item separately
+    private effectsSource: Subject<Observable<Action>> = new Subject();
+    private effects$: Observable<Action> = this.effectsSource.pipe(
         mergeAll() // Merge the effects into one single stream of (effect) actions
     );
 
@@ -79,7 +77,7 @@ class MiniStoreCore {
 
     constructor() {
         // Listen to Actions which are emitted by Effects
-        this.effectActions$.pipe(
+        this.effects$.pipe(
             tap(action => this.dispatch(action))
         ).subscribe();
 
@@ -101,14 +99,14 @@ class MiniStoreCore {
         this.reducerSource.next(reducer);
     }
 
-    addEffects(effects: Observable<Action>[]) {
-        this.effectsSource$$.next(effects);
+    createEffect(effect: Observable<Action>) {
+        this.effectsSource.next(effect);
     }
 
     dispatch = (action: Action) => this.actionsSource.next(action);
 
     updateState(state: AppState) {
-        this.stateSource.next(state)
+        this.stateSource.next(state);
     }
 
     select(mapFn: ((state: AppState) => any)) {

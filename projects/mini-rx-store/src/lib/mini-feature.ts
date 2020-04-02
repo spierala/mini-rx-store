@@ -112,7 +112,7 @@ export class MiniFeature<StateType> {
             })
         );
 
-        Store.addEffects([effect$]);
+        Store.createEffect(effect$);
 
         return (payload?: PayLoadType) => {
             Store.dispatch({
