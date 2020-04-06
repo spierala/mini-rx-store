@@ -46,21 +46,21 @@ Although being a lightweight library, MiniRx supports many of the core features 
 
 `npm i mini-rx-store`
 
-#### Create the MiniStore (App State):
-The `MiniStore` is created and ready to use as soon as you import MiniStore.
+#### Create the Store (App State):
+The `Store` is created and ready to use as soon as you import `Store`.
 
-```import { MiniStore } from 'mini-rx-store';```
+```import { Store } from 'mini-rx-store';```
 
-#### Create a MiniFeature (Feature State):
-A `MiniFeature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
+#### Create a Feature (Feature State):
+A `Feature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
 The Feature States together form the App State (Single Source of Truth).
 ```
-import { MiniStore } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 import { initialState, ProductState, reducer } from './state/product.reducer';
 ...
 // Inside long living Module / Service
 constructor() {
-    MiniStore.feature<ProductState>('products', initialState, reducer);
+    Store.feature<ProductState>('products', initialState, reducer);
 }
 ```
 The code above creates a new feature state for _products_.
@@ -90,7 +90,7 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
 }
 ```
 
-Usually you would create a new `MiniFeature` inside long living Modules/Services.
+Usually you would create a new `Feature` inside long living Modules/Services.
 
 #### Create an Action:
 ```
@@ -106,47 +106,47 @@ export class CreateProduct implements Action {
 
 #### Dispatch an Action: 
 ```
-import { MiniStore } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 import { CreateProduct } from 'product.actions';
 
-MiniStore.dispatch(new CreateProduct(product));
+Store.dispatch(new CreateProduct(product));
 ```
 
 #### Write an effect: 
 Effects handle code that triggers side effects like API calls: 
 * An Effect listens for a specific Action
 * That Action triggers the actual side effect
-* The Effect needs to return a new Action
+* The Effect needs to return a new Action as soon as the side effect finished
 
 ```
 import { Action, actions$, ofType } from 'mini-rx-store';
 import { LoadFail, LoadSuccess, ProductActionTypes } from './product.actions';
+import { ProductService } from '../product.service';
 
-private loadProducts$: Observable<Action> = actions$.pipe(
-    ofType(ProductActionTypes.Load),
-    mergeMap(action =>
-      this.productService.getProducts().pipe(
-        map(products => (new LoadSuccess(products))),
-        catchError(err => of(new LoadFail(err)))
-      )
-    )
-);
+constructor(private productService: ProductService) {
+    Store.createEffect(
+        actions$.pipe(
+            ofType(productActions.ProductActionTypes.Load),
+            mergeMap(() =>
+                this.productService.getProducts().pipe(
+                    map(products => (new LoadSuccess(products))),
+                    catchError(err => of(new LoadFail(err)))
+                )
+            )
+        )
+    );
+} 
 ```
 The code above creates an Effect. As soon as the `Load` Action is dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new Action will be dispatched:
 `LoadSuccess` or `LoadFail`.
-
-You need to register the Effect before the corresponding Action is dispatched.
-#### Register one or many effects: 
-```
-MiniStore.effects([loadProducts$]);
-```
  
 #### Create Selectors:
 Selectors are used to select and combine state. 
 ```
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
+import { ProductState } from './product.reducer';
 
-const getProductFeatureState = createFeatureSelector('products');
+const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
 export const getProducts = createSelector(
     getProductFeatureState,
@@ -158,24 +158,24 @@ If the selector is called with the same arguments again, it will just return the
 
 #### Select Observable State (with a selector): 
 ```
-import { MiniStore } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 import { getProducts } from '../../state';
 
-this.products$ = MiniStore.select(getProducts);
+this.products$ = Store.select(getProducts);
 ```
 `select` runs the selector on the App State and returns an Observable which will emit as soon as the _products_ data changes. 
 
-## Make simple things simple - The `MiniFeature` API 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `MiniFeature` instance (which is returned by the `MiniStore.feature` function).
+## Make simple things simple - The `Feature` API 
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `Feature` instance (which is returned by the `Store.feature` function).
 
 You can update state without writing Actions and Reducers!
-#### Get hold of the MiniFeature instance
+#### Get hold of the Feature instance
 ```
-private feature: MiniFeature<UserState> = MiniStore.feature<UserState>('users', initialState);
+private feature: Feature<UserState> = Store.feature<UserState>('users', initialState);
 ```
-Alternatively you can extend MiniFeature:
+Alternatively you can extend Feature:
 ```
-export class ProductStateService extends MiniFeature<ProductState>{
+export class ProductStateService extends Feature<ProductState>{
     constructor(
         private productService: ProductService
     ) {
@@ -272,7 +272,7 @@ The code above creates an Effect for _deleting a product_ from the list. The API
 
 #### FYI
 Also the simplified API sets on Redux: 
-Behind the scenes `MiniFeature` is creating a default reducer and a default action in order to update the feature state.
+Behind the scenes `Feature` is creating a default reducer and a default action in order to update the feature state.
 When you use `setState()` or `setStateAction()` MiniRx dispatches the default action and the default reducer will update the feature accordingly.
 
 See the default Action in the Redux Dev Tools:
@@ -282,11 +282,11 @@ See the default Action in the Redux Dev Tools:
 ## Settings
 #### Enable Logging of Actions and State Changes in the Browser Console: 
 ```
-import { MiniStore } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 
-MiniStore.settings = {enableLogging: true};
+Store.settings = {enableLogging: true};
 ```
-The code above sets the global MiniStore Settings.
+The code above sets the global Store Settings.
 `enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
 
@@ -318,9 +318,9 @@ export class AppModule {}
 
 #### If you do not use Angular
 ```
-import { MiniStore, ReduxDevtoolsExtension } from 'mini-rx-store';
+import { Store, ReduxDevtoolsExtension } from 'mini-rx-store';
 
-MiniStore.addExtension(new ReduxDevtoolsExtension());
+Store.addExtension(new ReduxDevtoolsExtension());
 ```
 
 ## Showcase
