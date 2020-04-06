@@ -1,16 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, StoreExtension, Reducer, Settings } from './interfaces';
-import {
-    distinctUntilChanged,
-    map,
-    mergeAll,
-    publishReplay,
-    refCount,
-    scan,
-    share,
-    tap,
-    withLatestFrom
-} from 'rxjs/operators';
+import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
+import { distinctUntilChanged, map, mergeAll, scan, tap, withLatestFrom } from 'rxjs/operators';
 import { combineReducers } from './utils';
 import { Feature } from './feature';
 
@@ -20,9 +10,7 @@ class StoreCore {
 
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
-    actions$: Observable<Action> = this.actionsSource.asObservable().pipe(
-        share()
-    );
+    actions$: Observable<Action> = this.actionsSource.asObservable();
 
     // EFFECTS
     private effectsSource: Subject<Observable<Action>> = new Subject();
@@ -32,10 +20,7 @@ class StoreCore {
 
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
-    state$: Observable<AppState> = this.stateSource.pipe(
-        publishReplay(1),
-        refCount()
-    );
+    state$: Observable<AppState> = this.stateSource.asObservable();
 
     // COMBINED REDUCER
     private reducerSource: Subject<Reducer<any>> = new Subject();
