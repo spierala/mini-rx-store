@@ -175,11 +175,9 @@ private feature: Feature<UserState> = Store.feature<UserState>('users', initialS
 ```
 Alternatively you can extend Feature:
 ```
-export class ProductStateService extends Feature<ProductState>{
-    constructor(
-        private productService: ProductService
-    ) {
-        super('products', initialState);
+export class UserStateService extends Feature<UserState>{
+    constructor() {
+        super('users', initialState);
     }
 }
 ```
