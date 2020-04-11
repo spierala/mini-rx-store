@@ -49,7 +49,7 @@ export class ProductStateService extends Feature<ProductState> {
                         currentProductId: newProduct.id,
                         error: ''
                     };
-                })),
+                }), 'success'),
                 catchError(error => of(this.setStateAction({
                     error
                 }, 'error')))
@@ -120,14 +120,14 @@ export class ProductStateService extends Feature<ProductState> {
                 ...state,
                 currentProductId: id
             };
-        });
+        }, 'currProd');
     }
 
     clearCurrentProduct() {
-        this.setState({currentProductId: undefined});
+        this.setState({currentProductId: undefined}, 'clearCurrProd');
     }
 
     initializeCurrentProduct() {
-        this.setState({currentProductId: 0});
+        this.setState({currentProductId: 0}, 'initCurrProd');
     }
 }
