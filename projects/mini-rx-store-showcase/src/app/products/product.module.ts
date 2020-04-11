@@ -28,6 +28,6 @@ export class ProductModule {
         private productStateService: ProductStateService
     ) {
         // DEMO MiniEffects
-        this.productStateService.loadFn();
+        this.productStateService.loadProducts();
     }
 }

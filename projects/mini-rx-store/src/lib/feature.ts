@@ -1,8 +1,8 @@
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Action, AppState, Reducer } from './interfaces';
 import { default as Store } from './store-core';
 import { ofType } from './utils';
-import { distinctUntilChanged, map, tap, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { createFeatureSelector } from './selector';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
@@ -41,13 +41,12 @@ export class FeatureBase<StateType> {
 
 export class Feature<StateType> extends FeatureBase<StateType> {
 
-    state$: Observable<StateType>;
-    private stateOrCallbackWithName$: Subject<{
-        stateOrCallback: StateOrCallback<StateType>,
-        name: string
-    }> = new Subject();
-
     private readonly actionTypeSetState: string;
+
+    protected state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
+    private get state(): StateType {
+        return this.state$.getValue();
+    }
 
     constructor(
         private featureName: string,
@@ -55,67 +54,41 @@ export class Feature<StateType> extends FeatureBase<StateType> {
     ) {
         super(featureName, initialState);
 
-        // Feature State
-        this.state$ = Store.select(createFeatureSelector(featureName));
-
-        // Create Default Action Type and Reducer (needed for setState())
+        // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
 
-        this.stateOrCallbackWithName$.pipe(
-            withLatestFrom(this.state$),
-            tap(([stateOrCallbackWithName, state]) => {
-                const {stateOrCallback, name} = stateOrCallbackWithName;
-
-                Store.dispatch({
-                    type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-                    payload: this.calcNewState(state, stateOrCallback)
-                });
-            })
-        ).subscribe();
+        // Feature State and delegate to local BehaviorSubject
+        Store.select(createFeatureSelector(featureName)).subscribe(this.state$);
     }
 
-    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
-        this.stateOrCallbackWithName$.next({
-            stateOrCallback,
-            name
+    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
+        Store.dispatch({
+            type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
+            payload: this.calcNewState(this.state, stateOrCallback)
         });
     }
 
-    setStateAction(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        return {
-            type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-            payload: stateOrCallback
-        };
-    }
-
-    select<K>(mapFn: (state: StateType) => K): Observable<K> {
+    protected select<K>(mapFn: (state: StateType) => K): Observable<K> {
         return this.state$.pipe(
             map((state: StateType) => mapFn(state)),
             distinctUntilChanged()
         );
     }
 
-    createEffect<PayLoadType = any>(
+    protected createEffect<PayLoadType = any>(
         effectName: string,
-        effectFn: (payload: Observable<PayLoadType>) => Observable<Action>
+        effectFn: (payload: Observable<PayLoadType>) => Observable<StateOrCallback<StateType>>
     ): (payload?: PayLoadType) => void {
         const effectStartActionType = `${this.actionTypePrefix}/effect/${effectName}`;
         const effect$: Observable<Action> = Store.actions$.pipe(
             ofType(effectStartActionType),
             map(action => action.payload),
             effectFn,
-            withLatestFrom(this.state$),
-            map(([action, state]) => {
-                // Handle SetStateActions
-                if (action.type.indexOf(this.actionTypeSetState) > -1) {
-                    return {
-                        // type: Append set-state name: e.g. '@mini-rx/products/effect/load/set-state/success'
-                        type: effectStartActionType + '/' + nameUpdateAction + action.type.split(nameUpdateAction)[1],
-                        payload: this.calcNewState(state, action.payload)
-                    };
-                }
-                // Every other Action
-                return action;
+            map((stateOrCallback) => {
+                return {
+                    type: effectStartActionType + '/' + nameUpdateAction,
+                    payload: this.calcNewState(this.state, stateOrCallback)
+                };
             })
         );
 
@@ -146,7 +119,7 @@ export class Feature<StateType> extends FeatureBase<StateType> {
 function createDefaultReducer<StateType>(nameSpaceFeature: string): Reducer<StateType> {
     return (state: StateType, action: Action) => {
 
-        // Check for 'set-state' (setState() or feature effect setStateAction())
+        // Check for 'set-state' (can originate from setState() or feature effect)
         if (action.type.indexOf(nameSpaceFeature) > -1 && action.type.indexOf(nameUpdateAction) > -1) {
             return {
                 ...state,

@@ -1,15 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Feature } from 'mini-rx-store';
-import { initialState, ProductState } from './product.reducer';
 import { ProductService } from '../product.service';
 import { catchError, map, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { Product } from '../product';
+import {
+    getCurrentProduct,
+    getError,
+    getProductById,
+    getProducts,
+    getShowProductCode,
+    initialState,
+    ProductState
+} from './index';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProductStateService extends Feature<ProductState> {
+
+    displayCode$: Observable<boolean> = this.select(getShowProductCode);
+    selectedProduct$: Observable<Product> = this.select(getCurrentProduct);
+    products$: Observable<Product[]> = this.select(getProducts);
+    errorMessage$: Observable<string> = this.select(getError);
+    productById$: Observable<Product> = this.select(getProductById(1));
 
     constructor(
         private productService: ProductService
@@ -17,102 +31,97 @@ export class ProductStateService extends Feature<ProductState> {
         super('products', initialState);
     }
 
-    displayCode$: Observable<boolean> = this.select(state => state.showProductCode);
-
-    // Effects
-    loadFn = this.createEffect(
+    // EFFECTS
+    loadProducts = this.createEffect(
         'load',
         payload$ => payload$.pipe(
             mergeMap(() =>
                 this.productService.getProducts().pipe(
-                    map((products) => this.setStateAction({
+                    map(products => ({
                         products,
                         error: ''
-                    }, 'success')),
-                    catchError(error => of(this.setStateAction({
+                    })),
+                    catchError(error => of({
                         error,
                         products: []
-                    }, 'error')))
+                    }))
                 )
             )
         )
     );
 
-    createProductFn = this.createEffect<Product>(
+    createProduct = this.createEffect<Product>(
         'create',
         payload$ => payload$.pipe(
             mergeMap(product =>
                 this.productService.createProduct(product).pipe(
-                    map(newProduct => this.setStateAction(state => {
+                    map(newProduct => state => {
                         return {
                             products: [...state.products, newProduct],
                             currentProductId: newProduct.id,
                             error: ''
                         };
-                    }), 'success'),
-                    catchError(error => of(this.setStateAction({
+                    }),
+                    catchError(error => of({
                         error
-                    }, 'error')))
+                    }))
                 )
             )
         )
     );
 
-    updateProductFn = this.createEffect<Product>(
+    updateProduct = this.createEffect<Product>(
         'update',
         payload$ => payload$.pipe(
-            mergeMap((product) => {
+            mergeMap(product => {
                 return this.productService.updateProduct(product).pipe(
-                    map((updatedProduct) => this.setStateAction((state) => {
+                    map(updatedProduct => state => {
                         const updatedProducts = state.products.map(
                             item => updatedProduct.id === item.id ? updatedProduct : item
                         );
-
                         return {
                             products: updatedProducts,
                             currentProductId: product.id,
                             error: ''
                         };
-                    }, 'success')),
-                    catchError(error => of(this.setStateAction({
+                    }),
+                    catchError(error => of({
                         error
-                    }, 'error')))
+                    }))
                 );
             })
         )
     );
 
-    deleteProductFn = this.createEffect<number>(
+    deleteProduct = this.createEffect<number>(
         'delete',
         payload$ => payload$.pipe(
             withLatestFrom(this.state$),
             mergeMap(([productId, lastState]) => {
                 return this.productService.deleteProduct(productId).pipe(
-                    map(() => this.setStateAction(state => {
+                    map(() => state => {
                         return {
                             products: state.products.filter(product => product.id !== productId),
                             currentProductId: null,
                             error: ''
                         };
-                    }, 'success')),
-                    catchError(err => of(this.setStateAction(
-                        {
-                            products: lastState.products, // Restore State before Optimistic Update
-                            error: err
-                        }, 'error'
-                    ))),
+                    }),
+                    catchError(err => of({
+                        products: lastState.products, // Restore State before Optimistic Update
+                        error: err
+                    })),
                     // Optimistic Update
-                    startWith(this.setStateAction(state => {
+                    startWith(state => {
                         return {
                             products: state.products.filter(product => product.id !== productId)
                         };
-                    }, 'optimistic'))
+                    })
                 );
             })
         )
     );
 
-    // Set State
+    // UPDATE STATE
     setCurrentProduct(id: number) {
         this.setState(state => {
             if (state.currentProductId === id) {
@@ -130,5 +139,9 @@ export class ProductStateService extends Feature<ProductState> {
 
     initializeCurrentProduct() {
         this.setState({currentProductId: 0}, 'initCurrProd');
+    }
+
+    showProductCode(showProductCode: boolean) {
+        this.setState({showProductCode}, 'showProductCode');
     }
 }

@@ -1,64 +1,50 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from '../../product';
-import { getCurrentProduct, getError, getProductById, getProducts } from '../../state';
-import { Store } from 'mini-rx-store';
 import { ProductStateService } from '../../state/product-state.service';
 
 @Component({
-  templateUrl: './product-shell.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './product-shell.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProductShellComponent implements OnInit {
-  displayCode$: Observable<boolean>;
-  selectedProduct$: Observable<Product>;
-  products$: Observable<Product[]>;
-  errorMessage$: Observable<string>;
-  productById$: Observable<Product>;
+export class ProductShellComponent {
+    displayCode$: Observable<boolean> = this.productState.displayCode$;
+    selectedProduct$: Observable<Product> = this.productState.selectedProduct$;
+    products$: Observable<Product[]> = this.productState.products$;
+    errorMessage$: Observable<string> = this.productState.errorMessage$;
+    productById$: Observable<Product> = this.productState.productById$;
 
-  constructor(
-      private productStateService: ProductStateService
-  ) {
+    constructor(
+        private productState: ProductStateService
+    ) {
 
-  }
+    }
 
-  ngOnInit(): void {
-    this.products$ = Store.select(getProducts);
-    this.errorMessage$ = Store.select(getError);
-    this.selectedProduct$ = Store.select(getCurrentProduct);
+    checkChanged(value: boolean): void {
+        this.productState.showProductCode(value);
+    }
 
-    // Demonstrate how to select state via the Feature API
-    this.displayCode$ = this.productStateService.displayCode$;
+    newProduct(): void {
+        this.productState.initializeCurrentProduct();
+    }
 
-    // Demonstrate selector with static parameter
-    this.productById$ = Store.select(getProductById(1));
-  }
+    productSelected(product: Product): void {
+        this.productState.setCurrentProduct(product.id);
+    }
 
-  checkChanged(value: boolean): void {
-    // Demonstrate how to change state without Action
-    this.productStateService.setState({showProductCode: value}, 'showProductCode');
-  }
+    deleteProduct(product: Product): void {
+        this.productState.deleteProduct(product.id);
+    }
 
-  newProduct(): void {
-    this.productStateService.initializeCurrentProduct();
-  }
+    clearProduct(): void {
+        this.productState.clearCurrentProduct();
+    }
 
-  productSelected(product: Product): void {
-      this.productStateService.setCurrentProduct(product.id);
-  }
+    saveProduct(product: Product): void {
+        this.productState.createProduct(product);
+    }
 
-  deleteProduct(product: Product): void {
-      this.productStateService.deleteProductFn(product.id);
-  }
-
-  clearProduct(): void {
-    this.productStateService.clearCurrentProduct();
-  }
-  saveProduct(product: Product): void {
-    this.productStateService.createProductFn(product);
-  }
-
-  updateProduct(product: Product): void {
-      this.productStateService.updateProductFn(product);
-  }
+    updateProduct(product: Product): void {
+        this.productState.updateProduct(product);
+    }
 }
