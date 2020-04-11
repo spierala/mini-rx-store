@@ -2,11 +2,11 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
 import { distinctUntilChanged, map, mergeAll, scan, tap, withLatestFrom } from 'rxjs/operators';
 import { combineReducers } from './utils';
-import { Feature } from './feature';
+import { FeatureBase, Feature } from './feature';
 
 class StoreCore {
     // FEATURE STATES
-    features: Map<string, Feature<any>> = new Map();
+    features: Map<string, FeatureBase<any>> = new Map();
 
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();

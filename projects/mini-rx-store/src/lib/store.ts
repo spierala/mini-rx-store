@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { Action, AppState, StoreExtension, Reducer, Settings } from './interfaces';
 import StoreCore from './store-core';
-import { Feature } from './feature';
+import { FeatureBase, Feature } from './feature';
 
 // Expose public store API
 class Store {
@@ -9,8 +9,8 @@ class Store {
         featureName: string,
         initialState: StateType = {} as StateType,
         reducer?: Reducer<StateType>
-    ): Feature<StateType> {
-        return new Feature(featureName, initialState, reducer);
+    ): FeatureBase<StateType> {
+        return new FeatureBase(featureName, initialState, reducer);
     }
 
     createEffect(effect: Observable<Action>) {
@@ -26,7 +26,7 @@ class Store {
     }
 
     dispatch = (action: Action) => StoreCore.dispatch(action);
-    
+
     select<K>(mapFn: (state: AppState) => K): Observable<K> {
         return StoreCore.select(mapFn);
     }

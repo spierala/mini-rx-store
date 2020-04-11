@@ -1,7 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 import { Action, AppState, Reducer } from './interfaces';
 import { default as Store } from './store-core';
-import { combineReducers, ofType } from './utils';
+import { ofType } from './utils';
 import { distinctUntilChanged, map, tap, withLatestFrom } from 'rxjs/operators';
 import { createFeatureSelector } from './selector';
 
@@ -10,18 +10,11 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
 const nameUpdateAction = 'set-state';
 
-export class Feature<StateType> {
-
-    state$: Observable<StateType>;
-    private stateOrCallbackWithName$: Subject<{
-        stateOrCallback: StateOrCallback<StateType>,
-        name: string
-    }> = new Subject();
-    private readonly actionTypePrefix: string;
-    private readonly actionTypeSetState: string;
+export class FeatureBase<StateType> {
+    protected actionTypePrefix: string;
 
     constructor(
-        private featureName: string,
+        featureName: string,
         initialState: StateType,
         reducer?: Reducer<StateType>
     ) {
@@ -35,25 +28,38 @@ export class Feature<StateType> {
 
         this.actionTypePrefix =  '@mini-rx/' + featureName;
 
-        // Feature State
-        this.state$ = Store.select(createFeatureSelector(featureName));
-
-        // Create Default Action Type and Reducer (needed for setState())
-        this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
-        const defaultReducer: Reducer<StateType> = createDefaultReducer(this.actionTypePrefix);
-
-        // Combine feature and default reducer
-        const reducers: Reducer<StateType>[] = reducer ? [defaultReducer, reducer] : [defaultReducer];
-        const combinedReducer: Reducer<StateType> = combineReducers(reducers);
-        // Add initial state to combined reducer
-        const combinedReducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(combinedReducer, initialState);
-        // The reducer must know its feature to reduce feature state only...
-        const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, combinedReducerWithInitialState);
+        reducer = reducer ? reducer : createDefaultReducer(this.actionTypePrefix);
+        const reducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(reducer, initialState);
+        const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducerWithInitialState);
 
         // Add reducer to Store
         Store.addFeatureReducer(featureReducer);
         // Dispatch an initial action to let reducers create the initial state
         Store.dispatch({type: `${this.actionTypePrefix}/init`});
+    }
+}
+
+export class Feature<StateType> extends FeatureBase<StateType> {
+
+    state$: Observable<StateType>;
+    private stateOrCallbackWithName$: Subject<{
+        stateOrCallback: StateOrCallback<StateType>,
+        name: string
+    }> = new Subject();
+
+    private readonly actionTypeSetState: string;
+
+    constructor(
+        private featureName: string,
+        initialState: StateType
+    ) {
+        super(featureName, initialState);
+
+        // Feature State
+        this.state$ = Store.select(createFeatureSelector(featureName));
+
+        // Create Default Action Type and Reducer (needed for setState())
+        this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
 
         this.stateOrCallbackWithName$.pipe(
             withLatestFrom(this.state$),
