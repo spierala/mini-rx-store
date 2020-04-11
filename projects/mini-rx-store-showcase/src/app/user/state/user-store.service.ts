@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../user';
-import { createFeatureSelector, createSelector, Feature, Store } from 'mini-rx-store';
+import { createFeatureSelector, createSelector, Feature } from 'mini-rx-store';
 
 export interface UserState {
     maskUserName: boolean;
@@ -16,16 +16,17 @@ const initialState: UserState = {
 @Injectable({
     providedIn: 'root'
 })
-export class UserStoreService {
+export class UserStoreService extends Feature<UserState> {
 
-    // Create Feature Store
-    private feature: Feature<UserState> = Store.feature<UserState>('users', initialState);
+    constructor() {
+        super('users', initialState);
+    }
 
-    maskUserName$: Observable<boolean> = this.feature.select(getMaskUser);
+    maskUserName$: Observable<boolean> = this.select(getMaskUser);
 
     updateMaskUserName(maskUserName: boolean) {
         // Update State
-        this.feature.setState({maskUserName});
+        this.setState({maskUserName});
     }
 }
 

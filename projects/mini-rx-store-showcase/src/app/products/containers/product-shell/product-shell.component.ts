@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import * as productActions from './../../state/product.actions';
 import { Product } from '../../product';
 import { getCurrentProduct, getError, getProductById, getProducts } from '../../state';
 import { Store } from 'mini-rx-store';
@@ -15,7 +14,7 @@ export class ProductShellComponent implements OnInit {
   selectedProduct$: Observable<Product>;
   products$: Observable<Product[]>;
   errorMessage$: Observable<string>;
-  productById$: Observable<Product>
+  productById$: Observable<Product>;
 
   constructor(
       private productStateService: ProductStateService
@@ -41,11 +40,11 @@ export class ProductShellComponent implements OnInit {
   }
 
   newProduct(): void {
-    Store.dispatch(new productActions.InitializeCurrentProduct());
+    this.productStateService.initializeCurrentProduct();
   }
 
   productSelected(product: Product): void {
-    Store.dispatch(new productActions.SetCurrentProduct(product));
+      this.productStateService.setCurrentProduct(product.id);
   }
 
   deleteProduct(product: Product): void {
@@ -53,13 +52,13 @@ export class ProductShellComponent implements OnInit {
   }
 
   clearProduct(): void {
-    Store.dispatch(new productActions.ClearCurrentProduct());
+    this.productStateService.clearCurrentProduct();
   }
   saveProduct(product: Product): void {
-    Store.dispatch(new productActions.CreateProduct(product));
+    this.productStateService.createProductFn(product);
   }
 
   updateProduct(product: Product): void {
-    Store.dispatch(new productActions.UpdateProduct(product));
+      this.productStateService.updateProductFn(product);
   }
 }

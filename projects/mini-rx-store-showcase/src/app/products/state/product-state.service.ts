@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Feature } from 'mini-rx-store';
-import { initialState, ProductState, reducer } from './product.reducer';
+import { initialState, ProductState } from './product.reducer';
 import { ProductService } from '../product.service';
 import { catchError, map, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { Product } from '../product';
 
 @Injectable({
     providedIn: 'root'
@@ -13,11 +14,12 @@ export class ProductStateService extends Feature<ProductState> {
     constructor(
         private productService: ProductService
     ) {
-        super('products', initialState, reducer);
+        super('products', initialState);
     }
 
     displayCode$: Observable<boolean> = this.select(state => state.showProductCode);
 
+    // Effects
     loadFn = this.createEffect(
         'load',
         payload$ => payload$.pipe(
@@ -30,6 +32,48 @@ export class ProductStateService extends Feature<ProductState> {
                     catchError(error => of(this.setStateAction({
                         error,
                         products: []
+                    }, 'error')))
+                );
+            })
+        )
+    );
+
+    createProductFn = this.createEffect<Product>(
+        'create',
+        payload$ => payload$.pipe(
+            mergeMap(product => this.productService.createProduct(product).pipe(
+                map(newProduct => this.setStateAction(state => {
+                    return {
+                        ...state,
+                        products: [...state.products, newProduct],
+                        currentProductId: newProduct.id,
+                        error: ''
+                    };
+                })),
+                catchError(error => of(this.setStateAction({
+                    error
+                }, 'error')))
+            )
+        ))
+    );
+
+    updateProductFn = this.createEffect<Product>(
+        'update',
+        payload$ => payload$.pipe(
+            mergeMap((product) => {
+                return this.productService.updateProduct(product).pipe(
+                    map((updatedProduct) => this.setStateAction((state) => {
+                        const updatedProducts = state.products.map(
+                            item => product.id === item.id ? product : item);
+
+                        return {
+                            products: updatedProducts,
+                            currentProductId: product.id,
+                            error: ''
+                        };
+                    }, 'success')),
+                    catchError(error => of(this.setStateAction({
+                        error
                     }, 'error')))
                 );
             })
@@ -65,4 +109,25 @@ export class ProductStateService extends Feature<ProductState> {
             })
         )
     );
+
+    // Set State
+    setCurrentProduct(id: number) {
+        this.setState(state => {
+            if (state.currentProductId === id) {
+                return state;
+            }
+            return {
+                ...state,
+                currentProductId: id
+            };
+        });
+    }
+
+    clearCurrentProduct() {
+        this.setState({currentProductId: undefined});
+    }
+
+    initializeCurrentProduct() {
+        this.setState({currentProductId: 0});
+    }
 }
