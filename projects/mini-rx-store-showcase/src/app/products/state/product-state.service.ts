@@ -23,8 +23,8 @@ export class ProductStateService extends Feature<ProductState> {
     loadFn = this.createEffect(
         'load',
         payload$ => payload$.pipe(
-            mergeMap(() => {
-                return this.productService.getProducts().pipe(
+            mergeMap(() =>
+                this.productService.getProducts().pipe(
                     map((products) => this.setStateAction({
                         products,
                         error: ''
@@ -33,28 +33,29 @@ export class ProductStateService extends Feature<ProductState> {
                         error,
                         products: []
                     }, 'error')))
-                );
-            })
+                )
+            )
         )
     );
 
     createProductFn = this.createEffect<Product>(
         'create',
         payload$ => payload$.pipe(
-            mergeMap(product => this.productService.createProduct(product).pipe(
-                map(newProduct => this.setStateAction(state => {
-                    return {
-                        ...state,
-                        products: [...state.products, newProduct],
-                        currentProductId: newProduct.id,
-                        error: ''
-                    };
-                }), 'success'),
-                catchError(error => of(this.setStateAction({
-                    error
-                }, 'error')))
+            mergeMap(product =>
+                this.productService.createProduct(product).pipe(
+                    map(newProduct => this.setStateAction(state => {
+                        return {
+                            products: [...state.products, newProduct],
+                            currentProductId: newProduct.id,
+                            error: ''
+                        };
+                    }), 'success'),
+                    catchError(error => of(this.setStateAction({
+                        error
+                    }, 'error')))
+                )
             )
-        ))
+        )
     );
 
     updateProductFn = this.createEffect<Product>(
@@ -64,7 +65,8 @@ export class ProductStateService extends Feature<ProductState> {
                 return this.productService.updateProduct(product).pipe(
                     map((updatedProduct) => this.setStateAction((state) => {
                         const updatedProducts = state.products.map(
-                            item => product.id === item.id ? product : item);
+                            item => updatedProduct.id === item.id ? updatedProduct : item
+                        );
 
                         return {
                             products: updatedProducts,
@@ -117,7 +119,6 @@ export class ProductStateService extends Feature<ProductState> {
                 return state;
             }
             return {
-                ...state,
                 currentProductId: id
             };
         }, 'currProd');
