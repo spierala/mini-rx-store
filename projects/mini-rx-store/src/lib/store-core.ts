@@ -26,10 +26,7 @@ class StoreCore {
     private reducerSource: Subject<Reducer<any>> = new Subject();
     combinedReducer$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
         scan<Reducer<any>, Reducer<AppState>>((acc, reducer) => {
-            if (acc) {
-                return combineReducers([acc, reducer]);
-            }
-            return reducer;
+            return combineReducers([acc, reducer]);
         })
     );
 
