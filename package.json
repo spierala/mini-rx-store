@@ -8,6 +8,7 @@
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
+        "test:minirx": "jest --config ./projects/mini-rx-store/jest.config.js",
         "test:minirx:watch": "jest --config ./projects/mini-rx-store/jest.config.js --watch",
         "test:minirx:coverage": "jest --config ./projects/mini-rx-store/jest.config.js --coverage",
         "pretty-quick": "pretty-quick",
