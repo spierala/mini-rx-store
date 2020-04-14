@@ -20,7 +20,6 @@ export class FeatureBase<StateType> {
     ) {
         // Check if feature already exists
         if (!Store.features.has(featureName)) {
-            // Create Feature Store instance
             Store.features.set(featureName, this);
         } else {
             throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
@@ -31,10 +30,12 @@ export class FeatureBase<StateType> {
         reducer = reducer
             ? reducer
             : createDefaultReducer(this.actionTypePrefix);
+
         const reducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(
             reducer,
             initialState
         );
+
         const featureReducer: Reducer<AppState> = createFeatureReducer(
             featureName,
             reducerWithInitialState
@@ -48,7 +49,8 @@ export class FeatureBase<StateType> {
 }
 
 export abstract class Feature<StateType> extends FeatureBase<StateType> {
-    private readonly actionTypeSetState: string;
+    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
+    private effectCounter = 1; // Used for naming anonymous effects
 
     protected state$: BehaviorSubject<StateType> = new BehaviorSubject(
         undefined
@@ -89,13 +91,21 @@ export abstract class Feature<StateType> extends FeatureBase<StateType> {
         );
     }
 
+    private getEffectStartActionType(effectName): string {
+        if (!effectName) {
+            effectName = this.effectCounter;
+            this.effectCounter++;
+        }
+        return `${this.actionTypePrefix}/effect/${effectName}`;
+    }
+
     protected createEffect<PayLoadType = any>(
-        effectName: string,
         effectFn: (
             payload: Observable<PayLoadType>
-        ) => Observable<StateOrCallback<StateType>>
+        ) => Observable<StateOrCallback<StateType>>,
+        effectName?: string
     ): (payload?: PayLoadType) => void {
-        const effectStartActionType = `${this.actionTypePrefix}/effect/${effectName}`;
+        const effectStartActionType = this.getEffectStartActionType(effectName);
         const effect$: Observable<Action> = Store.actions$.pipe(
             ofType(effectStartActionType),
             map((action) => action.payload),
