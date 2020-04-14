@@ -246,13 +246,12 @@ Alternatively `setState` accepts a new state object directly.
 
 #### Create an Effect with `createEffect`
 
-**`createEffect<PayLoadType = any>( effectFn: (payload: Observable<PayLoadType>) => Observable<(state: S) => S | state: Partial<S>>, effectName?: string ): (payload?: PayLoadType) => void`**
+**`createEffect<PayLoadType>(effectFn: (payload: Observable<PayLoadType>) => Observable<(state: S) => S | state: Partial<S>>, effectName?: string ): (payload?: PayLoadType) => void`**
 
 Example:
 
 ```
 deleteProductFn = this.createEffect<number>(
-    'delete',
     payload$ => payload$.pipe(
         mergeMap((productId) => {
             return this.productService.deleteProduct(productId).pipe(
@@ -266,7 +265,8 @@ deleteProductFn = this.createEffect<number>(
                 catchError(err => of({error: err})) // Or return the new state object directly
             )
         })
-    )
+    ),
+    'delete' // Used for logging / Redux Dev Tools
 );
 
 // Run the effect
