@@ -2,18 +2,18 @@ import { Observable } from 'rxjs';
 import {
     Action,
     AppState,
-    StoreExtension,
     Reducer,
     Settings,
+    StoreExtension,
 } from './interfaces';
 import StoreCore from './store-core';
-import { FeatureBase, Feature } from './feature';
+import { FeatureBase } from './feature';
 
 // Expose public store API
 class Store {
     feature<StateType>(
         featureName: string,
-        initialState: Partial<StateType>,
+        initialState: StateType,
         reducer: Reducer<StateType>
     ) {
         new FeatureBase(featureName, initialState, reducer);
