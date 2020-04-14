@@ -45,3 +45,4 @@ testem.log
 .DS_Store
 Thumbs.db
 projects/mini-rx-store/node_modules/
+projects/mini-rx-store/coverage/

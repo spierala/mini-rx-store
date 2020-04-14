@@ -6,8 +6,6 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './containers/product-shell/product-shell.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-import { Store } from 'mini-rx-store';
-import { ProductEffects } from './state/product.effects';
 import { ProductStateService } from './state/product-state.service';
 
 const productRoutes: Routes = [
@@ -27,10 +25,9 @@ const productRoutes: Routes = [
 })
 export class ProductModule {
     constructor(
-        private productEffects: ProductEffects,
         private productStateService: ProductStateService
     ) {
         // DEMO MiniEffects
-        this.productStateService.loadFn();
+        this.productStateService.loadProducts();
     }
 }

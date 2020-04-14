@@ -1,8 +1,28 @@
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
-import { ProductState } from './product.reducer';
+import { Product } from '../product';
+
+// State for this feature (Product)
+export interface ProductState {
+    showProductCode: boolean;
+    currentProductId: number | null;
+    products: Product[];
+    error: string;
+}
+
+export const initialState: ProductState = {
+    showProductCode: true,
+    currentProductId: null,
+    products: [],
+    error: ''
+};
 
 // Selector functions
-const getProductFeatureState = createFeatureSelector<ProductState>('products');
+const getProductFeatureState = createFeatureSelector<ProductState>();
+
+export const getShowProductCode = createSelector(
+    getProductFeatureState,
+    (state: ProductState) => state.showProductCode
+);
 
 export const getCurrentProductId = createSelector(
     getProductFeatureState,

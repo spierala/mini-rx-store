@@ -16,14 +16,6 @@
             "project": "projects/mini-rx-store/ng-package.json"
           }
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/mini-rx-store/src/test.ts",
-            "tsConfig": "projects/mini-rx-store/tsconfig.spec.json",
-            "karmaConfig": "projects/mini-rx-store/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -113,23 +105,6 @@
             "browserTarget": "mini-rx-store-showcase:build"
           }
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/mini-rx-store-showcase/src/test.ts",
-            "polyfills": "projects/mini-rx-store-showcase/src/polyfills.ts",
-            "tsConfig": "projects/mini-rx-store-showcase/tsconfig.spec.json",
-            "karmaConfig": "projects/mini-rx-store-showcase/karma.conf.js",
-            "assets": [
-              "projects/mini-rx-store-showcase/src/favicon.ico",
-              "projects/mini-rx-store-showcase/src/assets"
-            ],
-            "styles": [
-              "projects/mini-rx-store-showcase/src/styles.css"
-            ],
-            "scripts": []
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -170,14 +145,6 @@
             "project": "projects/mini-rx-ng-devtools/ng-package.json"
           }
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/mini-rx-ng-devtools/src/test.ts",
-            "tsConfig": "projects/mini-rx-ng-devtools/tsconfig.spec.json",
-            "karmaConfig": "projects/mini-rx-ng-devtools/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -192,5 +159,5 @@
         }
       }
     }},
-  "defaultProject": "mini-rx-store"
+  "defaultProject": "mini-rx-store-showcase"
 }

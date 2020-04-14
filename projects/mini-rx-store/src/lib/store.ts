@@ -1,16 +1,22 @@
 import { Observable } from 'rxjs';
-import { Action, AppState, StoreExtension, Reducer, Settings } from './interfaces';
+import {
+    Action,
+    AppState,
+    Reducer,
+    Settings,
+    StoreExtension,
+} from './interfaces';
 import StoreCore from './store-core';
-import { Feature } from './feature';
+import { FeatureBase } from './feature';
 
 // Expose public store API
 class Store {
     feature<StateType>(
         featureName: string,
-        initialState: StateType = {} as StateType,
-        reducer?: Reducer<StateType>
-    ): Feature<StateType> {
-        return new Feature(featureName, initialState, reducer);
+        initialState: StateType,
+        reducer: Reducer<StateType>
+    ) {
+        new FeatureBase(featureName, initialState, reducer);
     }
 
     createEffect(effect: Observable<Action>) {
@@ -26,7 +32,7 @@ class Store {
     }
 
     dispatch = (action: Action) => StoreCore.dispatch(action);
-    
+
     select<K>(mapFn: (state: AppState) => K): Observable<K> {
         return StoreCore.select(mapFn);
     }

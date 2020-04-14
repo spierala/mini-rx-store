@@ -31,7 +31,8 @@
       "mini-rx-ng-devtools/*": [
         "dist/mini-rx-ng-devtools/*"
       ]
-    }
+    },
+      "esModuleInterop": true
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
