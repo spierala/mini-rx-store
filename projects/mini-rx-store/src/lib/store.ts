@@ -1,5 +1,11 @@
 import { Observable } from 'rxjs';
-import { Action, AppState, StoreExtension, Reducer, Settings } from './interfaces';
+import {
+    Action,
+    AppState,
+    StoreExtension,
+    Reducer,
+    Settings,
+} from './interfaces';
 import StoreCore from './store-core';
 import { FeatureBase, Feature } from './feature';
 
@@ -7,10 +13,10 @@ import { FeatureBase, Feature } from './feature';
 class Store {
     feature<StateType>(
         featureName: string,
-        initialState: StateType = {} as StateType,
-        reducer?: Reducer<StateType>
-    ): FeatureBase<StateType> {
-        return new FeatureBase(featureName, initialState, reducer);
+        initialState: Partial<StateType>,
+        reducer: Reducer<StateType>
+    ) {
+        new FeatureBase(featureName, initialState, reducer);
     }
 
     createEffect(effect: Observable<Action>) {
