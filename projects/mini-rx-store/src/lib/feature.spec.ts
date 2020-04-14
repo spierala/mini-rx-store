@@ -4,16 +4,17 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
 
 class FeatureState extends Feature<UserState> {
-    $firstName = this.select(state => state.firstName);
-    $lastName = this.select(state => state.lastName);
+    $firstName = this.select((state) => state.firstName);
+    $lastName = this.select((state) => state.lastName);
 
-    loadFn = this.createEffect(
-        'load',
-        payload$ => payload$.pipe(
-            mergeMap(() => getAsyncUser().pipe(
-                map((user) => user),
-                catchError(err => EMPTY)
-            ))
+    loadFn = this.createEffect((payload$) =>
+        payload$.pipe(
+            mergeMap(() =>
+                getAsyncUser().pipe(
+                    map((user) => user),
+                    catchError((err) => EMPTY)
+                )
+            )
         )
     );
 
@@ -22,11 +23,11 @@ class FeatureState extends Feature<UserState> {
     }
 
     updateFirstName(firstName) {
-        this.setState(state => ({firstName}));
+        this.setState((state) => ({ firstName }));
     }
 
     updateLastName(lastName) {
-        this.setState({lastName});
+        this.setState({ lastName });
     }
 }
 
@@ -61,4 +62,3 @@ describe('Feature', () => {
         expect(spy).toHaveBeenCalledWith('Steven');
     });
 });
-
