@@ -187,13 +187,11 @@ this.products$ = Store.select(getProducts);
 
 ## Make simple things simple - The `Feature` API
 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `Feature` instance (which is returned by the `Store.feature` function).
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
 
-You can update state without writing Actions and Reducers!
+#### Create a Feature (Feature State):
 
-#### Create a Feature Store
-
-To create a Feature Store, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
+To create a Feature, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
 
 ```
 export class UserStateService extends Feature<UserState>{
@@ -290,9 +288,10 @@ The code above creates an Effect for _deleting a product_ from the list. The API
 
 #### FYI
 
-Also the simplified API makes use of Redux :
+Also the `Feature` API makes use of Redux:
+Each Feature is registered in the Store (Single Source of Truth) and is part of the global App State.
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
-When you use `setState()` or `createEffect()` MiniRx dispatches the default action, and the default reducer will update the feature accordingly.
+When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action, and the default reducer will update the feature state accordingly.
 
 See the default Action in the Redux Dev Tools:
 
