@@ -284,7 +284,7 @@ The code above creates an Effect for _deleting a product_ from the list. The API
     When the side effect completed you can directly return the new state or return a callback function which gets the current state and returns a new state.
 
 -   **`effectName: string`**:
-    ID which needs to be unique per feature. That ID will also show up in the logging (Redux Dev Tools / JS console).
+    ID which needs to be unique for each effect. That ID will also show up in the logging (Redux Dev Tools / JS console).
 
 #### FYI
 
