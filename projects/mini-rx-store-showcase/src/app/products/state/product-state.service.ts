@@ -139,7 +139,7 @@ export class ProductStateService extends Feature<ProductState> {
                     })
                 );
             })
-        )
+        ), 'delete'
     );
 
     // UPDATE STATE
