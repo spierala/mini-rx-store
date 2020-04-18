@@ -24,6 +24,7 @@ import {
     providedIn: 'root',
 })
 export class ProductStateService extends Feature<ProductState> {
+    // SELECT STATE with memoized selectors
     displayCode$: Observable<boolean> = this.select(getShowProductCode);
     selectedProduct$: Observable<Product> = this.select(getCurrentProduct);
     products$: Observable<Product[]> = this.select(getProducts);
@@ -34,7 +35,8 @@ export class ProductStateService extends Feature<ProductState> {
         super('products', initialState);
     }
 
-    // EFFECTS
+    // FEATURE EFFECTS (scoped to the current feature state)
+    // The completed sideEffects update the feature state directly
     loadProducts = this.createEffect(
         (payload$) =>
             payload$.pipe(
