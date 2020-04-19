@@ -1,12 +1,35 @@
-import { Injector, NgModule } from '@angular/core';
+import { Inject, Injectable, InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import { NgReduxDevtoolsExtension } from './ng-redux-devtools.extension';
-import { Store } from 'mini-rx-store';
+import { ReduxDevtoolsOptions, Store } from 'mini-rx-store';
 
-@NgModule({
-    declarations: [],
+const OPTIONS = new InjectionToken<ReduxDevtoolsOptions>('ReduxDevtoolsOptions');
+
+@Injectable({
+    providedIn: 'root'
 })
+class NgReduxDevtoolsService {
+    constructor(private injector: Injector, @Inject(OPTIONS) private options: ReduxDevtoolsOptions) {
+        Store.addExtension(new NgReduxDevtoolsExtension(options, injector));
+    }
+}
+
+@NgModule()
 export class NgReduxDevtoolsModule {
-    constructor(injector: Injector) {
-        Store.addExtension(new NgReduxDevtoolsExtension(injector));
+    static instrument(
+        config: Partial<ReduxDevtoolsOptions> = {}
+    ): ModuleWithProviders<NgReduxDevtoolsModule> {
+        return {
+            ngModule: NgReduxDevtoolsModule,
+            providers: [
+                {
+                    provide: OPTIONS,
+                    useValue: config
+                }
+            ]
+        };
+    }
+
+    constructor(ngReduxDevTools: NgReduxDevtoolsService) {
+
     }
 }

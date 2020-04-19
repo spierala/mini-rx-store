@@ -5,16 +5,32 @@ import { default as Store } from '../store-core';
 
 const win = window as any;
 
+const defaultOptions: Partial<ReduxDevtoolsOptions> = {
+    name: 'MiniRx - Redux Dev Tools'
+};
+
+export interface ReduxDevtoolsOptions {
+    maxAge: number;
+    name: string;
+}
+
 export class ReduxDevtoolsExtension implements StoreExtension {
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
 
-    constructor() {
+    constructor(
+        private readonly options: Partial<ReduxDevtoolsOptions>
+    ) {
+
+        this.options = {
+            ...defaultOptions,
+            ...this.options
+        };
     }
 
     init() {
         if (this.devtoolsExtension) {
-            this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect();
+            this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect(this.options);
 
             actions$.pipe(
                 withLatestFrom(Store.state$),
