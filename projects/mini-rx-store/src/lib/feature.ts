@@ -60,7 +60,7 @@ export abstract class Feature<StateType> extends FeatureBase<StateType> {
     }
 
     protected constructor(
-        private featureName: string,
+        featureName: string,
         initialState: StateType
     ) {
         super(featureName, initialState);
