@@ -155,7 +155,7 @@ constructor(private productService: ProductService) {
 The code above creates an Effect. As soon as the `Load` Action is dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new Action will be dispatched:
 `LoadSuccess` or `LoadFail`.
 
-#### Create Selectors:
+#### Create (memoized) Selectors:
 
 Selectors are used to select and combine state.
 
@@ -174,7 +174,7 @@ export const getProducts = createSelector(
 `createSelector` creates a memoized selector. This improves performance especially if your selectors perform expensive computation.
 If the selector is called with the same arguments again, it will just return the previously calculated result.
 
-#### Select Observable State (with a selector):
+#### Select Observable State (with a memoized selector):
 
 ```
 import { Store } from 'mini-rx-store';
@@ -187,13 +187,11 @@ this.products$ = Store.select(getProducts);
 
 ## Make simple things simple - The `Feature` API
 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API which is offered for each `Feature` instance (which is returned by the `Store.feature` function).
+If a Feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
 
-You can update state without writing Actions and Reducers!
+#### Create a Feature (Feature State):
 
-#### Create a Feature Store
-
-To create a Feature Store, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
+To create a Feature, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
 
 ```
 export class UserStateService extends Feature<UserState>{
@@ -219,7 +217,7 @@ The returned Observable will emit the selected data over time.
 
 #### Update state with `setState`
 
-**`setState(stateFn: (state: S) => S | state: Partial<S>): void`**
+**`setState(stateFn: (state: S) => S | state: Partial<S>, name?: string): void`**
 
 Example:
 
@@ -244,6 +242,10 @@ updateMaskUserName(maskUserName: boolean) {
 Inside of that function you can compose the new feature state.
 
 Alternatively `setState` accepts a new state object directly.
+
+For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
+
+`this.setState({ showProductCode }, 'showProductCode');`
 
 #### Create an Effect with `createEffect`
 
@@ -286,13 +288,36 @@ The code above creates an Effect for _deleting a product_ from the list. The API
     When the side effect completed you can directly return the new state or return a callback function which gets the current state and returns a new state.
 
 -   **`effectName: string`**:
-    ID which needs to be unique per feature. That ID will also show up in the logging (Redux Dev Tools / JS console).
+    ID which needs to be unique for each effect. That ID will also show up in the logging (Redux Dev Tools / JS console).
 
-#### FYI
+#### Select Observable State (with a memoized selector):
+You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
+This is because the Feature API is operating on a specific feature state already (the feature name has been provided in the constructor). 
 
-Also the simplified API makes use of Redux :
+```
+const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
+
+const getProducts = createSelector(
+    getProductFeatureState,
+    state => state.products
+);
+
+// Inside the Feature state service
+export class ProductStateService extends Feature<ProductState>{
+    this.products$ = this.select(getProducts);
+
+    constructor(private productService: ProductService) {
+        super('products', initialState); // Feature name 'products' is provided here already...
+    }
+}
+```
+
+#### FYI: How the Feature API works
+
+Also the `Feature` API makes use of Redux:
+Each Feature is registered in the Store (Single Source of Truth) and is part of the global App State.
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
-When you use `setState()` or `createEffect()` MiniRx dispatches the default action, and the default reducer will update the feature accordingly.
+When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action, and the default reducer will update the feature state accordingly.
 
 See the default Action in the Redux Dev Tools:
 
@@ -362,7 +387,7 @@ I did a refactor from NgRx to MiniRx and the app still works :)
 
 ## References
 
-These projects and articles helped and inspired me to create MiniRx:
+These projects, articles and courses helped and inspired me to create MiniRx:
 
 -   [NgRx](https://ngrx.io/)
 -   [Observable Store](https://github.com/DanWahlin/Observable-Store)
@@ -370,13 +395,16 @@ These projects and articles helped and inspired me to create MiniRx:
 -   [Basic State Managment with an Observable Service](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)
 -   [Redux From Scratch With Angular and RxJS](https://www.youtube.com/watch?v=hG7v7quMMwM)
 -   [How I wrote NgRx Store in 63 lines of code](https://medium.com/angular-in-depth/how-i-wrote-ngrx-store-in-63-lines-of-code-dfe925fe979b)
+-   [Pluralsight: Angular NgRx: Getting Started](https://app.pluralsight.com/library/courses/angular-ngrx-getting-started/table-of-contents)
+-   [Pluralsight: RxJS in Angular: Reactive Development](https://app.pluralsight.com/library/courses/rxjs-angular-reactive-development/table-of-contents)
+-   [Pluralsight: RxJS: Getting Started](https://app.pluralsight.com/library/courses/rxjs-getting-started/table-of-contents)
 
 ## TODO
 
 -   Further Integrate Redux Dev Tools
 -   Work on the ReadMe and Documentation
 -   Nice To Have: Test lib in React, Vue, maybe even AngularJS
--   Add Unit Tests
+-   Add more Unit Tests
 
 ## License
 
