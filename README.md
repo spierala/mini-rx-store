@@ -337,8 +337,7 @@ The code above sets the global Store Settings.
 `enableLogging` is currently the only available setting.
 Typically you would set the settings when bootstrapping the app and before the store is used.
 
-## Redux Dev Tools (experimental):
-
+## Redux Dev Tools:
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
 
 MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
@@ -347,7 +346,14 @@ You need to install the Browser Plugin to make it work.
 -   [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 -   [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
+Currently these options are available to configure the DevTools:
+* `name`: the instance name to be shown on the DevTools monitor page.
+* `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
+* `latency: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. It is the joint between performance and speed. When set to 0, all actions will be sent instantly. Set it to a higher value when experiencing perf issues (also maxAge to a lower value). Default is 500 ms.
+
+
 #### Installation (Angular):
+[![npm version](https://badge.fury.io/js/mini-rx-ng-devtools.svg)](https://www.npmjs.com/package/mini-rx-ng-devtools)
 
 `npm i mini-rx-ng-devtools`
 
@@ -358,7 +364,11 @@ import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 
 @NgModule({
     imports: [
-        NgReduxDevtoolsModule
+        NgReduxDevtoolsModule.instrument({
+            name: 'MiniRx Showcase',
+            maxAge: 25,
+            latency: 1000
+        })
     ]
     ...
 })
@@ -370,7 +380,11 @@ export class AppModule {}
 ```
 import { Store, ReduxDevtoolsExtension } from 'mini-rx-store';
 
-Store.addExtension(new ReduxDevtoolsExtension());
+Store.addExtension(new ReduxDevtoolsExtension({
+    name: 'MiniRx Showcase',
+    maxAge: 25,
+    latency: 1000
+}));
 ```
 
 ## Showcase
