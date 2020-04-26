@@ -15,7 +15,7 @@ export class FeatureBase<StateType> {
 
     constructor(
         featureName: string,
-        initialState: Partial<StateType>,
+        initialState: StateType,
         reducer?: Reducer<StateType>
     ) {
         // Check if feature already exists
@@ -61,7 +61,7 @@ export abstract class Feature<StateType> extends FeatureBase<StateType> {
 
     protected constructor(
         featureName: string,
-        initialState: Partial<StateType>
+        initialState: StateType
     ) {
         super(featureName, initialState);
 
