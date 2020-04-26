@@ -87,10 +87,10 @@ export function createSelector(...args: any[]): Selector<any, any> {
     const projector = args[args.length - 1];
     const memoizedProjector = memoizeOne(projector);
 
-    return (state) => {
+    return memoizeOne((state) => {
         const selectorResults = selectors.map(fn => fn(state));
         return memoizedProjector.apply(null, selectorResults);
-    };
+    });
 }
 
 
