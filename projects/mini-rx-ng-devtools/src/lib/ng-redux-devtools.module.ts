@@ -7,7 +7,7 @@ const OPTIONS = new InjectionToken<ReduxDevtoolsOptions>('ReduxDevtoolsOptions')
 @Injectable({
     providedIn: 'root'
 })
-class NgReduxDevtoolsService {
+export class NgReduxDevtoolsService {
     constructor(private injector: Injector, @Inject(OPTIONS) private options: ReduxDevtoolsOptions) {
         Store.addExtension(new NgReduxDevtoolsExtension(options, injector));
     }
