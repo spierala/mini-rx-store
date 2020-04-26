@@ -6,9 +6,6 @@
     "homepage": "https://github.com/spierala/mini-rx-store",
     "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
     "description": "MiniRx: Redux DevTools Integration for Angular",
-    "devDependencies": {
-        "mini-rx-store": "latest"
-    },
     "peerDependencies": {
         "@angular/common": "^8.2.14",
         "@angular/core": "^8.2.14"

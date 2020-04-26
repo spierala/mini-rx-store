@@ -14,6 +14,8 @@
         "pretty-quick": "pretty-quick",
         "minirx-version++": "cd projects/mini-rx-store && npm version prerelease",
         "minirx-build": "npm run minirx-version++ && ng build mini-rx-store && copy LICENSE dist/mini-rx-store && copy README.md dist/mini-rx-store",
+        "minirx-ng-devtools-version++": "cd projects/mini-rx-ng-devtools && npm version patch",
+        "minirx-ng-devtools-build": "ng build mini-rx-store && npm run minirx-ng-devtools-version++ && ng build mini-rx-ng-devtools",
         "showcase-analyze": "ng build  mini-rx-store-showcase --outputPath=dist --prod --stats-json && webpack-bundle-analyzer dist/stats-es2015.json --port 4201"
     },
     "private": true,
