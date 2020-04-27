@@ -10,7 +10,7 @@ const asyncUser: UserState = {
     lastName: 'Seagal'
 };
 
-export function getAsyncUser(): Observable<UserState> { // move to shared spec
+export function getAsyncUser(): Observable<UserState> {
     return of(asyncUser);
 }
 
@@ -27,20 +27,18 @@ function reducer(state: UserState, action: Action): any {
     }
 }
 
-export interface UserState { // move to shared spec
+interface UserState {
     firstName: string;
     lastName: string;
 }
 
-export const initialState: UserState = { // move to shared spec
+const initialState: UserState = {
     firstName: 'Bruce',
     lastName: 'Willis'
 };
 
 const getUser = createFeatureSelector<UserState>('user');
 const getFirstName = createSelector(getUser, user => user.firstName);
-
-
 
 describe('Store', () => {
     it('should initialize the store', () => {
