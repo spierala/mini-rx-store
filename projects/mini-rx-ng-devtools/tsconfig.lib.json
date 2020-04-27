@@ -9,7 +9,13 @@
     "lib": [
       "dom",
       "es2018"
-    ]
+    ],
+    "paths": {
+        "mini-rx-store": [
+            "dist/mini-rx-store",
+            "projects/mini-rx-store/src/public-api"
+        ]
+    }
   },
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,

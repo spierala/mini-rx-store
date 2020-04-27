@@ -84,7 +84,11 @@ export abstract class Feature<StateType> extends FeatureBase<StateType> {
         });
     }
 
-    protected select<K>(mapFn: (state: StateType) => K): Observable<K> {
+    protected select<K>(mapFn: (state: StateType | AppState) => K, selectFromStore: boolean = false): Observable<K> {
+        if (selectFromStore) {
+            return Store.select(mapFn);
+        }
+
         return this.state$.pipe(
             map((state: StateType) => mapFn(state)),
             distinctUntilChanged()

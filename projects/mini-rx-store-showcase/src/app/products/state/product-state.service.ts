@@ -25,11 +25,11 @@ import {
 })
 export class ProductStateService extends Feature<ProductState> {
     // SELECT STATE with memoized selectors
-    displayCode$: Observable<boolean> = this.select(getShowProductCode);
-    selectedProduct$: Observable<Product> = this.select(getCurrentProduct);
-    products$: Observable<Product[]> = this.select(getProducts);
-    errorMessage$: Observable<string> = this.select(getError);
-    productById$: Observable<Product> = this.select(getProductById(1));
+    displayCode$: Observable<boolean> = this.select(getShowProductCode, true);
+    selectedProduct$: Observable<Product> = this.select(getCurrentProduct, true);
+    products$: Observable<Product[]> = this.select(getProducts, true);
+    errorMessage$: Observable<string> = this.select(getError, true);
+    productById$: Observable<Product> = this.select(getProductById(1), true);
 
     constructor(private productService: ProductService) {
         super('products', initialState);
