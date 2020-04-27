@@ -1,16 +1,32 @@
-import { Inject, Injectable, InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
+// Credits: Akita: https://github.com/datorama/akita/blob/master/libs/akita-ng-devtools/src/lib/ng-devtools.module.ts)
+
+import {
+    APP_INITIALIZER,
+    Inject,
+    Injectable,
+    InjectionToken,
+    Injector,
+    ModuleWithProviders,
+    NgModule
+} from '@angular/core';
 import { NgReduxDevtoolsExtension } from './ng-redux-devtools.extension';
 import { ReduxDevtoolsOptions, Store } from 'mini-rx-store';
 
-const OPTIONS = new InjectionToken<ReduxDevtoolsOptions>('ReduxDevtoolsOptions');
+export const DEVTOOLS_OPTIONS = new InjectionToken<ReduxDevtoolsOptions>('ReduxDevtoolsOptions');
 
 @Injectable({
     providedIn: 'root'
 })
 export class NgReduxDevtoolsService {
-    constructor(private injector: Injector, @Inject(OPTIONS) private options: ReduxDevtoolsOptions) {
+    constructor(private injector: Injector, @Inject(DEVTOOLS_OPTIONS) private options: ReduxDevtoolsOptions) {
         Store.addExtension(new NgReduxDevtoolsExtension(options, injector));
     }
+}
+
+// Auto initialize the devtools
+export function d() {}
+export function init(devtoolsService: NgReduxDevtoolsService) {
+    return d;
 }
 
 @NgModule()
@@ -22,14 +38,16 @@ export class NgReduxDevtoolsModule {
             ngModule: NgReduxDevtoolsModule,
             providers: [
                 {
-                    provide: OPTIONS,
+                    provide: DEVTOOLS_OPTIONS,
                     useValue: config
+                },
+                {
+                    provide: APP_INITIALIZER,
+                    useFactory: init,
+                    deps: [NgReduxDevtoolsService],
+                    multi: true
                 }
             ]
         };
-    }
-
-    constructor(ngReduxDevTools: NgReduxDevtoolsService) {
-
     }
 }

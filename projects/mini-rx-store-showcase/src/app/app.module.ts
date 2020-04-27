@@ -20,16 +20,16 @@ import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 
 @NgModule({
   imports: [
-    NgReduxDevtoolsModule.instrument({
-        name: 'MiniRx Showcase',
-        maxAge: 25,
-        latency: 1000
-    }),
     BrowserModule,
     HttpClientModule,
     HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 1000 }),
     UserModule,
     AppRoutingModule,
+      NgReduxDevtoolsModule.instrument({
+          name: 'MiniRx Showcase',
+          maxAge: 25,
+          latency: 1000
+      }),
   ],
   declarations: [
     AppComponent,
