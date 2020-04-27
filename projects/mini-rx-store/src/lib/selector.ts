@@ -1,7 +1,9 @@
+// createSelector is heavily inspired by NgRx!
+// Typings are taken directly from NgRx with small modifications:
+// https://github.com/ngrx/platform/blob/8.6.0/modules/store/src/selector.ts
+
 import memoizeOne from 'memoize-one';
 
-// Credits for the Typing of createSelector go to NgRx!
-// https://github.com/ngrx/platform/blob/master/modules/store/src/selector.ts
 export type Selector<T, V> = (state: T) => V;
 
 export function createSelector<State, S1, Result>(
