@@ -1,6 +1,19 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
-import { distinctUntilChanged, map, mergeAll, scan, tap, withLatestFrom } from 'rxjs/operators';
+import {
+    Action,
+    AppState,
+    Reducer,
+    Settings,
+    StoreExtension,
+} from './interfaces';
+import {
+    distinctUntilChanged,
+    map,
+    mergeAll,
+    scan,
+    tap,
+    withLatestFrom,
+} from 'rxjs/operators';
 import { combineReducers } from './utils';
 import { FeatureBase, Feature } from './feature';
 
@@ -22,12 +35,13 @@ class StoreCore {
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
     state$: Observable<AppState> = this.stateSource.asObservable();
 
-    // COMBINED REDUCER
+    // COMBINED REDUCERS
     private reducerSource: Subject<Reducer<any>> = new Subject();
-    combinedReducer$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
-        scan<Reducer<any>, Reducer<AppState>>((acc, reducer) => {
-            return combineReducers([acc, reducer]);
-        })
+    combinedReducers$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
+        scan<Reducer<any>, Reducer<any>[]>((acc, reducer) => {
+            return [...acc, reducer];
+        }, []),
+        map((reducers) => combineReducers(reducers))
     );
 
     // SETTINGS
@@ -46,7 +60,7 @@ class StoreCore {
 
         this._settings = {
             ...this.defaultSettings,
-            ...settings
+            ...settings,
         };
     }
 
@@ -59,22 +73,22 @@ class StoreCore {
 
     constructor() {
         // Listen to Actions which are emitted by Effects
-        this.effects$.pipe(
-            tap(action => this.dispatch(action))
-        ).subscribe();
+        this.effects$.pipe(tap((action) => this.dispatch(action))).subscribe();
 
         // Listen to the Actions Stream and update state accordingly
-        this.actions$.pipe(
-            withLatestFrom(this.combinedReducer$),
-            scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
-                const state = reducer(acc, action);
-                this.log({action, state});
-                return state;
-            }, {}),
-            tap(state => {
-                this.updateState(state);
-            }),
-        ).subscribe();
+        this.actions$
+            .pipe(
+                withLatestFrom(this.combinedReducers$),
+                scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
+                    const state = reducer(acc, action);
+                    this.log({ action, state });
+                    return state;
+                }, {}),
+                tap((state) => {
+                    this.updateState(state);
+                })
+            )
+            .subscribe();
     }
 
     addFeatureReducer(reducer: Reducer<any>) {
@@ -103,11 +117,17 @@ class StoreCore {
         this.extensions.push(extension);
     }
 
-    private log({action, state}) {
+    private log({ action, state }) {
         if (this.settings.enableLogging) {
             console.log(
-                '%cACTION', 'font-weight: bold; color: #ff9900',
-                '\nType:', action.type, '\nPayload: ', action.payload, '\nState: ', state
+                '%cACTION',
+                'font-weight: bold; color: #ff9900',
+                '\nType:',
+                action.type,
+                '\nPayload: ',
+                action.payload,
+                '\nState: ',
+                state
             );
         }
     }
