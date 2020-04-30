@@ -4,25 +4,34 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
 import { createFeatureSelector, createSelector } from './selector';
 
-interface UserState { // move to shared spec
+interface UserState {
     firstName: string;
     lastName: string;
     city: string;
+    country: string;
 }
 
-const initialState: UserState = { // move to shared spec
+const initialState: UserState = {
     firstName: 'Bruce',
     lastName: 'Willis',
-    city: 'LA'
+    city: 'LA',
+    country: 'United States',
 };
 
-const getUserFeatureState = createFeatureSelector<UserState>('user2');
-const getCity = createSelector(getUserFeatureState, state => state.city);
+const getUserFeatureState = createFeatureSelector<UserState>('user2'); // Select From App State
+const getCity = createSelector(getUserFeatureState, (state) => state.city);
+
+const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select Feature State by omitting the Feature name
+const getCountry = createSelector(
+    getUserFeatureState2,
+    (state) => state.country
+);
 
 class FeatureState extends Feature<UserState> {
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
     city$ = this.select(getCity, true);
+    country$ = this.select(getCountry);
 
     loadFn = this.createEffect((payload$) =>
         payload$.pipe(
@@ -76,6 +85,13 @@ describe('Feature', () => {
         const spy = jest.fn();
         userFeature.city$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('LA');
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should select state from feature (Feature State)', () => {
+        const spy = jest.fn();
+        userFeature.country$.subscribe(spy);
+        expect(spy).toHaveBeenCalledWith('United States');
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
