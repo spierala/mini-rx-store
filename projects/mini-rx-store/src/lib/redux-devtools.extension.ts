@@ -1,7 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, StoreExtension } from '../interfaces';
-import { actions$ } from '../store';
-import StoreCore from '../store-core';
+import { AppState, StoreExtension } from './interfaces';
+import { actions$ } from './store';
+import StoreCore from './store-core';
 
 const win = window as any;
 

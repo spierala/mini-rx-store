@@ -5,7 +5,7 @@ import { createFeatureSelector, createSelector } from './selector';
 import { EMPTY, Observable, of } from 'rxjs';
 import { ofType } from './utils';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { ReduxDevtoolsExtension } from './redux-devtools/redux-devtools.extension';
+import { ReduxDevtoolsExtension } from './redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 
 const asyncUser: Partial<UserState> = {
