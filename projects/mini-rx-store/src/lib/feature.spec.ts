@@ -56,8 +56,7 @@ class FeatureState extends Feature<UserState> {
         payload$.pipe(
             mergeMap(() =>
                 fakeApiGet().pipe(
-                    map((user) => user),
-                    catchError((err) => EMPTY)
+                    map((user) => user)
                 )
             )
         )

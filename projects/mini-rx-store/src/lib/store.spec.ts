@@ -145,8 +145,7 @@ describe('Store', () => {
                         map((user) => ({
                             type: 'loadUserSuccess',
                             payload: user,
-                        })),
-                        catchError((err) => EMPTY)
+                        }))
                     )
                 )
             )
@@ -164,8 +163,7 @@ describe('Store', () => {
                             map((user) => ({
                                 type: 'saveUserSuccess',
                                 payload: user,
-                            })),
-                            catchError((err) => EMPTY)
+                            }))
                         )
                     )
                 )
@@ -255,5 +253,32 @@ describe('Store', () => {
         Store.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
         expect(StoreCore['extensions'].length).toBe(1);
+    });
+
+    it('should call the reducer before running the effect', () => {
+        const callOrder = [];
+        const someReducer = (state, action: Action) => {
+            switch (action.type) {
+                case 'someAction2':
+                    callOrder.push('reducer');
+            }
+        };
+        const onEffectStarted = (): Observable<Action> => {
+            callOrder.push('effect');
+            return of({type: 'whatever'});
+        };
+
+        Store.feature('someFeature', {}, someReducer);
+
+        Store.createEffect(
+            actions$.pipe(
+                ofType('someAction2'),
+                mergeMap(() => onEffectStarted())
+            )
+        );
+
+        Store.dispatch({type: 'someAction2'});
+
+        expect(callOrder).toEqual(['reducer', 'effect']);
     });
 });
