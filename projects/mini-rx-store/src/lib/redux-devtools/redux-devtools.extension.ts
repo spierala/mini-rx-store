@@ -50,7 +50,7 @@ export class ReduxDevtoolsExtension implements StoreExtension {
         }
     }
 
-    updateState(state: AppState) {
+    protected updateState(state: AppState) {
         StoreCore.updateState(state);
     }
 }
