@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
 import {
     Action,
     AppState,
@@ -9,7 +9,7 @@ import {
 import {
     distinctUntilChanged,
     map,
-    mergeAll,
+    mergeAll, observeOn,
     scan,
     tap,
     withLatestFrom,
@@ -78,6 +78,7 @@ class StoreCore {
         // Listen to the Actions Stream and update state accordingly
         this.actions$
             .pipe(
+                observeOn(queueScheduler),
                 withLatestFrom(this.combinedReducers$),
                 scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
                     const state = reducer(acc, action);

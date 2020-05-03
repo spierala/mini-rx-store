@@ -1,14 +1,15 @@
 import { Feature } from './feature';
-import { getAsyncUser } from './store.spec';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { createFeatureSelector, createSelector } from './selector';
+import { cold, hot } from 'jest-marbles';
 
 interface UserState {
     firstName: string;
     lastName: string;
     city: string;
     country: string;
+    err: string;
 }
 
 const initialState: UserState = {
@@ -16,7 +17,24 @@ const initialState: UserState = {
     lastName: 'Willis',
     city: 'LA',
     country: 'United States',
+    err: undefined
 };
+
+const asyncUser: UserState = {
+    firstName: 'Steven',
+    lastName: 'Seagal',
+    city: 'LA',
+    country: 'United States',
+    err: ''
+};
+
+function fakeApiGet(): Observable<UserState> {
+    return cold('---a', {a: asyncUser});
+}
+
+function fakeApiWithError(): Observable<UserState> {
+    return cold('-#');
+}
 
 const getUserFeatureState = createFeatureSelector<UserState>('user2'); // Select From App State
 const getCity = createSelector(getUserFeatureState, (state) => state.city);
@@ -28,6 +46,7 @@ const getCountry = createSelector(
 );
 
 class FeatureState extends Feature<UserState> {
+    state$ = this.state$;
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
     city$ = this.select(getCity, true);
@@ -36,9 +55,20 @@ class FeatureState extends Feature<UserState> {
     loadFn = this.createEffect((payload$) =>
         payload$.pipe(
             mergeMap(() =>
-                getAsyncUser().pipe(
+                fakeApiGet().pipe(
                     map((user) => user),
                     catchError((err) => EMPTY)
+                )
+            )
+        )
+    );
+
+    loadFnWithError = this.createEffect((payload$) =>
+        payload$.pipe(
+            mergeMap(() =>
+                fakeApiWithError().pipe(
+                    map((user) => user),
+                    catchError((err) => of({err: 'error'}))
                 )
             )
         )
@@ -54,6 +84,10 @@ class FeatureState extends Feature<UserState> {
 
     updateLastName(lastName) {
         this.setState({ lastName });
+    }
+
+    resetState() {
+        this.setState(initialState);
     }
 }
 
@@ -97,8 +131,12 @@ describe('Feature', () => {
 
     it('should create and execute an effect', () => {
         userFeature.loadFn();
-        const spy = jest.fn();
-        userFeature.firstName$.subscribe(spy);
-        expect(spy).toHaveBeenCalledWith('Steven');
+        expect(userFeature.firstName$).toBeObservable(hot('a--b', {a: 'Nicolas', b: 'Steven'}));
+    });
+
+    it('should create and execute an effect and handle error', () => {
+        userFeature.resetState();
+        userFeature.loadFnWithError();
+        expect(userFeature.state$).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
     });
 });

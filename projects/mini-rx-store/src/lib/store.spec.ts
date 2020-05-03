@@ -6,24 +6,53 @@ import { EMPTY, Observable, of } from 'rxjs';
 import { ofType } from './utils';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from './redux-devtools/redux-devtools.extension';
+import { cold, hot } from 'jest-marbles';
 
-const asyncUser: UserState = {
+const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
     lastName: 'Seagal',
+    age: 30
 };
 
-export function getAsyncUser(): Observable<UserState> {
-    return of(asyncUser);
+const updatedAsyncUser: Partial<UserState> = {
+    firstName: 'Steven',
+    lastName: 'Seagal',
+    age: 31
+};
+
+function fakeApiGet(): Observable<UserState> {
+    return cold('---a', {a: asyncUser});
 }
 
-function reducer(state: UserState, action: Action): any {
+function fakeApiUpdate(): Observable<UserState> {
+    return cold('-a', {a: updatedAsyncUser});
+}
+
+function fakeApiWithError(): Observable<UserState> {
+    return cold('-#');
+}
+
+function reducer(state: UserState, action: Action): UserState {
     switch (action.type) {
         case 'updateUser':
+        case 'loadUserSuccess':
+        case 'saveUserSuccess':
             return {
                 ...state,
                 ...action.payload,
             };
-
+        case 'resetUser':
+            return initialState;
+        case 'incAge':
+            return {
+                ...state,
+                age: state.age + 1
+            };
+        case 'error':
+            return {
+                ...state,
+                err: action.payload
+            };
         default:
             return state;
     }
@@ -32,18 +61,23 @@ function reducer(state: UserState, action: Action): any {
 interface UserState {
     firstName: string;
     lastName: string;
+    age: number;
+    err: string;
 }
 
 const initialState: UserState = {
     firstName: 'Bruce',
     lastName: 'Willis',
+    age: 30,
+    err: undefined
 };
 
 const getUser = createFeatureSelector<UserState>('user');
-const getFirstName = createSelector(getUser, (user) => user.firstName);
+const getFirstName = createSelector(getUser, user => user.firstName);
+const getAge = createSelector(getUser, user => user.age);
 
 describe('Store', () => {
-    it('should initialize the store', () => {
+    it('should initialize the store with an empty object', () => {
         const spy = jest.fn();
         Store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({});
@@ -84,14 +118,32 @@ describe('Store', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+    it('should update the Feature state #1', () => {
+        const age$ = Store.select(getAge);
+        hot('-a-b').subscribe(
+            value => Store.dispatch({type: 'incAge'})
+        );
+        expect(age$).toBeObservable(hot('ab-c', {a: 30, b: 31, c: 32}));
+    });
+
+    it('should update the Feature state #2', () => {
+        const age$ = Store.select(getAge);
+        hot('(ab)').subscribe(
+            value => Store.dispatch({type: 'incAge'})
+        );
+        expect(age$).toBeObservable(hot('(abc)', {a: 32, b: 33, c: 34}));
+    });
+
     it('should create and execute an effect', () => {
+        Store.dispatch({type: 'resetUser'});
+
         Store.createEffect(
             actions$.pipe(
                 ofType('loadUser'),
                 mergeMap(() =>
-                    getAsyncUser().pipe(
+                    fakeApiGet().pipe(
                         map((user) => ({
-                            type: 'updateUser',
+                            type: 'loadUserSuccess',
                             payload: user,
                         })),
                         catchError((err) => EMPTY)
@@ -102,11 +154,49 @@ describe('Store', () => {
 
         Store.dispatch({ type: 'loadUser' });
 
-        const spy = jest.fn();
-        Store.select(getUser).subscribe(spy);
+        // Lets be crazy and add another effect while the other effect is busy
+        cold('-a').subscribe(() => {
+            Store.createEffect(
+                actions$.pipe(
+                    ofType('saveUser'),
+                    mergeMap(() =>
+                        fakeApiUpdate().pipe(
+                            map((user) => ({
+                                type: 'saveUserSuccess',
+                                payload: user,
+                            })),
+                            catchError((err) => EMPTY)
+                        )
+                    )
+                )
+            );
 
-        expect(spy).toHaveBeenCalledWith(asyncUser);
-        expect(spy).toHaveBeenCalledTimes(1);
+            Store.dispatch({type: 'saveUser'});
+        });
+
+        expect(Store.select(getUser)).toBeObservable(hot('a-xb', {a: initialState, b: asyncUser, x: updatedAsyncUser}));
+    });
+
+    it('should create and execute an effect and handle side effect error', () => {
+        Store.dispatch({type: 'resetUser'});
+
+        Store.createEffect(
+            actions$.pipe(
+                ofType('someAction'),
+                mergeMap(() =>
+                    fakeApiWithError().pipe(
+                        map((user) => ({
+                            type: 'whatever'
+                        })),
+                        catchError((err) => of({type: 'error', payload: 'error'}))
+                    )
+                )
+            )
+        );
+
+        Store.dispatch({type: 'someAction'});
+
+        expect(Store.select(getUser)).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
     });
 
     it('should set the settings', () => {
@@ -128,9 +218,11 @@ describe('Store', () => {
     it('should log', () => {
         console.log = jest.fn();
 
-        const user = {
+        const user: UserState = {
             firstName: 'John',
             lastName: 'Travolta',
+            age: 35,
+            err: undefined
         };
 
         const newState = {
