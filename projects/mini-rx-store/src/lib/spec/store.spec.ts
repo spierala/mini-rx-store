@@ -1,11 +1,11 @@
-import Store, { actions$ } from './store';
-import StoreCore from './store-core';
-import { Action, Settings } from './interfaces';
-import { createFeatureSelector, createSelector } from './selector';
+import Store, { actions$ } from '../store';
+import StoreCore from '../store-core';
+import { Action, Settings } from '../interfaces';
+import { createFeatureSelector, createSelector } from '../selector';
 import { EMPTY, Observable, of } from 'rxjs';
-import { ofType } from './utils';
+import { ofType } from '../utils';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { ReduxDevtoolsExtension } from './redux-devtools.extension';
+import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 
 const asyncUser: Partial<UserState> = {

@@ -1,6 +1,6 @@
-import Store, { actions$ } from './store';
-import { combineReducers, ofType } from './utils';
-import { Action } from './interfaces';
+import Store, { actions$ } from '../store';
+import { combineReducers, ofType } from '../utils';
+import { Action } from '../interfaces';
 
 const action1: Action = {
     type: 'updateUser'

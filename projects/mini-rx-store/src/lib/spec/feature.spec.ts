@@ -1,7 +1,7 @@
-import { Feature } from './feature';
+import { Feature } from '../feature';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { EMPTY, Observable, of } from 'rxjs';
-import { createFeatureSelector, createSelector } from './selector';
+import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 
 interface UserState {

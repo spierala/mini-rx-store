@@ -1,6 +1,6 @@
 // Credits to NgRx: https://github.com/ngrx/platform/blob/8.6.0/modules/store/spec/selector.spec.ts
 
-import { createSelector } from './selector';
+import { createSelector } from '../selector';
 
 describe('Selectors', () => {
     let countOne: number;
