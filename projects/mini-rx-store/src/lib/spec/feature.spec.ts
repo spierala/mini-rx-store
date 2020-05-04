@@ -3,6 +3,7 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import { EMPTY, Observable, of } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
+import { actions$ } from '../store';
 
 interface UserState {
     firstName: string;
@@ -59,6 +60,26 @@ class FeatureState extends Feature<UserState> {
                     map((user) => user)
                 )
             )
+        ), 'load'
+    );
+
+    loadFnWithoutName = this.createEffect((payload$) =>
+        payload$.pipe(
+            mergeMap(() =>
+                fakeApiGet().pipe(
+                    map((user) => user)
+                )
+            )
+        )
+    );
+
+    loadFnWithoutName2 = this.createEffect((payload$) =>
+        payload$.pipe(
+            mergeMap(() =>
+                fakeApiGet().pipe(
+                    map((user) => user)
+                )
+            )
         )
     );
 
@@ -83,6 +104,10 @@ class FeatureState extends Feature<UserState> {
 
     updateLastName(lastName) {
         this.setState({ lastName });
+    }
+
+    updateCity(city) {
+        this.setState({ city }, 'updateCity');
     }
 
     resetState() {
@@ -137,5 +162,47 @@ describe('Feature', () => {
         userFeature.resetState();
         userFeature.loadFnWithError();
         expect(userFeature.state$).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
+    });
+
+    it('should append setState name to action type', () => {
+        userFeature.resetState();
+
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+        userFeature.updateCity('NY');
+        expect(spy).toHaveBeenCalledWith({type: '@mini-rx/user2/set-state/updateCity', payload: {...initialState, city: 'NY'}});
+    });
+
+    it('should append effect name to action type', () => {
+        hot('a').subscribe(
+            () => userFeature.loadFn()
+        );
+
+        expect(actions$).toBeObservable(hot('a--b', {
+            a: {type: '@mini-rx/user2/effect/load', payload: undefined},
+            b: {type: '@mini-rx/user2/effect/load/set-state', payload: asyncUser},
+        }));
+    });
+
+    it('should append default effect name to action type', () => {
+        hot('a').subscribe(
+            () => userFeature.loadFnWithoutName()
+        );
+
+        expect(actions$).toBeObservable(hot('a--b', {
+            a: {type: '@mini-rx/user2/effect/1', payload: undefined},
+            b: {type: '@mini-rx/user2/effect/1/set-state', payload: asyncUser},
+        }));
+    });
+
+    it('should increment and append default effect name to action type', () => {
+        hot('a').subscribe(
+            () => userFeature.loadFnWithoutName2()
+        );
+
+        expect(actions$).toBeObservable(hot('a--b', {
+            a: {type: '@mini-rx/user2/effect/2', payload: undefined},
+            b: {type: '@mini-rx/user2/effect/2/set-state', payload: asyncUser},
+        }));
     });
 });
