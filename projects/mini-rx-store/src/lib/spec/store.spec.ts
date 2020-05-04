@@ -2,9 +2,9 @@ import Store, { actions$ } from '../store';
 import StoreCore from '../store-core';
 import { Action, Settings } from '../interfaces';
 import { createFeatureSelector, createSelector } from '../selector';
-import { EMPTY, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 
@@ -32,6 +32,20 @@ function fakeApiWithError(): Observable<UserState> {
     return cold('-#');
 }
 
+interface UserState {
+    firstName: string;
+    lastName: string;
+    age: number;
+    err: string;
+}
+
+const initialState: UserState = {
+    firstName: 'Bruce',
+    lastName: 'Willis',
+    age: 30,
+    err: undefined
+};
+
 function reducer(state: UserState, action: Action): UserState {
     switch (action.type) {
         case 'updateUser':
@@ -58,23 +72,46 @@ function reducer(state: UserState, action: Action): UserState {
     }
 }
 
-interface UserState {
-    firstName: string;
-    lastName: string;
-    age: number;
-    err: string;
+const getUserFeatureState = createFeatureSelector<UserState>('user');
+const getFirstName = createSelector(getUserFeatureState, user => user.firstName);
+const getAge = createSelector(getUserFeatureState, user => user.age);
+
+interface CounterState {
+    counter: number;
 }
 
-const initialState: UserState = {
-    firstName: 'Bruce',
-    lastName: 'Willis',
-    age: 30,
-    err: undefined
+const counterInitialState: CounterState = {
+    counter: 1,
 };
 
-const getUser = createFeatureSelector<UserState>('user');
-const getFirstName = createSelector(getUser, user => user.firstName);
-const getAge = createSelector(getUser, user => user.age);
+function counterReducer(state: CounterState, action: Action) {
+    switch (action.type) {
+        case 'counter':
+            return {
+                ...state,
+                counter: state.counter + 1
+            };
+        default:
+            return state;
+    }
+}
+
+function counter2Reducer(state: CounterState, action: Action) {
+    switch (action.type) {
+        case 'counterEffectSuccess':
+            return {
+                ...state,
+                counter: state.counter + 1
+            };
+        default:
+            return state;
+    }
+}
+
+const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
+const getCounter1 = createSelector(getCounterFeatureState, state => state.counter);
+const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
+const getCounter2 = createSelector(getCounter2FeatureState, state => state.counter);
 
 describe('Store', () => {
     it('should initialize the store with an empty object', () => {
@@ -172,7 +209,7 @@ describe('Store', () => {
             Store.dispatch({type: 'saveUser'});
         });
 
-        expect(Store.select(getUser)).toBeObservable(hot('a-xb', {a: initialState, b: asyncUser, x: updatedAsyncUser}));
+        expect(Store.select(getUserFeatureState)).toBeObservable(hot('a-xb', {a: initialState, b: asyncUser, x: updatedAsyncUser}));
     });
 
     it('should create and execute an effect and handle side effect error', () => {
@@ -194,7 +231,7 @@ describe('Store', () => {
 
         Store.dispatch({type: 'someAction'});
 
-        expect(Store.select(getUser)).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
+        expect(Store.select(getUserFeatureState)).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
     });
 
     it('should set the settings', () => {
@@ -281,4 +318,49 @@ describe('Store', () => {
 
         expect(callOrder).toEqual(['reducer', 'effect']);
     });
+    
+    it('should queue actions', () => {
+        const callLimit = 5000;
+
+        Store.feature<CounterState>('counter', counterInitialState, counterReducer);
+
+        const spy = jest.fn().mockImplementation((value) => {
+            Store.dispatch({type: 'counter'});
+        });
+
+        const counter1$ = Store.select(getCounter1);
+
+        counter1$.pipe(
+            take(callLimit),
+        ).subscribe(spy);
+
+        expect(spy).toHaveBeenCalledTimes(callLimit);
+        expect(spy).toHaveBeenNthCalledWith(callLimit, callLimit);
+    });
+
+    it('should queue effect actions', () => {
+        const callLimit = 5000;
+
+        Store.feature<CounterState>('counter2', counterInitialState, counter2Reducer);
+
+        Store.createEffect(
+            actions$.pipe(
+                ofType('counterEffectStart'),
+                mergeMap(() => of({type: 'counterEffectSuccess'}))
+            )
+        );
+
+        const spy2 = jest.fn().mockImplementation((value) => {
+            Store.dispatch({type: 'counterEffectStart'});
+        });
+
+        const counter2$ = Store.select(getCounter2);
+
+        counter2$.pipe(
+            take(callLimit),
+        ).subscribe(spy2);
+
+        expect(spy2).toHaveBeenCalledTimes(callLimit);
+        expect(spy2).toHaveBeenNthCalledWith(callLimit, callLimit);
+    })
 });

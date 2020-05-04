@@ -78,7 +78,7 @@ class StoreCore {
         // Listen to the Actions Stream and update state accordingly
         this.actions$
             .pipe(
-                observeOn(queueScheduler),
+                // observeOn(queueScheduler),
                 withLatestFrom(this.combinedReducers$),
                 scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
                     const state = reducer(acc, action);
