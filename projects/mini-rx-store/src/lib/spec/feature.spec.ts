@@ -3,7 +3,8 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
-import { actions$ } from '../store';
+import Store, { actions$ } from '../store';
+import { Action } from '../interfaces';
 
 interface UserState {
     firstName: string;
@@ -46,12 +47,20 @@ const getCountry = createSelector(
     (state) => state.country
 );
 
+const someFeatureInitialState = {test: 'OK'};
+const someReducer = (state: any, action: Action) => {
+    return state;
+};
+Store.feature('someFeature', someFeatureInitialState, someReducer);
+const getSomeFeatureSelector = createFeatureSelector('someFeature');
+
 class FeatureState extends Feature<UserState> {
     state$ = this.state$;
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
-    city$ = this.select(getCity, true);
     country$ = this.select(getCountry);
+    city$ = this.select(getCity, true);
+    someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
     loadFn = this.createEffect((payload$) =>
         payload$.pipe(
@@ -150,6 +159,13 @@ describe('Feature', () => {
         const spy = jest.fn();
         userFeature.country$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('United States');
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should select state from another Feature (created with Store.feature)', () => {
+        const spy = jest.fn();
+        userFeature.someFeatureState$.subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(someFeatureInitialState);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 

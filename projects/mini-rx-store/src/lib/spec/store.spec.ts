@@ -171,6 +171,15 @@ describe('Store', () => {
         expect(age$).toBeObservable(hot('(abc)', {a: 32, b: 33, c: 34}));
     });
 
+    it('should return undefined if feature does not exist yet', () => {
+        const featureSelector = createFeatureSelector('notExistingFeature');
+
+        const spy = jest.fn();
+        Store.select(featureSelector).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(undefined);
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
     it('should create and execute an effect', () => {
         Store.dispatch({type: 'resetUser'});
 
@@ -318,7 +327,7 @@ describe('Store', () => {
 
         expect(callOrder).toEqual(['reducer', 'effect']);
     });
-    
+
     it('should queue actions', () => {
         const callLimit = 5000;
 
@@ -362,5 +371,5 @@ describe('Store', () => {
 
         expect(spy2).toHaveBeenCalledTimes(callLimit);
         expect(spy2).toHaveBeenNthCalledWith(callLimit, callLimit);
-    })
+    });
 });
