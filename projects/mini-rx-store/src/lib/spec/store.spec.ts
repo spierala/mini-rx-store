@@ -7,6 +7,7 @@ import { ofType } from '../utils';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
+import { Feature } from '../feature';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -76,15 +77,15 @@ const getUserFeatureState = createFeatureSelector<UserState>('user');
 const getFirstName = createSelector(getUserFeatureState, user => user.firstName);
 const getAge = createSelector(getUserFeatureState, user => user.age);
 
-interface CounterState {
+export interface CounterState {
     counter: number;
 }
 
-const counterInitialState: CounterState = {
+export const counterInitialState: CounterState = {
     counter: 1,
 };
 
-function counterReducer(state: CounterState, action: Action) {
+export function counterReducer(state: CounterState, action: Action) {
     switch (action.type) {
         case 'counter':
             return {
@@ -112,6 +113,19 @@ const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
 const getCounter1 = createSelector(getCounterFeatureState, state => state.counter);
 const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
 const getCounter2 = createSelector(getCounter2FeatureState, state => state.counter);
+
+class CounterFeatureState extends Feature<CounterState> {
+    constructor() {
+        super('counter3', counterInitialState);
+    }
+
+    increment() {
+        this.setState(state => ({...state, counter: state.counter + 1}));
+    }
+}
+
+const getCounter3FeatureState = createFeatureSelector<CounterState>('counter3');
+const getCounter3 = createSelector(getCounter3FeatureState, state => state.counter);
 
 describe('Store', () => {
     it('should initialize the store with an empty object', () => {
@@ -371,5 +385,15 @@ describe('Store', () => {
 
         expect(spy2).toHaveBeenCalledTimes(callLimit);
         expect(spy2).toHaveBeenNthCalledWith(callLimit, callLimit);
+    });
+
+    it('should select state from a Feature (which was created with `extends Feature)', () => {
+        const counterFeatureState = new CounterFeatureState();
+        counterFeatureState.increment();
+
+        const spy = jest.fn();
+        Store.select(getCounter3).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(2);
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 });
