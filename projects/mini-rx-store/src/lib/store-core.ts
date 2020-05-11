@@ -83,7 +83,6 @@ class StoreCore {
         // Check if feature already exists
         if (reducers.hasOwnProperty(featureName)) {
             throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
-            return;
         }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
