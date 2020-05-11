@@ -1,25 +1,9 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import {
-    Action,
-    AppState,
-    Reducer,
-    Settings,
-    StoreExtension,
-} from './interfaces';
-import {
-    distinctUntilChanged,
-    map,
-    mergeAll, observeOn,
-    scan,
-    tap,
-    withLatestFrom,
-} from 'rxjs/operators';
-import { combineReducers } from './utils';
-import { FeatureBase, Feature } from './feature';
+import { Action, AppState, Reducer, Settings, StoreExtension, } from './interfaces';
+import { distinctUntilChanged, map, mergeAll, observeOn, scan, tap, withLatestFrom, } from 'rxjs/operators';
+import { combineReducers, createActionTypePrefix, nameUpdateAction } from './utils';
 
 class StoreCore {
-    // FEATURE STATES
-    features: Map<string, FeatureBase<any>> = new Map();
 
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
@@ -36,12 +20,9 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // COMBINED REDUCERS
-    private reducerSource: Subject<Reducer<any>> = new Subject();
-    combinedReducers$: Observable<Reducer<AppState>> = this.reducerSource.pipe(
-        scan<Reducer<any>, Reducer<any>[]>((acc, reducer) => {
-            return [...acc, reducer];
-        }, []),
-        map((reducers) => combineReducers(reducers))
+    private reducersSource: BehaviorSubject<{ [key: string]: Reducer<any> }> = new BehaviorSubject({});
+    combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
+        map(reducers => combineReducers(Object.values(reducers)))
     );
 
     // SETTINGS
@@ -79,7 +60,7 @@ class StoreCore {
         this.actions$
             .pipe(
                 observeOn(queueScheduler),
-                withLatestFrom(this.combinedReducers$),
+                withLatestFrom(this.combinedReducer$),
                 scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
                     const state = reducer(acc, action);
                     this.log({ action, state });
@@ -92,8 +73,43 @@ class StoreCore {
             .subscribe();
     }
 
-    addFeatureReducer(reducer: Reducer<any>) {
-        this.reducerSource.next(reducer);
+    addFeature<StateType>(
+        featureName: string,
+        initialState: StateType,
+        reducer?: Reducer<StateType>
+    ) {
+        const reducers = this.reducersSource.getValue();
+
+        // Check if feature already exists
+        if (reducers.hasOwnProperty(featureName)) {
+            throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
+            return;
+        }
+
+        const actionTypePrefix = createActionTypePrefix(featureName);
+
+        reducer = reducer
+            ? reducer
+            : createDefaultReducer(actionTypePrefix);
+
+        const reducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(
+            reducer,
+            initialState
+        );
+
+        const featureReducer: Reducer<AppState> = createFeatureReducer(
+            featureName,
+            reducerWithInitialState
+        );
+
+        // Add reducer
+        this.reducersSource.next({
+            ...reducers,
+            [featureName]: featureReducer
+        });
+
+        // Dispatch an initial action to let reducers create the initial state
+        this.dispatch({ type: `${actionTypePrefix}/init` });
     }
 
     createEffect(effect: Observable<Action>) {
@@ -132,6 +148,46 @@ class StoreCore {
             );
         }
     }
+}
+
+function createDefaultReducer<StateType>(
+    nameSpaceFeature: string
+): Reducer<StateType> {
+    return (state: StateType, action: Action) => {
+        // Check for 'set-state' (can originate from setState() or feature effect)
+        if (
+            action.type.indexOf(nameSpaceFeature) > -1 &&
+            action.type.indexOf(nameUpdateAction) > -1
+        ) {
+            return {
+                ...state,
+                ...action.payload,
+            };
+        }
+        return state;
+    };
+}
+
+function createReducerWithInitialState<StateType>(
+    reducer: Reducer<StateType>,
+    initialState: StateType
+): Reducer<StateType> {
+    return (state: StateType, action: Action): StateType => {
+        state = state === undefined ? initialState : state;
+        return reducer(state, action);
+    };
+}
+
+function createFeatureReducer(
+    featureName: string,
+    reducer: Reducer<any>
+): Reducer<AppState> {
+    return (state: AppState, action: Action): AppState => {
+        return {
+            ...state,
+            [featureName]: reducer(state[featureName], action),
+        };
+    };
 }
 
 // Created once to initialize singleton

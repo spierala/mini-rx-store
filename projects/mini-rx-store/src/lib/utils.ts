@@ -19,3 +19,9 @@ export function combineReducers<StateType, ActionType>(reducers: Reducer<StateTy
         }, state);
     };
 }
+
+export function createActionTypePrefix(featureName): string {
+    return '@mini-rx/' + featureName;
+}
+
+export const nameUpdateAction = 'set-state';
