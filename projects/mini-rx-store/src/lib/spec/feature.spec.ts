@@ -5,6 +5,7 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
 import { Action } from '../interfaces';
+import { counterInitialState, counterReducer } from './_spec-helpers';
 
 interface UserState {
     firstName: string;
@@ -41,17 +42,13 @@ function fakeApiWithError(): Observable<UserState> {
 const getUserFeatureState = createFeatureSelector<UserState>('user2'); // Select From App State
 const getCity = createSelector(getUserFeatureState, (state) => state.city);
 
-const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select Feature State by omitting the Feature name
+const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
 const getCountry = createSelector(
     getUserFeatureState2,
     (state) => state.country
 );
 
-const someFeatureInitialState = {test: 'OK'};
-const someReducer = (state: any, action: Action) => {
-    return state;
-};
-Store.feature('someFeature', someFeatureInitialState, someReducer);
+Store.feature('someFeature', counterInitialState, counterReducer);
 const getSomeFeatureSelector = createFeatureSelector('someFeature');
 
 class FeatureState extends Feature<UserState> {
@@ -124,14 +121,13 @@ class FeatureState extends Feature<UserState> {
     }
 }
 
-let userFeature: FeatureState;
+const userFeature: FeatureState = new FeatureState();
 
 describe('Feature', () => {
     it('should initialize the feature', () => {
-        userFeature = new FeatureState();
         const spy = jest.fn();
-        userFeature.firstName$.subscribe(spy);
-        expect(spy).toHaveBeenCalledWith('Bruce');
+        userFeature.state$.subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(initialState);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
@@ -142,20 +138,22 @@ describe('Feature', () => {
         expect(spy).toHaveBeenCalledWith('Nicolas');
         expect(spy).toHaveBeenCalledTimes(1);
 
+        spy.mockReset();
+
         userFeature.updateLastName('Cage');
         userFeature.lastName$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('Cage');
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should select state from store (App State)', () => {
+    it('should select state from App State', () => {
         const spy = jest.fn();
         userFeature.city$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('LA');
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should select state from feature (Feature State)', () => {
+    it('should select state from Feature State', () => {
         const spy = jest.fn();
         userFeature.country$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('United States');
@@ -165,7 +163,7 @@ describe('Feature', () => {
     it('should select state from another Feature (created with Store.feature)', () => {
         const spy = jest.fn();
         userFeature.someFeatureState$.subscribe(spy);
-        expect(spy).toHaveBeenCalledWith(someFeatureInitialState);
+        expect(spy).toHaveBeenCalledWith(counterInitialState);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 

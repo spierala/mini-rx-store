@@ -8,6 +8,7 @@ import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { Feature } from '../feature';
+import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -77,38 +78,6 @@ const getUserFeatureState = createFeatureSelector<UserState>('user');
 const getFirstName = createSelector(getUserFeatureState, user => user.firstName);
 const getAge = createSelector(getUserFeatureState, user => user.age);
 
-export interface CounterState {
-    counter: number;
-}
-
-export const counterInitialState: CounterState = {
-    counter: 1,
-};
-
-export function counterReducer(state: CounterState, action: Action) {
-    switch (action.type) {
-        case 'counter':
-            return {
-                ...state,
-                counter: state.counter + 1
-            };
-        default:
-            return state;
-    }
-}
-
-function counter2Reducer(state: CounterState, action: Action) {
-    switch (action.type) {
-        case 'counterEffectSuccess':
-            return {
-                ...state,
-                counter: state.counter + 1
-            };
-        default:
-            return state;
-    }
-}
-
 const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
 const getCounter1 = createSelector(getCounterFeatureState, state => state.counter);
 const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
@@ -165,7 +134,7 @@ describe('Store', () => {
 
         const spy = jest.fn();
         Store.select(getFirstName).subscribe(spy);
-        expect(spy).toHaveBeenCalledWith('Nicolas');
+        expect(spy).toHaveBeenCalledWith(user.firstName);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
@@ -363,6 +332,18 @@ describe('Store', () => {
 
     it('should queue effect actions', () => {
         const callLimit = 5000;
+
+        function counter2Reducer(state: CounterState, action: Action) {
+            switch (action.type) {
+                case 'counterEffectSuccess':
+                    return {
+                        ...state,
+                        counter: state.counter + 1
+                    };
+                default:
+                    return state;
+            }
+        }
 
         Store.feature<CounterState>('counter2', counterInitialState, counter2Reducer);
 

@@ -1,8 +1,8 @@
 import Store from '../store';
 import StoreCore from '../store-core';
 import { ReduxDevtoolsExtension, ReduxDevtoolsOptions } from '../redux-devtools.extension';
-import { counterInitialState, counterReducer, CounterState } from './store.spec';
 import { Action } from '../interfaces';
+import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
