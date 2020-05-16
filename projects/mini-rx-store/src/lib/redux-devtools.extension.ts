@@ -1,7 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, StoreExtension } from '../interfaces';
-import { actions$ } from '../store';
-import StoreCore from '../store-core';
+import { AppState, StoreExtension } from './interfaces';
+import { actions$ } from './store';
+import StoreCore from './store-core';
 
 const win = window as any;
 
@@ -31,26 +31,28 @@ export class ReduxDevtoolsExtension implements StoreExtension {
 
     init() {
         if (this.devtoolsExtension) {
-            this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect(this.options);
+            this.devtoolsConnection = this.devtoolsExtension.connect(this.options);
 
             actions$.pipe(
                 withLatestFrom(StoreCore.state$),
                 tap(([action, state]) => this.devtoolsConnection.send(action, state))
             ).subscribe();
 
-            this.devtoolsConnection.subscribe(message => {
-                if (message.type === DevToolActions.DISPATCH) {
-                    switch (message.payload.type) {
-                        case DevToolActions.JUMP_TO_STATE:
-                        case DevToolActions.JUMP_TO_ACTION:
-                            this.updateState(JSON.parse(message.state));
-                    }
-                }
-            });
+            this.devtoolsConnection.subscribe(this.onDevToolsMessage.bind(this));
         }
     }
 
-    updateState(state: AppState) {
+    private onDevToolsMessage(message) {
+        if (message.type === DevToolActions.DISPATCH) {
+            switch (message.payload.type) {
+                case DevToolActions.JUMP_TO_STATE:
+                case DevToolActions.JUMP_TO_ACTION:
+                    this.updateState(JSON.parse(message.state));
+            }
+        }
+    }
+
+    protected updateState(state: AppState) {
         StoreCore.updateState(state);
     }
 }

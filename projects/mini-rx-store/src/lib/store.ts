@@ -7,7 +7,6 @@ import {
     StoreExtension,
 } from './interfaces';
 import StoreCore from './store-core';
-import { FeatureBase } from './feature';
 
 // Expose public store API
 class Store {
@@ -16,7 +15,7 @@ class Store {
         initialState: StateType,
         reducer: Reducer<StateType>
     ) {
-        new FeatureBase(featureName, initialState, reducer);
+        StoreCore.addFeature<StateType>(featureName, initialState, reducer);
     }
 
     createEffect(effect: Observable<Action>) {
