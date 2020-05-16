@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Action, AppState } from './interfaces';
-import { default as Store } from './store-core'; // TODO use StoreCore
+import StoreCore from './store-core';
 import { createActionTypePrefix, nameUpdateAction, ofType } from './utils';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { createFeatureSelector } from './selector';
@@ -24,7 +24,7 @@ export abstract class Feature<StateType> {
         featureName: string,
         initialState: StateType
     ) {
-        Store.addFeature<StateType>(featureName, initialState);
+        StoreCore.addFeature<StateType>(featureName, initialState);
 
         this.actionTypePrefix = createActionTypePrefix(featureName);
 
@@ -32,14 +32,14 @@ export abstract class Feature<StateType> {
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
 
         // Feature State and delegate to local BehaviorSubject
-        Store.select(createFeatureSelector(featureName)).subscribe(this.state$);
+        StoreCore.select(createFeatureSelector(featureName)).subscribe(this.state$);
     }
 
     protected setState(
         stateOrCallback: StateOrCallback<StateType>,
         name?: string
     ): void {
-        Store.dispatch({
+        StoreCore.dispatch({
             type: name
                 ? this.actionTypeSetState + '/' + name
                 : this.actionTypeSetState,
@@ -49,7 +49,7 @@ export abstract class Feature<StateType> {
 
     protected select<K>(mapFn: (state: StateType | AppState) => K, selectFromStore: boolean = false): Observable<K> {
         if (selectFromStore) {
-            return Store.select(mapFn);
+            return StoreCore.select(mapFn);
         }
 
         return this.state$.pipe(
@@ -73,7 +73,7 @@ export abstract class Feature<StateType> {
         effectName?: string
     ): (payload?: PayLoadType) => void {
         const effectStartActionType = this.getEffectStartActionType(effectName);
-        const effect$: Observable<Action> = Store.actions$.pipe(
+        const effect$: Observable<Action> = StoreCore.actions$.pipe(
             ofType(effectStartActionType),
             map((action) => action.payload),
             effectFn,
@@ -85,10 +85,10 @@ export abstract class Feature<StateType> {
             })
         );
 
-        Store.createEffect(effect$);
+        StoreCore.createEffect(effect$);
 
         return (payload?: PayLoadType) => {
-            Store.dispatch({
+            StoreCore.dispatch({
                 type: effectStartActionType,
                 payload,
             });
