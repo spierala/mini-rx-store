@@ -71,5 +71,13 @@ describe('Redux Dev Tools', () => {
 
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith(stateFromReduxDevTools);
+
+        spy.mockReset();
+
+        extension['onDevToolsMessage']({
+            type: 'NOT_SUPPORTED_TYPE'
+        });
+
+        expect(spy).toHaveBeenCalledTimes(0);
     });
 });
