@@ -31,22 +31,24 @@ export class ReduxDevtoolsExtension implements StoreExtension {
 
     init() {
         if (this.devtoolsExtension) {
-            this.devtoolsConnection = win.__REDUX_DEVTOOLS_EXTENSION__.connect(this.options);
+            this.devtoolsConnection = this.devtoolsExtension.connect(this.options);
 
             actions$.pipe(
                 withLatestFrom(StoreCore.state$),
                 tap(([action, state]) => this.devtoolsConnection.send(action, state))
             ).subscribe();
 
-            this.devtoolsConnection.subscribe(message => {
-                if (message.type === DevToolActions.DISPATCH) {
-                    switch (message.payload.type) {
-                        case DevToolActions.JUMP_TO_STATE:
-                        case DevToolActions.JUMP_TO_ACTION:
-                            this.updateState(JSON.parse(message.state));
-                    }
-                }
-            });
+            this.devtoolsConnection.subscribe(this.onDevToolsMessage.bind(this));
+        }
+    }
+
+    private onDevToolsMessage(message) {
+        if (message.type === DevToolActions.DISPATCH) {
+            switch (message.payload.type) {
+                case DevToolActions.JUMP_TO_STATE:
+                case DevToolActions.JUMP_TO_ACTION:
+                    this.updateState(JSON.parse(message.state));
+            }
         }
     }
 
