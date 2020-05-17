@@ -1,13 +1,9 @@
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 
-# MiniRx: The Lightweight RxJS Redux Store
+# MiniRx: The RxJS Redux Store
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
-
-**Attention**: MiniRx is currently in beta phase. The API might still change.
-
-If you have a bug or an idea, feel free to open an issue on GitHub.
 
 ## Redux
 
@@ -22,27 +18,17 @@ The Redux Pattern is based on this 3 key principles:
 ## MiniRx Features
 
 -   Minimal configuration and setup
--   MiniRx is lightweight - check the [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib) :)
--   Advanced "Redux / NgRx Store" API:
-    Although being a lightweight library, MiniRx supports many of the core features from the popular [@ngrx/store](https://ngrx.io/guide/store) library for Angular:
-    _ Actions
-    _ Reducers
-    _ Memoized Selectors
-    _ Effects
--   Simplified API for basic state management per feature... You can update state without writing Actions and Reducers! This API operates directly on the feature state:
-    -   `setState()` to update the feature state
-    -   `select()` to read feature state
-    -   `createEffect()` create an effect with a minimum amount of code
--   The [source code](https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store/src/lib) is easy to understand if you know some RxJS :)
--   [RxJS](https://github.com/ReactiveX/rxjs) is the one and only (peer) dependency
+-   "Redux" API:
+    - Actions
+    - Reducers
+    - Memoized Selectors
+    - Effects
+-   "Feature" API   :
+    -   `setState()` update the feature state
+    -   `select()` read feature state
+    -   `createEffect()` run side effects like API calls and update feature state
 -   Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
 -   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
-
-## When should you use MiniRx?
-
--   If you have a small or medium sized application.
--   If you tried to manage state yourself (e.g. with [Observable Services](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)) and you created state soup :)
--   If you have the feeling that your app is not big / complex enough to justify a full-blown state management solution like NgRx then MiniRx is an easy choice.
 
 ## Usage
 
@@ -71,11 +57,10 @@ constructor() {
 }
 ```
 
-The code above creates a new feature state for _products_.
-Its initial state is set and the reducer function defines how the feature state changes along with an incoming Action.
+The code above creates a new feature state for _products_. 
+`Store.feature` receives the feature name, the initial feature state and a reducer function.
 
-Initial state example:
-
+**Initial state example**:
 ```
 export const initialState: ProductState = {
   showProductCode: true,
@@ -83,8 +68,8 @@ export const initialState: ProductState = {
 };
 ```
 
+**Reducers** specify how the application's state changes in response to actions sent to the store.
 A reducer function typically looks like this:
-
 ```
 export function reducer(state: ProductState, action: ProductActions): ProductState {
   switch (action.type) {
@@ -140,7 +125,7 @@ import { ProductService } from '../product.service';
 constructor(private productService: ProductService) {
     Store.createEffect(
         actions$.pipe(
-            ofType(productActions.ProductActionTypes.Load),
+            ofType(ProductActionTypes.Load),
             mergeMap(() =>
                 this.productService.getProducts().pipe(
                     map(products => (new LoadSuccess(products))),
@@ -172,7 +157,7 @@ export const getProducts = createSelector(
 ```
 
 `createSelector` creates a memoized selector. This improves performance especially if your selectors perform expensive computation.
-If the selector is called with the same arguments again, it will just return the previously calculated result.
+If a selector is called with the same arguments again, it will just return the previously calculated result.
 
 #### Select Observable State (with a memoized selector):
 
@@ -238,7 +223,7 @@ updateMaskUserName(maskUserName: boolean) {
 }
 ```
 
-`setState` takes also a callback function which gives you access to the current feature state (see the `state` parameter).
+`setState` takes a callback function which gives you access to the current feature state (see the `state` parameter).
 Inside of that function you can compose the new feature state.
 
 Alternatively `setState` accepts a new state object directly.
@@ -292,7 +277,7 @@ The code above creates an Effect for _deleting a product_ from the list. The API
 
 #### Select Observable State (with a memoized selector):
 You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
-This is because the Feature API is operating on a specific feature state already (the feature name has been provided in the constructor). 
+This is because the Feature API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor). 
 
 ```
 const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
@@ -317,7 +302,8 @@ export class ProductStateService extends Feature<ProductState>{
 Also the `Feature` API makes use of Redux:
 Each Feature is registered in the Store (Single Source of Truth) and is part of the global App State.
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
-When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action, and the default reducer will update the feature state accordingly.
+When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action, 
+and the default reducer will update the feature state accordingly.
 
 See the default Action in the Redux Dev Tools:
 
@@ -335,7 +321,7 @@ Store.settings = {enableLogging: true};
 
 The code above sets the global Store Settings.
 `enableLogging` is currently the only available setting.
-Typically you would set the settings when bootstrapping the app and before the store is used.
+Typically, you would set the settings when bootstrapping the app and before the store is used.
 
 ## Redux Dev Tools:
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
@@ -346,10 +332,10 @@ You need to install the Browser Plugin to make it work.
 -   [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 -   [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
-Currently these options are available to configure the DevTools:
+Currently, these options are available to configure the DevTools:
 * `name`: the instance name to be shown on the DevTools monitor page.
 * `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
-* `latency: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. It is the joint between performance and speed. When set to 0, all actions will be sent instantly. Set it to a higher value when experiencing perf issues (also maxAge to a lower value). Default is 500 ms.
+* `latency: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
 
 
 #### Installation (Angular):
@@ -397,13 +383,14 @@ Run `ng serve mini-rx-store-showcase --open` to see MiniRx in action.
 
 The showcase is based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
 
-I did a refactor from NgRx to MiniRx and the app still works :)
+I did a refactor from NgRx to MiniRx, and the app still works :)
 
 ## References
 
 These projects, articles and courses helped and inspired me to create MiniRx:
 
 -   [NgRx](https://ngrx.io/)
+-   [Akita](https://github.com/datorama/akita)
 -   [Observable Store](https://github.com/DanWahlin/Observable-Store)
 -   [RxJS Observable Store](https://github.com/jurebajt/rxjs-observable-store)
 -   [Basic State Managment with an Observable Service](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)
@@ -412,13 +399,6 @@ These projects, articles and courses helped and inspired me to create MiniRx:
 -   [Pluralsight: Angular NgRx: Getting Started](https://app.pluralsight.com/library/courses/angular-ngrx-getting-started/table-of-contents)
 -   [Pluralsight: RxJS in Angular: Reactive Development](https://app.pluralsight.com/library/courses/rxjs-angular-reactive-development/table-of-contents)
 -   [Pluralsight: RxJS: Getting Started](https://app.pluralsight.com/library/courses/rxjs-getting-started/table-of-contents)
-
-## TODO
-
--   Further Integrate Redux Dev Tools
--   Work on the ReadMe and Documentation
--   Nice To Have: Test lib in React, Vue, maybe even AngularJS
--   Add more Unit Tests
 
 ## License
 
