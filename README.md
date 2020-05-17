@@ -60,7 +60,7 @@ constructor() {
 The code above creates a new feature state for _products_. 
 `Store.feature` receives the feature name, the initial feature state and a reducer function.
 
-**Initial state example**:
+Initial state example:
 ```
 export const initialState: ProductState = {
   showProductCode: true,
@@ -68,7 +68,7 @@ export const initialState: ProductState = {
 };
 ```
 
-**Reducers** specify how the application's state changes in response to actions sent to the store.
+Reducers specify how the application's state changes in response to actions sent to the store.
 A reducer function typically looks like this:
 ```
 export function reducer(state: ProductState, action: ProductActions): ProductState {
@@ -101,13 +101,14 @@ export class CreateProduct implements Action {
 ```
 
 #### Dispatch an Action:
-
+Dispatch an Action to update state:
 ```
 import { Store } from 'mini-rx-store';
 import { CreateProduct } from 'product.actions';
 
 Store.dispatch(new CreateProduct(product));
 ```
+After the action has been dispatched the state will be updated accordingly (as defined in the reducer function).
 
 #### Write an effect:
 
