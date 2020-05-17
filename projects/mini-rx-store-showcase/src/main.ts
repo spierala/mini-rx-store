@@ -12,4 +12,4 @@ if (environment.production) {
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
 
-Store.settings = {enableLogging: true};
+Store.settings({enableLogging: true});

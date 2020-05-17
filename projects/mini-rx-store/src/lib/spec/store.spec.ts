@@ -228,7 +228,7 @@ describe('Store', () => {
 
     it('should set the settings', () => {
         const settings: Settings = { enableLogging: true };
-        Store.settings = settings;
+        Store.settings(settings);
         expect(StoreCore.settings).toEqual(settings);
     });
 
@@ -236,7 +236,7 @@ describe('Store', () => {
         console.warn = jest.fn();
 
         const settings: Settings = { enableLogging: true };
-        Store.settings = settings;
+        Store.settings(settings);
         expect(console.warn).toHaveBeenCalledWith(
             'MiniRx: Settings are already set.'
         );
@@ -257,7 +257,7 @@ describe('Store', () => {
         };
 
         const settings: Settings = { enableLogging: true };
-        Store.settings = settings;
+        Store.settings(settings);
         expect(StoreCore.settings).toEqual(settings);
 
         Store.dispatch({
