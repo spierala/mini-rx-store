@@ -26,7 +26,7 @@ class Store {
         StoreCore.addExtension(extension);
     }
 
-    set settings(settings: Partial<Settings>) {
+    settings(settings: Partial<Settings>) {
         StoreCore.settings = settings;
     }
 
