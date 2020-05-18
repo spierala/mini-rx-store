@@ -5,6 +5,9 @@
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
+## RxJS
+MiniRX Store is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
+
 ## Redux
 
 MiniRx uses the Redux Pattern to make state management easy and predictable.
@@ -317,7 +320,7 @@ See the default Action in the Redux Dev Tools:
 ```
 import { Store } from 'mini-rx-store';
 
-Store.settings = {enableLogging: true};
+Store.settings({enableLogging: true});
 ```
 
 The code above sets the global Store Settings.
