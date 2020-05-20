@@ -17,7 +17,7 @@ export const initialState: ProductState = {
 };
 
 // Selector functions
-const getProductFeatureState = createFeatureSelector<ProductState>('products');
+const getProductFeatureState = createFeatureSelector<ProductState>();
 
 export const getShowProductCode = createSelector(
     getProductFeatureState,

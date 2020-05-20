@@ -175,7 +175,7 @@ import { getProducts } from '../../state';
 this.products$ = Store.select(getProducts);
 ```
 
-`select` runs the selector on the App State and returns an Observable which will emit as soon as the _products_ data changes.
+`Store.select` runs the selector against the App State and returns an Observable which will emit as soon as the _products_ data changes.
 
 ## Make simple things simple - The `Feature` API
 
