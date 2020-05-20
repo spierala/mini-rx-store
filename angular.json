@@ -158,6 +158,124 @@
           }
         }
       }
+    },
+    "mini-rx-store-showcase-redux": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/mini-rx-store-showcase-redux",
+      "sourceRoot": "projects/mini-rx-store-showcase-redux/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/mini-rx-store-showcase-redux",
+            "index": "projects/mini-rx-store-showcase-redux/src/index.html",
+            "main": "projects/mini-rx-store-showcase-redux/src/main.ts",
+            "polyfills": "projects/mini-rx-store-showcase-redux/src/polyfills.ts",
+            "tsConfig": "projects/mini-rx-store-showcase-redux/tsconfig.app.json",
+            "aot": false,
+            "assets": [
+              "projects/mini-rx-store-showcase-redux/src/favicon.ico",
+              "projects/mini-rx-store-showcase-redux/src/assets"
+            ],
+            "styles": [
+              "projects/mini-rx-store-showcase-redux/src/styles.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/mini-rx-store-showcase-redux/src/environments/environment.ts",
+                  "with": "projects/mini-rx-store-showcase-redux/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "mini-rx-store-showcase-redux:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "mini-rx-store-showcase-redux:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "mini-rx-store-showcase-redux:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/mini-rx-store-showcase-redux/src/test.ts",
+            "polyfills": "projects/mini-rx-store-showcase-redux/src/polyfills.ts",
+            "tsConfig": "projects/mini-rx-store-showcase-redux/tsconfig.spec.json",
+            "karmaConfig": "projects/mini-rx-store-showcase-redux/karma.conf.js",
+            "assets": [
+              "projects/mini-rx-store-showcase-redux/src/favicon.ico",
+              "projects/mini-rx-store-showcase-redux/src/assets"
+            ],
+            "styles": [
+              "projects/mini-rx-store-showcase-redux/src/styles.css"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/mini-rx-store-showcase-redux/tsconfig.app.json",
+              "projects/mini-rx-store-showcase-redux/tsconfig.spec.json",
+              "projects/mini-rx-store-showcase-redux/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/mini-rx-store-showcase-redux/e2e/protractor.conf.js",
+            "devServerTarget": "mini-rx-store-showcase-redux:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "mini-rx-store-showcase-redux:serve:production"
+            }
+          }
+        }
+      }
     }},
   "defaultProject": "mini-rx-store-showcase"
 }
