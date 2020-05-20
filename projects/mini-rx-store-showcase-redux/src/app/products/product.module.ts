@@ -6,11 +6,8 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './containers/product-shell/product-shell.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-
-/* NgRx */
-import { StoreModule } from '@ngrx/store';
-import { reducer } from './state/product.reducer';
-import { EffectsModule } from '@ngrx/effects';
+import { Store } from 'mini-rx-store';
+import { initialState, reducer } from './state/product.reducer';
 import { ProductEffects } from './state/product.effects';
 
 const productRoutes: Routes = [
@@ -21,10 +18,6 @@ const productRoutes: Routes = [
   imports: [
     SharedModule,
     RouterModule.forChild(productRoutes),
-    StoreModule.forFeature('products', reducer),
-    EffectsModule.forFeature(
-      [ ProductEffects ]
-    ),
   ],
   declarations: [
     ProductShellComponent,
@@ -32,4 +25,10 @@ const productRoutes: Routes = [
     ProductEditComponent
   ]
 })
-export class ProductModule { }
+export class ProductModule {
+    constructor(
+        private productEffects: ProductEffects
+    ) {
+        Store.feature('products', initialState, reducer);
+    }
+}

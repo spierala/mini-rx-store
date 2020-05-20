@@ -8,7 +8,7 @@ export interface UserState {
   currentUser: User;
 }
 
-const initialState: UserState = {
+export const initialState: UserState = {
   maskUserName: true,
   currentUser: null
 };

@@ -1,6 +1,5 @@
-/* NgRx */
-import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { UserState } from './user.reducer';
+import { createFeatureSelector, createSelector } from 'mini-rx-store';
 
 
 // Selector functions

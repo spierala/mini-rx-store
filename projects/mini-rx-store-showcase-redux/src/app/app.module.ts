@@ -17,11 +17,8 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 /* Feature Modules */
 import { UserModule } from './user/user.module';
 
-/* NgRx */
-import { StoreModule } from '@ngrx/store';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
-import { EffectsModule } from '@ngrx/effects';
+import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
 
 @NgModule({
   imports: [
@@ -30,22 +27,11 @@ import { EffectsModule } from '@ngrx/effects';
     HttpClientInMemoryWebApiModule.forRoot(ProductData),
     UserModule,
     AppRoutingModule,
-    StoreModule.forRoot({}),
-    // StoreModule.forRoot({},
-    //   {
-    //     runtimeChecks: {
-    //       strictStateImmutability: true,
-    //       strictActionImmutability: true,
-    //       strictStateSerializability: true,
-    //       strictActionSerializability: true
-    //     }
-    //   }),
-    StoreDevtoolsModule.instrument({
-      name: 'APM Demo App DevTools',
-      maxAge: 25,
-      logOnly: environment.production,
-    }),
-    EffectsModule.forRoot([])
+      NgReduxDevtoolsModule.instrument({
+          name: 'MiniRx Showcase',
+          maxAge: 25,
+          latency: 1000
+      }),
   ],
   declarations: [
     AppComponent,

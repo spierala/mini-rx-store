@@ -1,5 +1,4 @@
-/* NgRx */
-import { Action } from '@ngrx/store';
+import { Action } from 'mini-rx-store';
 
 export enum UserActionTypes {
   MaskUserName = '[User] Mask User Name'

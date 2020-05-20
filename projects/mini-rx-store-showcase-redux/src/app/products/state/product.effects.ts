@@ -6,19 +6,20 @@ import { mergeMap, map, catchError } from 'rxjs/operators';
 import { ProductService } from '../product.service';
 import { Product } from '../product';
 
-/* NgRx */
-import { Action } from '@ngrx/store';
-import { Actions, Effect, ofType } from '@ngrx/effects';
 import * as productActions from './product.actions';
+import { Action, actions$, ofType, Store } from 'mini-rx-store';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ProductEffects {
 
-  constructor(private productService: ProductService,
-              private actions$: Actions) { }
+  constructor(private productService: ProductService) {
+      Store.createEffect(this.loadProducts$);
+      Store.createEffect(this.updateProduct$);
+      Store.createEffect(this.createProduct$);
+      Store.createEffect(this.deleteProduct$);
+  }
 
-  @Effect()
-  loadProducts$: Observable<Action> = this.actions$.pipe(
+  loadProducts$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.Load),
     mergeMap(action =>
       this.productService.getProducts().pipe(
@@ -28,8 +29,7 @@ export class ProductEffects {
     )
   );
 
-  @Effect()
-  updateProduct$: Observable<Action> = this.actions$.pipe(
+  updateProduct$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.UpdateProduct),
     map((action: productActions.UpdateProduct) => action.payload),
     mergeMap((product: Product) =>
@@ -40,8 +40,7 @@ export class ProductEffects {
     )
   );
 
-  @Effect()
-  createProduct$: Observable<Action> = this.actions$.pipe(
+  createProduct$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.CreateProduct),
     map((action: productActions.CreateProduct) => action.payload),
     mergeMap((product: Product) =>
@@ -52,8 +51,7 @@ export class ProductEffects {
     )
   );
 
-  @Effect()
-  deleteProduct$: Observable<Action> = this.actions$.pipe(
+  deleteProduct$: Observable<Action> = actions$.pipe(
     ofType(productActions.ProductActionTypes.DeleteProduct),
     map((action: productActions.DeleteProduct) => action.payload),
     mergeMap((productId: number) =>
