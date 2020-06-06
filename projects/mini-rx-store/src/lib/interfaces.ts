@@ -6,7 +6,7 @@ export interface StoreExtension {
     init(): void;
 }
 
-export interface Action<PayLoadType = any> {
+export interface Action {
     type: string;
     payload?: any;
 }

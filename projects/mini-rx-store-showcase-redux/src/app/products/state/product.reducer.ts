@@ -13,6 +13,7 @@ import {
     initializeCurrentProduct, loadFail
 } from './product.actions';
 import { Action } from 'mini-rx-store';
+import { on, reducer } from "ts-action";
 
 // State for this feature (Product)
 export interface ProductState {
@@ -29,7 +30,7 @@ export const initialState: ProductState = {
   error: ''
 };
 
-export function reducer(state = initialState, action: Action): ProductState {
+export function myreducer(state = initialState, action: Action): ProductState {
 
   switch (action.type) {
     case toggleProductCode.type:
@@ -120,3 +121,9 @@ export function reducer(state = initialState, action: Action): ProductState {
       return state;
   }
 }
+
+
+const fooBarReducer = reducer(
+    initialState,
+    on(createProductSuccess, (state, { payload }) => ({ ...state, products: [payload] }))
+);

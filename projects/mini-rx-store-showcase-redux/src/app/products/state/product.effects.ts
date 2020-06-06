@@ -12,7 +12,7 @@ import {
     createProduct, createProductFail, createProductSuccess, deleteProduct, deleteProductFail, deleteProductSuccess,
     load,
     loadFail,
-    loadSuccess,
+    loadSuccess, testaction,
     updateProduct,
     updateProductFail,
     updateProductSuccess
@@ -40,13 +40,13 @@ export class ProductEffects {
 
   updateProduct$: Observable<Action> = actions$.pipe(
     ofType(updateProduct),
-    map((action: Action) => action.payload),
-    mergeMap((product: Product) =>
-      this.productService.updateProduct(product).pipe(
-        map(updatedProduct => (updateProductSuccess(updatedProduct))),
-        catchError(err => of(updateProductFail(err)))
-      )
-    )
+    toPayload(),
+    mergeMap((product) => {
+     return this.productService.updateProduct(product).pipe(
+         map(updatedProduct => (updateProductSuccess(updatedProduct))),
+         catchError(err => of(updateProductFail(err)))
+     )
+    })
   );
 
   createProduct$: Observable<Action> = actions$.pipe(
