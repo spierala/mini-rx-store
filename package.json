@@ -32,6 +32,8 @@
         "bootstrap": "^4.4.1",
         "memoize-one": "^5.1.1",
         "rxjs": "~6.4.0",
+        "ts-action": "^11.0.0",
+        "ts-action-operators": "^9.1.1",
         "tslib": "^1.10.0",
         "zone.js": "~0.9.1"
     },

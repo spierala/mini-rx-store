@@ -1,5 +1,18 @@
 import { Product } from '../product';
-import { ProductActionTypes, ProductActions } from './product.actions';
+import {
+    toggleProductCode,
+    setCurrentProduct,
+    deleteProductSuccess,
+    updateProductFail,
+    loadSuccess,
+    deleteProductFail,
+    updateProductSuccess,
+    clearCurrentProduct,
+    createProductSuccess,
+    createProductFail,
+    initializeCurrentProduct, loadFail
+} from './product.actions';
+import { Action } from 'mini-rx-store';
 
 // State for this feature (Product)
 export interface ProductState {
@@ -16,48 +29,48 @@ export const initialState: ProductState = {
   error: ''
 };
 
-export function reducer(state: ProductState, action: ProductActions): ProductState {
+export function reducer(state = initialState, action: Action): ProductState {
 
   switch (action.type) {
-    case ProductActionTypes.ToggleProductCode:
+    case toggleProductCode.type:
       return {
         ...state,
         showProductCode: action.payload
       };
 
-    case ProductActionTypes.SetCurrentProduct:
+    case setCurrentProduct.type:
       return {
         ...state,
         currentProductId: action.payload.id
       };
 
-    case ProductActionTypes.ClearCurrentProduct:
+    case clearCurrentProduct.type:
       return {
         ...state,
         currentProductId: null
       };
 
-    case ProductActionTypes.InitializeCurrentProduct:
+    case initializeCurrentProduct.type:
       return {
         ...state,
         currentProductId: 0
       };
 
-    case ProductActionTypes.LoadSuccess:
+    case loadSuccess.type:
       return {
         ...state,
         products: action.payload,
         error: ''
       };
 
-    case ProductActionTypes.LoadFail:
+    case loadFail.type:
       return {
         ...state,
         products: [],
         error: action.payload
       };
 
-    case ProductActionTypes.UpdateProductSuccess:
+    case updateProductSuccess.type:
       const updatedProducts = state.products.map(
         item => action.payload.id === item.id ? action.payload : item);
       return {
@@ -67,14 +80,14 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
         error: ''
       };
 
-    case ProductActionTypes.UpdateProductFail:
+    case updateProductFail.type:
       return {
         ...state,
         error: action.payload
       };
 
     // After a create, the currentProduct is the new product.
-    case ProductActionTypes.CreateProductSuccess:
+    case createProductSuccess.type:
       return {
         ...state,
         products: [...state.products, action.payload],
@@ -82,14 +95,14 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
         error: ''
       };
 
-    case ProductActionTypes.CreateProductFail:
+    case createProductFail.type:
       return {
         ...state,
         error: action.payload
       };
 
     // After a delete, the currentProduct is null.
-    case ProductActionTypes.DeleteProductSuccess:
+    case deleteProductSuccess.type:
       return {
         ...state,
         products: state.products.filter(product => product.id !== action.payload),
@@ -97,7 +110,7 @@ export function reducer(state: ProductState, action: ProductActions): ProductSta
         error: ''
       };
 
-    case ProductActionTypes.DeleteProductFail:
+    case deleteProductFail.type:
       return {
         ...state,
         error: action.payload

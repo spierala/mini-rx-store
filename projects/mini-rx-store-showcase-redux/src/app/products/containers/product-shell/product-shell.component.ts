@@ -1,10 +1,20 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import * as fromProduct from './../../state';
-import * as productActions from './../../state/product.actions';
+import {
+    clearCurrentProduct,
+    createProduct,
+    deleteProduct,
+    initializeCurrentProduct,
+    load,
+    setCurrentProduct,
+    toggleProductCode,
+    updateProduct
+} from './../../state/product.actions';
 import { Product } from '../../product';
 import { Store } from 'mini-rx-store';
+
 
 @Component({
   templateUrl: './product-shell.component.html',
@@ -19,7 +29,7 @@ export class ProductShellComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    Store.dispatch(new productActions.Load());
+    Store.dispatch(load());
     this.products$ = Store.select(fromProduct.getProducts);
     this.errorMessage$ = Store.select(fromProduct.getError);
     this.selectedProduct$ = Store.select(fromProduct.getCurrentProduct);
@@ -27,29 +37,29 @@ export class ProductShellComponent implements OnInit {
   }
 
   checkChanged(value: boolean): void {
-    Store.dispatch(new productActions.ToggleProductCode(value));
+    Store.dispatch(toggleProductCode(value));
   }
 
   newProduct(): void {
-    Store.dispatch(new productActions.InitializeCurrentProduct());
+    Store.dispatch(initializeCurrentProduct());
   }
 
   productSelected(product: Product): void {
-    Store.dispatch(new productActions.SetCurrentProduct(product));
+    Store.dispatch(setCurrentProduct(product));
   }
 
   deleteProduct(product: Product): void {
-    Store.dispatch(new productActions.DeleteProduct(product.id));
+    Store.dispatch(deleteProduct(product.id));
   }
 
   clearProduct(): void {
-    Store.dispatch(new productActions.ClearCurrentProduct());
+    Store.dispatch(clearCurrentProduct());
   }
   saveProduct(product: Product): void {
-    Store.dispatch(new productActions.CreateProduct(product));
+    Store.dispatch(createProduct(product));
   }
 
   updateProduct(product: Product): void {
-    Store.dispatch(new productActions.UpdateProduct(product));
+    Store.dispatch(updateProduct(product));
   }
 }
