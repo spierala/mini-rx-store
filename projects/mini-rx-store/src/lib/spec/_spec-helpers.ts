@@ -8,7 +8,7 @@ export const counterInitialState: CounterState = {
     counter: 1,
 };
 
-export function counterReducer(state: CounterState, action: Action) {
+export function counterReducer(state: CounterState = counterInitialState, action: Action) {
     switch (action.type) {
         case 'counter':
             return {

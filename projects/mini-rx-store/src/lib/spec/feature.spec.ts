@@ -4,7 +4,6 @@ import { Observable, of } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
-import { Action } from '../interfaces';
 import { counterInitialState, counterReducer } from './_spec-helpers';
 
 interface UserState {
@@ -48,7 +47,7 @@ const getCountry = createSelector(
     (state) => state.country
 );
 
-Store.feature('someFeature', counterInitialState, counterReducer);
+Store.feature('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector('someFeature');
 
 class FeatureState extends Feature<UserState> {

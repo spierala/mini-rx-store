@@ -29,6 +29,6 @@ export class ProductModule {
     constructor(
         private productEffects: ProductEffects
     ) {
-        Store.feature('products', initialState, reducer);
+         Store.feature('products', reducer, initialState);
     }
 }

@@ -12,8 +12,8 @@ import StoreCore from './store-core';
 class Store {
     feature<StateType>(
         featureName: string,
-        initialState: StateType,
-        reducer: Reducer<StateType>
+        reducer: Reducer<StateType>,
+        initialState?: StateType,
     ) {
         StoreCore.addFeature<StateType>(featureName, initialState, reducer);
     }

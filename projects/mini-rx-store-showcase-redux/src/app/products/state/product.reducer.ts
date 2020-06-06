@@ -16,7 +16,7 @@ export const initialState: ProductState = {
   error: ''
 };
 
-export function reducer(state = initialState, action: ProductActions): ProductState {
+export function reducer(state: ProductState, action: ProductActions): ProductState {
 
   switch (action.type) {
     case ProductActionTypes.ToggleProductCode:
