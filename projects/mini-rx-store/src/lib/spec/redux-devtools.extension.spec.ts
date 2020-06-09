@@ -2,7 +2,7 @@ import Store from '../store';
 import StoreCore from '../store-core';
 import { ReduxDevtoolsExtension, ReduxDevtoolsOptions } from '../redux-devtools.extension';
 import { Action } from '../interfaces';
-import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
+import { counterReducer, CounterState } from './_spec-helpers';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
@@ -25,7 +25,7 @@ const connectFn = jest.fn().mockImplementation(() => {
 
 describe('Redux Dev Tools', () => {
     beforeAll(() => {
-        Store.feature<CounterState>('devToolsCounter',  counterInitialState, counterReducer);
+        Store.feature<CounterState>('devToolsCounter', counterReducer);
     });
     it('should connect to Store', () => {
         const options: Partial<ReduxDevtoolsOptions> = {

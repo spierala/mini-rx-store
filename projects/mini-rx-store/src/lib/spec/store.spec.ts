@@ -48,7 +48,7 @@ const initialState: UserState = {
     err: undefined
 };
 
-function reducer(state: UserState, action: Action): UserState {
+function reducer(state: UserState = initialState, action: Action): UserState {
     switch (action.type) {
         case 'updateUser':
         case 'loadUserSuccess':
@@ -105,7 +105,7 @@ describe('Store', () => {
     });
 
     it('should initialize a Feature state', () => {
-        Store.feature<UserState>('user', initialState, reducer);
+        Store.feature<UserState>('user', reducer);
 
         const spy = jest.fn();
         Store.select((state) => state).subscribe(spy);
@@ -117,7 +117,7 @@ describe('Store', () => {
 
     it('should throw when reusing feature name', () => {
         expect(() =>
-            Store.feature<UserState>('user', initialState, reducer)
+            Store.feature<UserState>('user', reducer)
         ).toThrowError();
     });
 
@@ -297,7 +297,7 @@ describe('Store', () => {
             return of({type: 'whatever'});
         };
 
-        Store.feature('someFeature', {}, someReducer);
+        Store.feature('someFeature', someReducer, {});
 
         Store.createEffect(
             actions$.pipe(
@@ -314,7 +314,7 @@ describe('Store', () => {
     it('should queue actions', () => {
         const callLimit = 5000;
 
-        Store.feature<CounterState>('counter', counterInitialState, counterReducer);
+        Store.feature<CounterState>('counter', counterReducer);
 
         const spy = jest.fn().mockImplementation((value) => {
             Store.dispatch({type: 'counter'});
@@ -345,7 +345,7 @@ describe('Store', () => {
             }
         }
 
-        Store.feature<CounterState>('counter2', counterInitialState, counter2Reducer);
+        Store.feature<CounterState>('counter2', counter2Reducer, counterInitialState);
 
         Store.createEffect(
             actions$.pipe(
@@ -376,5 +376,17 @@ describe('Store', () => {
         Store.select(getCounter3).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(2);
         expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should overwrite reducers default state with a provided initialState', () => {
+        const customInitialState: CounterState = {
+            counter: 2,
+        };
+
+        Store.feature<CounterState>('counter4', counterReducer, customInitialState);
+
+        const spy = jest.fn();
+        Store.select((state) => state.counter4).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(customInitialState);
     });
 });

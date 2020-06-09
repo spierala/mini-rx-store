@@ -91,14 +91,11 @@ class StoreCore {
             ? reducer
             : createDefaultReducer(actionTypePrefix);
 
-        const reducerWithInitialState: Reducer<StateType> = createReducerWithInitialState(
-            reducer,
-            initialState
-        );
+        reducer = initialState ? createReducerWithInitialState(reducer, initialState) : reducer;
 
         const featureReducer: Reducer<AppState> = createFeatureReducer(
             featureName,
-            reducerWithInitialState
+            reducer
         );
 
         // Add reducer
@@ -171,8 +168,7 @@ function createReducerWithInitialState<StateType>(
     reducer: Reducer<StateType>,
     initialState: StateType
 ): Reducer<StateType> {
-    return (state: StateType, action: Action): StateType => {
-        state = state === undefined ? initialState : state;
+    return (state: StateType = initialState, action: Action): StateType => {
         return reducer(state, action);
     };
 }

@@ -54,29 +54,26 @@ Usually you would create a new `Feature` inside long living Modules/Services:
 
 ```
 import { Store } from 'mini-rx-store';
-import { initialState, ProductState, reducer } from './state/product.reducer';
+import { ProductState, reducer } from './state/product.reducer';
 ...
 // Inside long living Module / Service
 constructor() {
-    Store.feature<ProductState>('products', initialState, reducer);
+    Store.feature<ProductState>('products', reducer);
 }
 ```
 
-The code above creates a new Feature State for _products_.
-`Store.feature` receives a feature name, a initial state and a reducer function.
+The code above creates a new feature state for _products_. 
+`Store.feature` receives the feature name, and a reducer function.
 
-Initial state example:
+Reducers specify how the feature state changes in response to actions sent to the store.
+A reducer function typically looks like this:
 ```
-export const initialState: ProductState = {
+const initialState: ProductState = {
   showProductCode: true,
   products: [],
 };
-```
 
-Reducers specify how the application's state changes in response to actions sent to the store.
-A reducer function typically looks like this:
-```
-export function reducer(state: ProductState, action: ProductActions): ProductState {
+export function reducer(state: ProductState = initialState, action: ProductActions): ProductState {
   switch (action.type) {
     case ProductActionTypes.ToggleProductCode:
       return {

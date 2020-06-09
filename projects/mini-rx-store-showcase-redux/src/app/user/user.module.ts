@@ -5,7 +5,7 @@ import { SharedModule } from '../shared/shared.module';
 
 import { LoginComponent } from './login.component';
 
-import { initialState, reducer } from './state/user.reducer';
+import { reducer } from './state/user.reducer';
 import { Store } from 'mini-rx-store';
 
 const userRoutes: Routes = [
@@ -23,6 +23,6 @@ const userRoutes: Routes = [
 })
 export class UserModule {
     constructor() {
-        Store.feature('users', initialState, reducer);
+       Store.feature('users', reducer);
     }
 }
