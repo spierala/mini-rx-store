@@ -6,7 +6,7 @@
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
 ## RxJS
-MiniRX Store is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
+MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
 
 ## Redux
 
@@ -51,6 +51,8 @@ The `Store` is created and ready to use as soon as you import `Store`.
 A `Feature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
 The Feature States together form the App State (Single Source of Truth).
 
+Usually you would create a new `Feature` inside long living Modules/Services:
+
 ```
 import { Store } from 'mini-rx-store';
 import { ProductState, reducer } from './state/product.reducer';
@@ -86,11 +88,11 @@ export function reducer(state: ProductState = initialState, action: ProductActio
 }
 ```
 
-Usually you would create a new `Feature` inside long living Modules/Services.
-
 #### Create an Action:
 
 ```
+import { Action } from 'mini-rx-store';
+
 export enum ProductActionTypes {
   CreateProduct = '[Product] Create Product',
 }
@@ -121,6 +123,7 @@ Effects handle code that triggers side effects like API calls:
 
 ```
 import { Action, actions$, ofType } from 'mini-rx-store';
+import { mergeMap, map, catchError } from 'rxjs/operators';
 import { LoadFail, LoadSuccess, ProductActionTypes } from './product.actions';
 import { ProductService } from '../product.service';
 
@@ -170,7 +173,7 @@ import { getProducts } from '../../state';
 this.products$ = Store.select(getProducts);
 ```
 
-`select` runs the selector on the App State and returns an Observable which will emit as soon as the _products_ data changes.
+`Store.select` runs the selector against the App State and returns an Observable which will emit as soon as the _products_ data changes.
 
 ## ts-action
 
@@ -329,7 +332,7 @@ The code above creates an Effect for _deleting a product_ from the list. The API
     When the side effect completed you can directly return the new state or return a callback function which gets the current state and returns a new state.
 
 -   **`effectName: string`**:
-    ID which needs to be unique for each effect. That ID will also show up in the logging (Redux Dev Tools / JS console).
+    ID which needs to be unique for each effect. That ID will show up in the logging (Redux Dev Tools / JS console).
 
 #### Select Observable State (with a memoized selector):
 You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
@@ -391,7 +394,7 @@ You need to install the Browser Plugin to make it work.
 Currently, these options are available to configure the DevTools:
 * `name`: the instance name to be shown on the DevTools monitor page.
 * `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
-* `latency: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
+* `latency`: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
 
 
 #### Installation (Angular):
