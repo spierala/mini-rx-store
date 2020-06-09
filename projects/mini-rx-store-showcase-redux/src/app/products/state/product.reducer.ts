@@ -1,129 +1,83 @@
 import { Product } from '../product';
 import {
-    toggleProductCode,
-    setCurrentProduct,
-    deleteProductSuccess,
-    updateProductFail,
-    loadSuccess,
-    deleteProductFail,
-    updateProductSuccess,
     clearCurrentProduct,
-    createProductSuccess,
     createProductFail,
-    initializeCurrentProduct, loadFail
+    createProductSuccess,
+    deleteProductFail,
+    deleteProductSuccess,
+    initializeCurrentProduct,
+    loadFail,
+    loadSuccess,
+    setCurrentProduct,
+    toggleProductCode,
+    updateProductFail,
+    updateProductSuccess
 } from './product.actions';
-import { Action } from 'mini-rx-store';
-import { on, reducer } from "ts-action";
+import { on, reducer } from 'ts-action';
 
 // State for this feature (Product)
 export interface ProductState {
-  showProductCode: boolean;
-  currentProductId: number | null;
-  products: Product[];
-  error: string;
+    showProductCode: boolean;
+    currentProductId: number | null;
+    products: Product[];
+    error: string;
 }
 
-export const initialState: ProductState = {
-  showProductCode: true,
-  currentProductId: null,
-  products: [],
-  error: ''
+const initialState: ProductState = {
+    showProductCode: true,
+    currentProductId: null,
+    products: [],
+    error: ''
 };
 
-export function myreducer(state = initialState, action: Action): ProductState {
-
-  switch (action.type) {
-    case toggleProductCode.type:
-      return {
+export const productReducer = reducer(
+    initialState,
+    on(toggleProductCode, (state, {payload}) => ({...state, showProductCode: payload})),
+    on(setCurrentProduct, (state, {payload}) => ({...state, currentProductId: payload.id})),
+    on(clearCurrentProduct, (state) => ({...state, currentProductId: null})),
+    on(initializeCurrentProduct, (state) => ({...state, currentProductId: 0})),
+    on(loadSuccess, (state, {payload}) => ({
         ...state,
-        showProductCode: action.payload
-      };
-
-    case setCurrentProduct.type:
-      return {
-        ...state,
-        currentProductId: action.payload.id
-      };
-
-    case clearCurrentProduct.type:
-      return {
-        ...state,
-        currentProductId: null
-      };
-
-    case initializeCurrentProduct.type:
-      return {
-        ...state,
-        currentProductId: 0
-      };
-
-    case loadSuccess.type:
-      return {
-        ...state,
-        products: action.payload,
+        products: payload,
         error: ''
-      };
-
-    case loadFail.type:
-      return {
+    })),
+    on(loadFail, (state, {payload}) => ({
         ...state,
         products: [],
-        error: action.payload
-      };
-
-    case updateProductSuccess.type:
-      const updatedProducts = state.products.map(
-        item => action.payload.id === item.id ? action.payload : item);
-      return {
+        error: payload
+    })),
+    on(updateProductSuccess, (state, {payload}) => {
+        const updatedProducts = state.products.map(
+            item => payload.id === item.id ? payload : item);
+        return {
+            ...state,
+            products: updatedProducts,
+            currentProductId: payload.id,
+            error: ''
+        };
+    }),
+    on(updateProductFail, (state, {payload}) => ({
         ...state,
-        products: updatedProducts,
-        currentProductId: action.payload.id,
+        error: payload
+    })),
+    on(createProductSuccess, (state, {payload}) => ({
+        ...state,
+        products: [...state.products, payload],
+        currentProductId: payload.id,
         error: ''
-      };
-
-    case updateProductFail.type:
-      return {
+    })),
+    on(createProductFail, (state, {payload}) => ({
         ...state,
-        error: action.payload
-      };
-
-    // After a create, the currentProduct is the new product.
-    case createProductSuccess.type:
-      return {
+        error: payload
+    })),
+    on(deleteProductSuccess, (state, {payload}) => ({
         ...state,
-        products: [...state.products, action.payload],
-        currentProductId: action.payload.id,
-        error: ''
-      };
-
-    case createProductFail.type:
-      return {
-        ...state,
-        error: action.payload
-      };
-
-    // After a delete, the currentProduct is null.
-    case deleteProductSuccess.type:
-      return {
-        ...state,
-        products: state.products.filter(product => product.id !== action.payload),
+        products: state.products.filter(product => product.id !== payload),
         currentProductId: null,
         error: ''
-      };
-
-    case deleteProductFail.type:
-      return {
+    })),
+    on(deleteProductFail, (state, {payload}) => ({
         ...state,
-        error: action.payload
-      };
-
-    default:
-      return state;
-  }
-}
-
-
-const fooBarReducer = reducer(
-    initialState,
-    on(createProductSuccess, (state, { payload }) => ({ ...state, products: [payload] }))
+        error: payload
+    })),
 );
