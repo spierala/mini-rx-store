@@ -1,14 +1,5 @@
-
-import * as fromRoot from '../../state/app.state';
 import * as fromProducts from './product.reducer';
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
-
-// Extends the app state to include the product feature.
-// This is required because products are lazy loaded.
-// So the reference to ProductState cannot be added to app.state.ts directly.
-export interface State extends fromRoot.State {
-    products: fromProducts.ProductState;
-}
 
 // Selector functions
 const getProductFeatureState = createFeatureSelector<fromProducts.ProductState>('products');
