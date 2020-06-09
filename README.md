@@ -26,6 +26,7 @@ The Redux Pattern is based on this 3 key principles:
     - Reducers
     - Memoized Selectors
     - Effects
+- Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume Actions with as little boilerplate as possible
 -   "Feature" API   :
     -   `setState()` update the feature state
     -   `select()` read feature state
@@ -170,6 +171,60 @@ this.products$ = Store.select(getProducts);
 ```
 
 `select` runs the selector on the App State and returns an Observable which will emit as soon as the _products_ data changes.
+
+## ts-action
+
+MiniRX supports writing and consuming Actions with [ts-action](https://www.npmjs.com/package/ts-action).
+
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume Actions in Effects.
+
+Install the packages using npm:
+
+`npm install ts-action ts-action-operators`
+
+#### Create an Action:
+```
+import { action, payload } from 'ts-action';
+
+export const createProduct = action('[Product] Create Product', payload<Product>());
+```
+
+#### Dispatch an Action:
+```
+import { Store } from 'mini-rx-store';
+import { createProduct } from './../../state/product.actions';
+
+Store.dispatch(createProduct(product));
+```
+
+#### Reducer
+```
+import { on, reducer } from 'ts-action';
+
+export const productReducer = reducer(
+    initialState,
+    on(toggleProductCode, (state, {payload}) => ({...state, showProductCode: payload}))
+);
+```
+
+#### Effects
+Consume Actions in Effects
+```
+import { Action, actions$, Store } from 'mini-rx-store';
+import { ofType, toPayload } from 'ts-action-operators';
+
+updateProduct$: Observable<Action> = actions$.pipe(
+    ofType(updateProduct),
+    toPayload(),
+    mergeMap((product) => {
+        return this.productService.updateProduct(product).pipe(
+            map(updatedProduct => (updateProductSuccess(updatedProduct))),
+            catchError(err => of(updateProductFail(err)))
+        );
+    })
+);
+```
+
 
 ## Make simple things simple - The `Feature` API
 
