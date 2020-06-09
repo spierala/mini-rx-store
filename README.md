@@ -429,17 +429,19 @@ Store.addExtension(new ReduxDevtoolsExtension({
 }));
 ```
 
-## Showcase
+## Showcases
 
-This Repo contains also an Angular showcase project.
+This Repo contains also two Angular showcase projects.
 
 Run `npm i`
 
-Run `ng serve mini-rx-store-showcase --open` to see MiniRx in action.
+See the MiniRX "Redux" API in Action:
+Run `ng serve mini-rx-store-showcase-redux --open`
 
-The showcase is based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
+See the MiniRX "Feature" API in Action:
+Run `ng serve mini-rx-store-showcase --open`
 
-I did a refactor from NgRx to MiniRx, and the app still works :)
+The showcases are based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
 
 ## References
 
