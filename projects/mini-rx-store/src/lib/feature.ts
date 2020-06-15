@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable } from 'rxjs';
 import { Action, AppState } from './interfaces';
 import StoreCore from './store-core';
 import { createActionTypePrefix, nameUpdateAction, ofType } from './utils';
@@ -16,7 +16,7 @@ export abstract class Feature<StateType> {
     protected state$: BehaviorSubject<StateType> = new BehaviorSubject(
         undefined
     );
-    private get state(): StateType {
+    get state(): StateType {
         return this.state$.getValue();
     }
 
