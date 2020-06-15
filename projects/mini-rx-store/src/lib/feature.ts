@@ -47,13 +47,15 @@ export abstract class Feature<StateType> {
         });
     }
 
-    protected select<K>(mapFn: (state: StateType | AppState) => K, selectFromStore: boolean = false): Observable<K> {
+    protected select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
+    protected select<K>(mapFn: (state: AppState) => K, selectFromStore?: boolean): Observable<K>;
+    protected select<K, T extends (state: AppState | StateType) => K>(mapFn: T, selectFromStore: boolean = false): Observable<K> {
         if (selectFromStore) {
             return StoreCore.select(mapFn);
         }
 
         return this.state$.pipe(
-            map((state: StateType) => mapFn(state)),
+            map((state) => mapFn(state)),
             distinctUntilChanged()
         );
     }
