@@ -5,6 +5,7 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
 import { counterInitialState, counterReducer } from './_spec-helpers';
+import { ofType } from '../utils';
 
 interface UserState {
     firstName: string;
@@ -19,7 +20,7 @@ const initialState: UserState = {
     lastName: 'Willis',
     city: 'LA',
     country: 'United States',
-    err: undefined
+    err: undefined,
 };
 
 const asyncUser: UserState = {
@@ -27,11 +28,11 @@ const asyncUser: UserState = {
     lastName: 'Seagal',
     city: 'LA',
     country: 'United States',
-    err: ''
+    err: '',
 };
 
 function fakeApiGet(): Observable<UserState> {
-    return cold('---a', {a: asyncUser});
+    return cold('---a', { a: asyncUser });
 }
 
 function fakeApiWithError(): Observable<UserState> {
@@ -58,34 +59,20 @@ class FeatureState extends Feature<UserState> {
     city$ = this.select(getCity, true);
     someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
-    loadFn = this.createEffect((payload$) =>
-        payload$.pipe(
-            mergeMap(() =>
-                fakeApiGet().pipe(
-                    map((user) => user)
-                )
-            )
-        ), 'load'
+    loadFn = this.createEffect(
+        (payload$) =>
+            payload$.pipe(
+                mergeMap(() => fakeApiGet().pipe(map((user) => user)))
+            ),
+        'load'
     );
 
     loadFnWithoutName = this.createEffect((payload$) =>
-        payload$.pipe(
-            mergeMap(() =>
-                fakeApiGet().pipe(
-                    map((user) => user)
-                )
-            )
-        )
+        payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user))))
     );
 
     loadFnWithoutName2 = this.createEffect((payload$) =>
-        payload$.pipe(
-            mergeMap(() =>
-                fakeApiGet().pipe(
-                    map((user) => user)
-                )
-            )
-        )
+        payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user))))
     );
 
     loadFnWithError = this.createEffect((payload$) =>
@@ -93,7 +80,7 @@ class FeatureState extends Feature<UserState> {
             mergeMap(() =>
                 fakeApiWithError().pipe(
                     map((user) => user),
-                    catchError((err) => of({err: 'error'}))
+                    catchError((err) => of({ err: 'error' }))
                 )
             )
         )
@@ -168,13 +155,17 @@ describe('Feature', () => {
 
     it('should create and execute an effect', () => {
         userFeature.loadFn();
-        expect(userFeature.firstName$).toBeObservable(hot('a--b', {a: 'Nicolas', b: 'Steven'}));
+        expect(userFeature.firstName$).toBeObservable(
+            hot('a--b', { a: 'Nicolas', b: 'Steven' })
+        );
     });
 
     it('should create and execute an effect and handle error', () => {
         userFeature.resetState();
         userFeature.loadFnWithError();
-        expect(userFeature.state$).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
+        expect(userFeature.state$).toBeObservable(
+            hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
+        );
     });
 
     it('should append setState name to action type', () => {
@@ -183,39 +174,77 @@ describe('Feature', () => {
         const spy = jest.fn();
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
-        expect(spy).toHaveBeenCalledWith({type: '@mini-rx/user2/set-state/updateCity', payload: {...initialState, city: 'NY'}});
+        expect(spy).toHaveBeenCalledWith({
+            type: '@mini-rx/user2/set-state/updateCity',
+            payload: { ...initialState, city: 'NY' },
+        });
     });
 
     it('should append effect name to action type', () => {
-        hot('a').subscribe(
-            () => userFeature.loadFn()
-        );
+        hot('a').subscribe(() => userFeature.loadFn());
 
-        expect(actions$).toBeObservable(hot('a--b', {
-            a: {type: '@mini-rx/user2/effect/load', payload: undefined},
-            b: {type: '@mini-rx/user2/effect/load/set-state', payload: asyncUser},
-        }));
+        expect(actions$).toBeObservable(
+            hot('a--b', {
+                a: { type: '@mini-rx/user2/effect/load', payload: undefined },
+                b: {
+                    type: '@mini-rx/user2/effect/load/set-state',
+                    payload: asyncUser,
+                },
+            })
+        );
     });
 
     it('should append default effect name to action type', () => {
-        hot('a').subscribe(
-            () => userFeature.loadFnWithoutName()
-        );
+        hot('a').subscribe(() => userFeature.loadFnWithoutName());
 
-        expect(actions$).toBeObservable(hot('a--b', {
-            a: {type: '@mini-rx/user2/effect/1', payload: undefined},
-            b: {type: '@mini-rx/user2/effect/1/set-state', payload: asyncUser},
-        }));
+        expect(actions$).toBeObservable(
+            hot('a--b', {
+                a: { type: '@mini-rx/user2/effect/1', payload: undefined },
+                b: {
+                    type: '@mini-rx/user2/effect/1/set-state',
+                    payload: asyncUser,
+                },
+            })
+        );
     });
 
     it('should increment and append default effect name to action type', () => {
-        hot('a').subscribe(
-            () => userFeature.loadFnWithoutName2()
-        );
+        hot('a').subscribe(() => userFeature.loadFnWithoutName2());
 
-        expect(actions$).toBeObservable(hot('a--b', {
-            a: {type: '@mini-rx/user2/effect/2', payload: undefined},
-            b: {type: '@mini-rx/user2/effect/2/set-state', payload: asyncUser},
-        }));
+        expect(actions$).toBeObservable(
+            hot('a--b', {
+                a: { type: '@mini-rx/user2/effect/2', payload: undefined },
+                b: {
+                    type: '@mini-rx/user2/effect/2/set-state',
+                    payload: asyncUser,
+                },
+            })
+        );
+    });
+
+    it('should resubscribe on action stream when side effect error is not handled', () => {
+        const spy = jest.fn();
+
+        class EffectResubscribeFeature extends Feature<any> {
+            loadFnWithUnhandledError = this.createEffect((payload$) =>
+                payload$.pipe(
+                    mergeMap(() => {
+                        spy();
+                        throw new Error();
+                    })
+                )
+            );
+
+            constructor() {
+                super('EffectResubscribeFeature', {});
+            }
+        }
+
+        const feature: EffectResubscribeFeature = new EffectResubscribeFeature();
+        feature.loadFnWithUnhandledError();
+        feature.loadFnWithUnhandledError();
+        feature.loadFnWithUnhandledError();
+
+        expect(spy).toHaveBeenCalledTimes(3);
     });
 });
