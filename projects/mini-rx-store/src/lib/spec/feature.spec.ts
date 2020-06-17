@@ -102,6 +102,13 @@ class FeatureState extends Feature<UserState> {
         this.setState({ city }, 'updateCity');
     }
 
+    updateCountry(country) {
+        this.setState({
+            ...this.state, // Test updating state using `this.state`
+            country,
+        });
+    }
+
     resetState() {
         this.setState(initialState);
     }
@@ -130,6 +137,15 @@ describe('Feature', () => {
         userFeature.lastName$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('Cage');
         expect(spy).toHaveBeenCalledTimes(1);
+
+        spy.mockReset();
+
+        userFeature.updateCountry('Belgium'); // Test updating state using `this.state`
+        userFeature.country$.subscribe(spy);
+        expect(spy).toHaveBeenCalledWith('Belgium');
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        userFeature.resetState();
     });
 
     it('should select state from App State', () => {
@@ -156,7 +172,7 @@ describe('Feature', () => {
     it('should create and execute an effect', () => {
         userFeature.loadFn();
         expect(userFeature.firstName$).toBeObservable(
-            hot('a--b', { a: 'Nicolas', b: 'Steven' })
+            hot('a--b', { a: 'Bruce', b: 'Steven' })
         );
     });
 
