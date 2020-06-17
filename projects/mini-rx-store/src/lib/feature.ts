@@ -1,4 +1,4 @@
-import { BehaviorSubject, EMPTY, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Action, AppState } from './interfaces';
 import StoreCore from './store-core';
 import { createActionTypePrefix, nameUpdateAction, ofType } from './utils';
@@ -20,10 +20,7 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(
-        featureName: string,
-        initialState: StateType
-    ) {
+    protected constructor(featureName: string, initialState: StateType) {
         StoreCore.addFeature<StateType>(featureName, initialState);
 
         this.actionTypePrefix = createActionTypePrefix(featureName);
@@ -32,7 +29,9 @@ export abstract class Feature<StateType> {
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
 
         // Feature State and delegate to local BehaviorSubject
-        StoreCore.select(createFeatureSelector(featureName)).subscribe(this.state$);
+        StoreCore.select(createFeatureSelector(featureName)).subscribe(
+            this.state$
+        );
     }
 
     protected setState(
@@ -47,9 +46,18 @@ export abstract class Feature<StateType> {
         });
     }
 
-    protected select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
-    protected select<K>(mapFn: (state: AppState) => K, selectFromStore?: boolean): Observable<K>;
-    protected select<K, T extends (state: AppState | StateType) => K>(mapFn: T, selectFromStore: boolean = false): Observable<K> {
+    protected select<K>(
+        mapFn: (state: StateType) => K,
+        selectFromStore?: boolean
+    ): Observable<K>;
+    protected select<K>(
+        mapFn: (state: AppState) => K,
+        selectFromStore?: boolean
+    ): Observable<K>;
+    protected select<K, T extends (state: AppState | StateType) => K>(
+        mapFn: T,
+        selectFromStore: boolean = false
+    ): Observable<K> {
         if (selectFromStore) {
             return StoreCore.select(mapFn);
         }

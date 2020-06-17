@@ -5,7 +5,6 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
 import { counterInitialState, counterReducer } from './_spec-helpers';
-import { ofType } from '../utils';
 
 interface UserState {
     firstName: string;

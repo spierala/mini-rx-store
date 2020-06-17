@@ -13,7 +13,7 @@ class Store {
     feature<StateType>(
         featureName: string,
         reducer: Reducer<StateType>,
-        initialState?: StateType,
+        initialState?: StateType
     ) {
         StoreCore.addFeature<StateType>(featureName, initialState, reducer);
     }
