@@ -15,7 +15,12 @@
             "tsConfig": "projects/mini-rx-store/tsconfig.lib.json",
             "project": "projects/mini-rx-store/ng-package.json"
           }
-        },
+        ,          "configurations": {
+            "production": {
+              "tsConfig": "projects/mini-rx-store/tsconfig.lib.prod.json"
+            }
+          }
+},
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -45,7 +50,7 @@
             "main": "projects/mini-rx-store-showcase/src/main.ts",
             "polyfills": "projects/mini-rx-store-showcase/src/polyfills.ts",
             "tsConfig": "projects/mini-rx-store-showcase/tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "projects/mini-rx-store-showcase/src/favicon.ico",
               "projects/mini-rx-store-showcase/src/assets"
@@ -69,7 +74,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -144,7 +148,12 @@
             "tsConfig": "projects/mini-rx-ng-devtools/tsconfig.lib.json",
             "project": "projects/mini-rx-ng-devtools/ng-package.json"
           }
-        },
+        ,          "configurations": {
+            "production": {
+              "tsConfig": "projects/mini-rx-ng-devtools/tsconfig.lib.prod.json"
+            }
+          }
+},
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -174,7 +183,7 @@
             "main": "projects/mini-rx-store-showcase-redux/src/main.ts",
             "polyfills": "projects/mini-rx-store-showcase-redux/src/polyfills.ts",
             "tsConfig": "projects/mini-rx-store-showcase-redux/tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "projects/mini-rx-store-showcase-redux/src/favicon.ico",
               "projects/mini-rx-store-showcase-redux/src/assets"
@@ -198,7 +207,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
