@@ -12,7 +12,6 @@ export class ProductShellComponent {
     selectedProduct$: Observable<Product> = this.productState.selectedProduct$;
     products$: Observable<Product[]> = this.productState.products$;
     errorMessage$: Observable<string> = this.productState.errorMessage$;
-    productById$: Observable<Product> = this.productState.productById$;
 
     constructor(
         private productState: ProductStateService
