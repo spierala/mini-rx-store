@@ -6,6 +6,7 @@
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
 ## RxJS
+
 MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
 
 ## Redux
@@ -22,12 +23,12 @@ The Redux Pattern is based on this 3 key principles:
 
 -   Minimal configuration and setup
 -   "Redux" API:
-    - Actions
-    - Reducers
-    - Memoized Selectors
-    - Effects
-- Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume Actions with as little boilerplate as possible
--   "Feature" API   :
+    -   Actions
+    -   Reducers
+    -   Memoized Selectors
+    -   Effects
+-   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume Actions with as little boilerplate as possible
+-   "Feature" API :
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `createEffect()` run side effects like API calls and update feature state
@@ -63,11 +64,12 @@ constructor() {
 }
 ```
 
-The code above creates a new feature state for _products_. 
+The code above creates a new feature state for _products_.
 `Store.feature` receives the feature name, and a reducer function.
 
 Reducers specify how the feature state changes in response to actions sent to the store.
 A reducer function typically looks like this:
+
 ```
 const initialState: ProductState = {
   showProductCode: true,
@@ -104,13 +106,16 @@ export class CreateProduct implements Action {
 ```
 
 #### Dispatch an Action:
+
 Dispatch an Action to update state:
+
 ```
 import { Store } from 'mini-rx-store';
 import { CreateProduct } from 'product.actions';
 
 Store.dispatch(new CreateProduct(product));
 ```
+
 After the action has been dispatched the state will be updated accordingly (as defined in the reducer function).
 
 #### Write an effect:
@@ -186,6 +191,7 @@ Install the packages using npm:
 `npm install ts-action ts-action-operators`
 
 #### Create an Action:
+
 ```
 import { action, payload } from 'ts-action';
 
@@ -193,6 +199,7 @@ export const createProduct = action('[Product] Create Product', payload<Product>
 ```
 
 #### Dispatch an Action:
+
 ```
 import { Store } from 'mini-rx-store';
 import { createProduct } from './../../state/product.actions';
@@ -201,6 +208,7 @@ Store.dispatch(createProduct(product));
 ```
 
 #### Reducer
+
 ```
 import { on, reducer } from 'ts-action';
 
@@ -211,7 +219,9 @@ export const productReducer = reducer(
 ```
 
 #### Effects
+
 Consume Actions in Effects
+
 ```
 import { Action, actions$, Store } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
@@ -228,7 +238,6 @@ updateProduct$: Observable<Action> = actions$.pipe(
 );
 ```
 
-
 ## Make simple things simple - The `Feature` API
 
 If a Feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
@@ -238,6 +247,11 @@ If a Feature in your application requires only simple state management, then you
 To create a Feature, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
 
 ```
+interface UserState {
+    currentUser: User;
+    favProductIds: string[];
+}
+
 export class UserStateService extends Feature<UserState>{
     constructor() {
         super('users', initialState);
@@ -247,12 +261,12 @@ export class UserStateService extends Feature<UserState>{
 
 #### Select state with `select`
 
-**`select(mapFn: ((state: S) => any)): Observable<any>`**
+**`select(mapFn: (state: S) => any): Observable<any>`**
 
 Example:
 
 ```
-maskUserName$: Observable<boolean> = this.select(state => state.maskUserName);
+currentUser$: Observable<User> = this.select(state => state.currentUser);
 ```
 
 `select` takes a callback function which gives you access to the current feature state (see the `state` parameter).
@@ -261,82 +275,84 @@ The returned Observable will emit the selected data over time.
 
 #### Update state with `setState`
 
-**`setState(stateFn: (state: S) => S | state: Partial<S>, name?: string): void`**
+**`setState(state: Partial<S>, name?: string): void`**
 
 Example:
 
 ```
-// Pass callback to setState
-updateMaskUserName(maskUserName: boolean) {
-    this.setState((state) => {
-        return {
-            ...state,
-            maskUserName
-        }
-    });
-}
-
-// Or pass the new state object directly (in case the current state is not needed to calculate the new state)
-updateMaskUserName(maskUserName: boolean) {
-    this.setState({maskUserName});
+updateUser(user: User) {
+    this.setState({currentUser: user});
 }
 ```
 
-`setState` takes a callback function which gives you access to the current feature state (see the `state` parameter).
-Inside of that function you can compose the new feature state.
+`setState` sets the new state of the feature.
 
-Alternatively `setState` accepts a new state object directly.
+```
+// Update state based on current state
+addFavorite(productId) {
+    this.setState({
+        favProductIds: [...this.state.favProductIds, productId]
+    });
+}
+```
+
+Do you want to calculate the new state based on the current state?
+You can use `this.state` which holds the current state snapshot.
 
 For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
 
-`this.setState({ showProductCode }, 'showProductCode');`
+`this.setState({currentUser: user} 'updateUser');`
 
 #### Create an Effect with `createEffect`
 
-**`createEffect<PayLoadType>(effectFn: (payload: Observable<PayLoadType>) => Observable<(state: S) => S | state: Partial<S>>, effectName?: string ): (payload?: PayLoadType) => void`**
+**`createEffect<PayLoadType = any>(effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>, effectName?: string): (payload?: PayLoadType) => void`**
 
 Example:
 
 ```
-deleteProductFn = this.createEffect<number>(
-    payload$ => payload$.pipe(
-        mergeMap((productId) => {
-            return this.productService.deleteProduct(productId).pipe(
-                map(() => state => { // Return callback which calculates the new state
-                    return {
-                        ...state,
-                        products: state.products.filter(product => product.id !== productId),
-                        error: ''
-                    }
-                }),
-                catchError(err => of({error: err})) // Or return the new state object directly
+createProduct = this.createEffect<Product>(
+    (payload$) =>
+        payload$.pipe(
+            mergeMap((product) =>
+                this.productService.createProduct(product).pipe(
+                    map((newProduct) => ({
+                        products: [...this.state.products, newProduct],
+                        currentProductId: newProduct.id,
+                        error: '',
+                    })),
+                    catchError((error) =>
+                        of({
+                            error,
+                        })
+                    )
+                )
             )
-        })
-    ),
-    'delete' // Used for logging / Redux Dev Tools
+        )
 );
 
 // Run the effect
-deleteProductFn(123);
+createProduct(product);
 ```
 
-The code above creates an Effect for _deleting a product_ from the list. The API call `this.productService.deleteProduct(productId)` is the side effect which needs to be performed.
-`createEffect` returns a function which can be called later to start the Effect with an optional payload (see `deleteProductFn(123)`).
+The code above creates an Effect for _creating a product_.
+The API call `this.productService.createProduct` is the side effect which needs to be performed.
+`createEffect` returns a function which can be called later to start the Effect with an optional payload (see `createProduct(product)`).
 
 `createEffect` takes 2 arguments:
 
--   **`effectFn: (payload$: Observable<PayLoadType>) => Observable<(state: S) => S | state: Partial<S>>`**:
+-   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
     Within the `effectFn` you can access the `payload$` Observable.
-    That Observable emits as soon as the Effect has started (e.g. by calling `deleteProductFn(123)`).
-    You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc).
-    When the side effect completed you can directly return the new state or return a callback function which gets the current state and returns a new state.
+    That Observable emits as soon as the Effect has started (e.g. by calling `createProduct(product)`).
+    You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual side effect (`mergeMap`, `switchMap` etc).
+    When the side effect completed you can directly return the new feature state.
 
 -   **`effectName: string`**:
-    ID which needs to be unique for each effect. That ID will show up in the logging (Redux Dev Tools / JS console).
+    Optional Name which needs to be unique for each effect. That ID will show up in the logging (Redux Dev Tools / JS console).
 
 #### Select Observable State (with a memoized selector):
+
 You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
-This is because the Feature API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor). 
+This is because the Feature API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
 
 ```
 const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
@@ -361,7 +377,7 @@ export class ProductStateService extends Feature<ProductState>{
 Also the `Feature` API makes use of Redux:
 Each Feature is registered in the Store (Single Source of Truth) and is part of the global App State.
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
-When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action, 
+When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action,
 and the default reducer will update the feature state accordingly.
 
 See the default Action in the Redux Dev Tools:
@@ -383,6 +399,7 @@ The code above sets the global Store Settings.
 Typically, you would set the settings when bootstrapping the app and before the store is used.
 
 ## Redux Dev Tools:
+
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
 
 MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
@@ -392,12 +409,13 @@ You need to install the Browser Plugin to make it work.
 -   [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
 Currently, these options are available to configure the DevTools:
-* `name`: the instance name to be shown on the DevTools monitor page.
-* `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
-* `latency`: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
 
+-   `name`: the instance name to be shown on the DevTools monitor page.
+-   `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
+-   `latency`: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
 
 #### Installation (Angular):
+
 [![npm version](https://badge.fury.io/js/mini-rx-ng-devtools.svg)](https://www.npmjs.com/package/mini-rx-ng-devtools)
 
 `npm i mini-rx-ng-devtools`
