@@ -3,7 +3,7 @@ import { Feature } from 'mini-rx-store';
 import { ProductService } from '../product.service';
 import {
     catchError,
-    map,
+    map, mapTo,
     mergeMap,
     startWith,
     withLatestFrom,
@@ -13,7 +13,6 @@ import { Product } from '../product';
 import {
     getCurrentProduct,
     getError,
-    getProductById,
     getProducts,
     getShowProductCode,
     initialState,
@@ -29,14 +28,13 @@ export class ProductStateService extends Feature<ProductState> {
     selectedProduct$: Observable<Product> = this.select(getCurrentProduct);
     products$: Observable<Product[]> = this.select(getProducts);
     errorMessage$: Observable<string> = this.select(getError);
-    productById$: Observable<Product> = this.select(getProductById(1));
 
     constructor(private productService: ProductService) {
         super('products', initialState);
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)
-    // The completed sideEffects update the feature state directly
+    // The completed side effects (api calls) update the feature state directly
     loadProducts = this.createEffect(
         (payload$) =>
             payload$.pipe(
@@ -63,9 +61,9 @@ export class ProductStateService extends Feature<ProductState> {
             payload$.pipe(
                 mergeMap((product) =>
                     this.productService.createProduct(product).pipe(
-                        map((newProduct) => (state) => {
+                        map((newProduct) => {
                             return {
-                                products: [...state.products, newProduct],
+                                products: [...this.state.products, newProduct],
                                 currentProductId: newProduct.id,
                                 error: '',
                             };
@@ -86,8 +84,8 @@ export class ProductStateService extends Feature<ProductState> {
             payload$.pipe(
                 mergeMap((product) => {
                     return this.productService.updateProduct(product).pipe(
-                        map((updatedProduct) => (state) => {
-                            const updatedProducts = state.products.map((item) =>
+                        map((updatedProduct) => {
+                            const updatedProducts = this.state.products.map((item) =>
                                 updatedProduct.id === item.id
                                     ? updatedProduct
                                     : item
@@ -111,31 +109,27 @@ export class ProductStateService extends Feature<ProductState> {
 
     deleteProduct = this.createEffect<number>((payload$) =>
         payload$.pipe(
-            withLatestFrom(this.state$),
+            withLatestFrom(this.state$), // Get snapshot of state for undoing optimistic update
             mergeMap(([productId, lastState]) => {
                 return this.productService.deleteProduct(productId).pipe(
-                    map(() => (state) => {
-                        return {
-                            products: state.products.filter(
+                    mapTo( {
+                            products: this.state.products.filter(
                                 (product) => product.id !== productId
                             ),
                             currentProductId: null,
                             error: '',
-                        };
-                    }),
+                        }),
                     catchError((err) =>
                         of({
                             products: lastState.products, // Restore State before Optimistic Update
-                            error: err,
+                            error: err
                         })
                     ),
-                    // Optimistic Update
-                    startWith((state) => {
-                        return {
-                            products: state.products.filter(
-                                (product) => product.id !== productId
-                            ),
-                        };
+                    // Example for an Optimistic Update
+                    startWith( {
+                        products: this.state.products.filter(
+                            (product) => product.id !== productId
+                        )
                     })
                 );
             })
@@ -144,13 +138,9 @@ export class ProductStateService extends Feature<ProductState> {
 
     // UPDATE STATE
     setCurrentProduct(id: number) {
-        this.setState((state) => {
-            if (state.currentProductId === id) {
-                return state;
-            }
-            return {
+        this.setState(
+            {
                 currentProductId: id,
-            };
         }, 'currProd');
     }
 
