@@ -27,7 +27,7 @@ The Redux Pattern is based on this 3 key principles:
     -   Reducers
     -   Memoized Selectors
     -   Effects
--   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume Actions with as little boilerplate as possible
+-   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume actions with as little boilerplate as possible
 -   "Feature" API :
     -   `setState()` update the feature state
     -   `select()` read feature state
@@ -180,9 +180,9 @@ this.products$ = Store.select(getProducts);
 
 ## ts-action
 
-MiniRX supports writing and consuming Actions with [ts-action](https://www.npmjs.com/package/ts-action).
+MiniRX supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action).
 
-There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume Actions in Effects.
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume actions in Effects.
 
 Install the packages using npm:
 
@@ -218,7 +218,7 @@ export const productReducer = reducer(
 
 #### Effects
 
-Consume Actions in Effects
+Consume actions in Effects
 
 ```
 import { Action, actions$, Store } from 'mini-rx-store';
@@ -238,7 +238,8 @@ updateProduct$: Observable<Action> = actions$.pipe(
 
 ## Make simple things simple - The `Feature` API
 
-If a feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
+If a feature in your application requires only simple state management, then you can fall back to a simplified API: 
+With the `Feature` API you can update state without writing actions and reducers.
 
 #### Create a Feature (Feature State):
 
