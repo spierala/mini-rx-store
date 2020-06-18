@@ -50,7 +50,7 @@ The `Store` is created and ready to use as soon as you import `Store`.
 #### Create a Feature (Feature State):
 
 A _feature_ holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
-The _feature_ states together form the app state (Single source of truth).
+The feature states together form the app state (Single source of truth).
 
 Usually you would create a new _feature_ inside long living Modules/Services:
 
@@ -120,9 +120,9 @@ After the action has been dispatched the state will be updated accordingly (as d
 
 Effects handle code that triggers side effects like API calls:
 
--   An Effect listens for a specific Action
--   That Action triggers the actual side effect
--   The Effect needs to return a new Action as soon as the side effect finished
+-   An Effect listens for a specific action
+-   That action triggers the actual side effect
+-   The Effect needs to return a new action as soon as the side effect finished
 
 ```
 import { Action, actions$, ofType } from 'mini-rx-store';
@@ -145,7 +145,7 @@ constructor(private productService: ProductService) {
 }
 ```
 
-The code above creates an Effect. As soon as the `Load` Action is dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new Action will be dispatched:
+The code above creates an Effect. As soon as the `Load` action has been dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new action will be dispatched:
 `LoadSuccess` or `LoadFail`.
 
 #### Create (memoized) Selectors:
@@ -451,10 +451,10 @@ This Repo contains also two Angular showcase projects.
 
 Run `npm i`
 
-See the MiniRX "Redux" API in Action:
+See the MiniRX "Redux" API in action:
 Run `ng serve mini-rx-store-showcase-redux --open`
 
-See the MiniRX "Feature" API in Action:
+See the MiniRX "Feature" API in action:
 Run `ng serve mini-rx-store-showcase --open`
 
 The showcases are based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
