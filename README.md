@@ -49,10 +49,10 @@ The `Store` is created and ready to use as soon as you import `Store`.
 
 #### Create a Feature (Feature State):
 
-A `Feature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
-The Feature States together form the App State (Single Source of Truth).
+A _feature_ holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
+The _feature_ states together form the app state (Single source of truth).
 
-Usually you would create a new `Feature` inside long living Modules/Services:
+Usually you would create a new _feature_ inside long living Modules/Services:
 
 ```
 import { Store } from 'mini-rx-store';
@@ -69,7 +69,6 @@ The code above creates a new feature state for _products_.
 
 Reducers specify how the feature state changes in response to actions sent to the store.
 A reducer function typically looks like this:
-
 ```
 const initialState: ProductState = {
   showProductCode: true,
@@ -91,7 +90,6 @@ export function reducer(state: ProductState = initialState, action: ProductActio
 ```
 
 #### Create an Action:
-
 ```
 import { Action } from 'mini-rx-store';
 
@@ -107,7 +105,7 @@ export class CreateProduct implements Action {
 
 #### Dispatch an Action:
 
-Dispatch an Action to update state:
+Dispatch an action to update state:
 
 ```
 import { Store } from 'mini-rx-store';
@@ -178,7 +176,7 @@ import { getProducts } from '../../state';
 this.products$ = Store.select(getProducts);
 ```
 
-`Store.select` runs the selector against the App State and returns an Observable which will emit as soon as the _products_ data changes.
+`Store.select` runs the selector against the app state and returns an Observable which will emit as soon as the _products_ data changes.
 
 ## ts-action
 
@@ -240,11 +238,11 @@ updateProduct$: Observable<Action> = actions$.pipe(
 
 ## Make simple things simple - The `Feature` API
 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
+If a feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
 
 #### Create a Feature (Feature State):
 
-To create a Feature, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
+To create a `Feature`, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
 
 ```
 interface UserState {
@@ -271,20 +269,18 @@ currentUser$: Observable<User> = this.select(state => state.currentUser);
 
 `select` takes a callback function which gives you access to the current feature state (see the `state` parameter).
 Inside of that function you can pick a certain piece of state.
-The returned Observable will emit the selected data over time.
+`select` returns an Observable which will emit as soon as the selected data changes.
 
 #### Update state with `setState`
 
 **`setState(state: Partial<S>, name?: string): void`**
 
 Example:
-
 ```
 updateUser(user: User) {
     this.setState({currentUser: user});
 }
 ```
-
 `setState` sets the new state of the feature.
 
 ```
@@ -295,7 +291,6 @@ addFavorite(productId) {
     });
 }
 ```
-
 Do you want to calculate the new state based on the current state?
 You can use `this.state` which holds the current state snapshot.
 
@@ -341,18 +336,18 @@ The API call `this.productService.createProduct` is the side effect which needs 
 `createEffect` takes 2 arguments:
 
 -   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
-    Within the `effectFn` you can access the `payload$` Observable.
+    Within the `effectFn` callback you can access the `payload$` Observable.
     That Observable emits as soon as the Effect has started (e.g. by calling `createProduct(product)`).
     You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual side effect (`mergeMap`, `switchMap` etc).
     When the side effect completed you can directly return the new feature state.
 
 -   **`effectName: string`**:
-    Optional Name which needs to be unique for each effect. That ID will show up in the logging (Redux Dev Tools / JS console).
+    Optional name which needs to be unique for each effect. That name will show up in the logging (Redux Dev Tools / JS console).
 
 #### Select Observable State (with a memoized selector):
 
 You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
-This is because the Feature API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
+This is because the `Feature` API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
 
 ```
 const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
@@ -375,12 +370,12 @@ export class ProductStateService extends Feature<ProductState>{
 #### FYI: How the Feature API works
 
 Also the `Feature` API makes use of Redux:
-Each Feature is registered in the Store (Single Source of Truth) and is part of the global App State.
+Each feature is registered in the Store (Single source of truth) and is part of the global application state.
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
 When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action,
 and the default reducer will update the feature state accordingly.
 
-See the default Action in the Redux Dev Tools:
+See the default action in the Redux Dev Tools:
 
 ![Redux Dev Tools for MiniRx](.github/images/default-action.gif)
 
@@ -394,9 +389,9 @@ import { Store } from 'mini-rx-store';
 Store.settings({enableLogging: true});
 ```
 
-The code above sets the global Store Settings.
+The code above sets the global Store settings.
 `enableLogging` is currently the only available setting.
-Typically, you would set the settings when bootstrapping the app and before the store is used.
+Typically, you would set the settings when bootstrapping the app and before the Store is used.
 
 ## Redux Dev Tools:
 
