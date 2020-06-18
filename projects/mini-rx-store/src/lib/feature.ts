@@ -5,9 +5,6 @@ import { createActionTypePrefix, nameUpdateAction, ofType } from './utils';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { createFeatureSelector } from './selector';
 
-type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
-type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
-
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
@@ -35,14 +32,14 @@ export abstract class Feature<StateType> {
     }
 
     protected setState(
-        stateOrCallback: StateOrCallback<StateType>,
+        state: Partial<StateType>,
         name?: string
     ): void {
         StoreCore.dispatch({
             type: name
                 ? this.actionTypeSetState + '/' + name
                 : this.actionTypeSetState,
-            payload: this.calcNewState(this.state, stateOrCallback),
+            payload:  {...this.state, ...state},
         });
     }
 
@@ -79,7 +76,7 @@ export abstract class Feature<StateType> {
     protected createEffect<PayLoadType = any>(
         effectFn: (
             payload: Observable<PayLoadType>
-        ) => Observable<StateOrCallback<StateType>>,
+        ) => Observable<Partial<StateType>>,
         effectName?: string
     ): (payload?: PayLoadType) => void {
         const effectStartActionType = this.getEffectStartActionType(effectName);
@@ -87,10 +84,10 @@ export abstract class Feature<StateType> {
             ofType(effectStartActionType),
             map((action) => action.payload),
             effectFn,
-            map((stateOrCallback) => {
+            map((state: Partial<StateType>) => {
                 return {
                     type: effectStartActionType + '/' + nameUpdateAction,
-                    payload: this.calcNewState(this.state, stateOrCallback),
+                    payload: {...this.state, ...state},
                 };
             })
         );
@@ -102,22 +99,6 @@ export abstract class Feature<StateType> {
                 type: effectStartActionType,
                 payload,
             });
-        };
-    }
-
-    private calcNewState(
-        state: StateType,
-        stateOrCallback: StateOrCallback<StateType>
-    ): StateType {
-        if (typeof stateOrCallback === 'function') {
-            return {
-                ...state,
-                ...stateOrCallback(state),
-            };
-        }
-        return {
-            ...state,
-            ...stateOrCallback,
         };
     }
 }

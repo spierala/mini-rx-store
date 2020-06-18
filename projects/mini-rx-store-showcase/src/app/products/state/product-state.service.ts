@@ -61,13 +61,11 @@ export class ProductStateService extends Feature<ProductState> {
             payload$.pipe(
                 mergeMap((product) =>
                     this.productService.createProduct(product).pipe(
-                        map((newProduct) => {
-                            return {
-                                products: [...this.state.products, newProduct],
-                                currentProductId: newProduct.id,
-                                error: '',
-                            };
-                        }),
+                        map((newProduct) => ({
+                            products: [...this.state.products, newProduct],
+                            currentProductId: newProduct.id,
+                            error: '',
+                        })),
                         catchError((error) =>
                             of({
                                 error,
@@ -138,10 +136,7 @@ export class ProductStateService extends Feature<ProductState> {
 
     // UPDATE STATE
     setCurrentProduct(id: number) {
-        this.setState(
-            {
-                currentProductId: id,
-        }, 'currProd');
+        this.setState({currentProductId: id}, 'currProd');
     }
 
     clearCurrentProduct() {

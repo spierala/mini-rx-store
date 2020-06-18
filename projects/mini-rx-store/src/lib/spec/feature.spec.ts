@@ -90,7 +90,7 @@ class FeatureState extends Feature<UserState> {
     }
 
     updateFirstName(firstName) {
-        this.setState((state) => ({ firstName }));
+        this.setState({ firstName });
     }
 
     updateLastName(lastName) {
