@@ -8,7 +8,6 @@ import { takeWhile } from 'rxjs/operators';
 
 import * as fromUser from './state';
 import * as userActions from './state/user.actions';
-import * as fromRoot from '../state/app.state';
 import { Store } from 'mini-rx-store';
 
 @Component({
