@@ -14,7 +14,7 @@ import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 
-/* Feature Modules */
+
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 

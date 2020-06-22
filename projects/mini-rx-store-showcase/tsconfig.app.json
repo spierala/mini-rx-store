@@ -2,15 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
-    "types": [],
-    "paths": {
-      "mini-rx-store": [
-        "projects/mini-rx-store/src/public-api"
-      ],
-      "mini-rx-ng-devtools": [
-        "projects/mini-rx-ng-devtools/src/public-api"
-      ]
-    }
+    "types": []
   },
   "files": [
     "src/main.ts",
