@@ -274,6 +274,29 @@ currentUser$: Observable<User> = this.select(state => state.currentUser);
 Inside of that function you can pick a certain piece of state.
 `select` returns an Observable which will emit as soon as the selected data changes.
 
+#### Select state (with a memoized selector):
+
+You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
+This is because the `Feature` API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
+
+```
+const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
+
+const getProducts = createSelector(
+    getProductFeatureState,
+    state => state.products
+);
+
+// Inside the Feature state service
+export class ProductStateService extends Feature<ProductState>{
+    this.products$ = this.select(getProducts);
+
+    constructor(private productService: ProductService) {
+        super('products', initialState); // Feature name 'products' is provided here already...
+    }
+}
+```
+
 #### Update state with `setState`
 
 **`setState(state: Partial<S>, name?: string): void`**
@@ -355,34 +378,11 @@ The API call `this.productService.createProduct` is the side effect which needs 
 -   **`effectName: string`**:
     Optional name which needs to be unique for each effect. That name will show up in the logging (Redux Dev Tools / JS console).
 
-FYI: See how RxJS flattening operators are triggering api calls:
+##### FYI: See how RxJS flattening operators are triggering api calls:
 
 ![See how RxJS operators are triggering api calls](.github/images/rxjs-flattening-operators.gif)
 
-#### Select Observable State (with a memoized selector):
-
-You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
-This is because the `Feature` API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
-
-```
-const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
-
-const getProducts = createSelector(
-    getProductFeatureState,
-    state => state.products
-);
-
-// Inside the Feature state service
-export class ProductStateService extends Feature<ProductState>{
-    this.products$ = this.select(getProducts);
-
-    constructor(private productService: ProductService) {
-        super('products', initialState); // Feature name 'products' is provided here already...
-    }
-}
-```
-
-#### FYI: How the Feature API works
+##### FYI: How the Feature API works
 
 Also the `Feature` API makes use of Redux:
 Each feature is registered in the Store (Single source of truth) and is part of the global application state.
