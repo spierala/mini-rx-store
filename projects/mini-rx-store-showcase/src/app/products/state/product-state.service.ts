@@ -1,14 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Feature } from 'mini-rx-store';
 import { ProductService } from '../product.service';
-import {
-    catchError,
-    map, mapTo,
-    mergeMap,
-    startWith,
-    withLatestFrom,
-} from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { catchError, map, mapTo, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
+import { Observable, of, pipe } from 'rxjs';
 import { Product } from '../product';
 import {
     getCurrentProduct,
@@ -36,107 +30,93 @@ export class ProductStateService extends Feature<ProductState> {
     // FEATURE EFFECTS (scoped to the current feature state)
     // The completed side effects (api calls) update the feature state directly
     loadProducts = this.createEffect(
-        (payload$) =>
-            payload$.pipe(
-                mergeMap(() =>
-                    this.productService.getProducts().pipe(
-                        map((products) => ({
-                            products,
-                            error: '',
-                        })),
-                        catchError((error) =>
-                            of({
-                                error,
-                                products: [],
-                            })
-                        )
-                    )
+        mergeMap(() =>
+            this.productService.getProducts().pipe(
+                map((products) => ({
+                    products,
+                    error: '',
+                })),
+                catchError((error) =>
+                    of({
+                        error,
+                        products: [],
+                    })
                 )
-            ),
+            )
+        ),
         'load'
     );
 
     createProduct = this.createEffect<Product>(
-        (payload$) =>
-            payload$.pipe(
-                mergeMap((product) =>
-                    this.productService.createProduct(product).pipe(
-                        map((newProduct) => ({
-                            products: [...this.state.products, newProduct],
-                            currentProductId: newProduct.id,
-                            error: '',
-                        })),
-                        catchError((error) =>
-                            of({
-                                error,
-                            })
-                        )
-                    )
+        mergeMap((product) =>
+            this.productService.createProduct(product).pipe(
+                map((newProduct) => ({
+                    products: [...this.state.products, newProduct],
+                    currentProductId: newProduct.id,
+                    error: '',
+                })),
+                catchError((error) =>
+                    of({
+                        error,
+                    })
                 )
-            ),
+            )
+        ),
         'create'
     );
 
     updateProduct = this.createEffect<Product>(
-        (payload$) =>
-            payload$.pipe(
-                mergeMap((product) => {
-                    return this.productService.updateProduct(product).pipe(
-                        map((updatedProduct) => {
-                            const updatedProducts = this.state.products.map((item) =>
-                                updatedProduct.id === item.id
-                                    ? updatedProduct
-                                    : item
-                            );
-                            return {
-                                products: updatedProducts,
-                                currentProductId: product.id,
-                                error: '',
-                            };
-                        }),
-                        catchError((error) =>
-                            of({
-                                error,
-                            })
-                        )
+        mergeMap((product) => {
+            return this.productService.updateProduct(product).pipe(
+                map((updatedProduct) => {
+                    const updatedProducts = this.state.products.map((item) =>
+                        updatedProduct.id === item.id ? updatedProduct : item
                     );
-                })
-            ),
+                    return {
+                        products: updatedProducts,
+                        currentProductId: product.id,
+                        error: '',
+                    };
+                }),
+                catchError((error) =>
+                    of({
+                        error,
+                    })
+                )
+            );
+        }),
         'update'
     );
 
-    deleteProduct = this.createEffect<number>((payload$) =>
-        payload$.pipe(
+    deleteProduct = this.createEffect<number>(
+        pipe(
             withLatestFrom(this.state$), // Get snapshot of state for undoing optimistic update
             mergeMap(([productId, lastState]) => {
                 return this.productService.deleteProduct(productId).pipe(
-                    mapTo( {
-                            products: this.state.products.filter(
-                                (product) => product.id !== productId
-                            ),
-                            currentProductId: null,
-                            error: '',
-                        }),
+                    mapTo({
+                        products: this.state.products.filter((product) => product.id !== productId),
+                        currentProductId: null,
+                        error: '',
+                    }),
                     catchError((err) =>
                         of({
                             products: lastState.products, // Restore State before Optimistic Update
-                            error: err
+                            error: err,
                         })
                     ),
                     // Example for an Optimistic Update
-                    startWith( {
-                        products: this.state.products.filter(
-                            (product) => product.id !== productId
-                        )
+                    startWith({
+                        products: this.state.products.filter((product) => product.id !== productId),
                     })
                 );
             })
-        ), 'delete'
+        ),
+        'delete'
     );
 
     // UPDATE STATE
     setCurrentProduct(id: number) {
-        this.setState({currentProductId: id}, 'currProd');
+        this.setState({ currentProductId: id }, 'currProd');
     }
 
     clearCurrentProduct() {
