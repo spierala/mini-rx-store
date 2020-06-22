@@ -1,11 +1,5 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import {
-    Action,
-    AppState,
-    Reducer,
-    Settings,
-    StoreExtension,
-} from './interfaces';
+import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
 import {
     catchError,
     distinctUntilChanged,
@@ -16,11 +10,7 @@ import {
     tap,
     withLatestFrom,
 } from 'rxjs/operators';
-import {
-    combineReducers,
-    createActionTypePrefix,
-    nameUpdateAction,
-} from './utils';
+import { combineReducers, createActionTypePrefix, nameUpdateAction } from './utils';
 
 class StoreCore {
     // ACTIONS
@@ -109,14 +99,9 @@ class StoreCore {
 
         reducer = reducer ? reducer : createDefaultReducer(actionTypePrefix);
 
-        reducer = initialState
-            ? createReducerWithInitialState(reducer, initialState)
-            : reducer;
+        reducer = initialState ? createReducerWithInitialState(reducer, initialState) : reducer;
 
-        const featureReducer: Reducer<AppState> = createFeatureReducer(
-            featureName,
-            reducer
-        );
+        const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
 
         // Add reducer
         this.reducersSource.next({
@@ -125,13 +110,11 @@ class StoreCore {
         });
 
         // Dispatch an initial action to let reducers create the initial state
-        this.dispatch({ type: `${actionTypePrefix}/init` });
+        this.dispatch({ type: `${actionTypePrefix}/INIT` });
     }
 
     createEffect(effect$: Observable<Action>) {
-        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(
-            effect$
-        );
+        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
         this.effectsSource.next(effectWithErrorHandler$);
     }
 
@@ -169,9 +152,7 @@ class StoreCore {
     }
 }
 
-function createDefaultReducer<StateType>(
-    nameSpaceFeature: string
-): Reducer<StateType> {
+function createDefaultReducer<StateType>(nameSpaceFeature: string): Reducer<StateType> {
     return (state: StateType, action: Action) => {
         // Check for 'set-state' (can originate from setState() or feature effect)
         if (
@@ -196,10 +177,7 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function createFeatureReducer(
-    featureName: string,
-    reducer: Reducer<any>
-): Reducer<AppState> {
+function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
     return (state: AppState, action: Action): AppState => {
         return {
             ...state,
@@ -221,10 +199,7 @@ function defaultEffectsErrorHandler<T extends Action>(
                 return observable$; // last attempt
             }
             // Return observable that produces this particular effect
-            return defaultEffectsErrorHandler(
-                observable$,
-                retryAttemptLeft - 1
-            );
+            return defaultEffectsErrorHandler(observable$, retryAttemptLeft - 1);
         })
     );
 }

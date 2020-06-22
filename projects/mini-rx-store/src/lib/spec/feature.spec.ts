@@ -42,10 +42,7 @@ const getUserFeatureState = createFeatureSelector<UserState>('user2'); // Select
 const getCity = createSelector(getUserFeatureState, (state) => state.city);
 
 const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
-const getCountry = createSelector(
-    getUserFeatureState2,
-    (state) => state.country
-);
+const getCountry = createSelector(getUserFeatureState2, (state) => state.country);
 
 Store.feature('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector('someFeature');
@@ -59,10 +56,7 @@ class FeatureState extends Feature<UserState> {
     someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
     loadFn = this.createEffect(
-        (payload$) =>
-            payload$.pipe(
-                mergeMap(() => fakeApiGet().pipe(map((user) => user)))
-            ),
+        (payload$) => payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user)))),
         'load'
     );
 
@@ -170,9 +164,7 @@ describe('Feature', () => {
 
     it('should create and execute an effect', () => {
         userFeature.loadFn();
-        expect(userFeature.firstName$).toBeObservable(
-            hot('a--b', { a: 'Bruce', b: 'Steven' })
-        );
+        expect(userFeature.firstName$).toBeObservable(hot('a--b', { a: 'Bruce', b: 'Steven' }));
     });
 
     it('should create and execute an effect and handle error', () => {
@@ -190,7 +182,7 @@ describe('Feature', () => {
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
-            type: '@mini-rx/user2/set-state/updateCity',
+            type: '@mini-rx/user2/SET-STATE/updateCity',
             payload: { ...initialState, city: 'NY' },
         });
     });
@@ -200,9 +192,9 @@ describe('Feature', () => {
 
         expect(actions$).toBeObservable(
             hot('a--b', {
-                a: { type: '@mini-rx/user2/effect/load', payload: undefined },
+                a: { type: '@mini-rx/user2/EFFECT/load', payload: undefined },
                 b: {
-                    type: '@mini-rx/user2/effect/load/set-state',
+                    type: '@mini-rx/user2/EFFECT/load/SET-STATE',
                     payload: asyncUser,
                 },
             })
@@ -214,9 +206,9 @@ describe('Feature', () => {
 
         expect(actions$).toBeObservable(
             hot('a--b', {
-                a: { type: '@mini-rx/user2/effect/1', payload: undefined },
+                a: { type: '@mini-rx/user2/EFFECT/1', payload: undefined },
                 b: {
-                    type: '@mini-rx/user2/effect/1/set-state',
+                    type: '@mini-rx/user2/EFFECT/1/SET-STATE',
                     payload: asyncUser,
                 },
             })
@@ -228,9 +220,9 @@ describe('Feature', () => {
 
         expect(actions$).toBeObservable(
             hot('a--b', {
-                a: { type: '@mini-rx/user2/effect/2', payload: undefined },
+                a: { type: '@mini-rx/user2/EFFECT/2', payload: undefined },
                 b: {
-                    type: '@mini-rx/user2/effect/2/set-state',
+                    type: '@mini-rx/user2/EFFECT/2/SET-STATE',
                     payload: asyncUser,
                 },
             })
