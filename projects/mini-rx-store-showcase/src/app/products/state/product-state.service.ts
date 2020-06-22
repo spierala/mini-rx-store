@@ -88,6 +88,7 @@ export class ProductStateService extends Feature<ProductState> {
         'update'
     );
 
+    // Delete with Optimistic Update
     deleteProduct = this.createEffect<number>(
         pipe(
             withLatestFrom(this.state$), // Get snapshot of state for undoing optimistic update
