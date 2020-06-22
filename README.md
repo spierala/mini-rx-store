@@ -69,6 +69,7 @@ The code above creates a new feature state for _products_.
 
 Reducers specify how the feature state changes in response to actions sent to the store.
 A reducer function typically looks like this:
+
 ```
 const initialState: ProductState = {
   showProductCode: true,
@@ -90,6 +91,7 @@ export function reducer(state: ProductState = initialState, action: ProductActio
 ```
 
 #### Create an Action:
+
 ```
 import { Action } from 'mini-rx-store';
 
@@ -238,7 +240,7 @@ updateProduct$: Observable<Action> = actions$.pipe(
 
 ## Make simple things simple - The `Feature` API
 
-If a feature in your application requires only simple state management, then you can fall back to a simplified API: 
+If a feature in your application requires only simple state management, then you can fall back to a simplified API:
 With the `Feature` API you can update state without writing actions and reducers.
 
 #### Create a Feature (Feature State):
@@ -277,11 +279,13 @@ Inside of that function you can pick a certain piece of state.
 **`setState(state: Partial<S>, name?: string): void`**
 
 Example:
+
 ```
 updateUser(user: User) {
     this.setState({currentUser: user});
 }
 ```
+
 `setState` sets the new state of the feature.
 
 ```
@@ -292,6 +296,7 @@ addFavorite(productId) {
     });
 }
 ```
+
 Do you want to calculate the new state based on the current state?
 You can use `this.state` which holds the current state snapshot.
 
@@ -303,27 +308,28 @@ For better logging in the JS Console / Redux Dev Tools you can provide an option
 
 **`createEffect<PayLoadType = any>(effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>, effectName?: string): (payload?: PayLoadType) => void`**
 
+`createEffect` offers a simple way to trigger side effects (e.g. API calls)
+and update feature state straight away.
+
 Example:
 
 ```
 createProduct = this.createEffect<Product>(
-    (payload$) =>
-        payload$.pipe(
-            mergeMap((product) =>
-                this.productService.createProduct(product).pipe(
-                    map((newProduct) => ({
-                        products: [...this.state.products, newProduct],
-                        currentProductId: newProduct.id,
-                        error: '',
-                    })),
-                    catchError((error) =>
-                        of({
-                            error,
-                        })
-                    )
-                )
+    mergeMap((product) =>
+        this.productService.createProduct(product).pipe(
+            map((newProduct) => ({
+                products: [...this.state.products, newProduct],
+                currentProductId: newProduct.id,
+                error: '',
+            })),
+            catchError((error) =>
+                of({
+                    error,
+                })
             )
         )
+    ),
+    'create'
 );
 
 // Run the effect
@@ -337,13 +343,21 @@ The API call `this.productService.createProduct` is the side effect which needs 
 `createEffect` takes 2 arguments:
 
 -   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
-    Within the `effectFn` callback you can access the `payload$` Observable.
-    That Observable emits as soon as the Effect has started (e.g. by calling `createProduct(product)`).
-    You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual side effect (`mergeMap`, `switchMap` etc).
-    When the side effect completed you can directly return the new feature state.
+    The `effectFn` is a function that takes an Observable as its input and returns another Observable.
+    That is exactly the definition of RxJS operators ([What are operators?](https://rxjs-dev.firebaseapp.com/guide/operators)) :)
+    Therefore we can use RxJS (flattening) operators as `effectFn` callback to control how the actual side effects are triggered.
+    (e.g. `mergeMap`, `switchMap`, `concatMap`, `exhaustMap`).
+
+    The input of `effectFn` is an Observable which emits the _payload_ of the function which starts the Effect
+    (e.g. `product` is the payload when calling `createProduct(product)`).
+    `effectFn` has to return an Observable with the new feature state.
 
 -   **`effectName: string`**:
     Optional name which needs to be unique for each effect. That name will show up in the logging (Redux Dev Tools / JS console).
+
+FYI: See how RxJS flattening operators are triggering api calls:
+
+![See how RxJS operators are triggering api calls](.github/images/rxjs-flattening-operators.gif)
 
 #### Select Observable State (with a memoized selector):
 
