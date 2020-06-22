@@ -337,6 +337,9 @@ and update feature state straight away.
 Example:
 
 ```
+import { catchError, map, mergeMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 createProduct = this.createEffect<Product>(
     mergeMap((product) =>
         this.productService.createProduct(product).pipe(
@@ -368,21 +371,22 @@ The API call `this.productService.createProduct` is the side effect which needs 
 -   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
     The `effectFn` is a function that takes an Observable as its input and returns another Observable.
     That is exactly the definition of RxJS operators ([What are operators?](https://rxjs-dev.firebaseapp.com/guide/operators)) :)
-    Therefore we can use RxJS (flattening) operators as `effectFn` callback to control how the actual side effects are triggered.
+    Therefore we can use RxJS (flattening) operators as `effectFn` callback to control how the actual side effect is triggered.
     (e.g. `mergeMap`, `switchMap`, `concatMap`, `exhaustMap`).
 
-    The input of `effectFn` is an Observable which emits the _payload_ of the function which starts the Effect
+    The input of `effectFn` is an Observable which emits the _payload_ argument of the function which starts the Effect
     (e.g. `product` is the payload when calling `createProduct(product)`).
-    `effectFn` has to return an Observable with the new feature state.
+
+    Finally `effectFn` has to return an Observable with the new feature state.
 
 -   **`effectName: string`**:
     Optional name which needs to be unique for each effect. That name will show up in the logging (Redux Dev Tools / JS console).
 
-##### FYI: See how RxJS flattening operators are triggering api calls:
+**FYI: See how RxJS flattening operators are triggering api calls:**
 
 ![See how RxJS operators are triggering api calls](.github/images/rxjs-flattening-operators.gif)
 
-##### FYI: How the Feature API works
+**FYI: How the Feature API works**
 
 Also the `Feature` API makes use of Redux:
 Each feature is registered in the Store (Single source of truth) and is part of the global application state.
