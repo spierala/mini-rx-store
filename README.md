@@ -1,4 +1,4 @@
-![See how RxJS operators are triggering api calls](.github/images/mini-rx-logo.png)
+![MiniRx Logo](.github/images/mini-rx-logo.png)
 
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
@@ -8,7 +8,6 @@
 **MiniRx Store** provides Reactive State Management for Javascript Applications.
 
 ## RxJS
-
 MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
 
 ## Redux
@@ -30,7 +29,7 @@ The Redux Pattern is based on this 3 key principles:
     -   Memoized Selectors
     -   Effects
 -   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume actions with as little boilerplate as possible
--   "Feature" API :
+-   "Feature" API: Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `createEffect()` run side effects like API calls and update feature state
