@@ -1,3 +1,5 @@
+![MiniRx Logo](.github/images/mini-rx-logo.png)
+
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 
@@ -22,12 +24,12 @@ The Redux Pattern is based on this 3 key principles:
 
 -   Minimal configuration and setup
 -   "Redux" API:
-    - Actions
-    - Reducers
-    - Memoized Selectors
-    - Effects
-- Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume Actions with as little boilerplate as possible
--   "Feature" API   :
+    -   Actions
+    -   Reducers
+    -   Memoized Selectors
+    -   Effects
+-   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume actions with as little boilerplate as possible
+-   "Feature" API: Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `createEffect()` run side effects like API calls and update feature state
@@ -48,10 +50,10 @@ The `Store` is created and ready to use as soon as you import `Store`.
 
 #### Create a Feature (Feature State):
 
-A `Feature` holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
-The Feature States together form the App State (Single Source of Truth).
+A _feature_ holds a piece of state which belongs to a specific feature in your application (e.g. 'products', 'users').
+The feature states together form the app state (Single source of truth).
 
-Usually you would create a new `Feature` inside long living Modules/Services:
+Usually you would create a new _feature_ inside long living Modules/Services:
 
 ```
 import { Store } from 'mini-rx-store';
@@ -63,11 +65,12 @@ constructor() {
 }
 ```
 
-The code above creates a new feature state for _products_. 
+The code above creates a new feature state for _products_.
 `Store.feature` receives the feature name, and a reducer function.
 
 Reducers specify how the feature state changes in response to actions sent to the store.
 A reducer function typically looks like this:
+
 ```
 const initialState: ProductState = {
   showProductCode: true,
@@ -104,22 +107,25 @@ export class CreateProduct implements Action {
 ```
 
 #### Dispatch an Action:
-Dispatch an Action to update state:
+
+Dispatch an action to update state:
+
 ```
 import { Store } from 'mini-rx-store';
 import { CreateProduct } from 'product.actions';
 
 Store.dispatch(new CreateProduct(product));
 ```
+
 After the action has been dispatched the state will be updated accordingly (as defined in the reducer function).
 
 #### Write an effect:
 
 Effects handle code that triggers side effects like API calls:
 
--   An Effect listens for a specific Action
--   That Action triggers the actual side effect
--   The Effect needs to return a new Action as soon as the side effect finished
+-   An Effect listens for a specific action
+-   That action triggers the actual side effect
+-   The Effect needs to return a new action as soon as the side effect finished
 
 ```
 import { Action, actions$, ofType } from 'mini-rx-store';
@@ -142,7 +148,7 @@ constructor(private productService: ProductService) {
 }
 ```
 
-The code above creates an Effect. As soon as the `Load` Action is dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new Action will be dispatched:
+The code above creates an Effect. As soon as the `Load` action has been dispatched the API call (`this.productService.getProducts()`) will be executed. Depending on the result of the API call a new action will be dispatched:
 `LoadSuccess` or `LoadFail`.
 
 #### Create (memoized) Selectors:
@@ -173,19 +179,20 @@ import { getProducts } from '../../state';
 this.products$ = Store.select(getProducts);
 ```
 
-`Store.select` runs the selector against the App State and returns an Observable which will emit as soon as the _products_ data changes.
+`Store.select` runs the selector against the app state and returns an Observable which will emit as soon as the _products_ data changes.
 
 ## ts-action
 
-MiniRX supports writing and consuming Actions with [ts-action](https://www.npmjs.com/package/ts-action).
+MiniRX supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action).
 
-There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume Actions in Effects.
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume actions in Effects.
 
 Install the packages using npm:
 
 `npm install ts-action ts-action-operators`
 
 #### Create an Action:
+
 ```
 import { action, payload } from 'ts-action';
 
@@ -193,6 +200,7 @@ export const createProduct = action('[Product] Create Product', payload<Product>
 ```
 
 #### Dispatch an Action:
+
 ```
 import { Store } from 'mini-rx-store';
 import { createProduct } from './../../state/product.actions';
@@ -201,6 +209,7 @@ Store.dispatch(createProduct(product));
 ```
 
 #### Reducer
+
 ```
 import { on, reducer } from 'ts-action';
 
@@ -211,7 +220,9 @@ export const productReducer = reducer(
 ```
 
 #### Effects
-Consume Actions in Effects
+
+Consume actions in Effects
+
 ```
 import { Action, actions$, Store } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
@@ -228,16 +239,21 @@ updateProduct$: Observable<Action> = actions$.pipe(
 );
 ```
 
-
 ## Make simple things simple - The `Feature` API
 
-If a Feature in your application requires only simple state management, then you can fall back to a simplified API: With the `Feature` API you can update state without writing Actions and Reducers.
+If a feature in your application requires only simple state management, then you can fall back to a simplified API:
+With the `Feature` API you can update state without writing actions and reducers.
 
 #### Create a Feature (Feature State):
 
-To create a Feature, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
+To create a `Feature`, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
 
 ```
+interface UserState {
+    currentUser: User;
+    favProductIds: string[];
+}
+
 export class UserStateService extends Feature<UserState>{
     constructor() {
         super('users', initialState);
@@ -247,96 +263,22 @@ export class UserStateService extends Feature<UserState>{
 
 #### Select state with `select`
 
-**`select(mapFn: ((state: S) => any)): Observable<any>`**
+**`select(mapFn: (state: S) => any): Observable<any>`**
 
 Example:
 
 ```
-maskUserName$: Observable<boolean> = this.select(state => state.maskUserName);
+currentUser$: Observable<User> = this.select(state => state.currentUser);
 ```
 
 `select` takes a callback function which gives you access to the current feature state (see the `state` parameter).
 Inside of that function you can pick a certain piece of state.
-The returned Observable will emit the selected data over time.
+`select` returns an Observable which will emit as soon as the selected data changes.
 
-#### Update state with `setState`
+#### Select state (with a memoized selector):
 
-**`setState(stateFn: (state: S) => S | state: Partial<S>, name?: string): void`**
-
-Example:
-
-```
-// Pass callback to setState
-updateMaskUserName(maskUserName: boolean) {
-    this.setState((state) => {
-        return {
-            ...state,
-            maskUserName
-        }
-    });
-}
-
-// Or pass the new state object directly (in case the current state is not needed to calculate the new state)
-updateMaskUserName(maskUserName: boolean) {
-    this.setState({maskUserName});
-}
-```
-
-`setState` takes a callback function which gives you access to the current feature state (see the `state` parameter).
-Inside of that function you can compose the new feature state.
-
-Alternatively `setState` accepts a new state object directly.
-
-For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
-
-`this.setState({ showProductCode }, 'showProductCode');`
-
-#### Create an Effect with `createEffect`
-
-**`createEffect<PayLoadType>(effectFn: (payload: Observable<PayLoadType>) => Observable<(state: S) => S | state: Partial<S>>, effectName?: string ): (payload?: PayLoadType) => void`**
-
-Example:
-
-```
-deleteProductFn = this.createEffect<number>(
-    payload$ => payload$.pipe(
-        mergeMap((productId) => {
-            return this.productService.deleteProduct(productId).pipe(
-                map(() => state => { // Return callback which calculates the new state
-                    return {
-                        ...state,
-                        products: state.products.filter(product => product.id !== productId),
-                        error: ''
-                    }
-                }),
-                catchError(err => of({error: err})) // Or return the new state object directly
-            )
-        })
-    ),
-    'delete' // Used for logging / Redux Dev Tools
-);
-
-// Run the effect
-deleteProductFn(123);
-```
-
-The code above creates an Effect for _deleting a product_ from the list. The API call `this.productService.deleteProduct(productId)` is the side effect which needs to be performed.
-`createEffect` returns a function which can be called later to start the Effect with an optional payload (see `deleteProductFn(123)`).
-
-`createEffect` takes 2 arguments:
-
--   **`effectFn: (payload$: Observable<PayLoadType>) => Observable<(state: S) => S | state: Partial<S>>`**:
-    Within the `effectFn` you can access the `payload$` Observable.
-    That Observable emits as soon as the Effect has started (e.g. by calling `deleteProductFn(123)`).
-    You can directly `pipe` on the `payload$` Observable to access the payload value and do the usual RxJS things to run the actual Side Effect (`mergeMap`, `switchMap` etc).
-    When the side effect completed you can directly return the new state or return a callback function which gets the current state and returns a new state.
-
--   **`effectName: string`**:
-    ID which needs to be unique for each effect. That ID will show up in the logging (Redux Dev Tools / JS console).
-
-#### Select Observable State (with a memoized selector):
 You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
-This is because the Feature API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor). 
+This is because the `Feature` API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
 
 ```
 const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
@@ -356,15 +298,104 @@ export class ProductStateService extends Feature<ProductState>{
 }
 ```
 
-#### FYI: How the Feature API works
+#### Update state with `setState`
+
+**`setState(state: Partial<S>, name?: string): void`**
+
+Example:
+
+```
+updateUser(user: User) {
+    this.setState({currentUser: user});
+}
+```
+
+`setState` sets the new state of the feature.
+
+```
+// Update state based on current state
+addFavorite(productId) {
+    this.setState({
+        favProductIds: [...this.state.favProductIds, productId]
+    });
+}
+```
+
+Do you want to calculate the new state based on the current state?
+You can use `this.state` which holds the current state snapshot.
+
+For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
+
+`this.setState({currentUser: user} 'updateUser');`
+
+#### Create an Effect with `createEffect`
+
+**`createEffect<PayLoadType = any>(effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>, effectName?: string): (payload?: PayLoadType) => void`**
+
+`createEffect` offers a simple way to trigger side effects (e.g. API calls)
+and update feature state straight away.
+
+Example:
+
+```
+import { catchError, map, mergeMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+
+createProduct = this.createEffect<Product>(
+    mergeMap((product) =>
+        this.productService.createProduct(product).pipe(
+            map((newProduct) => ({
+                products: [...this.state.products, newProduct],
+                currentProductId: newProduct.id,
+                error: '',
+            })),
+            catchError((error) =>
+                of({
+                    error,
+                })
+            )
+        )
+    ),
+    'create'
+);
+
+// Run the effect
+createProduct(product);
+```
+
+The code above creates an Effect for _creating a product_.
+The API call `this.productService.createProduct` is the side effect which needs to be performed.
+`createEffect` returns a function which can be called later to start the Effect with an optional payload (see `createProduct(product)`).
+
+`createEffect` takes 2 arguments:
+
+-   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
+    The `effectFn` is a function that takes an Observable as its input and returns another Observable.
+    That is exactly the definition of RxJS operators ([What are operators?](https://rxjs-dev.firebaseapp.com/guide/operators)) :)
+    Therefore we can use RxJS (flattening) operators as `effectFn` callback to control how the actual side effect is triggered.
+    (e.g. `mergeMap`, `switchMap`, `concatMap`, `exhaustMap`).
+
+    The input of `effectFn` is an Observable which emits the _payload_ argument of the function which starts the Effect
+    (e.g. `product` is the payload when calling `createProduct(product)`).
+
+    Finally `effectFn` has to return an Observable with the new feature state.
+
+-   **`effectName: string`**:
+    Optional name which needs to be unique for each effect. That name will show up in the logging (Redux Dev Tools / JS console).
+
+**FYI: See how RxJS flattening operators are triggering api calls:**
+
+![See how RxJS operators are triggering api calls](.github/images/rxjs-flattening-operators.gif)
+
+**FYI: How the Feature API works**
 
 Also the `Feature` API makes use of Redux:
-Each Feature is registered in the Store (Single Source of Truth) and is part of the global App State.
+Each feature is registered in the Store (Single source of truth) and is part of the global application state.
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
-When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action, 
+When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action,
 and the default reducer will update the feature state accordingly.
 
-See the default Action in the Redux Dev Tools:
+See the default action in the Redux Dev Tools:
 
 ![Redux Dev Tools for MiniRx](.github/images/default-action.gif)
 
@@ -378,11 +409,12 @@ import { Store } from 'mini-rx-store';
 Store.settings({enableLogging: true});
 ```
 
-The code above sets the global Store Settings.
+The code above sets the global Store settings.
 `enableLogging` is currently the only available setting.
-Typically, you would set the settings when bootstrapping the app and before the store is used.
+Typically, you would set the settings when bootstrapping the app and before the Store is used.
 
 ## Redux Dev Tools:
+
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
 
 MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
@@ -392,12 +424,13 @@ You need to install the Browser Plugin to make it work.
 -   [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
 Currently, these options are available to configure the DevTools:
-* `name`: the instance name to be shown on the DevTools monitor page.
-* `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
-* `latency`: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
 
+-   `name`: the instance name to be shown on the DevTools monitor page.
+-   `maxAge`: maximum allowed actions to be stored in the history tree. The oldest actions are removed once maxAge is reached. It's critical for performance. Default is 50.
+-   `latency`: if more than one action is dispatched in the indicated interval, all new actions will be collected and sent at once. Default is 500 ms.
 
 #### Installation (Angular):
+
 [![npm version](https://badge.fury.io/js/mini-rx-ng-devtools.svg)](https://www.npmjs.com/package/mini-rx-ng-devtools)
 
 `npm i mini-rx-ng-devtools`
@@ -438,10 +471,10 @@ This Repo contains also two Angular showcase projects.
 
 Run `npm i`
 
-See the MiniRX "Redux" API in Action:
+See the MiniRX "Redux" API in action:
 Run `ng serve mini-rx-store-showcase-redux --open`
 
-See the MiniRX "Feature" API in Action:
+See the MiniRX "Feature" API in action:
 Run `ng serve mini-rx-store-showcase --open`
 
 The showcases are based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5

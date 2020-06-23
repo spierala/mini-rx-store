@@ -1,10 +1,18 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import { Action, AppState, Reducer, Settings, StoreExtension, } from './interfaces';
-import { distinctUntilChanged, map, mergeAll, observeOn, scan, tap, withLatestFrom, } from 'rxjs/operators';
+import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
+import {
+    catchError,
+    distinctUntilChanged,
+    map,
+    mergeAll,
+    observeOn,
+    scan,
+    tap,
+    withLatestFrom,
+} from 'rxjs/operators';
 import { combineReducers, createActionTypePrefix, nameUpdateAction } from './utils';
 
 class StoreCore {
-
     // ACTIONS
     private actionsSource: Subject<Action> = new Subject();
     actions$: Observable<Action> = this.actionsSource.asObservable();
@@ -20,9 +28,11 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // COMBINED REDUCERS
-    private reducersSource: BehaviorSubject<{ [key: string]: Reducer<any> }> = new BehaviorSubject({});
+    private reducersSource: BehaviorSubject<{
+        [key: string]: Reducer<any>;
+    }> = new BehaviorSubject({});
     combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        map(reducers => combineReducers(Object.values(reducers)))
+        map((reducers) => combineReducers(Object.values(reducers)))
     );
 
     // SETTINGS
@@ -87,29 +97,25 @@ class StoreCore {
 
         const actionTypePrefix = createActionTypePrefix(featureName);
 
-        reducer = reducer
-            ? reducer
-            : createDefaultReducer(actionTypePrefix);
+        reducer = reducer ? reducer : createDefaultReducer(actionTypePrefix);
 
         reducer = initialState ? createReducerWithInitialState(reducer, initialState) : reducer;
 
-        const featureReducer: Reducer<AppState> = createFeatureReducer(
-            featureName,
-            reducer
-        );
+        const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
 
         // Add reducer
         this.reducersSource.next({
             ...reducers,
-            [featureName]: featureReducer
+            [featureName]: featureReducer,
         });
 
         // Dispatch an initial action to let reducers create the initial state
-        this.dispatch({ type: `${actionTypePrefix}/init` });
+        this.dispatch({ type: `${actionTypePrefix}/INIT` });
     }
 
-    createEffect(effect: Observable<Action>) {
-        this.effectsSource.next(effect);
+    createEffect(effect$: Observable<Action>) {
+        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
+        this.effectsSource.next(effectWithErrorHandler$);
     }
 
     dispatch = (action: Action) => this.actionsSource.next(action);
@@ -146,9 +152,7 @@ class StoreCore {
     }
 }
 
-function createDefaultReducer<StateType>(
-    nameSpaceFeature: string
-): Reducer<StateType> {
+function createDefaultReducer<StateType>(nameSpaceFeature: string): Reducer<StateType> {
     return (state: StateType, action: Action) => {
         // Check for 'set-state' (can originate from setState() or feature effect)
         if (
@@ -173,16 +177,31 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function createFeatureReducer(
-    featureName: string,
-    reducer: Reducer<any>
-): Reducer<AppState> {
+function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
     return (state: AppState, action: Action): AppState => {
         return {
             ...state,
             [featureName]: reducer(state[featureName], action),
         };
     };
+}
+
+// Prevent effect to unsubscribe from the actions stream
+// Credits: NgRx: https://github.com/ngrx/platform/blob/9.2.0/modules/effects/src/effects_error_handler.ts
+const MAX_NUMBER_OF_RETRY_ATTEMPTS = 10;
+function defaultEffectsErrorHandler<T extends Action>(
+    observable$: Observable<T>,
+    retryAttemptLeft: number = MAX_NUMBER_OF_RETRY_ATTEMPTS
+): Observable<T> {
+    return observable$.pipe(
+        catchError((error) => {
+            if (retryAttemptLeft <= 1) {
+                return observable$; // last attempt
+            }
+            // Return observable that produces this particular effect
+            return defaultEffectsErrorHandler(observable$, retryAttemptLeft - 1);
+        })
+    );
 }
 
 // Created once to initialize singleton

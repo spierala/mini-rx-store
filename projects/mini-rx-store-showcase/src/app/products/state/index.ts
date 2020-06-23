@@ -52,11 +52,6 @@ export const getCurrentProduct = createSelector(
     }
 );
 
-export const getProductById = (id: number) => createSelector(
-    getProducts,
-    products => products.find(item => item.id === id)
-);
-
 export const getError = createSelector(
     getProductFeatureState,
     state => state.error

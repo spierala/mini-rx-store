@@ -19,7 +19,7 @@ const initialState: UserState = {
     lastName: 'Willis',
     city: 'LA',
     country: 'United States',
-    err: undefined
+    err: undefined,
 };
 
 const asyncUser: UserState = {
@@ -27,11 +27,11 @@ const asyncUser: UserState = {
     lastName: 'Seagal',
     city: 'LA',
     country: 'United States',
-    err: ''
+    err: '',
 };
 
 function fakeApiGet(): Observable<UserState> {
-    return cold('---a', {a: asyncUser});
+    return cold('---a', { a: asyncUser });
 }
 
 function fakeApiWithError(): Observable<UserState> {
@@ -42,10 +42,7 @@ const getUserFeatureState = createFeatureSelector<UserState>('user2'); // Select
 const getCity = createSelector(getUserFeatureState, (state) => state.city);
 
 const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
-const getCountry = createSelector(
-    getUserFeatureState2,
-    (state) => state.country
-);
+const getCountry = createSelector(getUserFeatureState2, (state) => state.country);
 
 Store.feature('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector('someFeature');
@@ -58,34 +55,17 @@ class FeatureState extends Feature<UserState> {
     city$ = this.select(getCity, true);
     someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
-    loadFn = this.createEffect((payload$) =>
-        payload$.pipe(
-            mergeMap(() =>
-                fakeApiGet().pipe(
-                    map((user) => user)
-                )
-            )
-        ), 'load'
+    loadFn = this.createEffect(
+        (payload$) => payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user)))),
+        'load'
     );
 
     loadFnWithoutName = this.createEffect((payload$) =>
-        payload$.pipe(
-            mergeMap(() =>
-                fakeApiGet().pipe(
-                    map((user) => user)
-                )
-            )
-        )
+        payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user))))
     );
 
     loadFnWithoutName2 = this.createEffect((payload$) =>
-        payload$.pipe(
-            mergeMap(() =>
-                fakeApiGet().pipe(
-                    map((user) => user)
-                )
-            )
-        )
+        payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user))))
     );
 
     loadFnWithError = this.createEffect((payload$) =>
@@ -93,7 +73,7 @@ class FeatureState extends Feature<UserState> {
             mergeMap(() =>
                 fakeApiWithError().pipe(
                     map((user) => user),
-                    catchError((err) => of({err: 'error'}))
+                    catchError((err) => of({ err: 'error' }))
                 )
             )
         )
@@ -104,7 +84,7 @@ class FeatureState extends Feature<UserState> {
     }
 
     updateFirstName(firstName) {
-        this.setState((state) => ({ firstName }));
+        this.setState({ firstName });
     }
 
     updateLastName(lastName) {
@@ -113,6 +93,13 @@ class FeatureState extends Feature<UserState> {
 
     updateCity(city) {
         this.setState({ city }, 'updateCity');
+    }
+
+    updateCountry(country) {
+        this.setState({
+            ...this.state, // Test updating state using `this.state`
+            country,
+        });
     }
 
     resetState() {
@@ -143,6 +130,15 @@ describe('Feature', () => {
         userFeature.lastName$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('Cage');
         expect(spy).toHaveBeenCalledTimes(1);
+
+        spy.mockReset();
+
+        userFeature.updateCountry('Belgium'); // Test updating state using `this.state`
+        userFeature.country$.subscribe(spy);
+        expect(spy).toHaveBeenCalledWith('Belgium');
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        userFeature.resetState();
     });
 
     it('should select state from App State', () => {
@@ -168,13 +164,15 @@ describe('Feature', () => {
 
     it('should create and execute an effect', () => {
         userFeature.loadFn();
-        expect(userFeature.firstName$).toBeObservable(hot('a--b', {a: 'Nicolas', b: 'Steven'}));
+        expect(userFeature.firstName$).toBeObservable(hot('a--b', { a: 'Bruce', b: 'Steven' }));
     });
 
     it('should create and execute an effect and handle error', () => {
         userFeature.resetState();
         userFeature.loadFnWithError();
-        expect(userFeature.state$).toBeObservable(hot('ab', {a: initialState, b: {...initialState, err: 'error'}}));
+        expect(userFeature.state$).toBeObservable(
+            hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
+        );
     });
 
     it('should append setState name to action type', () => {
@@ -183,39 +181,77 @@ describe('Feature', () => {
         const spy = jest.fn();
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
-        expect(spy).toHaveBeenCalledWith({type: '@mini-rx/user2/set-state/updateCity', payload: {...initialState, city: 'NY'}});
+        expect(spy).toHaveBeenCalledWith({
+            type: '@mini-rx/user2/SET-STATE/updateCity',
+            payload: { ...initialState, city: 'NY' },
+        });
     });
 
     it('should append effect name to action type', () => {
-        hot('a').subscribe(
-            () => userFeature.loadFn()
-        );
+        hot('a').subscribe(() => userFeature.loadFn());
 
-        expect(actions$).toBeObservable(hot('a--b', {
-            a: {type: '@mini-rx/user2/effect/load', payload: undefined},
-            b: {type: '@mini-rx/user2/effect/load/set-state', payload: asyncUser},
-        }));
+        expect(actions$).toBeObservable(
+            hot('a--b', {
+                a: { type: '@mini-rx/user2/EFFECT/load', payload: undefined },
+                b: {
+                    type: '@mini-rx/user2/EFFECT/load/SET-STATE',
+                    payload: asyncUser,
+                },
+            })
+        );
     });
 
     it('should append default effect name to action type', () => {
-        hot('a').subscribe(
-            () => userFeature.loadFnWithoutName()
-        );
+        hot('a').subscribe(() => userFeature.loadFnWithoutName());
 
-        expect(actions$).toBeObservable(hot('a--b', {
-            a: {type: '@mini-rx/user2/effect/1', payload: undefined},
-            b: {type: '@mini-rx/user2/effect/1/set-state', payload: asyncUser},
-        }));
+        expect(actions$).toBeObservable(
+            hot('a--b', {
+                a: { type: '@mini-rx/user2/EFFECT/1', payload: undefined },
+                b: {
+                    type: '@mini-rx/user2/EFFECT/1/SET-STATE',
+                    payload: asyncUser,
+                },
+            })
+        );
     });
 
     it('should increment and append default effect name to action type', () => {
-        hot('a').subscribe(
-            () => userFeature.loadFnWithoutName2()
-        );
+        hot('a').subscribe(() => userFeature.loadFnWithoutName2());
 
-        expect(actions$).toBeObservable(hot('a--b', {
-            a: {type: '@mini-rx/user2/effect/2', payload: undefined},
-            b: {type: '@mini-rx/user2/effect/2/set-state', payload: asyncUser},
-        }));
+        expect(actions$).toBeObservable(
+            hot('a--b', {
+                a: { type: '@mini-rx/user2/EFFECT/2', payload: undefined },
+                b: {
+                    type: '@mini-rx/user2/EFFECT/2/SET-STATE',
+                    payload: asyncUser,
+                },
+            })
+        );
+    });
+
+    it('should resubscribe on action stream when side effect error is not handled', () => {
+        const spy = jest.fn();
+
+        class EffectResubscribeFeature extends Feature<any> {
+            loadFnWithUnhandledError = this.createEffect((payload$) =>
+                payload$.pipe(
+                    mergeMap(() => {
+                        spy();
+                        throw new Error();
+                    })
+                )
+            );
+
+            constructor() {
+                super('EffectResubscribeFeature', {});
+            }
+        }
+
+        const feature: EffectResubscribeFeature = new EffectResubscribeFeature();
+        feature.loadFnWithUnhandledError();
+        feature.loadFnWithUnhandledError();
+        feature.loadFnWithUnhandledError();
+
+        expect(spy).toHaveBeenCalledTimes(3);
     });
 });
