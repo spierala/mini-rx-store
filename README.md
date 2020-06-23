@@ -1,4 +1,4 @@
-![See how RxJS operators are triggering api calls](.github/images/mini_rx_rgb.png)
+![See how RxJS operators are triggering api calls](.github/images/mini-rx-logo.png)
 
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
