@@ -1,11 +1,27 @@
-![MiniRx Logo](.github/images/mini-rx-logo.png)
+![MiniRx - RxJS Redux Store - Logo](.github/images/mini-rx-logo.png)
 
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 
 # MiniRx: The RxJS Redux Store
 
-**MiniRx Store** provides Reactive State Management for Javascript Applications.
+**MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
+
+## MiniRx Features
+
+-   Minimal configuration and setup
+-   ["Redux" API](#redux-api):
+    -   Actions
+    -   Reducers
+    -   Memoized Selectors
+    -   Effects
+    -   [Support for ts-action](#ts-action): Create and consume actions with as little boilerplate as possible
+-   ["Feature" API](#feature-api): Update state without actions and reducers:
+    -   `setState()` update the feature state
+    -   `select()` read feature state
+    -   `createEffect()` run side effects like API calls and update feature state
+-   [Support for Redux Dev Tools](#redux-dev-tools)
+-   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## RxJS
 MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
@@ -20,33 +36,13 @@ The Redux Pattern is based on this 3 key principles:
 -   State is read-only and is only changed by dispatching actions
 -   Changes are made using pure functions called reducers
 
-## MiniRx Features
-
--   Minimal configuration and setup
--   "Redux" API:
-    -   Actions
-    -   Reducers
-    -   Memoized Selectors
-    -   Effects
--   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume actions with as little boilerplate as possible
--   "Feature" API: Update state without actions and reducers:
-    -   `setState()` update the feature state
-    -   `select()` read feature state
-    -   `createEffect()` run side effects like API calls and update feature state
--   Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
--   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
-
-## Usage
-
-#### Installation:
+## Installation:
 
 `npm i mini-rx-store`
 
-#### Create the Store (App State):
+## "Redux" API:
 
-The `Store` is created and ready to use as soon as you import `Store`.
-
-`import { Store } from 'mini-rx-store';`
+> Make hard things simple
 
 #### Create a Feature (Feature State):
 
@@ -58,11 +54,8 @@ Usually you would create a new _feature_ inside long living Modules/Services:
 ```
 import { Store } from 'mini-rx-store';
 import { ProductState, reducer } from './state/product.reducer';
-...
-// Inside long living Module / Service
-constructor() {
-    Store.feature<ProductState>('products', reducer);
-}
+
+Store.feature<ProductState>('products', reducer);
 ```
 
 The code above creates a new feature state for _products_.
@@ -183,9 +176,9 @@ this.products$ = Store.select(getProducts);
 
 ## ts-action
 
-MiniRX supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action).
+MiniRx supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action) to reduce boilerplate code.
 
-There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume actions in Effects.
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in Effects.
 
 Install the packages using npm:
 
@@ -239,7 +232,9 @@ updateProduct$: Observable<Action> = actions$.pipe(
 );
 ```
 
-## Make simple things simple - The `Feature` API
+## "Feature" API:
+
+> Make simple things simple
 
 If a feature in your application requires only simple state management, then you can fall back to a simplified API:
 With the `Feature` API you can update state without writing actions and reducers.
@@ -253,6 +248,11 @@ interface UserState {
     currentUser: User;
     favProductIds: string[];
 }
+
+const initialState: UserState = {
+  currentUser: undefined,
+  favProductIds: []
+};
 
 export class UserStateService extends Feature<UserState>{
     constructor() {
@@ -371,7 +371,7 @@ The API call `this.productService.createProduct` is the side effect which needs 
 
 -   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
     The `effectFn` is a function that takes an Observable as its input and returns another Observable.
-    That is exactly the definition of RxJS operators ([What are operators?](https://rxjs-dev.firebaseapp.com/guide/operators)) :)
+    That is exactly the [definition of RxJS operators](https://rxjs-dev.firebaseapp.com/guide/operators) :)
     Therefore we can use RxJS (flattening) operators as `effectFn` callback to control how the actual side effect is triggered.
     (e.g. `mergeMap`, `switchMap`, `concatMap`, `exhaustMap`).
 
@@ -395,10 +395,6 @@ Behind the scenes `Feature` is creating a default reducer, and a default action 
 When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action,
 and the default reducer will update the feature state accordingly.
 
-See the default action in the Redux Dev Tools:
-
-![Redux Dev Tools for MiniRx](.github/images/default-action.gif)
-
 ## Settings
 
 #### Enable Logging of Actions and State Changes in the Browser Console:
@@ -417,7 +413,7 @@ Typically, you would set the settings when bootstrapping the app and before the 
 
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
 
-MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
+MiniRx has basic support for the [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension) (you can time travel and inspect the current state).
 You need to install the Browser Plugin to make it work.
 
 -   [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
@@ -471,10 +467,10 @@ This Repo contains also two Angular showcase projects.
 
 Run `npm i`
 
-See the MiniRX "Redux" API in action:
+See the MiniRx "Redux" API in action:
 Run `ng serve mini-rx-store-showcase-redux --open`
 
-See the MiniRX "Feature" API in action:
+See the MiniRx "Feature" API in action:
 Run `ng serve mini-rx-store-showcase --open`
 
 The showcases are based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
