@@ -5,7 +5,23 @@
 
 # MiniRx: The RxJS Redux Store
 
-**MiniRx Store** provides Reactive State Management for Javascript Applications.
+**MiniRx Store** provides Reactive State Management for Javascript Applications inspired by Redux.
+
+## MiniRx Features
+
+-   Minimal configuration and setup
+-   ["Redux" API](redux-api):
+    -   Actions
+    -   Reducers
+    -   Memoized Selectors
+    -   Effects
+-   [Support for ts-action](ts-action): Create and consume actions with as little boilerplate as possible
+-   ["Feature" API](feature-api): Update state without actions and reducers:
+    -   `setState()` update the feature state
+    -   `select()` read feature state
+    -   `createEffect()` run side effects like API calls and update feature state
+-   Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
+-   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## RxJS
 MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
@@ -20,33 +36,11 @@ The Redux Pattern is based on this 3 key principles:
 -   State is read-only and is only changed by dispatching actions
 -   Changes are made using pure functions called reducers
 
-## MiniRx Features
-
--   Minimal configuration and setup
--   "Redux" API:
-    -   Actions
-    -   Reducers
-    -   Memoized Selectors
-    -   Effects
--   Support for [ts-action](https://www.npmjs.com/package/ts-action): Create and consume actions with as little boilerplate as possible
--   "Feature" API: Update state without actions and reducers:
-    -   `setState()` update the feature state
-    -   `select()` read feature state
-    -   `createEffect()` run side effects like API calls and update feature state
--   Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
--   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
-
-## Usage
-
-#### Installation:
+## Installation:
 
 `npm i mini-rx-store`
 
-#### Create the Store (App State):
-
-The `Store` is created and ready to use as soon as you import `Store`.
-
-`import { Store } from 'mini-rx-store';`
+## "Redux" API: Make hard things simple
 
 #### Create a Feature (Feature State):
 
@@ -58,11 +52,8 @@ Usually you would create a new _feature_ inside long living Modules/Services:
 ```
 import { Store } from 'mini-rx-store';
 import { ProductState, reducer } from './state/product.reducer';
-...
-// Inside long living Module / Service
-constructor() {
-    Store.feature<ProductState>('products', reducer);
-}
+
+Store.feature<ProductState>('products', reducer);
 ```
 
 The code above creates a new feature state for _products_.
@@ -239,7 +230,7 @@ updateProduct$: Observable<Action> = actions$.pipe(
 );
 ```
 
-## Make simple things simple - The `Feature` API
+## "Feature" API: Make simple things simple
 
 If a feature in your application requires only simple state management, then you can fall back to a simplified API:
 With the `Feature` API you can update state without writing actions and reducers.
