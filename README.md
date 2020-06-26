@@ -174,9 +174,9 @@ this.products$ = Store.select(getProducts);
 
 ## ts-action
 
-MiniRX supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action).
+MiniRx supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action) which helps to reduce boilerplate code.
 
-There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) which will help you to consume actions in Effects.
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in Effects.
 
 Install the packages using npm:
 
@@ -244,6 +244,11 @@ interface UserState {
     currentUser: User;
     favProductIds: string[];
 }
+
+const initialState: UserState = {
+  currentUser: undefined,
+  favProductIds: []
+};
 
 export class UserStateService extends Feature<UserState>{
     constructor() {
@@ -408,7 +413,7 @@ Typically, you would set the settings when bootstrapping the app and before the 
 
 ![Redux Dev Tools for MiniRx](.github/images/redux-dev-tools.gif)
 
-MiniRx has basic support for the Redux Dev Tools (you can time travel and inspect the current state).
+MiniRx has basic support for the [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension) (you can time travel and inspect the current state).
 You need to install the Browser Plugin to make it work.
 
 -   [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
@@ -462,10 +467,10 @@ This Repo contains also two Angular showcase projects.
 
 Run `npm i`
 
-See the MiniRX "Redux" API in action:
+See the MiniRx "Redux" API in action:
 Run `ng serve mini-rx-store-showcase-redux --open`
 
-See the MiniRX "Feature" API in action:
+See the MiniRx "Feature" API in action:
 Run `ng serve mini-rx-store-showcase --open`
 
 The showcases are based on the NgRx example from Deborah Kurata: https://github.com/DeborahK/Angular-NgRx-GettingStarted/tree/master/APM-Demo5
