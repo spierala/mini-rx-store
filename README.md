@@ -5,22 +5,22 @@
 
 # MiniRx: The RxJS Redux Store
 
-**MiniRx Store** provides Reactive State Management for Javascript Applications inspired by Redux.
+**MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
 
 ## MiniRx Features
 
 -   Minimal configuration and setup
--   ["Redux" API](#redux-api):
+-   ["Redux" API](#redux-api-make-hard-things-simple):
     -   Actions
     -   Reducers
     -   Memoized Selectors
     -   Effects
--   [Support for ts-action](#ts-action): Create and consume actions with as little boilerplate as possible
--   ["Feature" API](#feature-api): Update state without actions and reducers:
+    -   [Support for ts-action](#ts-action): Create and consume actions with as little boilerplate as possible
+-   ["Feature" API](#feature-api-make-simple-things-simple): Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `createEffect()` run side effects like API calls and update feature state
--   Support for [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension)
+-   [Support for Redux Dev Tools](#redux-dev-tools)
 -   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## RxJS
