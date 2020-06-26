@@ -1,4 +1,4 @@
-![MiniRx Logo](.github/images/mini-rx-logo.png)
+![MiniRx - RxJS Redux Store - Logo](.github/images/mini-rx-logo.png)
 
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
@@ -10,13 +10,13 @@
 ## MiniRx Features
 
 -   Minimal configuration and setup
--   ["Redux" API](#redux-api-make-hard-things-simple):
+-   ["Redux" API](#redux-api):
     -   Actions
     -   Reducers
     -   Memoized Selectors
     -   Effects
     -   [Support for ts-action](#ts-action): Create and consume actions with as little boilerplate as possible
--   ["Feature" API](#feature-api-make-simple-things-simple): Update state without actions and reducers:
+-   ["Feature" API](#feature-api): Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `createEffect()` run side effects like API calls and update feature state
@@ -40,7 +40,9 @@ The Redux Pattern is based on this 3 key principles:
 
 `npm i mini-rx-store`
 
-## "Redux" API: Make hard things simple
+## "Redux" API:
+
+> Make hard things simple
 
 #### Create a Feature (Feature State):
 
@@ -230,7 +232,9 @@ updateProduct$: Observable<Action> = actions$.pipe(
 );
 ```
 
-## "Feature" API: Make simple things simple
+## "Feature" API:
+
+> Make simple things simple
 
 If a feature in your application requires only simple state management, then you can fall back to a simplified API:
 With the `Feature` API you can update state without writing actions and reducers.
