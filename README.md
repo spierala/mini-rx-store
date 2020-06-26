@@ -10,13 +10,13 @@
 ## MiniRx Features
 
 -   Minimal configuration and setup
--   ["Redux" API](redux-api):
+-   ["Redux" API](#redux-api):
     -   Actions
     -   Reducers
     -   Memoized Selectors
     -   Effects
--   [Support for ts-action](ts-action): Create and consume actions with as little boilerplate as possible
--   ["Feature" API](feature-api): Update state without actions and reducers:
+-   [Support for ts-action](#ts-action): Create and consume actions with as little boilerplate as possible
+-   ["Feature" API](#feature-api): Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `createEffect()` run side effects like API calls and update feature state
