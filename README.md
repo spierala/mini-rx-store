@@ -176,7 +176,7 @@ this.products$ = Store.select(getProducts);
 
 ## ts-action
 
-MiniRx supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action) which helps to reduce boilerplate code.
+MiniRx supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action) to reduce boilerplate code.
 
 There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in Effects.
 
@@ -371,7 +371,7 @@ The API call `this.productService.createProduct` is the side effect which needs 
 
 -   **`effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<S>>`**:
     The `effectFn` is a function that takes an Observable as its input and returns another Observable.
-    That is exactly the definition of RxJS operators ([What are operators?](https://rxjs-dev.firebaseapp.com/guide/operators)) :)
+    That is exactly the [definition of RxJS operators](https://rxjs-dev.firebaseapp.com/guide/operators) :)
     Therefore we can use RxJS (flattening) operators as `effectFn` callback to control how the actual side effect is triggered.
     (e.g. `mergeMap`, `switchMap`, `concatMap`, `exhaustMap`).
 
@@ -394,10 +394,6 @@ Each feature is registered in the Store (Single source of truth) and is part of 
 Behind the scenes `Feature` is creating a default reducer, and a default action in order to update the feature state.
 When you use `setState()` or when the feature´s effect completed, then MiniRx dispatches the default action,
 and the default reducer will update the feature state accordingly.
-
-See the default action in the Redux Dev Tools:
-
-![Redux Dev Tools for MiniRx](.github/images/default-action.gif)
 
 ## Settings
 
