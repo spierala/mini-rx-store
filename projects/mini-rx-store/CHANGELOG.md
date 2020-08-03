@@ -16,3 +16,7 @@ New usage: `Store.feature<ProductState>('products', reducer);`
 
 ### Bug Fixes
 * Fix typing issue with `Feature.select
+
+# 1.0.0 (2020-08-03)
+### Bug Fixes
+* Feature API: setState default action payload: only partial state

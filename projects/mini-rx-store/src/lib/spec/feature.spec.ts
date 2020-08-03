@@ -175,7 +175,7 @@ describe('Feature', () => {
         );
     });
 
-    it('should append setState name to action type', () => {
+    it('should dispatch a set-state default action', () => {
         userFeature.resetState();
 
         const spy = jest.fn();
@@ -183,7 +183,7 @@ describe('Feature', () => {
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
             type: '@mini-rx/user2/SET-STATE/updateCity',
-            payload: { ...initialState, city: 'NY' },
+            payload: { city: 'NY' },
         });
     });
 

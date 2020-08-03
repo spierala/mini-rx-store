@@ -12,7 +12,7 @@
     "test:minirx:watch": "jest --config ./projects/mini-rx-store/jest.config.js --watch",
     "test:minirx:coverage": "jest --config ./projects/mini-rx-store/jest.config.js --coverage",
     "pretty-quick": "pretty-quick",
-    "minirx-version++": "cd projects/mini-rx-store && npm version prerelease --preid=rc",
+    "minirx-version++": "cd projects/mini-rx-store && npm version patch",
     "minirx-build": "npm run minirx-version++ && ng build mini-rx-store --prod && copy LICENSE dist/mini-rx-store && copy README.md dist/mini-rx-store",
     "minirx-ng-devtools-version++": "cd projects/mini-rx-ng-devtools && npm version patch",
     "minirx-ng-devtools-build": "ng build mini-rx-store --prod && npm run minirx-ng-devtools-version++ && ng build mini-rx-ng-devtools --prod",

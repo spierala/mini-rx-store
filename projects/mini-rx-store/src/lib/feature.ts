@@ -7,7 +7,7 @@ import { createFeatureSelector } from './selector';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
-    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
+    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
     private effectCounter = 1; // Used for naming anonymous effects
 
     protected state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
@@ -30,7 +30,7 @@ export abstract class Feature<StateType> {
     protected setState(state: Partial<StateType>, name?: string): void {
         StoreCore.dispatch({
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-            payload: { ...this.state, ...state },
+            payload: state,
         });
     }
 
