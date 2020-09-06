@@ -16,8 +16,6 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 
 /* Feature Modules */
 import { UserModule } from './user/user.module';
-
-import { environment } from '../environments/environment';
 import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
 
 @NgModule({
@@ -27,11 +25,11 @@ import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-r
     HttpClientInMemoryWebApiModule.forRoot(ProductData),
     UserModule,
     AppRoutingModule,
-      NgReduxDevtoolsModule.instrument({
-          name: 'MiniRx Showcase',
-          maxAge: 25,
-          latency: 1000
-      }),
+    NgReduxDevtoolsModule.instrument({
+      name: 'MiniRx Showcase',
+      maxAge: 25,
+      latency: 1000
+    }),
   ],
   declarations: [
     AppComponent,
