@@ -20,3 +20,7 @@ New usage: `Store.feature<ProductState>('products', reducer);`
 # 1.0.0 (2020-08-03)
 ### Bug Fixes
 * Feature API: setState default action payload: only partial state
+
+# 1.0.1 (2020-09-06)
+### Bug Fixes
+* Feature API: fix issue: select returns AnonymousSubject instead of Observable
