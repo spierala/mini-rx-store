@@ -2,12 +2,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Action, AppState } from './interfaces';
 import StoreCore from './store-core';
 import { createActionTypePrefix, nameUpdateAction, ofType } from './utils';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-import { createFeatureSelector } from './selector';
+import { map } from 'rxjs/operators';
+import { createFeatureSelector, createSelector, Selector } from './selector';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
+    private readonly featureSelector: Selector<AppState, StateType>;
     private effectCounter = 1; // Used for naming anonymous effects
 
     protected state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
@@ -23,8 +24,10 @@ export abstract class Feature<StateType> {
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
 
-        // Feature State and delegate to local BehaviorSubject
-        StoreCore.select(createFeatureSelector(featureName)).subscribe(this.state$);
+        this.featureSelector = createFeatureSelector<StateType>(featureName);
+
+        // Select Feature State and delegate to local BehaviorSubject
+        StoreCore.select(this.featureSelector).subscribe(this.state$);
     }
 
     protected setState(state: Partial<StateType>, name?: string): void {
@@ -44,10 +47,12 @@ export abstract class Feature<StateType> {
             return StoreCore.select(mapFn);
         }
 
-        return this.state$.pipe(
-            map((state) => mapFn(state)),
-            distinctUntilChanged()
+        const selector = createSelector(
+            this.featureSelector,
+            mapFn
         );
+
+        return StoreCore.select(selector);
     }
 
     private getEffectStartActionType(effectName): string {
