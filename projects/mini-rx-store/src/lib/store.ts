@@ -3,7 +3,6 @@ import {
     Action,
     AppState,
     Reducer,
-    Settings,
     StoreExtension,
 } from './interfaces';
 import StoreCore from './store-core';
@@ -24,10 +23,6 @@ class Store {
 
     addExtension(extension: StoreExtension) {
         StoreCore.addExtension(extension);
-    }
-
-    settings(settings: Partial<Settings>) {
-        StoreCore.settings = settings;
     }
 
     dispatch = (action: Action) => StoreCore.dispatch(action);

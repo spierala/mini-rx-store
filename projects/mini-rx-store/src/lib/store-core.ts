@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
+import { Action, AppState, Reducer, StoreExtension } from './interfaces';
 import {
     catchError,
     distinctUntilChanged,
@@ -35,30 +35,6 @@ class StoreCore {
         map((reducers) => combineReducers(Object.values(reducers)))
     );
 
-    // SETTINGS
-    // tslint:disable-next-line:variable-name
-    private _settings: Partial<Settings>;
-    private defaultSettings: Settings = {
-        enableLogging: false,
-    };
-
-    set settings(settings: Partial<Settings>) {
-        if (this._settings) {
-            // Set settings only once
-            console.warn(`MiniRx: Settings are already set.`);
-            return;
-        }
-
-        this._settings = {
-            ...this.defaultSettings,
-            ...settings,
-        };
-    }
-
-    get settings(): Partial<Settings> {
-        return this._settings ? this._settings : this.defaultSettings;
-    }
-
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
@@ -73,7 +49,7 @@ class StoreCore {
                 withLatestFrom(this.combinedReducer$),
                 scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
                     const state = reducer(acc, action);
-                    this.log({ action, state });
+                    // this.log({ action, state });
                     return state;
                 }, {}),
                 tap((state) => {
@@ -134,21 +110,6 @@ class StoreCore {
     addExtension(extension: StoreExtension) {
         extension.init();
         this.extensions.push(extension);
-    }
-
-    private log({ action, state }) {
-        if (this.settings.enableLogging) {
-            console.log(
-                '%cACTION',
-                'font-weight: bold; color: #ff9900',
-                '\nType:',
-                action.type,
-                '\nPayload: ',
-                action.payload,
-                '\nState: ',
-                state
-            );
-        }
     }
 }
 

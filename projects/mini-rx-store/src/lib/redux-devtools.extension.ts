@@ -1,6 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { AppState, StoreExtension } from './interfaces';
-import { actions$ } from './store';
 import StoreCore from './store-core';
 
 const win = window as any;
@@ -33,7 +32,7 @@ export class ReduxDevtoolsExtension implements StoreExtension {
         if (this.devtoolsExtension) {
             this.devtoolsConnection = this.devtoolsExtension.connect(this.options);
 
-            actions$.pipe(
+            StoreCore.actions$.pipe(
                 withLatestFrom(StoreCore.state$),
                 tap(([action, state]) => this.devtoolsConnection.send(action, state))
             ).subscribe();

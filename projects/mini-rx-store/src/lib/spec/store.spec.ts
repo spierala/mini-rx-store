@@ -1,6 +1,6 @@
 import Store, { actions$ } from '../store';
 import StoreCore from '../store-core';
-import { Action, Settings } from '../interfaces';
+import { Action } from '../interfaces';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
@@ -13,6 +13,7 @@ import {
     counterReducer,
     CounterState,
 } from './_spec-helpers';
+import { LoggerExtension } from '../logger.extension';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -242,22 +243,6 @@ describe('Store', () => {
         );
     });
 
-    it('should set the settings', () => {
-        const settings: Settings = { enableLogging: true };
-        Store.settings(settings);
-        expect(StoreCore.settings).toEqual(settings);
-    });
-
-    it('should warn if settings are set again', () => {
-        console.warn = jest.fn();
-
-        const settings: Settings = { enableLogging: true };
-        Store.settings(settings);
-        expect(console.warn).toHaveBeenCalledWith(
-            'MiniRx: Settings are already set.'
-        );
-    });
-
     it('should log', () => {
         console.log = jest.fn();
 
@@ -272,9 +257,7 @@ describe('Store', () => {
             user,
         };
 
-        const settings: Settings = { enableLogging: true };
-        Store.settings(settings);
-        expect(StoreCore.settings).toEqual(settings);
+        Store.addExtension(new LoggerExtension());
 
         Store.dispatch({
             type: 'updateUser',
@@ -297,7 +280,7 @@ describe('Store', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
         Store.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(StoreCore['extensions'].length).toBe(1);
+        expect(StoreCore['extensions'].length).toBe(2);
     });
 
     it('should call the reducer before running the effect', () => {
