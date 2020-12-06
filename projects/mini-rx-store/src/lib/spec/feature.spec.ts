@@ -1,6 +1,6 @@
 import { Feature } from '../feature';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { catchError, mergeMap, tap } from 'rxjs/operators';
+import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
@@ -56,24 +56,18 @@ class FeatureState extends Feature<UserState> {
     someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
     loadFn = this.createEffect(
-        (payload$) => payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user)))),
-        'load'
-    );
-
-    loadFnWithoutName = this.createEffect((payload$) =>
-        payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user))))
-    );
-
-    loadFnWithoutName2 = this.createEffect((payload$) =>
-        payload$.pipe(mergeMap(() => fakeApiGet().pipe(map((user) => user))))
+        (payload$) => payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap(user => this.setState(user)))))
     );
 
     loadFnWithError = this.createEffect((payload$) =>
         payload$.pipe(
             mergeMap(() =>
                 fakeApiWithError().pipe(
-                    map((user) => user),
-                    catchError((err) => of({ err: 'error' }))
+                    tap((user) => this.setState(user)),
+                    catchError((err) => {
+                        this.setState({ err: 'error' });
+                        return EMPTY;
+                    })
                 )
             )
         )
@@ -185,73 +179,5 @@ describe('Feature', () => {
             type: '@mini-rx/user2/SET-STATE/updateCity',
             payload: { city: 'NY' },
         });
-    });
-
-    it('should append effect name to action type', () => {
-        hot('a').subscribe(() => userFeature.loadFn());
-
-        expect(actions$).toBeObservable(
-            hot('a--b', {
-                a: { type: '@mini-rx/user2/EFFECT/load', payload: undefined },
-                b: {
-                    type: '@mini-rx/user2/EFFECT/load/SET-STATE',
-                    payload: asyncUser,
-                },
-            })
-        );
-    });
-
-    it('should append default effect name to action type', () => {
-        hot('a').subscribe(() => userFeature.loadFnWithoutName());
-
-        expect(actions$).toBeObservable(
-            hot('a--b', {
-                a: { type: '@mini-rx/user2/EFFECT/1', payload: undefined },
-                b: {
-                    type: '@mini-rx/user2/EFFECT/1/SET-STATE',
-                    payload: asyncUser,
-                },
-            })
-        );
-    });
-
-    it('should increment and append default effect name to action type', () => {
-        hot('a').subscribe(() => userFeature.loadFnWithoutName2());
-
-        expect(actions$).toBeObservable(
-            hot('a--b', {
-                a: { type: '@mini-rx/user2/EFFECT/2', payload: undefined },
-                b: {
-                    type: '@mini-rx/user2/EFFECT/2/SET-STATE',
-                    payload: asyncUser,
-                },
-            })
-        );
-    });
-
-    it('should resubscribe on action stream when side effect error is not handled', () => {
-        const spy = jest.fn();
-
-        class EffectResubscribeFeature extends Feature<any> {
-            loadFnWithUnhandledError = this.createEffect((payload$) =>
-                payload$.pipe(
-                    mergeMap(() => {
-                        spy();
-                        throw new Error();
-                    })
-                )
-            );
-
-            constructor() {
-                super('EffectResubscribeFeature', {});
-            }
-        }
-
-        const feature: EffectResubscribeFeature = new EffectResubscribeFeature();
-        feature.loadFnWithUnhandledError();
-        feature.loadFnWithUnhandledError();
-        feature.loadFnWithUnhandledError();
-
-        expect(spy).toHaveBeenCalledTimes(3);
     });
 });

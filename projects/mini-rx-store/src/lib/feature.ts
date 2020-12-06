@@ -1,15 +1,13 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Action, AppState } from './interfaces';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { AppState } from './interfaces';
 import StoreCore from './store-core';
-import { createActionTypePrefix, nameUpdateAction, ofType } from './utils';
-import { map } from 'rxjs/operators';
+import { createActionTypePrefix, nameUpdateAction } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
     private readonly featureSelector: Selector<AppState, StateType>;
-    private effectCounter = 1; // Used for naming anonymous effects
 
     protected state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
     get state(): StateType {
@@ -55,38 +53,17 @@ export abstract class Feature<StateType> {
         return StoreCore.select(selector);
     }
 
-    private getEffectStartActionType(effectName): string {
-        if (!effectName) {
-            effectName = this.effectCounter;
-            this.effectCounter++;
-        }
-        return `${this.actionTypePrefix}/EFFECT/${effectName}`;
-    }
-
     protected createEffect<PayLoadType = any>(
-        effectFn: (payload: Observable<PayLoadType>) => Observable<Partial<StateType>>,
-        effectName?: string
+        effectFn: (payload: Observable<PayLoadType>) => Observable<any>
     ): (payload?: PayLoadType) => void {
-        const effectStartActionType = this.getEffectStartActionType(effectName);
-        const effect$: Observable<Action> = StoreCore.actions$.pipe(
-            ofType(effectStartActionType),
-            map((action) => action.payload),
-            effectFn,
-            map((state: Partial<StateType>) => {
-                return {
-                    type: effectStartActionType + '/' + nameUpdateAction,
-                    payload: { ...this.state, ...state },
-                };
-            })
-        );
+        const subject: Subject<PayLoadType> = new Subject();
 
-        StoreCore.createEffect(effect$);
+        subject.pipe(
+            effectFn
+        ).subscribe();
 
         return (payload?: PayLoadType) => {
-            StoreCore.dispatch({
-                type: effectStartActionType,
-                payload,
-            });
+            subject.next(payload);
         };
     }
 }
