@@ -102,7 +102,7 @@ class CounterFeatureState extends Feature<CounterState> {
     }
 
     increment() {
-        this.setState({ counter: this.state.counter + 1 });
+        this.setState((state) => ({ counter: state.counter + 1 }));
     }
 }
 

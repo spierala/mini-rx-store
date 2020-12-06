@@ -4,7 +4,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
-import { counterInitialState, counterReducer } from './_spec-helpers';
+import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 
 interface UserState {
     firstName: string;
@@ -101,7 +101,21 @@ class FeatureState extends Feature<UserState> {
     }
 }
 
+class CounterFeature extends Feature<CounterState> {
+    counter$: Observable<number> = this.select(state => state.counter);
+
+    constructor() {
+        super('counterFeature', {counter: 0});
+    }
+
+    increment() {
+        // Update state using callback
+        this.setState(state => ({counter: state.counter + 1}));
+    }
+}
+
 const userFeature: FeatureState = new FeatureState();
+const counterFeature: CounterFeature = new CounterFeature();
 
 describe('Feature', () => {
     it('should initialize the feature', () => {
@@ -133,6 +147,19 @@ describe('Feature', () => {
         expect(spy).toHaveBeenCalledTimes(1);
 
         userFeature.resetState();
+    });
+
+    it('should update state using callback', () => {
+        const spy = jest.fn();
+        counterFeature.counter$.subscribe(spy);
+
+        expect(spy).toHaveBeenCalledWith(0);
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        counterFeature.increment();
+        expect(spy).toHaveBeenCalledWith(1);
+        expect(spy).toHaveBeenCalledTimes(2);
+
     });
 
     it('should select state from App State', () => {

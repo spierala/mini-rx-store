@@ -4,6 +4,9 @@ import StoreCore from './store-core';
 import { createActionTypePrefix, nameUpdateAction } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
 
+type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
+type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
+
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
@@ -28,10 +31,10 @@ export abstract class Feature<StateType> {
         StoreCore.select(this.featureSelector).subscribe(this.state$);
     }
 
-    protected setState(state: Partial<StateType>, name?: string): void {
+    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
         StoreCore.dispatch({
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-            payload: state,
+            payload: typeof stateOrCallback === 'function' ? stateOrCallback(this.state) : stateOrCallback
         });
     }
 
