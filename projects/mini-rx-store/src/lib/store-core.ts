@@ -1,15 +1,6 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import { Action, AppState, Reducer, StoreExtension } from './interfaces';
-import {
-    catchError,
-    distinctUntilChanged,
-    map,
-    mergeAll,
-    observeOn,
-    scan,
-    tap,
-    withLatestFrom,
-} from 'rxjs/operators';
+import { Action, AppState, MetaReducer, Reducer, StoreExtension } from './interfaces';
+import { catchError, distinctUntilChanged, map, mergeAll, observeOn, scan, tap, withLatestFrom, } from 'rxjs/operators';
 import { combineReducers, createActionTypePrefix, nameUpdateAction } from './utils';
 
 class StoreCore {
@@ -27,12 +18,21 @@ class StoreCore {
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
     state$: Observable<AppState> = this.stateSource.asObservable();
 
-    // COMBINED REDUCERS
+    // META REDUCERS
+    private metaReducersSource: BehaviorSubject<MetaReducer<any>> = new BehaviorSubject(undefined);
+
+    // REDUCERS
     private reducersSource: BehaviorSubject<{
         [key: string]: Reducer<any>;
     }> = new BehaviorSubject({});
+
+    // COMBINED REDUCERS
     combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        map((reducers) => combineReducers(Object.values(reducers)))
+        withLatestFrom(this.metaReducersSource),
+        map(([reducers, metaReducer]) => {
+            const combined = combineReducers(Object.values(reducers));
+            return metaReducer ? metaReducer(combined) : combined;
+        })
     );
 
     // EXTENSIONS
@@ -57,6 +57,12 @@ class StoreCore {
                 })
             )
             .subscribe();
+    }
+
+    addMetaReducer(
+        reducer: MetaReducer<any>
+    ) {
+        this.metaReducersSource.next(reducer);
     }
 
     addFeature<StateType>(

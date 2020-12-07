@@ -1,5 +1,5 @@
 export interface AppState {
-    [key: string]: string;
+    [key: string]: any;
 }
 
 export interface StoreExtension {
@@ -12,3 +12,5 @@ export interface Action {
 }
 
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
+
+export type MetaReducer<StateType> = (reducer: Reducer<any>) => StateType;

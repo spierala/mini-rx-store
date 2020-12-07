@@ -47,6 +47,9 @@ export const productReducer = reducer(
         error: payload
     })),
     on(updateProductSuccess, (state, {payload}) => {
+
+        state.currentProductId = 0;
+
         const updatedProducts = state.products.map(
             item => payload.id === item.id ? payload : item);
         return {
