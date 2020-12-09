@@ -1,6 +1,6 @@
 import { OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { Action, Reducer } from './interfaces';
+import { Action, AppState, MetaReducer, Reducer } from './interfaces';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -18,6 +18,18 @@ export function combineReducers<StateType, ActionType>(
             return reducer(currState, action);
         }, state);
     };
+}
+
+export function combineReducerWithMetaReducers(
+    reducer: Reducer<AppState>,
+    metaReducers: MetaReducer<any>[]
+): Reducer<any> {
+    return metaReducers.reduceRight(
+        (previousValue: Reducer<any>, currentValue: MetaReducer<any>) => {
+            return currentValue(previousValue);
+        },
+        reducer
+    );
 }
 
 export function createActionTypePrefix(featureName): string {

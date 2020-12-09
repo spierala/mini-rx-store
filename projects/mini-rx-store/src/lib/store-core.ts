@@ -1,7 +1,21 @@
-import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, queueScheduler, Subject } from 'rxjs';
 import { Action, AppState, MetaReducer, Reducer, StoreExtension } from './interfaces';
-import { catchError, distinctUntilChanged, map, mergeAll, observeOn, scan, tap, withLatestFrom, } from 'rxjs/operators';
-import { combineReducers, createActionTypePrefix, nameUpdateAction } from './utils';
+import {
+    catchError,
+    distinctUntilChanged,
+    map,
+    mergeAll,
+    observeOn,
+    scan,
+    tap,
+    withLatestFrom,
+} from 'rxjs/operators';
+import {
+    combineReducers,
+    combineReducerWithMetaReducers,
+    createActionTypePrefix,
+    nameUpdateAction,
+} from './utils';
 
 class StoreCore {
     // ACTIONS
@@ -19,7 +33,7 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // META REDUCERS
-    private metaReducersSource: BehaviorSubject<MetaReducer<any>> = new BehaviorSubject(undefined);
+    private metaReducersSource: BehaviorSubject<MetaReducer<any>[]> = new BehaviorSubject([]);
 
     // REDUCERS
     private reducersSource: BehaviorSubject<{
@@ -27,11 +41,17 @@ class StoreCore {
     }> = new BehaviorSubject({});
 
     // COMBINED REDUCERS
-    combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        withLatestFrom(this.metaReducersSource),
-        map(([reducers, metaReducer]) => {
-            const combined = combineReducers(Object.values(reducers));
-            return metaReducer ? metaReducer(combined) : combined;
+    combinedReducer$: Observable<Reducer<AppState>> = combineLatest([
+        this.reducersSource,
+        this.metaReducersSource,
+    ]).pipe(
+        map(([reducers, metaReducers]) => {
+            const combinedFeatureReducer: Reducer<AppState> = combineReducers(
+                Object.values(reducers)
+            );
+            return metaReducers && metaReducers.length > 0
+                ? combineReducerWithMetaReducers(combinedFeatureReducer, metaReducers)
+                : combinedFeatureReducer;
         })
     );
 
@@ -59,10 +79,8 @@ class StoreCore {
             .subscribe();
     }
 
-    addMetaReducer(
-        reducer: MetaReducer<any>
-    ) {
-        this.metaReducersSource.next(reducer);
+    addMetaReducer(reducer: MetaReducer<any>) {
+        this.metaReducersSource.next([...this.metaReducersSource.getValue(), reducer]);
     }
 
     addFeature<StateType>(

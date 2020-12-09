@@ -1,6 +1,6 @@
 import Store, { actions$ } from '../store';
 import StoreCore from '../store-core';
-import { Action } from '../interfaces';
+import { Action, Reducer } from '../interfaces';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
@@ -8,11 +8,7 @@ import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { Feature } from '../feature';
-import {
-    counterInitialState,
-    counterReducer,
-    CounterState,
-} from './_spec-helpers';
+import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 import { LoggerExtension } from '../logger.extension';
 
 const asyncUser: Partial<UserState> = {
@@ -80,22 +76,13 @@ function reducer(state: UserState = initialState, action: Action): UserState {
 }
 
 const getUserFeatureState = createFeatureSelector<UserState>('user');
-const getFirstName = createSelector(
-    getUserFeatureState,
-    (user) => user.firstName
-);
+const getFirstName = createSelector(getUserFeatureState, (user) => user.firstName);
 const getAge = createSelector(getUserFeatureState, (user) => user.age);
 
 const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
-const getCounter1 = createSelector(
-    getCounterFeatureState,
-    (state) => state.counter
-);
+const getCounter1 = createSelector(getCounterFeatureState, (state) => state.counter);
 const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
-const getCounter2 = createSelector(
-    getCounter2FeatureState,
-    (state) => state.counter
-);
+const getCounter2 = createSelector(getCounter2FeatureState, (state) => state.counter);
 
 class CounterFeatureState extends Feature<CounterState> {
     constructor() {
@@ -108,10 +95,7 @@ class CounterFeatureState extends Feature<CounterState> {
 }
 
 const getCounter3FeatureState = createFeatureSelector<CounterState>('counter3');
-const getCounter3 = createSelector(
-    getCounter3FeatureState,
-    (state) => state.counter
-);
+const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
 
 describe('Store', () => {
     it('should initialize the store with an empty object', () => {
@@ -228,9 +212,7 @@ describe('Store', () => {
                         map((user) => ({
                             type: 'whatever',
                         })),
-                        catchError((err) =>
-                            of({ type: 'error', payload: 'error' })
-                        )
+                        catchError((err) => of({ type: 'error', payload: 'error' }))
                     )
                 )
             )
@@ -342,11 +324,7 @@ describe('Store', () => {
             }
         }
 
-        Store.feature<CounterState>(
-            'counter2',
-            counter2Reducer,
-            counterInitialState
-        );
+        Store.feature<CounterState>('counter2', counter2Reducer, counterInitialState);
 
         Store.createEffect(
             actions$.pipe(
@@ -382,11 +360,7 @@ describe('Store', () => {
             counter: 2,
         };
 
-        Store.feature<CounterState>(
-            'counter4',
-            counterReducer,
-            customInitialState
-        );
+        Store.feature<CounterState>('counter4', counterReducer, customInitialState);
 
         const spy = jest.fn();
         Store.select((state) => state.counter4).subscribe(spy);
@@ -411,5 +385,56 @@ describe('Store', () => {
         Store.dispatch({ type: 'someAction3' });
 
         expect(spy).toHaveBeenCalledTimes(3);
+    });
+});
+
+function aReducer(state: string, action: Action): string {
+    switch (action.type) {
+        case 'metaTest':
+            return state + 'd';
+        default:
+            return state;
+    }
+}
+
+export function metaReducer1(reducer: Reducer<any>): Reducer<any> {
+    return (state, action) => {
+        if (action.type === 'metaTest') {
+            state = {
+                ...state,
+                metaTestFeature: state.metaTestFeature + 'b',
+            };
+        }
+
+        return reducer(state, action);
+    };
+}
+
+export function metaReducer2(reducer: Reducer<any>): Reducer<any> {
+    return (state, action) => {
+        if (action.type === 'metaTest') {
+            state = {
+                ...state,
+                metaTestFeature: state.metaTestFeature + 'c',
+            };
+        }
+
+        return reducer(state, action);
+    };
+}
+
+const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+
+describe('Store MetaReducers', () => {
+    beforeAll(() => {
+        StoreCore.addMetaReducer(metaReducer1);
+        StoreCore.addMetaReducer(metaReducer2);
+        StoreCore.addFeature<string>('metaTestFeature', 'a', aReducer);
+    });
+    it('should run meta reducers first, then the normal reducer', () => {
+        const spy = jest.fn();
+        StoreCore.select(getMetaTestFeature).subscribe(spy);
+        StoreCore.dispatch({ type: 'metaTest' });
+        expect(spy).toHaveBeenCalledWith('abcd');
     });
 });
