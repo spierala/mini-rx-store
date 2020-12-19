@@ -5,6 +5,7 @@ import { catchError, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 import { EMPTY, Observable, pipe } from 'rxjs';
 import { Product } from '../product';
 import { getCurrentProduct, getError, getProducts, getShowProductCode, initialState, ProductState, } from './index';
+import produce from 'immer';
 
 @Injectable({
     providedIn: 'root',
@@ -17,16 +18,14 @@ export class ProductStateService extends Feature<ProductState> {
     errorMessage$: Observable<string> = this.select(getError);
 
     constructor(private productService: ProductService) {
-        super('products', initialState);
+        super('products', initialState, {producerFn: produce});
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)
     // The completed side effects (api calls) update the feature state directly
     loadProducts = this.createEffect<void>(
         mergeMap(() => this.productService.getProducts().pipe(
-            tap({
-                next: (products) => this.setState({products}, 'load success'),
-            }),
+            tap((products) => this.setState({products}, 'load success')),
             catchError(error => {
                 this.setState({
                     error,
@@ -42,15 +41,11 @@ export class ProductStateService extends Feature<ProductState> {
             return payload$.pipe(
                 mergeMap(product => {
                     return this.productService.createProduct(product).pipe(
-                        tap({
-                            next: (newProduct) => this.setState(
-                            {
-                                        products: [...this.state.products, newProduct],
-                                        currentProductId: newProduct.id,
-                                        error: '',
-                                    }, 'create success'
-                            ),
-                        }),
+                        tap((newProduct) => this.setState(state => {
+                            state.products.push(newProduct);
+                            state.currentProductId = newProduct.id;
+                            state.error = '';
+                        })),
                         catchError(error => {
                             this.setState({error}, 'create error');
                             return EMPTY;

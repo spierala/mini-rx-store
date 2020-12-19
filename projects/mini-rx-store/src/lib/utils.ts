@@ -32,6 +32,10 @@ export function combineReducerWithMetaReducers(
     );
 }
 
+export function isFunction(value: any): value is Function {
+    return typeof value === 'function';
+}
+
 export function createActionTypePrefix(featureName): string {
     return '@mini-rx/' + featureName;
 }

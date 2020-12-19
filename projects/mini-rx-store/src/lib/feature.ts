@@ -1,11 +1,16 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AppState } from './interfaces';
 import StoreCore from './store-core';
-import { createActionTypePrefix, nameUpdateAction } from './utils';
+import { createActionTypePrefix, isFunction, nameUpdateAction } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
 
-type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
+type SetStateFn<StateType> = (state: StateType) => Partial<StateType> | void;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
+type ProducerFn = (state: any, fn: any) => any;
+
+interface FeatureConfig {
+    producerFn: ProducerFn;
+}
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
@@ -17,7 +22,15 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(featureName: string, initialState: StateType) {
+    private get producerFn(): ProducerFn {
+        return this.config.producerFn;
+    }
+
+    protected constructor(
+        featureName: string,
+        initialState: StateType,
+        private config: Partial<FeatureConfig> = {}
+    ) {
         StoreCore.addFeature<StateType>(featureName, initialState);
 
         this.actionTypePrefix = createActionTypePrefix(featureName);
@@ -32,9 +45,16 @@ export abstract class Feature<StateType> {
     }
 
     protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
+        let newState: Partial<StateType>;
+        if (isFunction(stateOrCallback)) {
+            newState = isFunction(this.producerFn) ? this.producerFn(this.state, stateOrCallback) : stateOrCallback(this.state);
+        } else {
+            newState = stateOrCallback;
+        }
+
         StoreCore.dispatch({
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-            payload: typeof stateOrCallback === 'function' ? stateOrCallback(this.state) : stateOrCallback
+            payload: newState
         });
     }
 
