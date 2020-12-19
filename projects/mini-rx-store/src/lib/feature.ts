@@ -1,8 +1,9 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { AppState } from './interfaces';
+import { Action, AppState } from './interfaces';
 import StoreCore from './store-core';
 import { createActionTypePrefix, nameUpdateAction } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
+import { undo } from './undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
@@ -31,11 +32,15 @@ export abstract class Feature<StateType> {
         StoreCore.select(this.featureSelector).subscribe(this.state$);
     }
 
-    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
-        StoreCore.dispatch({
+    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+        const action: Action = {
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
             payload: typeof stateOrCallback === 'function' ? stateOrCallback(this.state) : stateOrCallback
-        });
+        };
+
+        StoreCore.dispatch(action);
+
+        return action;
     }
 
     protected select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
@@ -68,5 +73,9 @@ export abstract class Feature<StateType> {
         return (payload?: PayLoadType) => {
             subject.next(payload);
         };
+    }
+
+    protected undo(action: Action) {
+        StoreCore.dispatch(undo(action));
     }
 }

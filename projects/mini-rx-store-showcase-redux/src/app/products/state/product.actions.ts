@@ -11,6 +11,7 @@ export const loadSuccess = action('[Product] Load Success', payload<Product[]>()
 export const loadFail = action('[Product] Load Fail', payload<string>());
 
 export const updateProduct = action('[Product] Update Product', payload<Product>());
+export const updateProductOptimistic = action('[Product] Update Product Optimistic', payload<Product>());
 export const updateProductSuccess = action('[Product] Update Product Success', payload<Product>());
 export const updateProductFail = action('[Product] Update Product Fail', payload<string>());
 

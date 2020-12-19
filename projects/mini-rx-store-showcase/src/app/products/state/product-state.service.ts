@@ -85,10 +85,9 @@ export class ProductStateService extends Feature<ProductState> {
     // Delete with Optimistic Update
     deleteProduct = this.createEffect<number>(
         pipe(
-            withLatestFrom(this.state$), // Get snapshot of state for undoing optimistic update
-            mergeMap(([productId, lastState]) => {
+            mergeMap((productId) => {
                 // Optimistic Update
-                this.setState({
+                const optimisticUpdate = this.setState({
                         products: this.state.products.filter((product) => product.id !== productId)
                     }, 'delete optimistic'
                 );
@@ -101,10 +100,7 @@ export class ProductStateService extends Feature<ProductState> {
                     }, 'delete success')),
                     catchError(err => {
                         // Undo Optimistic Update
-                        this.setState({
-                            products: lastState.products,
-                            error: err,
-                        }, 'delete error');
+                        this.undo(optimisticUpdate);
                         return EMPTY;
                     })
                 );

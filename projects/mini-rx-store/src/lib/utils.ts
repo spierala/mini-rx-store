@@ -10,10 +10,10 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
     );
 }
 
-export function combineReducers<StateType, ActionType>(
-    reducers: Reducer<StateType>[]
+export function combineReducers<StateType>(
+    reducers: Reducer<any>[]
 ): Reducer<StateType> {
-    return (state: StateType, action: Action): StateType => {
+    return (state: AppState = {}, action: Action): StateType => {
         return reducers.reduce((currState, reducer) => {
             return reducer(currState, action);
         }, state);
@@ -32,6 +32,7 @@ export function combineReducerWithMetaReducers(
     );
 }
 
+// TODO rename to createFeatureActionTypePrefix
 export function createActionTypePrefix(featureName): string {
     return '@mini-rx/' + featureName;
 }

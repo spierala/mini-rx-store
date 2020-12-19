@@ -46,7 +46,7 @@ class StoreCore {
         this.metaReducersSource,
     ]).pipe(
         map(([reducers, metaReducers]) => {
-            const combinedFeatureReducer: Reducer<AppState> = combineReducers(
+            const combinedFeatureReducer: Reducer<AppState> = combineReducers<AppState>(
                 Object.values(reducers)
             );
             return metaReducers && metaReducers.length > 0

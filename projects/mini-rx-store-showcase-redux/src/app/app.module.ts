@@ -16,11 +16,13 @@ import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
 import { ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
 import { environment } from '../environments/environment';
+import { UndoExtension } from '../../../mini-rx-store/src/lib/undo.extension';
 
 // Store Extensions
 if (!environment.production) {
     Store.addExtension(new ImmutableStateExtension());
     Store.addExtension(new LoggerExtension());
+    Store.addExtension(new UndoExtension());
 }
 
 @NgModule({
@@ -31,7 +33,7 @@ if (!environment.production) {
         UserModule,
         AppRoutingModule,
         NgReduxDevtoolsModule.instrument({
-            name: 'MiniRx Showcase',
+            name: 'MiniRx Redux Showcase',
             maxAge: 25,
             latency: 1000,
         }),

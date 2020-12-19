@@ -15,8 +15,9 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
-import { LoggerExtension, Store } from 'mini-rx-store';
+import { LoggerExtension, Store, UndoExtension } from 'mini-rx-store';
 
+Store.addExtension(new UndoExtension());
 Store.addExtension(new LoggerExtension());
 
 @NgModule({
