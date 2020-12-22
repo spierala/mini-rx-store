@@ -27,13 +27,13 @@ if (!environment.production) {
     imports: [
         BrowserModule,
         HttpClientModule,
-        HttpClientInMemoryWebApiModule.forRoot(ProductData),
+        HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
         UserModule,
         AppRoutingModule,
         NgReduxDevtoolsModule.instrument({
             name: 'MiniRx Showcase',
             maxAge: 25,
-            latency: 1000,
+            latency: 250,
         }),
     ],
     declarations: [

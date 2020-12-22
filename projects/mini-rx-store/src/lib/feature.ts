@@ -17,7 +17,7 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(featureName: string, initialState: StateType) {
+    protected constructor(private featureName: string, initialState: StateType) {
         StoreCore.addFeature<StateType>(featureName, initialState);
 
         this.actionTypePrefix = createActionTypePrefix(featureName);
@@ -32,10 +32,16 @@ export abstract class Feature<StateType> {
     }
 
     protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
-        StoreCore.dispatch({
-            type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-            payload: typeof stateOrCallback === 'function' ? stateOrCallback(this.state) : stateOrCallback
-        });
+        StoreCore.dispatch(
+            {
+                type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
+                payload:
+                    typeof stateOrCallback === 'function'
+                        ? stateOrCallback(this.state)
+                        : stateOrCallback,
+            },
+            { forFeature: this.featureName }
+        );
     }
 
     protected select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
@@ -48,10 +54,7 @@ export abstract class Feature<StateType> {
             return StoreCore.select(mapFn);
         }
 
-        const selector = createSelector(
-            this.featureSelector,
-            mapFn
-        );
+        const selector = createSelector(this.featureSelector, mapFn);
 
         return StoreCore.select(selector);
     }
@@ -61,9 +64,7 @@ export abstract class Feature<StateType> {
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();
 
-        subject.pipe(
-            effectFn
-        ).subscribe();
+        subject.pipe(effectFn).subscribe();
 
         return (payload?: PayLoadType) => {
             subject.next(payload);

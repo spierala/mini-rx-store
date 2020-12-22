@@ -10,6 +10,7 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
     );
 }
 
+// TODO typing
 export function combineReducers<StateType, ActionType>(
     reducers: Reducer<StateType>[]
 ): Reducer<StateType> {
@@ -20,16 +21,16 @@ export function combineReducers<StateType, ActionType>(
     };
 }
 
-export function combineReducerWithMetaReducers(
-    reducer: Reducer<AppState>,
-    metaReducers: MetaReducer<any>[]
-): Reducer<any> {
-    return metaReducers.reduceRight(
-        (previousValue: Reducer<any>, currentValue: MetaReducer<any>) => {
-            return currentValue(previousValue);
-        },
-        reducer
-    );
+// TODO typing
+export function combineMetaReducers(metaReducers: MetaReducer<AppState>[]): MetaReducer<AppState> {
+    return (reducer: Reducer<AppState>) => {
+        return metaReducers.reduceRight(
+            (previousValue: Reducer<AppState>, currentValue: MetaReducer<AppState>) => {
+                return currentValue(previousValue);
+            },
+            reducer
+        );
+    };
 }
 
 export function createActionTypePrefix(featureName): string {

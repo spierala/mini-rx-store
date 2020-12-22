@@ -1,5 +1,14 @@
 import { BehaviorSubject, combineLatest, Observable, queueScheduler, Subject } from 'rxjs';
-import { Action, AppState, MetaReducer, Reducer, StoreExtension } from './interfaces';
+import {
+    Action,
+    ActionMetaData,
+    ActionWithMeta,
+    AppState,
+    MetaReducer,
+    Reducer,
+    ReducerDictionary,
+    StoreExtension,
+} from './interfaces';
 import {
     catchError,
     distinctUntilChanged,
@@ -12,15 +21,17 @@ import {
 } from 'rxjs/operators';
 import {
     combineReducers,
-    combineReducerWithMetaReducers,
+    combineMetaReducers,
     createActionTypePrefix,
     nameUpdateAction,
 } from './utils';
 
 class StoreCore {
     // ACTIONS
-    private actionsSource: Subject<Action> = new Subject();
-    actions$: Observable<Action> = this.actionsSource.asObservable();
+    private actionsWithMetaSource: Subject<ActionWithMeta> = new Subject();
+    actions$: Observable<Action> = this.actionsWithMetaSource
+        .asObservable()
+        .pipe(map((actionWithMeta) => actionWithMeta.action));
 
     // EFFECTS
     private effectsSource: Subject<Observable<Action>> = new Subject();
@@ -33,46 +44,65 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // META REDUCERS
-    private metaReducersSource: BehaviorSubject<MetaReducer<any>[]> = new BehaviorSubject([]);
+    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject([]);
+    private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
+        map((metaReducers) => combineMetaReducers(metaReducers))
+    );
 
-    // REDUCERS
-    private reducersSource: BehaviorSubject<{
-        [key: string]: Reducer<any>;
-    }> = new BehaviorSubject({});
+    // REDUCER DICTIONARY
+    private reducersSource: BehaviorSubject<ReducerDictionary> = new BehaviorSubject({});
 
     // COMBINED REDUCERS
-    combinedReducer$: Observable<Reducer<AppState>> = combineLatest([
-        this.reducersSource,
-        this.metaReducersSource,
-    ]).pipe(
-        map(([reducers, metaReducers]) => {
-            const combinedFeatureReducer: Reducer<AppState> = combineReducers(
-                Object.values(reducers)
-            );
-            return metaReducers && metaReducers.length > 0
-                ? combineReducerWithMetaReducers(combinedFeatureReducer, metaReducers)
-                : combinedFeatureReducer;
-        })
+    private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
+        map((reducers) => combineReducers(Object.values(reducers)))
     );
 
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
     constructor() {
-        // Listen to Actions which are emitted by Effects
+        // Listen to Actions which are emitted by Effects and dispatch
         this.effects$.pipe(tap((action) => this.dispatch(action))).subscribe();
 
         // Listen to the Actions Stream and update state accordingly
-        this.actions$
+        this.actionsWithMetaSource
             .pipe(
                 observeOn(queueScheduler),
-                withLatestFrom(this.combinedReducer$),
-                scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
-                    const state = reducer(acc, action);
-                    // this.log({ action, state });
-                    return state;
-                }, {}),
-                tap((state) => {
+                withLatestFrom(
+                    this.combinedReducer$,
+                    this.reducersSource,
+                    this.combinedMetaReducer$
+                ),
+                scan(
+                    (
+                        state,
+                        [actionWithMeta, combinedReducer, reducerDictionary, combinedMetaReducer]: [
+                            ActionWithMeta,
+                            Reducer<AppState>,
+                            ReducerDictionary,
+                            MetaReducer<any>
+                        ]
+                    ) => {
+                        const forFeature: string =
+                            actionWithMeta.meta && actionWithMeta.meta.forFeature;
+                        const action: Action = actionWithMeta.action;
+
+                        let reducer: Reducer<any>;
+                        if (forFeature) {
+                            // Feature setState Actions only have to go through their own feature reducer
+                            reducer = reducerDictionary[forFeature];
+                        } else {
+                            reducer = combinedReducer;
+                        }
+
+                        const reducerWithMetaReducers: Reducer<AppState> = combinedMetaReducer(
+                            reducer
+                        );
+                        return reducerWithMetaReducers(state, action);
+                    },
+                    {}
+                ),
+                tap((state: AppState) => {
                     this.updateState(state);
                 })
             )
@@ -96,8 +126,9 @@ class StoreCore {
         }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
+        const reducerWasProvided: boolean = !!reducer;
 
-        reducer = reducer ? reducer : createDefaultReducer(actionTypePrefix);
+        reducer = reducerWasProvided ? reducer : createDefaultReducer(actionTypePrefix);
 
         reducer = initialState ? createReducerWithInitialState(reducer, initialState) : reducer;
 
@@ -110,7 +141,13 @@ class StoreCore {
         });
 
         // Dispatch an initial action to let reducers create the initial state
-        this.dispatch({ type: `${actionTypePrefix}/INIT` });
+        const forFeature: string = !reducerWasProvided ? featureName : undefined;
+        this.dispatch(
+            {
+                type: `${actionTypePrefix}/INIT`,
+            },
+            { forFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
+        );
     }
 
     createEffect(effect$: Observable<Action>) {
@@ -118,7 +155,11 @@ class StoreCore {
         this.effectsSource.next(effectWithErrorHandler$);
     }
 
-    dispatch = (action: Action) => this.actionsSource.next(action);
+    dispatch = (action: Action, meta?: ActionMetaData) =>
+        this.actionsWithMetaSource.next({
+            action,
+            meta,
+        });
 
     updateState(state: AppState) {
         this.stateSource.next(state);
@@ -139,7 +180,7 @@ class StoreCore {
 
 function createDefaultReducer<StateType>(nameSpaceFeature: string): Reducer<StateType> {
     return (state: StateType, action: Action) => {
-        // Check for 'set-state' (can originate from setState() or feature effect)
+        // Check for 'set-state' action (originates from Feature.setState())
         if (
             action.type.indexOf(nameSpaceFeature) > -1 &&
             action.type.indexOf(nameUpdateAction) > -1

@@ -4,6 +4,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
+import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 
 interface UserState {
@@ -55,8 +56,8 @@ class FeatureState extends Feature<UserState> {
     city$ = this.select(getCity, true);
     someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
-    loadFn = this.createEffect(
-        (payload$) => payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap(user => this.setState(user)))))
+    loadFn = this.createEffect((payload$) =>
+        payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap((user) => this.setState(user)))))
     );
 
     loadFnWithError = this.createEffect((payload$) =>
@@ -102,15 +103,21 @@ class FeatureState extends Feature<UserState> {
 }
 
 class CounterFeature extends Feature<CounterState> {
-    counter$: Observable<number> = this.select(state => state.counter);
+    counter$: Observable<number> = this.select((state) => state.counter);
 
     constructor() {
-        super('counterFeature', {counter: 0});
+        super('counterFeature', { counter: 0 });
     }
 
     increment() {
         // Update state using callback
-        this.setState(state => ({counter: state.counter + 1}));
+        this.setState((state) => ({ counter: state.counter + 1 }));
+    }
+}
+
+class CounterFeature2 extends Feature<any> {
+    constructor() {
+        super('counterFeature2', {});
     }
 }
 
@@ -118,6 +125,14 @@ const userFeature: FeatureState = new FeatureState();
 const counterFeature: CounterFeature = new CounterFeature();
 
 describe('Feature', () => {
+    const reducerSpy = jest.fn();
+
+    function someReducer() {
+        reducerSpy();
+    }
+
+    Store.feature('someReduxReducer', someReducer);
+
     it('should initialize the feature', () => {
         const spy = jest.fn();
         userFeature.state$.subscribe(spy);
@@ -159,7 +174,6 @@ describe('Feature', () => {
         counterFeature.increment();
         expect(spy).toHaveBeenCalledWith(1);
         expect(spy).toHaveBeenCalledTimes(2);
-
     });
 
     it('should select state from App State', () => {
@@ -206,5 +220,33 @@ describe('Feature', () => {
             type: '@mini-rx/user2/SET-STATE/updateCity',
             payload: { city: 'NY' },
         });
+    });
+
+    it('should dispatch a set-state default action with meta data', () => {
+        userFeature.resetState();
+
+        const spy = jest.fn();
+        StoreCore['actionsWithMetaSource'].subscribe(spy);
+        userFeature.updateCity('NY');
+        expect(spy).toHaveBeenCalledWith({
+            action: {
+                type: '@mini-rx/user2/SET-STATE/updateCity',
+                payload: { city: 'NY' },
+            },
+            meta: {
+                forFeature: 'user2',
+            },
+        });
+    });
+
+    it('should not run the redux reducers', () => {
+        // Feature setState Actions should only run its own feature state reducer
+        expect(reducerSpy).toHaveBeenCalledTimes(1); // 1 for initializing the redux reducer with an initial action
+        reducerSpy.mockReset();
+    });
+
+    it('should not run the redux reducers when a new feature state is added', () => {
+        const counterFeature = new CounterFeature2();
+        expect(reducerSpy).toHaveBeenCalledTimes(0);
     });
 });

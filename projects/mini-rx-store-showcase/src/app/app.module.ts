@@ -15,30 +15,35 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
-import { LoggerExtension, Store } from 'mini-rx-store';
+import { ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
+import { environment } from '../../../mini-rx-store-showcase-redux/src/environments/environment';
 
-Store.addExtension(new LoggerExtension());
+// Store Extensions
+if (!environment.production) {
+    Store.addExtension(new ImmutableStateExtension());
+    Store.addExtension(new LoggerExtension());
+}
 
 @NgModule({
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 1000 }),
-    UserModule,
-    AppRoutingModule,
-      NgReduxDevtoolsModule.instrument({
-          name: 'MiniRx Showcase',
-          maxAge: 25,
-          latency: 1000
-      }),
-  ],
-  declarations: [
-    AppComponent,
-    ShellComponent,
-    MenuComponent,
-    WelcomeComponent,
-    PageNotFoundComponent
-  ],
-  bootstrap: [AppComponent]
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+        HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
+        UserModule,
+        AppRoutingModule,
+        NgReduxDevtoolsModule.instrument({
+            name: 'MiniRx Showcase',
+            maxAge: 25,
+            latency: 250,
+        }),
+    ],
+    declarations: [
+        AppComponent,
+        ShellComponent,
+        MenuComponent,
+        WelcomeComponent,
+        PageNotFoundComponent,
+    ],
+    bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

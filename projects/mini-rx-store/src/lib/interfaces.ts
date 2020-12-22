@@ -11,6 +11,17 @@ export interface Action {
     payload?: any;
 }
 
+export interface ActionMetaData {
+    forFeature: string;
+}
+
+export interface ActionWithMeta {
+    action: Action;
+    meta: ActionMetaData;
+}
+
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
 export type MetaReducer<StateType> = (reducer: Reducer<any>) => StateType;
+
+export type ReducerDictionary = { [key: string]: Reducer<any> };
