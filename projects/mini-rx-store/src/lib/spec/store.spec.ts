@@ -120,6 +120,18 @@ describe('Store', () => {
         expect(() => Store.feature<UserState>('user', reducer)).toThrowError();
     });
 
+    it('should run the redux reducers when a new Feature state is added', () => {
+        const reducerSpy = jest.fn();
+
+        function someReducer() {
+            reducerSpy();
+        }
+
+        Store.feature('oneMoreFeature', someReducer);
+        Store.feature('oneMoreFeature2', (state) => state);
+        expect(reducerSpy).toHaveBeenCalledTimes(2);
+    });
+
     it('should update the Feature state', () => {
         const user = {
             firstName: 'Nicolas',
@@ -397,7 +409,7 @@ function aReducer(state: string, action: Action): string {
     }
 }
 
-export function metaReducer1(reducer: Reducer<any>): Reducer<any> {
+function metaReducer1(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
         if (action.type === 'metaTest') {
             state = {
@@ -410,7 +422,7 @@ export function metaReducer1(reducer: Reducer<any>): Reducer<any> {
     };
 }
 
-export function metaReducer2(reducer: Reducer<any>): Reducer<any> {
+function metaReducer2(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
         if (action.type === 'metaTest') {
             state = {

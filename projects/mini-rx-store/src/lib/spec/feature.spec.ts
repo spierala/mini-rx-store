@@ -6,6 +6,7 @@ import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
+import { Reducer } from '../interfaces';
 
 interface UserState {
     firstName: string;
@@ -239,14 +240,32 @@ describe('Feature', () => {
         });
     });
 
-    it('should not run the redux reducers', () => {
-        // Feature setState Actions should only run its own feature state reducer
-        expect(reducerSpy).toHaveBeenCalledTimes(1); // 1 for initializing the redux reducer with an initial action
+    it('should only run its own feature state reducer when Feature.setState is called', () => {
+        expect(reducerSpy).toHaveBeenCalledTimes(1); // 1 for initializing the feature state reducer with an initial action
         reducerSpy.mockReset();
     });
 
-    it('should not run the redux reducers when a new feature state is added', () => {
+    it('should NOT run the redux reducers when a new feature state is added', () => {
         const counterFeature = new CounterFeature2();
         expect(reducerSpy).toHaveBeenCalledTimes(0);
+        reducerSpy.mockReset();
+    });
+
+    it('should run the meta reducers when state changes', () => {
+        const metaReducerSpy = jest.fn();
+
+        function metaReducer(): Reducer<any> {
+            return (state) => {
+                metaReducerSpy();
+                return state;
+            };
+        }
+
+        StoreCore.addMetaReducer(metaReducer);
+
+        userFeature.updateCity('NY');
+        counterFeature.increment();
+
+        expect(metaReducerSpy).toHaveBeenCalledTimes(2);
     });
 });
