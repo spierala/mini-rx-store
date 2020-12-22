@@ -10,20 +10,16 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
     );
 }
 
-// TODO typing
-export function combineReducers<StateType, ActionType>(
-    reducers: Reducer<StateType>[]
-): Reducer<StateType> {
-    return (state: StateType, action: Action): StateType => {
+export function combineReducers(reducers: Reducer<any>[]): Reducer<AppState> {
+    return (state: AppState, action: Action): AppState => {
         return reducers.reduce((currState, reducer) => {
             return reducer(currState, action);
         }, state);
     };
 }
 
-// TODO typing
 export function combineMetaReducers(metaReducers: MetaReducer<AppState>[]): MetaReducer<AppState> {
-    return (reducer: Reducer<AppState>) => {
+    return (reducer: Reducer<any>): Reducer<AppState> => {
         return metaReducers.reduceRight(
             (previousValue: Reducer<AppState>, currentValue: MetaReducer<AppState>) => {
                 return currentValue(previousValue);

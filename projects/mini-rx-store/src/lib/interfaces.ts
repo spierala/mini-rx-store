@@ -22,6 +22,6 @@ export interface ActionWithMeta {
 
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
-export type MetaReducer<StateType> = (reducer: Reducer<any>) => StateType;
+export type MetaReducer<StateType> = (reducer: Reducer<any>) => Reducer<StateType>;
 
 export type ReducerDictionary = { [key: string]: Reducer<any> };

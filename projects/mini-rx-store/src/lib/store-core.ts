@@ -1,4 +1,4 @@
-import { BehaviorSubject, combineLatest, Observable, queueScheduler, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
 import {
     Action,
     ActionMetaData,
@@ -80,14 +80,14 @@ class StoreCore {
                             ActionWithMeta,
                             Reducer<AppState>,
                             ReducerDictionary,
-                            MetaReducer<any>
+                            MetaReducer<AppState>
                         ]
                     ) => {
                         const forFeature: string =
                             actionWithMeta.meta && actionWithMeta.meta.forFeature;
                         const action: Action = actionWithMeta.action;
 
-                        let reducer: Reducer<any>;
+                        let reducer: Reducer<AppState>;
                         if (forFeature) {
                             // Feature setState Actions only have to go through their own feature reducer
                             reducer = reducerDictionary[forFeature];
@@ -109,7 +109,7 @@ class StoreCore {
             .subscribe();
     }
 
-    addMetaReducer(reducer: MetaReducer<any>) {
+    addMetaReducer(reducer: MetaReducer<AppState>) {
         this.metaReducersSource.next([...this.metaReducersSource.getValue(), reducer]);
     }
 
