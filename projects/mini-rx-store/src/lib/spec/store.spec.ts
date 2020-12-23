@@ -400,6 +400,8 @@ describe('Store', () => {
     });
 });
 
+const nextStateSpy = jest.fn();
+
 function aReducer(state: string, action: Action): string {
     switch (action.type) {
         case 'metaTest':
@@ -435,11 +437,22 @@ function metaReducer2(reducer: Reducer<any>): Reducer<any> {
     };
 }
 
+export function inTheMiddleMetaReducer(oldReducer) {
+    return (state, action) => {
+        const nextState = oldReducer(state, action);
+
+        nextStateSpy(nextState);
+
+        return nextState;
+    };
+}
+
 const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
 
 describe('Store MetaReducers', () => {
     beforeAll(() => {
         StoreCore.addMetaReducer(metaReducer1);
+        StoreCore.addMetaReducer(inTheMiddleMetaReducer);
         StoreCore.addMetaReducer(metaReducer2);
         StoreCore.addFeature<string>('metaTestFeature', 'a', aReducer);
     });
@@ -448,5 +461,13 @@ describe('Store MetaReducers', () => {
         StoreCore.select(getMetaTestFeature).subscribe(spy);
         StoreCore.dispatch({ type: 'metaTest' });
         expect(spy).toHaveBeenCalledWith('abcd');
+    });
+    it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
+        expect(nextStateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ metaTestFeature: 'a' })
+        );
+        expect(nextStateSpy).toHaveBeenCalledWith(
+            expect.objectContaining({ metaTestFeature: 'abcd' })
+        );
     });
 });
