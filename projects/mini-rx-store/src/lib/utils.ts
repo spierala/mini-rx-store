@@ -32,5 +32,3 @@ export function combineMetaReducers(metaReducers: MetaReducer<AppState>[]): Meta
 export function createActionTypePrefix(featureName): string {
     return '@mini-rx/' + featureName;
 }
-
-export const nameUpdateAction = 'SET-STATE';

@@ -19,12 +19,7 @@ import {
     tap,
     withLatestFrom,
 } from 'rxjs/operators';
-import {
-    combineReducers,
-    combineMetaReducers,
-    createActionTypePrefix,
-    nameUpdateAction,
-} from './utils';
+import { combineReducers, combineMetaReducers, createActionTypePrefix } from './utils';
 
 class StoreCore {
     // ACTIONS
@@ -84,7 +79,7 @@ class StoreCore {
                         ]
                     ) => {
                         const forFeature: string =
-                            actionWithMeta.meta && actionWithMeta.meta.forFeature;
+                            actionWithMeta.meta && actionWithMeta.meta.onlyForFeature;
                         const action: Action = actionWithMeta.action;
 
                         let reducer: Reducer<AppState>;
@@ -115,10 +110,13 @@ class StoreCore {
 
     addFeature<StateType>(
         featureName: string,
-        initialState: StateType,
-        reducer?: Reducer<StateType>
+        reducer: Reducer<StateType>,
+        extra: {
+            isDefaultReducer?: boolean;
+        } = {}
     ) {
         const reducers = this.reducersSource.getValue();
+        const { isDefaultReducer } = extra;
 
         // Check if feature already exists
         if (reducers.hasOwnProperty(featureName)) {
@@ -126,12 +124,6 @@ class StoreCore {
         }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
-        const reducerWasProvided: boolean = !!reducer;
-
-        reducer = reducerWasProvided ? reducer : createDefaultReducer(actionTypePrefix);
-
-        reducer = initialState ? createReducerWithInitialState(reducer, initialState) : reducer;
-
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
 
         // Add reducer
@@ -141,12 +133,12 @@ class StoreCore {
         });
 
         // Dispatch an initial action to let reducers create the initial state
-        const forFeature: string = !reducerWasProvided ? featureName : undefined;
+        const onlyForFeature: string = isDefaultReducer ? featureName : undefined;
         this.dispatch(
             {
                 type: `${actionTypePrefix}/INIT`,
             },
-            { forFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
+            { onlyForFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
         );
     }
 
@@ -176,31 +168,6 @@ class StoreCore {
         extension.init();
         this.extensions.push(extension);
     }
-}
-
-function createDefaultReducer<StateType>(nameSpaceFeature: string): Reducer<StateType> {
-    return (state: StateType, action: Action) => {
-        // Check for 'set-state' action (originates from Feature.setState())
-        if (
-            action.type.indexOf(nameSpaceFeature) > -1 &&
-            action.type.indexOf(nameUpdateAction) > -1
-        ) {
-            return {
-                ...state,
-                ...action.payload,
-            };
-        }
-        return state;
-    };
-}
-
-function createReducerWithInitialState<StateType>(
-    reducer: Reducer<StateType>,
-    initialState: StateType
-): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action): StateType => {
-        return reducer(state, action);
-    };
 }
 
 function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {

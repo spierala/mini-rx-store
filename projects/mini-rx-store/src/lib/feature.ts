@@ -1,11 +1,13 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { AppState } from './interfaces';
+import { Action, AppState, Reducer } from './interfaces';
 import StoreCore from './store-core';
-import { createActionTypePrefix, nameUpdateAction } from './utils';
+import { createActionTypePrefix } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
+
+const nameUpdateAction = 'SET-STATE';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
@@ -18,7 +20,9 @@ export abstract class Feature<StateType> {
     }
 
     protected constructor(private featureName: string, initialState: StateType) {
-        StoreCore.addFeature<StateType>(featureName, initialState);
+        const actionTypePrefix = createActionTypePrefix(featureName);
+        const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
+        StoreCore.addFeature<StateType>(featureName, reducer, { isDefaultReducer: true });
 
         this.actionTypePrefix = createActionTypePrefix(featureName);
 
@@ -40,7 +44,7 @@ export abstract class Feature<StateType> {
                         ? stateOrCallback(this.state)
                         : stateOrCallback,
             },
-            { forFeature: this.featureName }
+            { onlyForFeature: this.featureName }
         );
     }
 
@@ -70,4 +74,23 @@ export abstract class Feature<StateType> {
             subject.next(payload);
         };
     }
+}
+
+function createDefaultReducer<StateType>(
+    nameSpaceFeature: string,
+    initialState: StateType
+): Reducer<StateType> {
+    return (state: StateType = initialState, action: Action) => {
+        // Check for 'set-state' action (originates from Feature.setState())
+        if (
+            action.type.indexOf(nameSpaceFeature) > -1 &&
+            action.type.indexOf(nameUpdateAction) > -1
+        ) {
+            return {
+                ...state,
+                ...action.payload,
+            };
+        }
+        return state;
+    };
 }

@@ -12,7 +12,7 @@ export interface Action {
 }
 
 export interface ActionMetaData {
-    forFeature: string;
+    onlyForFeature: string;
 }
 
 export interface ActionWithMeta {

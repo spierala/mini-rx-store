@@ -279,10 +279,12 @@ describe('Store', () => {
 
     it('should call the reducer before running the effect', () => {
         const callOrder = [];
-        const someReducer = (state, action: Action) => {
+        const someReducer = (state = {}, action: Action) => {
             switch (action.type) {
                 case 'someAction2':
                     callOrder.push('reducer');
+                default:
+                    return state;
             }
         };
         const onEffectStarted = (): Observable<Action> => {
@@ -290,7 +292,7 @@ describe('Store', () => {
             return of({ type: 'whatever' });
         };
 
-        Store.feature('someFeature', someReducer, {});
+        Store.feature('someFeature', someReducer);
 
         Store.createEffect(
             actions$.pipe(
@@ -324,7 +326,7 @@ describe('Store', () => {
     it('should queue effect actions', () => {
         const callLimit = 5000;
 
-        function counter2Reducer(state: CounterState, action: Action) {
+        function counter2Reducer(state: CounterState = counterInitialState, action: Action) {
             switch (action.type) {
                 case 'counterEffectSuccess':
                     return {
@@ -336,7 +338,7 @@ describe('Store', () => {
             }
         }
 
-        Store.feature<CounterState>('counter2', counter2Reducer, counterInitialState);
+        Store.feature<CounterState>('counter2', counter2Reducer);
 
         Store.createEffect(
             actions$.pipe(
@@ -367,18 +369,6 @@ describe('Store', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should overwrite reducers default state with a provided initialState', () => {
-        const customInitialState: CounterState = {
-            counter: 2,
-        };
-
-        Store.feature<CounterState>('counter4', counterReducer, customInitialState);
-
-        const spy = jest.fn();
-        Store.select((state) => state.counter4).subscribe(spy);
-        expect(spy).toHaveBeenCalledWith(customInitialState);
-    });
-
     it('should resubscribe on action stream when side effect error is not handled', () => {
         const spy = jest.fn();
 
@@ -402,7 +392,7 @@ describe('Store', () => {
 
 const nextStateSpy = jest.fn();
 
-function aReducer(state: string, action: Action): string {
+function aReducer(state: string = 'a', action: Action): string {
     switch (action.type) {
         case 'metaTest':
             return state + 'd';
@@ -454,7 +444,7 @@ describe('Store MetaReducers', () => {
         StoreCore.addMetaReducer(metaReducer1);
         StoreCore.addMetaReducer(inTheMiddleMetaReducer);
         StoreCore.addMetaReducer(metaReducer2);
-        StoreCore.addFeature<string>('metaTestFeature', 'a', aReducer);
+        StoreCore.addFeature<string>('metaTestFeature', aReducer);
     });
     it('should run meta reducers first, then the normal reducer', () => {
         const spy = jest.fn();

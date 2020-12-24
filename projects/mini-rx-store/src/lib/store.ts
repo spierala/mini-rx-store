@@ -1,20 +1,11 @@
 import { Observable } from 'rxjs';
-import {
-    Action,
-    AppState,
-    Reducer,
-    StoreExtension,
-} from './interfaces';
+import { Action, AppState, Reducer, StoreExtension } from './interfaces';
 import StoreCore from './store-core';
 
 // Expose public store API
 class Store {
-    feature<StateType>(
-        featureName: string,
-        reducer: Reducer<StateType>,
-        initialState?: StateType
-    ) {
-        StoreCore.addFeature<StateType>(featureName, initialState, reducer);
+    feature<StateType>(featureName: string, reducer: Reducer<StateType>) {
+        StoreCore.addFeature<StateType>(featureName, reducer);
     }
 
     createEffect(effect: Observable<Action>) {

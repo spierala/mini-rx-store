@@ -235,7 +235,7 @@ describe('Feature', () => {
                 payload: { city: 'NY' },
             },
             meta: {
-                forFeature: 'user2',
+                onlyForFeature: 'user2',
             },
         });
     });
