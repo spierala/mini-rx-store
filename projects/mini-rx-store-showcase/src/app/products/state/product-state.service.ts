@@ -1,10 +1,24 @@
+// TODO remove tap next, use just tap directly
+
 import { Injectable } from '@angular/core';
-import { Feature } from 'mini-rx-store';
+import { Action, Feature, Reducer } from 'mini-rx-store';
 import { ProductService } from '../product.service';
 import { catchError, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 import { EMPTY, Observable, pipe } from 'rxjs';
 import { Product } from '../product';
 import { getCurrentProduct, getError, getProducts, getShowProductCode, initialState, ProductState, } from './index';
+
+function metaReducer(reducer): Reducer<ProductState> {
+    return (state, action: Action) => {
+
+        switch (action.type) {
+            case 'Reset':
+                state = initialState;
+        }
+
+        return reducer(state, action);
+    };
+}
 
 @Injectable({
     providedIn: 'root',
@@ -17,7 +31,7 @@ export class ProductStateService extends Feature<ProductState> {
     errorMessage$: Observable<string> = this.select(getError);
 
     constructor(private productService: ProductService) {
-        super('products', initialState);
+        super('products', initialState, metaReducer);
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)

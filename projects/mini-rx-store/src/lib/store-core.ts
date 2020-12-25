@@ -20,6 +20,7 @@ import {
     withLatestFrom,
 } from 'rxjs/operators';
 import { combineReducers, combineMetaReducers, createActionTypePrefix } from './utils';
+import { Meta } from '@angular/platform-browser';
 
 class StoreCore {
     // ACTIONS
@@ -112,11 +113,13 @@ class StoreCore {
         featureName: string,
         reducer: Reducer<StateType>,
         extra: {
-            isDefaultReducer?: boolean;
+            isDefaultReducer?: boolean,
+            metaReducer?: MetaReducer<StateType>
         } = {}
     ) {
         const reducers = this.reducersSource.getValue();
-        const { isDefaultReducer } = extra;
+        const { isDefaultReducer, metaReducer } = extra;
+        reducer = metaReducer ? metaReducer(reducer) : reducer;
 
         // Check if feature already exists
         if (reducers.hasOwnProperty(featureName)) {

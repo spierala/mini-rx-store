@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, Reducer } from './interfaces';
+import { Action, AppState, MetaReducer, Reducer } from './interfaces';
 import StoreCore from './store-core';
 import { createActionTypePrefix } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
@@ -19,10 +19,10 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(private featureName: string, initialState: StateType) {
+    protected constructor(private featureName: string, initialState: StateType, metaReducer?: MetaReducer<StateType>) {
         const actionTypePrefix = createActionTypePrefix(featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
-        StoreCore.addFeature<StateType>(featureName, reducer, { isDefaultReducer: true });
+        StoreCore.addFeature<StateType>(featureName, reducer, { isDefaultReducer: true, metaReducer });
 
         this.actionTypePrefix = createActionTypePrefix(featureName);
 

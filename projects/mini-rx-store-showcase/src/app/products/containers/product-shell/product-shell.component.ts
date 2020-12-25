@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from '../../product';
 import { ProductStateService } from '../../state/product-state.service';
+import { Store } from 'mini-rx-store';
 
 @Component({
     templateUrl: './product-shell.component.html',
@@ -16,7 +17,9 @@ export class ProductShellComponent {
     constructor(
         private productState: ProductStateService
     ) {
-
+        // setInterval(() => {
+        //     Store.dispatch({type: 'Reset'})
+        // }, 10000)
     }
 
     checkChanged(value: boolean): void {
