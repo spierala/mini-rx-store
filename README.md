@@ -3,6 +3,8 @@
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 
+> **ℹ️  Version 2:** Currently I am working on version 2 of mini-rx-store. Please let me know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
+
 # MiniRx: The RxJS Redux Store
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
@@ -51,7 +53,7 @@ The feature states together form the app state (Single source of truth).
 
 Usually you would create a new _feature_ inside long living Modules/Services:
 
-```
+```ts
 import { Store } from 'mini-rx-store';
 import { ProductState, reducer } from './state/product.reducer';
 
@@ -64,7 +66,7 @@ The code above creates a new feature state for _products_.
 Reducers specify how the feature state changes in response to actions sent to the store.
 A reducer function typically looks like this:
 
-```
+```ts
 const initialState: ProductState = {
   showProductCode: true,
   products: [],
@@ -86,7 +88,7 @@ export function reducer(state: ProductState = initialState, action: ProductActio
 
 #### Create an Action:
 
-```
+```ts
 import { Action } from 'mini-rx-store';
 
 export enum ProductActionTypes {
@@ -103,7 +105,7 @@ export class CreateProduct implements Action {
 
 Dispatch an action to update state:
 
-```
+```ts
 import { Store } from 'mini-rx-store';
 import { CreateProduct } from 'product.actions';
 
@@ -120,7 +122,7 @@ Effects handle code that triggers side effects like API calls:
 -   That action triggers the actual side effect
 -   The Effect needs to return a new action as soon as the side effect finished
 
-```
+```ts
 import { Action, actions$, ofType } from 'mini-rx-store';
 import { mergeMap, map, catchError } from 'rxjs/operators';
 import { LoadFail, LoadSuccess, ProductActionTypes } from './product.actions';
@@ -148,7 +150,7 @@ The code above creates an Effect. As soon as the `Load` action has been dispatch
 
 Selectors are used to select and combine state.
 
-```
+```ts
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
 import { ProductState } from './product.reducer';
 
@@ -165,7 +167,7 @@ If a selector is called with the same arguments again, it will just return the p
 
 #### Select Observable State (with a memoized selector):
 
-```
+```ts
 import { Store } from 'mini-rx-store';
 import { getProducts } from '../../state';
 
@@ -186,7 +188,7 @@ Install the packages using npm:
 
 #### Create an Action:
 
-```
+```ts
 import { action, payload } from 'ts-action';
 
 export const createProduct = action('[Product] Create Product', payload<Product>());
@@ -194,7 +196,7 @@ export const createProduct = action('[Product] Create Product', payload<Product>
 
 #### Dispatch an Action:
 
-```
+```ts
 import { Store } from 'mini-rx-store';
 import { createProduct } from './../../state/product.actions';
 
@@ -203,7 +205,7 @@ Store.dispatch(createProduct(product));
 
 #### Reducer
 
-```
+```ts
 import { on, reducer } from 'ts-action';
 
 export const productReducer = reducer(
@@ -216,7 +218,7 @@ export const productReducer = reducer(
 
 Consume actions in Effects
 
-```
+```ts
 import { Action, actions$, Store } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 
@@ -243,7 +245,7 @@ With the `Feature` API you can update state without writing actions and reducers
 
 To create a `Feature`, you need to extend MiniRx's `Feature` class, passing the feature name as well as its initial state.
 
-```
+```ts
 interface UserState {
     currentUser: User;
     favProductIds: string[];
@@ -267,7 +269,7 @@ export class UserStateService extends Feature<UserState>{
 
 Example:
 
-```
+```ts
 currentUser$: Observable<User> = this.select(state => state.currentUser);
 ```
 
@@ -280,7 +282,7 @@ Inside of that function you can pick a certain piece of state.
 You can use memoized selectors also with the `Feature` API... You only have to omit the feature name when using `createFeatureSelector`.
 This is because the `Feature` API is operating on a specific feature state already (the corresponding feature name has been provided in the constructor).
 
-```
+```ts
 const getProductFeatureState = createFeatureSelector<ProductState>(); // Omit the feature name!
 
 const getProducts = createSelector(
@@ -304,7 +306,7 @@ export class ProductStateService extends Feature<ProductState>{
 
 Example:
 
-```
+```ts
 updateUser(user: User) {
     this.setState({currentUser: user});
 }
@@ -312,7 +314,7 @@ updateUser(user: User) {
 
 `setState` sets the new state of the feature.
 
-```
+```ts
 // Update state based on current state
 addFavorite(productId) {
     this.setState({
@@ -326,7 +328,9 @@ You can use `this.state` which holds the current state snapshot.
 
 For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
 
-`this.setState({currentUser: user} 'updateUser');`
+```ts
+this.setState({currentUser: user} 'updateUser');
+```
 
 #### Create an Effect with `createEffect`
 
@@ -337,7 +341,7 @@ and update feature state straight away.
 
 Example:
 
-```
+```ts
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -399,7 +403,7 @@ and the default reducer will update the feature state accordingly.
 
 #### Enable Logging of Actions and State Changes in the Browser Console:
 
-```
+```ts
 import { Store } from 'mini-rx-store';
 
 Store.settings({enableLogging: true});
@@ -433,7 +437,7 @@ Currently, these options are available to configure the DevTools:
 
 #### Add DevTools to Angular
 
-```
+```ts
 import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 
 @NgModule({
@@ -451,7 +455,7 @@ export class AppModule {}
 
 #### If you do not use Angular
 
-```
+```ts
 import { Store, ReduxDevtoolsExtension } from 'mini-rx-store';
 
 Store.addExtension(new ReduxDevtoolsExtension({
