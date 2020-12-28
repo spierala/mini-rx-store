@@ -18,10 +18,10 @@ export function combineReducers(reducers: Reducer<any>[]): Reducer<AppState> {
     };
 }
 
-export function combineMetaReducers(metaReducers: MetaReducer<AppState>[]): MetaReducer<AppState> {
-    return (reducer: Reducer<any>): Reducer<AppState> => {
+export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+    return (reducer: Reducer<any>): Reducer<T> => {
         return metaReducers.reduceRight(
-            (previousValue: Reducer<AppState>, currentValue: MetaReducer<AppState>) => {
+            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
                 return currentValue(previousValue);
             },
             reducer

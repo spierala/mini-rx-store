@@ -1,4 +1,4 @@
-import { Feature } from '../feature';
+import { Feature, nameUpdateAction } from '../feature';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
@@ -6,7 +6,8 @@ import { cold, hot } from 'jest-marbles';
 import Store, { actions$ } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
-import { Reducer } from '../interfaces';
+import { Action, Reducer } from '../interfaces';
+import { createActionTypePrefix } from '../utils';
 
 interface UserState {
     firstName: string;
@@ -267,5 +268,69 @@ describe('Feature', () => {
         counterFeature.increment();
 
         expect(metaReducerSpy).toHaveBeenCalledTimes(2);
+    });
+});
+
+const setStateActionType: string = createActionTypePrefix('countFeature') + '/' + nameUpdateAction;
+
+function metaReducer1(reducer): Reducer<CounterStringState> {
+    return (state, action: Action) => {
+        console.error('met1', action, state);
+
+        if (action.type === setStateActionType) {
+            state.count = state.count + '1';
+        }
+
+        return reducer(state, action);
+    };
+}
+
+function metaReducer2(reducer): Reducer<CounterStringState> {
+    return (state, action: Action) => {
+        console.error('met2', action, state);
+
+        if (action.type === setStateActionType) {
+            state.count = state.count + '2';
+        }
+
+        return reducer(state, action);
+    };
+}
+
+interface CounterStringState {
+    count: string;
+}
+
+class CountFeatureStore extends Feature<CounterStringState> {
+    count$: Observable<string> = this.select((state) => state.count);
+
+    constructor() {
+        super(
+            'countFeature',
+            { count: '0' },
+            {
+                metaReducers: [metaReducer1, metaReducer2],
+            }
+        );
+    }
+
+    increment() {
+        this.setState((state) => {
+            return { ...state, count: state.count + 3 };
+        });
+    }
+}
+
+const countFeatureStore = new CountFeatureStore();
+
+fdescribe('Feature MetaReducers', () => {
+    it('should run meta reducers first, then the normal reducer', () => {
+        const spy = jest.fn();
+        countFeatureStore.count$.subscribe(spy);
+
+        countFeatureStore.increment();
+
+        expect(spy).toHaveBeenCalledWith('0');
+        expect(spy).toHaveBeenCalledWith('0123');
     });
 });

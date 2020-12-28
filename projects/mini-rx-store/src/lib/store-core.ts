@@ -112,14 +112,18 @@ class StoreCore {
     addFeature<StateType>(
         featureName: string,
         reducer: Reducer<StateType>,
-        extra: {
-            isDefaultReducer?: boolean,
-            metaReducer?: MetaReducer<StateType>
+        config: {
+            isDefaultReducer?: boolean;
+            metaReducers?: MetaReducer<StateType>[];
         } = {}
     ) {
         const reducers = this.reducersSource.getValue();
-        const { isDefaultReducer, metaReducer } = extra;
-        reducer = metaReducer ? metaReducer(reducer) : reducer;
+        const { isDefaultReducer, metaReducers } = config;
+
+        reducer =
+            metaReducers && metaReducers.length > 0
+                ? combineMetaReducers<StateType>(metaReducers)(reducer)
+                : reducer;
 
         // Check if feature already exists
         if (reducers.hasOwnProperty(featureName)) {

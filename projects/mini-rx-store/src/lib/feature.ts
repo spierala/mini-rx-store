@@ -7,7 +7,7 @@ import { createFeatureSelector, createSelector, Selector } from './selector';
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-const nameUpdateAction = 'SET-STATE';
+export const nameUpdateAction = 'SET-STATE';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
@@ -19,12 +19,19 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(private featureName: string, initialState: StateType, metaReducer?: MetaReducer<StateType>) {
+    protected constructor(
+        private featureName: string,
+        initialState: StateType,
+        config?: { metaReducers?: MetaReducer<StateType>[] }
+    ) {
         const actionTypePrefix = createActionTypePrefix(featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
-        StoreCore.addFeature<StateType>(featureName, reducer, { isDefaultReducer: true, metaReducer });
+        StoreCore.addFeature<StateType>(featureName, reducer, {
+            isDefaultReducer: true,
+            metaReducers: config && config.metaReducers,
+        });
 
-        this.actionTypePrefix = createActionTypePrefix(featureName);
+        this.actionTypePrefix = actionTypePrefix;
 
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;

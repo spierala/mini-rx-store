@@ -6,7 +6,7 @@ import { Store } from 'mini-rx-store';
 
 @Component({
     templateUrl: './product-shell.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductShellComponent {
     displayCode$: Observable<boolean> = this.productState.displayCode$;
@@ -14,12 +14,10 @@ export class ProductShellComponent {
     products$: Observable<Product[]> = this.productState.products$;
     errorMessage$: Observable<string> = this.productState.errorMessage$;
 
-    constructor(
-        private productState: ProductStateService
-    ) {
-        // setInterval(() => {
-        //     Store.dispatch({type: 'Reset'})
-        // }, 10000)
+    constructor(private productState: ProductStateService) {
+        setInterval(() => {
+            Store.dispatch({ type: 'Test' });
+        }, 3000);
     }
 
     checkChanged(value: boolean): void {

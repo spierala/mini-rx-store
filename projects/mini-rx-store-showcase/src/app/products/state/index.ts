@@ -7,13 +7,15 @@ export interface ProductState {
     currentProductId: number | null;
     products: Product[];
     error: string;
+    counter: string;
 }
 
 export const initialState: ProductState = {
     showProductCode: true,
     currentProductId: null,
     products: [],
-    error: ''
+    error: '',
+    counter: '0',
 };
 
 // Selector functions
@@ -26,13 +28,10 @@ export const getShowProductCode = createSelector(
 
 export const getCurrentProductId = createSelector(
     getProductFeatureState,
-    state => state.currentProductId
+    (state) => state.currentProductId
 );
 
-export const getProducts = createSelector(
-    getProductFeatureState,
-    state => state.products
-);
+export const getProducts = createSelector(getProductFeatureState, (state) => state.products);
 
 export const getCurrentProduct = createSelector(
     getProducts,
@@ -44,15 +43,12 @@ export const getCurrentProduct = createSelector(
                 productName: '',
                 productCode: 'New',
                 description: '',
-                starRating: 0
+                starRating: 0,
             };
         } else {
-            return currentProductId ? products.find(p => p.id === currentProductId) : null;
+            return currentProductId ? products.find((p) => p.id === currentProductId) : null;
         }
     }
 );
 
-export const getError = createSelector(
-    getProductFeatureState,
-    state => state.error
-);
+export const getError = createSelector(getProductFeatureState, (state) => state.error);
