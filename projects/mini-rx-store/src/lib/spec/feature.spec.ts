@@ -321,16 +321,16 @@ class CountFeatureStore extends Feature<CounterStringState> {
     }
 }
 
-const countFeatureStore = new CountFeatureStore();
+// const countFeatureStore = new CountFeatureStore();
 
-fdescribe('Feature MetaReducers', () => {
-    it('should run meta reducers first, then the normal reducer', () => {
-        const spy = jest.fn();
-        countFeatureStore.count$.subscribe(spy);
-
-        countFeatureStore.increment();
-
-        expect(spy).toHaveBeenCalledWith('0');
-        expect(spy).toHaveBeenCalledWith('0123');
-    });
-});
+// describe('Feature MetaReducers', () => {
+//     it('should run meta reducers first, then the normal reducer', () => {
+//         const spy = jest.fn();
+//         countFeatureStore.count$.subscribe(spy);
+//
+//         countFeatureStore.increment();
+//
+//         expect(spy).toHaveBeenCalledWith('0');
+//         expect(spy).toHaveBeenCalledWith('0123');
+//     });
+// });
