@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze-strict';
 
 export class ImmutableStateExtension implements StoreExtension {
     init(): void {
-        StoreCore.addMetaReducer(storeFreeze);
+        StoreCore.addMetaReducers(storeFreeze);
     }
 }
 

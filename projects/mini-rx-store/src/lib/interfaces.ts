@@ -20,6 +20,10 @@ export interface ActionWithMeta {
     meta: ActionMetaData;
 }
 
+export interface StoreConfig {
+    metaReducers?: MetaReducer<AppState>[];
+}
+
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
 export type MetaReducer<StateType> = (reducer: Reducer<any>) => Reducer<StateType>;

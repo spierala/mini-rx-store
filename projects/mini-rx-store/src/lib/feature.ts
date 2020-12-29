@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, Reducer } from './interfaces';
+import { Action, AppState, MetaReducer, Reducer } from './interfaces';
 import StoreCore from './store-core';
 import { createActionTypePrefix } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
@@ -7,7 +7,7 @@ import { createFeatureSelector, createSelector, Selector } from './selector';
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-const nameUpdateAction = 'SET-STATE';
+export const nameUpdateAction = 'SET-STATE';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
@@ -19,12 +19,19 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(private featureName: string, initialState: StateType) {
+    protected constructor(
+        private featureName: string,
+        initialState: StateType,
+        config?: { metaReducers?: MetaReducer<StateType>[] }
+    ) {
         const actionTypePrefix = createActionTypePrefix(featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
-        StoreCore.addFeature<StateType>(featureName, reducer, { isDefaultReducer: true });
+        StoreCore.addFeature<StateType>(featureName, reducer, {
+            isDefaultReducer: true,
+            metaReducers: config && config.metaReducers,
+        });
 
-        this.actionTypePrefix = createActionTypePrefix(featureName);
+        this.actionTypePrefix = actionTypePrefix;
 
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
@@ -39,10 +46,7 @@ export abstract class Feature<StateType> {
         StoreCore.dispatch(
             {
                 type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-                payload:
-                    typeof stateOrCallback === 'function'
-                        ? stateOrCallback(this.state)
-                        : stateOrCallback,
+                payload: stateOrCallback,
             },
             { onlyForFeature: this.featureName }
         );
@@ -86,9 +90,13 @@ function createDefaultReducer<StateType>(
             action.type.indexOf(nameSpaceFeature) > -1 &&
             action.type.indexOf(nameUpdateAction) > -1
         ) {
+            const stateOrCallback: StateOrCallback<StateType> = action.payload;
+            const newState: Partial<StateType> =
+                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+
             return {
                 ...state,
-                ...action.payload,
+                ...newState,
             };
         }
         return state;

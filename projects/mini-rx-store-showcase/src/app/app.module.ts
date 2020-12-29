@@ -18,7 +18,6 @@ import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
 import { ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
 import { environment } from '../../../mini-rx-store-showcase-redux/src/environments/environment';
 
-// Store Extensions
 if (!environment.production) {
     Store.addExtension(new ImmutableStateExtension());
     Store.addExtension(new LoggerExtension());
