@@ -15,15 +15,13 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
-import { Feature, ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
+import { ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
 import { environment } from '../../../mini-rx-store-showcase-redux/src/environments/environment';
-import { Observable } from 'rxjs';
 
-// Store Extensions
-// if (!environment.production) {
-//     Store.addExtension(new ImmutableStateExtension());
-//     Store.addExtension(new LoggerExtension());
-// }
+if (!environment.production) {
+    Store.addExtension(new ImmutableStateExtension());
+    Store.addExtension(new LoggerExtension());
+}
 
 @NgModule({
     imports: [
@@ -47,26 +45,4 @@ import { Observable } from 'rxjs';
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {
-    constructor() {
-        const feature = new CountFeatureStore();
-
-        feature.count$.subscribe((value) => console.log(value));
-
-        feature.increment();
-    }
-}
-
-class CountFeatureStore extends Feature<string> {
-    count$: Observable<string> = this.select((state) => state);
-
-    constructor() {
-        super('countFeature', '0', {
-            // metaReducers: [metaReducer1, metaReducer2]
-        });
-    }
-
-    increment() {
-        this.setState((state) => state + '3', 'inc');
-    }
-}
+export class AppModule {}

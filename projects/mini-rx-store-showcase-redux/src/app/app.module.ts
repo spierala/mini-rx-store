@@ -45,6 +45,4 @@ if (!environment.production) {
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {
-    constructor() {}
-}
+export class AppModule {}

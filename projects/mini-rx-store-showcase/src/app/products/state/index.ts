@@ -7,7 +7,6 @@ export interface ProductState {
     currentProductId: number | null;
     products: Product[];
     error: string;
-    counter: string;
 }
 
 export const initialState: ProductState = {
@@ -15,7 +14,6 @@ export const initialState: ProductState = {
     currentProductId: null,
     products: [],
     error: '',
-    counter: '0',
 };
 
 // Selector functions

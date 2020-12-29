@@ -14,11 +14,7 @@ export class ProductShellComponent {
     products$: Observable<Product[]> = this.productState.products$;
     errorMessage$: Observable<string> = this.productState.errorMessage$;
 
-    constructor(private productState: ProductStateService) {
-        setInterval(() => {
-            this.productState.inc();
-        }, 6000);
-    }
+    constructor(private productState: ProductStateService) {}
 
     checkChanged(value: boolean): void {
         this.productState.showProductCode(value);
