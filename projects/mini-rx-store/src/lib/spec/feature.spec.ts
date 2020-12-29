@@ -306,6 +306,18 @@ describe('Feature MetaReducers', () => {
         };
     }
 
+    const nextStateSpy = jest.fn();
+
+    function inTheMiddleMetaReducer(reducer) {
+        return (state, action) => {
+            const nextState = reducer(state, action);
+
+            nextStateSpy(nextState);
+
+            return reducer(state, action);
+        };
+    }
+
     class CountFeatureStore extends Feature<CounterStringState> {
         count$: Observable<string> = this.select((state) => state.count);
 
@@ -314,7 +326,7 @@ describe('Feature MetaReducers', () => {
                 'countFeature',
                 { count: '0' },
                 {
-                    metaReducers: [metaReducer1, metaReducer2],
+                    metaReducers: [metaReducer1, inTheMiddleMetaReducer, metaReducer2],
                 }
             );
         }
@@ -337,5 +349,10 @@ describe('Feature MetaReducers', () => {
         countFeatureStore.increment();
 
         expect(spy).toHaveBeenCalledWith('0123');
+    });
+
+    it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
+        expect(nextStateSpy).toHaveBeenCalledWith(expect.objectContaining({ count: '0' }));
+        expect(nextStateSpy).toHaveBeenCalledWith(expect.objectContaining({ count: '0123' }));
     });
 });

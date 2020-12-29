@@ -427,13 +427,13 @@ function metaReducer2(reducer: Reducer<any>): Reducer<any> {
     };
 }
 
-export function inTheMiddleMetaReducer(oldReducer) {
+export function inTheMiddleMetaReducer(reducer) {
     return (state, action) => {
-        const nextState = oldReducer(state, action);
+        const nextState = reducer(state, action);
 
         nextStateSpy(nextState);
 
-        return nextState;
+        return reducer(state, action);
     };
 }
 
