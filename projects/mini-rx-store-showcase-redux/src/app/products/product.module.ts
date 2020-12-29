@@ -6,18 +6,20 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './containers/product-shell/product-shell.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
-import { store } from 'mini-rx-store';
+import { StoreModule } from 'mini-rx-store';
 import { productReducer } from './state/product.reducer';
 import { ProductEffects } from './state/product.effects';
 
 const productRoutes: Routes = [{ path: '', component: ProductShellComponent }];
 
 @NgModule({
-    imports: [SharedModule, RouterModule.forChild(productRoutes)],
+    imports: [
+        SharedModule,
+        RouterModule.forChild(productRoutes),
+        StoreModule.forFeature('products', productReducer),
+    ],
     declarations: [ProductShellComponent, ProductListComponent, ProductEditComponent],
 })
 export class ProductModule {
-    constructor(private productEffects: ProductEffects) {
-        store.feature('products', productReducer);
-    }
+    constructor(private productEffects: ProductEffects) {}
 }

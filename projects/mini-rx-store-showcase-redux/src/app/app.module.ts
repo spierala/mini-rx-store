@@ -14,27 +14,30 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
-import { ImmutableStateExtension, LoggerExtension, store } from 'mini-rx-store';
-import { environment } from '../environments/environment';
+import { Store, StoreModule } from 'mini-rx-store';
+import { counterReducer } from '../../../mini-rx-store/src/lib/spec/_spec-helpers';
 
 // Store Extensions
-if (!environment.production) {
-    store.addExtension(new ImmutableStateExtension());
-    store.addExtension(new LoggerExtension());
-}
+// if (!environment.production) {
+//     store.addExtension(new ImmutableStateExtension());
+//     store.addExtension(new LoggerExtension());
+// }
 
 @NgModule({
     imports: [
         BrowserModule,
         HttpClientModule,
         HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
-        UserModule,
         AppRoutingModule,
+        StoreModule.forRoot({
+            test: counterReducer,
+        }),
         NgReduxDevtoolsModule.instrument({
             name: 'MiniRx Showcase',
             maxAge: 25,
             latency: 250,
         }),
+        UserModule,
     ],
     declarations: [
         AppComponent,
@@ -45,4 +48,8 @@ if (!environment.production) {
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+    constructor(private store: Store) {
+        this.store.dispatch({ type: 'test' });
+    }
+}
