@@ -10,56 +10,55 @@ import {
     load,
     setCurrentProduct,
     toggleProductCode,
-    updateProduct
+    updateProduct,
 } from './../../state/product.actions';
 import { Product } from '../../product';
-import { Store } from 'mini-rx-store';
-
+import { store } from 'mini-rx-store';
 
 @Component({
-  templateUrl: './product-shell.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './product-shell.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductShellComponent implements OnInit {
-  displayCode$: Observable<boolean>;
-  selectedProduct$: Observable<Product>;
-  products$: Observable<Product[]>;
-  errorMessage$: Observable<string>;
+    displayCode$: Observable<boolean>;
+    selectedProduct$: Observable<Product>;
+    products$: Observable<Product[]>;
+    errorMessage$: Observable<string>;
 
-  constructor() {}
+    constructor() {}
 
-  ngOnInit(): void {
-    Store.dispatch(load());
-    this.products$ = Store.select(fromProduct.getProducts);
-    this.errorMessage$ = Store.select(fromProduct.getError);
-    this.selectedProduct$ = Store.select(fromProduct.getCurrentProduct);
-    this.displayCode$ = Store.select(fromProduct.getShowProductCode);
-  }
+    ngOnInit(): void {
+        store.dispatch(load());
+        this.products$ = store.select(fromProduct.getProducts);
+        this.errorMessage$ = store.select(fromProduct.getError);
+        this.selectedProduct$ = store.select(fromProduct.getCurrentProduct);
+        this.displayCode$ = store.select(fromProduct.getShowProductCode);
+    }
 
-  checkChanged(value: boolean): void {
-    Store.dispatch(toggleProductCode(value));
-  }
+    checkChanged(value: boolean): void {
+        store.dispatch(toggleProductCode(value));
+    }
 
-  newProduct(): void {
-    Store.dispatch(initializeCurrentProduct());
-  }
+    newProduct(): void {
+        store.dispatch(initializeCurrentProduct());
+    }
 
-  productSelected(product: Product): void {
-    Store.dispatch(setCurrentProduct(product));
-  }
+    productSelected(product: Product): void {
+        store.dispatch(setCurrentProduct(product));
+    }
 
-  deleteProduct(product: Product): void {
-    Store.dispatch(deleteProduct(product.id));
-  }
+    deleteProduct(product: Product): void {
+        store.dispatch(deleteProduct(product.id));
+    }
 
-  clearProduct(): void {
-    Store.dispatch(clearCurrentProduct());
-  }
-  saveProduct(product: Product): void {
-    Store.dispatch(createProduct(product));
-  }
+    clearProduct(): void {
+        store.dispatch(clearCurrentProduct());
+    }
+    saveProduct(product: Product): void {
+        store.dispatch(createProduct(product));
+    }
 
-  updateProduct(product: Product): void {
-    Store.dispatch(updateProduct(product));
-  }
+    updateProduct(product: Product): void {
+        store.dispatch(updateProduct(product));
+    }
 }

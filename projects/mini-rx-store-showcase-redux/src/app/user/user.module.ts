@@ -6,23 +6,16 @@ import { SharedModule } from '../shared/shared.module';
 import { LoginComponent } from './login.component';
 
 import { reducer } from './state/user.reducer';
-import { Store } from 'mini-rx-store';
+import { store } from 'mini-rx-store';
 
-const userRoutes: Routes = [
-  { path: 'login', component: LoginComponent }
-];
+const userRoutes: Routes = [{ path: 'login', component: LoginComponent }];
 
 @NgModule({
-  imports: [
-    SharedModule,
-    RouterModule.forChild(userRoutes)
-  ],
-  declarations: [
-    LoginComponent
-  ]
+    imports: [SharedModule, RouterModule.forChild(userRoutes)],
+    declarations: [LoginComponent],
 })
 export class UserModule {
     constructor() {
-       Store.feature('users', reducer);
+        store.feature('users', reducer);
     }
 }

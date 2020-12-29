@@ -2,7 +2,7 @@
  * Public API Surface of mini-rx-store
  */
 
-export { actions$, default as Store } from './lib/store';
+export { actions$, default as store } from './lib/store';
 export { Feature } from './lib/feature';
 export { createFeatureSelector, createSelector } from './lib/selector';
 export { Action, Reducer } from './lib/interfaces';
