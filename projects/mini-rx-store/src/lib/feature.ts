@@ -46,10 +46,7 @@ export abstract class Feature<StateType> {
         StoreCore.dispatch(
             {
                 type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-                payload:
-                    typeof stateOrCallback === 'function'
-                        ? stateOrCallback(this.state)
-                        : stateOrCallback,
+                payload: stateOrCallback,
             },
             { onlyForFeature: this.featureName }
         );
@@ -93,9 +90,13 @@ function createDefaultReducer<StateType>(
             action.type.indexOf(nameSpaceFeature) > -1 &&
             action.type.indexOf(nameUpdateAction) > -1
         ) {
+            const stateOrCallback: StateOrCallback<StateType> = action.payload;
+            const newState: Partial<StateType> =
+                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+
             return {
                 ...state,
-                ...action.payload,
+                ...newState,
             };
         }
         return state;

@@ -14,10 +14,15 @@ import {
     initialState,
     ProductState,
 } from './index';
+import { createActionTypePrefix } from '../../../../../mini-rx-store/src/lib/utils';
+import { nameUpdateAction } from '../../../../../mini-rx-store/src/lib/feature';
+
+const setStateActionType: string =
+    createActionTypePrefix('products') + '/' + nameUpdateAction + '/inc';
 
 function metaReducer1(reducer): Reducer<ProductState> {
     return (state, action: Action) => {
-        if (action.type === 'Test') {
+        if (action.type === setStateActionType) {
             state = {
                 ...state,
                 counter: state.counter + '1',
@@ -30,7 +35,7 @@ function metaReducer1(reducer): Reducer<ProductState> {
 
 function metaReducer2(reducer): Reducer<ProductState> {
     return (state, action: Action) => {
-        if (action.type === 'Test') {
+        if (action.type === setStateActionType) {
             state = {
                 ...state,
                 counter: state.counter + '2',
@@ -52,7 +57,9 @@ export class ProductStateService extends Feature<ProductState> {
     errorMessage$: Observable<string> = this.select(getError);
 
     constructor(private productService: ProductService) {
-        super('products', initialState, { metaReducers: [metaReducer1, metaReducer2] });
+        super('products', initialState, {
+            metaReducers: [metaReducer1, metaReducer2],
+        });
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)
@@ -182,5 +189,15 @@ export class ProductStateService extends Feature<ProductState> {
 
     showProductCode(showProductCode: boolean) {
         this.setState({ showProductCode }, 'showProductCode');
+    }
+
+    inc() {
+        this.setState(
+            (state) => ({
+                ...state,
+                counter: state.counter + '3',
+            }),
+            'inc'
+        );
     }
 }

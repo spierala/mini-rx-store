@@ -16,8 +16,8 @@ export class ProductShellComponent {
 
     constructor(private productState: ProductStateService) {
         setInterval(() => {
-            Store.dispatch({ type: 'Test' });
-        }, 3000);
+            this.productState.inc();
+        }, 6000);
     }
 
     checkChanged(value: boolean): void {

@@ -255,10 +255,11 @@ describe('Feature', () => {
     it('should run the meta reducers when state changes', () => {
         const metaReducerSpy = jest.fn();
 
-        function metaReducer(): Reducer<any> {
-            return (state) => {
+        function metaReducer(reducer): Reducer<any> {
+            return (state, action: Action) => {
                 metaReducerSpy();
-                return state;
+
+                return reducer(state, action);
             };
         }
 
@@ -271,66 +272,70 @@ describe('Feature', () => {
     });
 });
 
-const setStateActionType: string = createActionTypePrefix('countFeature') + '/' + nameUpdateAction;
+describe('Feature MetaReducers', () => {
+    const setStateActionType: string =
+        createActionTypePrefix('countFeature') + '/' + nameUpdateAction;
 
-function metaReducer1(reducer): Reducer<CounterStringState> {
-    return (state, action: Action) => {
-        console.error('met1', action, state);
-
-        if (action.type === setStateActionType) {
-            state.count = state.count + '1';
-        }
-
-        return reducer(state, action);
-    };
-}
-
-function metaReducer2(reducer): Reducer<CounterStringState> {
-    return (state, action: Action) => {
-        console.error('met2', action, state);
-
-        if (action.type === setStateActionType) {
-            state.count = state.count + '2';
-        }
-
-        return reducer(state, action);
-    };
-}
-
-interface CounterStringState {
-    count: string;
-}
-
-class CountFeatureStore extends Feature<CounterStringState> {
-    count$: Observable<string> = this.select((state) => state.count);
-
-    constructor() {
-        super(
-            'countFeature',
-            { count: '0' },
-            {
-                metaReducers: [metaReducer1, metaReducer2],
+    function metaReducer1(reducer): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === setStateActionType) {
+                state = {
+                    ...state,
+                    count: state.count + '1',
+                };
             }
-        );
+
+            return reducer(state, action);
+        };
     }
 
-    increment() {
-        this.setState((state) => {
-            return { ...state, count: state.count + 3 };
-        });
+    function metaReducer2(reducer): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === setStateActionType) {
+                state = {
+                    ...state,
+                    count: state.count + '2',
+                };
+            }
+
+            return reducer(state, action);
+        };
     }
-}
 
-// const countFeatureStore = new CountFeatureStore();
+    interface CounterStringState {
+        count: string;
+    }
 
-// describe('Feature MetaReducers', () => {
-//     it('should run meta reducers first, then the normal reducer', () => {
-//         const spy = jest.fn();
-//         countFeatureStore.count$.subscribe(spy);
-//
-//         countFeatureStore.increment();
-//
-//         expect(spy).toHaveBeenCalledWith('0');
-//         expect(spy).toHaveBeenCalledWith('0123');
-//     });
-// });
+    class CountFeatureStore extends Feature<CounterStringState> {
+        count$: Observable<string> = this.select((state) => state.count);
+
+        constructor() {
+            super(
+                'countFeature',
+                { count: '0' },
+                {
+                    metaReducers: [metaReducer1, metaReducer2],
+                }
+            );
+        }
+
+        increment() {
+            this.setState((state) => {
+                return { ...state, count: state.count + '3' };
+            });
+        }
+    }
+
+    const countFeatureStore = new CountFeatureStore();
+
+    it('should run meta reducers first, then the normal reducer', () => {
+        const spy = jest.fn();
+        countFeatureStore.count$.subscribe(spy);
+
+        expect(spy).toHaveBeenCalledWith('0');
+
+        countFeatureStore.increment();
+
+        expect(spy).toHaveBeenCalledWith('0123');
+    });
+});
