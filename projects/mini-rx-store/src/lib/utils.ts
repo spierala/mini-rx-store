@@ -32,3 +32,5 @@ export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaRedu
 export function createActionTypePrefix(featureName): string {
     return '@mini-rx/' + featureName;
 }
+
+export const storeInitActionType = '@mini-rx/store/init';

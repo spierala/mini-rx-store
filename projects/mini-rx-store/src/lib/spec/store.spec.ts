@@ -105,8 +105,31 @@ describe('Store', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should initialize a Feature state', () => {
-        Store.feature<UserState>('user', reducer);
+    it('should initialize a Feature state with a root reducer (and a meta reducer)', () => {
+        const callOrder = [];
+
+        function metaReducer1(reducer) {
+            return (state, action) => {
+                callOrder.push('meta1');
+                return reducer(state, action);
+            };
+        }
+
+        function metaReducer2(reducer) {
+            return (state, action) => {
+                callOrder.push('meta2');
+                return reducer(state, action);
+            };
+        }
+
+        Store.config(
+            {
+                user: reducer,
+            },
+            {
+                metaReducers: [metaReducer1, metaReducer2],
+            }
+        );
 
         const spy = jest.fn();
         Store.select((state) => state).subscribe(spy);
@@ -114,6 +137,9 @@ describe('Store', () => {
             user: initialState,
         });
         expect(spy).toHaveBeenCalledTimes(1);
+
+        // Call meta reducers from left to right
+        expect(callOrder).toEqual(['meta1', 'meta2']);
     });
 
     it('should throw when reusing feature name', () => {
@@ -441,9 +467,9 @@ const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
 
 describe('Store MetaReducers', () => {
     beforeAll(() => {
-        StoreCore.addMetaReducer(metaReducer1);
-        StoreCore.addMetaReducer(inTheMiddleMetaReducer);
-        StoreCore.addMetaReducer(metaReducer2);
+        StoreCore.addMetaReducers(metaReducer1);
+        StoreCore.addMetaReducers(inTheMiddleMetaReducer);
+        StoreCore.addMetaReducers(metaReducer2);
         StoreCore.addFeature<string>('metaTestFeature', aReducer);
     });
     it('should run meta reducers first, then the normal reducer', () => {

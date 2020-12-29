@@ -7,6 +7,7 @@ import {
     MetaReducer,
     Reducer,
     ReducerDictionary,
+    StoreConfig,
     StoreExtension,
 } from './interfaces';
 import {
@@ -19,7 +20,12 @@ import {
     tap,
     withLatestFrom,
 } from 'rxjs/operators';
-import { combineReducers, combineMetaReducers, createActionTypePrefix } from './utils';
+import {
+    combineReducers,
+    combineMetaReducers,
+    createActionTypePrefix,
+    storeInitActionType,
+} from './utils';
 import { Meta } from '@angular/platform-browser';
 
 class StoreCore {
@@ -47,6 +53,12 @@ class StoreCore {
 
     // REDUCER DICTIONARY
     private reducersSource: BehaviorSubject<ReducerDictionary> = new BehaviorSubject({});
+    private get reducers() {
+        return this.reducersSource.getValue();
+    }
+    private set reducers(reducers: ReducerDictionary) {
+        this.reducersSource.next(reducers);
+    }
 
     // COMBINED REDUCERS
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
@@ -105,8 +117,8 @@ class StoreCore {
             .subscribe();
     }
 
-    addMetaReducer(reducer: MetaReducer<AppState>) {
-        this.metaReducersSource.next([...this.metaReducersSource.getValue(), reducer]);
+    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
+        this.metaReducersSource.next([...this.metaReducersSource.getValue(), ...reducers]);
     }
 
     addFeature<StateType>(
@@ -117,7 +129,6 @@ class StoreCore {
             metaReducers?: MetaReducer<StateType>[];
         } = {}
     ) {
-        const reducers = this.reducersSource.getValue();
         const { isDefaultReducer, metaReducers } = config;
 
         reducer =
@@ -125,19 +136,16 @@ class StoreCore {
                 ? combineMetaReducers<StateType>(metaReducers)(reducer)
                 : reducer;
 
-        // Check if feature already exists
-        if (reducers.hasOwnProperty(featureName)) {
-            throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
-        }
+        checkFeatureExists(featureName, this.reducers);
 
         const actionTypePrefix = createActionTypePrefix(featureName);
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
 
         // Add reducer
-        this.reducersSource.next({
-            ...reducers,
+        this.reducers = {
+            ...this.reducers,
             [featureName]: featureReducer,
-        });
+        };
 
         // Dispatch an initial action to let reducers create the initial state
         const onlyForFeature: string = isDefaultReducer ? featureName : undefined;
@@ -147,6 +155,27 @@ class StoreCore {
             },
             { onlyForFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
         );
+    }
+
+    config(reducers, config: StoreConfig = {}) {
+        if (config.metaReducers && config.metaReducers.length > 0) {
+            this.addMetaReducers(...config.metaReducers);
+        }
+
+        Object.keys(reducers).forEach((featureName) => {
+            checkFeatureExists(featureName, this.reducers);
+            const featureReducer: Reducer<AppState> = createFeatureReducer(
+                featureName,
+                reducers[featureName]
+            );
+
+            this.reducers = {
+                ...this.reducers,
+                [featureName]: featureReducer,
+            };
+        });
+
+        this.dispatch({ type: storeInitActionType });
     }
 
     createEffect(effect$: Observable<Action>) {
@@ -184,6 +213,12 @@ function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reduc
             [featureName]: reducer(state[featureName], action),
         };
     };
+}
+
+function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
+    if (reducers.hasOwnProperty(featureName)) {
+        throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
+    }
 }
 
 // Prevent effect to unsubscribe from the actions stream

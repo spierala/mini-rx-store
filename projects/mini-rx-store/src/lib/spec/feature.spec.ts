@@ -263,7 +263,7 @@ describe('Feature', () => {
             };
         }
 
-        StoreCore.addMetaReducer(metaReducer);
+        StoreCore.addMetaReducers(metaReducer);
 
         userFeature.updateCity('NY');
         counterFeature.increment();

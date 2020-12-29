@@ -3,12 +3,12 @@ import StoreCore from './store-core';
 
 export class LoggerExtension implements StoreExtension {
     init(): void {
-        StoreCore.addMetaReducer(logger);
+        StoreCore.addMetaReducers(loggerMetaReducer);
     }
 }
 
-export function logger(reducer) {
-    return function newReducer(state, action) {
+export function loggerMetaReducer(reducer) {
+    return (state, action) => {
         const nextState = reducer(state, action);
 
         console.log(
