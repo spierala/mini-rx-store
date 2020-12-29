@@ -273,6 +273,10 @@ describe('Feature', () => {
 });
 
 describe('Feature MetaReducers', () => {
+    interface CounterStringState {
+        count: string;
+    }
+
     const setStateActionType: string =
         createActionTypePrefix('countFeature') + '/' + nameUpdateAction;
 
@@ -300,10 +304,6 @@ describe('Feature MetaReducers', () => {
 
             return reducer(state, action);
         };
-    }
-
-    interface CounterStringState {
-        count: string;
     }
 
     class CountFeatureStore extends Feature<CounterStringState> {
