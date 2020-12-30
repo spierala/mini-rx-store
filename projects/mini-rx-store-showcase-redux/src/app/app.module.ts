@@ -29,6 +29,7 @@ import { counterReducer } from '../../../mini-rx-store/src/lib/spec/_spec-helper
         HttpClientModule,
         HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
         AppRoutingModule,
+        UserModule,
         StoreModule.forRoot({
             test: counterReducer,
         }),
@@ -37,7 +38,6 @@ import { counterReducer } from '../../../mini-rx-store/src/lib/spec/_spec-helper
             maxAge: 25,
             latency: 250,
         }),
-        UserModule,
     ],
     declarations: [
         AppComponent,

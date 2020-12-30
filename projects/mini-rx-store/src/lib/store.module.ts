@@ -6,11 +6,6 @@ export const REDUCERS = new InjectionToken('__reducers__');
 export const FEATURE_NAME = new InjectionToken('__feature_name__');
 export const FEATURE_REDUCER = new InjectionToken('__feature_reducer__');
 
-// export function createStoreFactory<T>(reducers: ReducerDictionary): Store {
-//     store.config(reducers);
-//     return store;
-// }
-
 @NgModule()
 export class StoreRootModule {
     constructor(@Inject(REDUCERS) reducers: ReducerDictionary, private store: Store) {
@@ -22,6 +17,7 @@ export class StoreRootModule {
 export class StoreFeatureModule {
     constructor(
         private store: Store,
+        root: StoreRootModule, // Prevent feature states to be initialized before root state
         @Inject(FEATURE_NAME) featureName: string,
         @Inject(FEATURE_REDUCER) reducer: Reducer<any>
     ) {
