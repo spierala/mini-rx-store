@@ -8,7 +8,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import * as fromUser from './state';
 import * as userActions from './state/user.actions';
-import { store } from 'mini-rx-store';
+import { Store, store } from 'mini-rx-store';
 
 @Component({
     templateUrl: './login.component.html',
@@ -21,10 +21,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     maskUserName: boolean;
 
-    constructor(private authService: AuthService, private router: Router) {}
+    constructor(private authService: AuthService, private router: Router, private store: Store) {}
 
     ngOnInit(): void {
-        store
+        this.store
             .select(fromUser.getMaskUserName)
             .pipe(takeWhile(() => this.componentActive))
             .subscribe((maskUserName) => (this.maskUserName = maskUserName));
@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     checkChanged(value: boolean): void {
-        store.dispatch(new userActions.MaskUserName(value));
+        this.store.dispatch(new userActions.MaskUserName(value));
     }
 
     login(loginForm: NgForm): void {

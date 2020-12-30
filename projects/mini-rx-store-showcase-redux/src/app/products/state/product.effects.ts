@@ -6,7 +6,7 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 import { ProductService } from '../product.service';
 import { Product } from '../product';
 
-import { Action, actions$, store } from 'mini-rx-store';
+import { Action, actions$ } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,
@@ -25,12 +25,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ProductEffects {
-    constructor(private productService: ProductService) {
-        store.createEffect(this.loadProducts$);
-        store.createEffect(this.updateProduct$);
-        store.createEffect(this.createProduct$);
-        store.createEffect(this.deleteProduct$);
-    }
+    constructor(private productService: ProductService) {}
 
     loadProducts$: Observable<Action> = actions$.pipe(
         ofType(load),
