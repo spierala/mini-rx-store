@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { Store } from '../store';
 import { Action } from '../interfaces';
 
-export const OBJECTS_WITH_EFFECTS = new InjectionToken('__julietteNgInternal/objectsWithEffects__');
+export const OBJECTS_WITH_EFFECTS = new InjectionToken('__objectsWithEffects__');
 
 @NgModule()
 export class EffectsModule {

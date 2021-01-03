@@ -1,6 +1,6 @@
 import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { store, Store } from '../store';
-import { Reducer, ReducerDictionary } from '../interfaces';
+import { actions$, store, Store } from '../store';
+import { Reducer, ReducerDictionary, Actions } from '../interfaces';
 
 export const REDUCERS = new InjectionToken('__reducers__');
 export const FEATURE_NAME = new InjectionToken('__feature_name__');
@@ -35,6 +35,10 @@ export class StoreModule {
                 {
                     provide: Store,
                     useValue: store,
+                },
+                {
+                    provide: Actions,
+                    useValue: actions$,
                 },
             ],
         };
