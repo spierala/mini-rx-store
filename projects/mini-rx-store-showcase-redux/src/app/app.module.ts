@@ -12,10 +12,10 @@ import { ShellComponent } from './home/shell.component';
 import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
-import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
-import { Store, StoreModule } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 import { counterReducer } from '../../../mini-rx-store/src/lib/spec/_spec-helpers';
 import { UserModule } from './user/user.module';
+import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 
 // Store Extensions
 // if (!environment.production) {

@@ -1,6 +1,5 @@
 import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { actions$, store, Store } from '../store';
-import { Reducer, ReducerDictionary, Actions } from '../interfaces';
+import { Actions, actions$, store, Store, ReducerDictionary, Reducer } from 'mini-rx-store';
 
 export const REDUCERS = new InjectionToken('__reducers__');
 export const FEATURE_NAME = new InjectionToken('__feature_name__');
