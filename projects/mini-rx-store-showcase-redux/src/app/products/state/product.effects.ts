@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 
 import { ProductService } from '../product.service';
 import { Product } from '../product';
 
-import { Action, actions$ } from 'mini-rx-store';
+import { Action, Actions } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,
@@ -25,9 +25,10 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ProductEffects {
-    constructor(private productService: ProductService) {}
+    constructor(private productService: ProductService, private actions$: Actions) {}
 
-    loadProducts$: Observable<Action> = actions$.pipe(
+    loadProducts$: Observable<Action> = this.actions$.pipe(
+        tap((effectAction) => console.log('effectAction', effectAction)),
         ofType(load),
         mergeMap((action) =>
             this.productService.getProducts().pipe(
@@ -37,7 +38,7 @@ export class ProductEffects {
         )
     );
 
-    updateProduct$: Observable<Action> = actions$.pipe(
+    updateProduct$: Observable<Action> = this.actions$.pipe(
         ofType(updateProduct),
         toPayload(),
         mergeMap((product) => {
@@ -48,7 +49,7 @@ export class ProductEffects {
         })
     );
 
-    createProduct$: Observable<Action> = actions$.pipe(
+    createProduct$: Observable<Action> = this.actions$.pipe(
         ofType(createProduct),
         map((action: Action) => action.payload),
         mergeMap((product: Product) =>
@@ -59,7 +60,7 @@ export class ProductEffects {
         )
     );
 
-    deleteProduct$: Observable<Action> = actions$.pipe(
+    deleteProduct$: Observable<Action> = this.actions$.pipe(
         ofType(deleteProduct),
         map((action: Action) => action.payload),
         mergeMap((productId: number) =>
