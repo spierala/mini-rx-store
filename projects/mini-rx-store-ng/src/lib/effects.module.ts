@@ -8,7 +8,7 @@ import {
     fromObjectsWithEffectsToEffects,
 } from './effects-mapper';
 
-const OBJECTS_WITH_EFFECTS = new InjectionToken('__objectsWithEffects__');
+const OBJECTS_WITH_EFFECTS = new InjectionToken('@mini-rx/objectsWithEffects');
 
 @NgModule()
 export class EffectsModule {

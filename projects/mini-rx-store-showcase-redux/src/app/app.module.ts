@@ -12,7 +12,6 @@ import { ShellComponent } from './home/shell.component';
 import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
-import { counterReducer } from '../../../mini-rx-store/src/lib/spec/_spec-helpers';
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 
@@ -29,9 +28,7 @@ import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
         HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
         UserModule,
         AppRoutingModule,
-        StoreModule.forRoot({
-            test: counterReducer,
-        }),
+        StoreModule.forRoot(),
         NgReduxDevtoolsModule.instrument({
             name: 'MiniRx Showcase',
             maxAge: 25,
