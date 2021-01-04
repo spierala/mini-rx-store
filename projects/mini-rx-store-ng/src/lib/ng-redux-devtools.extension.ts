@@ -5,10 +5,7 @@ import { ReduxDevtoolsOptions } from 'mini-rx-store';
 export class NgReduxDevtoolsExtension extends ReduxDevtoolsExtension {
     private ngZone: NgZone = this.injector.get<NgZone>(NgZone as Type<NgZone>);
 
-    constructor(
-        options: Partial<ReduxDevtoolsOptions>,
-        private injector: Injector
-    ) {
+    constructor(options: Partial<ReduxDevtoolsOptions>, private injector: Injector) {
         super(options);
     }
 

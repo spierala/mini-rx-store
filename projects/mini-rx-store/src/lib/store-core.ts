@@ -2,6 +2,7 @@ import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
 import {
     Action,
     ActionMetaData,
+    Actions,
     ActionWithMeta,
     AppState,
     MetaReducer,
@@ -26,18 +27,17 @@ import {
     createActionTypePrefix,
     storeInitActionType,
 } from './utils';
-import { Meta } from '@angular/platform-browser';
 
 class StoreCore {
     // ACTIONS
     private actionsWithMetaSource: Subject<ActionWithMeta> = new Subject();
-    actions$: Observable<Action> = this.actionsWithMetaSource
+    actions$: Actions = this.actionsWithMetaSource
         .asObservable()
         .pipe(map((actionWithMeta) => actionWithMeta.action));
 
     // EFFECTS
     private effectsSource: Subject<Observable<Action>> = new Subject();
-    private effects$: Observable<Action> = this.effectsSource.pipe(
+    private effects$: Actions = this.effectsSource.pipe(
         mergeAll() // Merge the effects into one single stream of (effect) actions
     );
 

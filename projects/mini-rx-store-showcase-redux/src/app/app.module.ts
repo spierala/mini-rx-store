@@ -13,15 +13,13 @@ import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
-import { ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
-import { environment } from '../environments/environment';
+import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 
 // Store Extensions
-if (!environment.production) {
-    Store.addExtension(new ImmutableStateExtension());
-    Store.addExtension(new LoggerExtension());
-}
+// if (!environment.production) {
+//     store.addExtension(new ImmutableStateExtension());
+//     store.addExtension(new LoggerExtension());
+// }
 
 @NgModule({
     imports: [
@@ -30,6 +28,7 @@ if (!environment.production) {
         HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
         UserModule,
         AppRoutingModule,
+        StoreModule.forRoot(),
         NgReduxDevtoolsModule.instrument({
             name: 'MiniRx Showcase',
             maxAge: 25,

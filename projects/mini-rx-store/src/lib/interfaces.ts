@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export interface AppState {
     [key: string]: any;
 }
@@ -23,6 +25,8 @@ export interface ActionWithMeta {
 export interface StoreConfig {
     metaReducers?: MetaReducer<AppState>[];
 }
+
+export class Actions extends Observable<Action> {}
 
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 

@@ -10,7 +10,7 @@ import {
 import StoreCore from './store-core';
 
 // Expose public store API
-class Store {
+export class Store {
     feature<StateType>(featureName: string, reducer: Reducer<StateType>) {
         StoreCore.addFeature<StateType>(featureName, reducer);
     }
@@ -35,6 +35,6 @@ class Store {
 }
 
 // Created once to initialize singleton
-export default new Store();
+export const store = new Store();
 
 export const actions$ = StoreCore.actions$;

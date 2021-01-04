@@ -1,4 +1,4 @@
-import Store, { actions$ } from '../store';
+import { actions$, store } from '../store';
 import StoreCore from '../store-core';
 import { Action, Reducer } from '../interfaces';
 import { createFeatureSelector, createSelector } from '../selector';
@@ -100,7 +100,7 @@ const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.cou
 describe('Store', () => {
     it('should initialize the store with an empty object', () => {
         const spy = jest.fn();
-        Store.select((state) => state).subscribe(spy);
+        store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({});
         expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -122,7 +122,7 @@ describe('Store', () => {
             };
         }
 
-        Store.config(
+        store.config(
             {
                 user: reducer,
             },
@@ -132,7 +132,7 @@ describe('Store', () => {
         );
 
         const spy = jest.fn();
-        Store.select((state) => state).subscribe(spy);
+        store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({
             user: initialState,
         });
@@ -143,7 +143,7 @@ describe('Store', () => {
     });
 
     it('should throw when reusing feature name', () => {
-        expect(() => Store.feature<UserState>('user', reducer)).toThrowError();
+        expect(() => store.feature<UserState>('user', reducer)).toThrowError();
     });
 
     it('should run the redux reducers when a new Feature state is added', () => {
@@ -153,8 +153,8 @@ describe('Store', () => {
             reducerSpy();
         }
 
-        Store.feature('oneMoreFeature', someReducer);
-        Store.feature('oneMoreFeature2', (state) => state);
+        store.feature('oneMoreFeature', someReducer);
+        store.feature('oneMoreFeature2', (state) => state);
         expect(reducerSpy).toHaveBeenCalledTimes(2);
     });
 
@@ -164,26 +164,26 @@ describe('Store', () => {
             lastName: 'Cage',
         };
 
-        Store.dispatch({
+        store.dispatch({
             type: 'updateUser',
             payload: user,
         });
 
         const spy = jest.fn();
-        Store.select(getFirstName).subscribe(spy);
+        store.select(getFirstName).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(user.firstName);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should update the Feature state #1', () => {
-        const age$ = Store.select(getAge);
-        hot('-a-b').subscribe((value) => Store.dispatch({ type: 'incAge' }));
+        const age$ = store.select(getAge);
+        hot('-a-b').subscribe((value) => store.dispatch({ type: 'incAge' }));
         expect(age$).toBeObservable(hot('ab-c', { a: 30, b: 31, c: 32 }));
     });
 
     it('should update the Feature state #2', () => {
-        const age$ = Store.select(getAge);
-        hot('(ab)').subscribe((value) => Store.dispatch({ type: 'incAge' }));
+        const age$ = store.select(getAge);
+        hot('(ab)').subscribe((value) => store.dispatch({ type: 'incAge' }));
         expect(age$).toBeObservable(hot('(abc)', { a: 32, b: 33, c: 34 }));
     });
 
@@ -191,15 +191,15 @@ describe('Store', () => {
         const featureSelector = createFeatureSelector('notExistingFeature');
 
         const spy = jest.fn();
-        Store.select(featureSelector).subscribe(spy);
+        store.select(featureSelector).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(undefined);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should create and execute an effect', () => {
-        Store.dispatch({ type: 'resetUser' });
+        store.dispatch({ type: 'resetUser' });
 
-        Store.createEffect(
+        store.createEffect(
             actions$.pipe(
                 ofType('loadUser'),
                 mergeMap(() =>
@@ -213,11 +213,11 @@ describe('Store', () => {
             )
         );
 
-        Store.dispatch({ type: 'loadUser' });
+        store.dispatch({ type: 'loadUser' });
 
         // Lets be crazy and add another effect while the other effect is busy
         cold('-a').subscribe(() => {
-            Store.createEffect(
+            store.createEffect(
                 actions$.pipe(
                     ofType('saveUser'),
                     mergeMap(() =>
@@ -231,18 +231,18 @@ describe('Store', () => {
                 )
             );
 
-            Store.dispatch({ type: 'saveUser' });
+            store.dispatch({ type: 'saveUser' });
         });
 
-        expect(Store.select(getUserFeatureState)).toBeObservable(
+        expect(store.select(getUserFeatureState)).toBeObservable(
             hot('a-xb', { a: initialState, b: asyncUser, x: updatedAsyncUser })
         );
     });
 
     it('should create and execute an effect and handle side effect error', () => {
-        Store.dispatch({ type: 'resetUser' });
+        store.dispatch({ type: 'resetUser' });
 
-        Store.createEffect(
+        store.createEffect(
             actions$.pipe(
                 ofType('someAction'),
                 mergeMap(() =>
@@ -256,9 +256,9 @@ describe('Store', () => {
             )
         );
 
-        Store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
 
-        expect(Store.select(getUserFeatureState)).toBeObservable(
+        expect(store.select(getUserFeatureState)).toBeObservable(
             hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
         );
     });
@@ -277,9 +277,9 @@ describe('Store', () => {
             user,
         };
 
-        Store.addExtension(new LoggerExtension());
+        store.addExtension(new LoggerExtension());
 
-        Store.dispatch({
+        store.dispatch({
             type: 'updateUser',
             payload: user,
         });
@@ -298,7 +298,7 @@ describe('Store', () => {
 
     it('should add extension', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
-        Store.addExtension(new ReduxDevtoolsExtension({}));
+        store.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
         expect(StoreCore['extensions'].length).toBe(2);
     });
@@ -318,16 +318,16 @@ describe('Store', () => {
             return of({ type: 'whatever' });
         };
 
-        Store.feature('someFeature', someReducer);
+        store.feature('someFeature', someReducer);
 
-        Store.createEffect(
+        store.createEffect(
             actions$.pipe(
                 ofType('someAction2'),
                 mergeMap(() => onEffectStarted())
             )
         );
 
-        Store.dispatch({ type: 'someAction2' });
+        store.dispatch({ type: 'someAction2' });
 
         expect(callOrder).toEqual(['reducer', 'effect']);
     });
@@ -335,13 +335,13 @@ describe('Store', () => {
     it('should queue actions', () => {
         const callLimit = 5000;
 
-        Store.feature<CounterState>('counter', counterReducer);
+        store.feature<CounterState>('counter', counterReducer);
 
         const spy = jest.fn().mockImplementation((value) => {
-            Store.dispatch({ type: 'counter' });
+            store.dispatch({ type: 'counter' });
         });
 
-        const counter1$ = Store.select(getCounter1);
+        const counter1$ = store.select(getCounter1);
 
         counter1$.pipe(take(callLimit)).subscribe(spy);
 
@@ -364,9 +364,9 @@ describe('Store', () => {
             }
         }
 
-        Store.feature<CounterState>('counter2', counter2Reducer);
+        store.feature<CounterState>('counter2', counter2Reducer);
 
-        Store.createEffect(
+        store.createEffect(
             actions$.pipe(
                 ofType('counterEffectStart'),
                 mergeMap(() => of({ type: 'counterEffectSuccess' }))
@@ -374,10 +374,10 @@ describe('Store', () => {
         );
 
         const spy2 = jest.fn().mockImplementation((value) => {
-            Store.dispatch({ type: 'counterEffectStart' });
+            store.dispatch({ type: 'counterEffectStart' });
         });
 
-        const counter2$ = Store.select(getCounter2);
+        const counter2$ = store.select(getCounter2);
 
         counter2$.pipe(take(callLimit)).subscribe(spy2);
 
@@ -390,7 +390,7 @@ describe('Store', () => {
         counterFeatureState.increment();
 
         const spy = jest.fn();
-        Store.select(getCounter3).subscribe(spy);
+        store.select(getCounter3).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(2);
         expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -398,7 +398,7 @@ describe('Store', () => {
     it('should resubscribe on action stream when side effect error is not handled', () => {
         const spy = jest.fn();
 
-        Store.createEffect(
+        store.createEffect(
             actions$.pipe(
                 ofType('someAction3'),
                 mergeMap(() => {
@@ -408,9 +408,9 @@ describe('Store', () => {
             )
         );
 
-        Store.dispatch({ type: 'someAction3' });
-        Store.dispatch({ type: 'someAction3' });
-        Store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
 
         expect(spy).toHaveBeenCalledTimes(3);
     });
