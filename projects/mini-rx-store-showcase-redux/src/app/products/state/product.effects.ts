@@ -28,7 +28,6 @@ export class ProductEffects {
     constructor(private productService: ProductService, private actions$: Actions) {}
 
     loadProducts$: Observable<Action> = this.actions$.pipe(
-        tap((effectAction) => console.log('effectAction', effectAction)),
         ofType(load),
         mergeMap((action) =>
             this.productService.getProducts().pipe(

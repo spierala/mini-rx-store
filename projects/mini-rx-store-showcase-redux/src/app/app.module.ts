@@ -12,7 +12,6 @@ import { ShellComponent } from './home/shell.component';
 import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
-import { Store } from 'mini-rx-store';
 import { counterReducer } from '../../../mini-rx-store/src/lib/spec/_spec-helpers';
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
@@ -48,8 +47,4 @@ import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {
-    constructor(private store: Store) {
-        this.store.dispatch({ type: 'test' });
-    }
-}
+export class AppModule {}
