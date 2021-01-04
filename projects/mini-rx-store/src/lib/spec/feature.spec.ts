@@ -3,7 +3,7 @@ import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
-import Store, { actions$ } from '../store';
+import { actions$, store } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 import { Action, Reducer } from '../interfaces';
@@ -47,7 +47,7 @@ const getCity = createSelector(getUserFeatureState, (state) => state.city);
 const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
 const getCountry = createSelector(getUserFeatureState2, (state) => state.country);
 
-Store.feature('someFeature', counterReducer);
+store.feature('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector('someFeature');
 
 class FeatureState extends Feature<UserState> {
@@ -133,7 +133,7 @@ describe('Feature', () => {
         reducerSpy();
     }
 
-    Store.feature('someReduxReducer', someReducer);
+    store.feature('someReduxReducer', someReducer);
 
     it('should initialize the feature', () => {
         const spy = jest.fn();

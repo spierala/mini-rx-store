@@ -1,13 +1,13 @@
-import Store, { actions$ } from '../store';
+import { actions$, store } from '../store';
 import { combineReducers, ofType } from '../utils';
 import { Action } from '../interfaces';
 
 const action1: Action = {
-    type: 'updateUser'
+    type: 'updateUser',
 };
 
 const action2: Action = {
-    type: 'updateProduct'
+    type: 'updateProduct',
 };
 
 const action3: Action = {
@@ -15,11 +15,11 @@ const action3: Action = {
 };
 
 const action4: Action = {
-    type: 'showProductCode2'
+    type: 'showProductCode2',
 };
 
 const action5: Action = {
-    type: 'showProductCode3'
+    type: 'showProductCode3',
 };
 
 function reducer(state: any, action: Action): any {
@@ -27,7 +27,7 @@ function reducer(state: any, action: Action): any {
         case action3.type:
             return {
                 ...state,
-                showProductCode: true
+                showProductCode: true,
             };
         default:
             return state;
@@ -39,7 +39,7 @@ function reducer2(state: any, action: Action): any {
         case action4.type:
             return {
                 ...state,
-                showProductCode2: false
+                showProductCode2: false,
             };
         default:
             return state;
@@ -51,7 +51,7 @@ function reducer3(state: any, action: Action): any {
         case action4.type:
             return {
                 ...state,
-                showProductCode3: undefined
+                showProductCode3: undefined,
             };
         default:
             return state;
@@ -63,14 +63,14 @@ describe('ofType', () => {
         const spy = jest.fn();
         actions$.pipe(ofType('someType')).subscribe(spy);
 
-        Store.dispatch(action1);
+        store.dispatch(action1);
 
         expect(spy).toHaveBeenCalledTimes(0);
 
         const spy2 = jest.fn();
         actions$.pipe(ofType(action1.type)).subscribe(spy2);
 
-        Store.dispatch(action1);
+        store.dispatch(action1);
 
         expect(spy2).toHaveBeenCalledWith(action1);
         expect(spy2).toHaveBeenCalledTimes(1);
@@ -80,8 +80,8 @@ describe('ofType', () => {
         const spy = jest.fn();
         actions$.pipe(ofType('someType', action1.type, action2.type)).subscribe(spy);
 
-        Store.dispatch(action1);
-        Store.dispatch(action2);
+        store.dispatch(action1);
+        store.dispatch(action2);
 
         expect(spy).toHaveBeenCalledTimes(2);
     });
@@ -92,17 +92,17 @@ describe('combine Reducers', () => {
         const combinedReducer = combineReducers([reducer, reducer2]);
 
         const newState = combinedReducer({}, action3);
-        expect(newState).toEqual({showProductCode: true});
+        expect(newState).toEqual({ showProductCode: true });
 
         const newState2 = combinedReducer(newState, action4);
-        expect(newState2).toEqual({showProductCode: true, showProductCode2: false});
+        expect(newState2).toEqual({ showProductCode: true, showProductCode2: false });
 
         const combinedReducer2 = combineReducers([combinedReducer, reducer3]);
         const newState3 = combinedReducer2(newState2, action5);
         expect(newState3).toEqual({
             showProductCode: true,
             showProductCode2: false,
-            showProductCode3: undefined
+            showProductCode3: undefined,
         });
     });
 });
