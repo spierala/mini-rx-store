@@ -14,9 +14,9 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule } from 'mini-rx-ng-devtools';
+import { NgReduxDevtoolsModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, store } from 'mini-rx-store';
-import { environment } from '../../../mini-rx-store-showcase-redux/src/environments/environment';
+import { environment } from '../environments/environment';
 
 if (!environment.production) {
     store.addExtension(new ImmutableStateExtension());

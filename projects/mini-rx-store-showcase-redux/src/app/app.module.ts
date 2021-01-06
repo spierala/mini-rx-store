@@ -14,12 +14,14 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
+import { environment } from '../environments/environment';
+import { ImmutableStateExtension, store, LoggerExtension } from 'mini-rx-store';
 
 // Store Extensions
-// if (!environment.production) {
-//     store.addExtension(new ImmutableStateExtension());
-//     store.addExtension(new LoggerExtension());
-// }
+if (!environment.production) {
+    store.addExtension(new ImmutableStateExtension());
+    store.addExtension(new LoggerExtension());
+}
 
 @NgModule({
     imports: [
