@@ -1,4 +1,4 @@
-import { Feature, nameUpdateAction } from '../feature';
+import { FeatureStore, nameUpdateAction } from '../feature-store';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
@@ -50,7 +50,7 @@ const getCountry = createSelector(getUserFeatureState2, (state) => state.country
 store.feature('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector('someFeature');
 
-class FeatureState extends Feature<UserState> {
+class FeatureState extends FeatureStore<UserState> {
     state$ = this.state$;
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
@@ -104,7 +104,7 @@ class FeatureState extends Feature<UserState> {
     }
 }
 
-class CounterFeature extends Feature<CounterState> {
+class CounterFeature extends FeatureStore<CounterState> {
     counter$: Observable<number> = this.select((state) => state.counter);
 
     constructor() {
@@ -117,7 +117,7 @@ class CounterFeature extends Feature<CounterState> {
     }
 }
 
-class CounterFeature2 extends Feature<any> {
+class CounterFeature2 extends FeatureStore<any> {
     constructor() {
         super('counterFeature2', {});
     }
@@ -126,7 +126,7 @@ class CounterFeature2 extends Feature<any> {
 const userFeature: FeatureState = new FeatureState();
 const counterFeature: CounterFeature = new CounterFeature();
 
-describe('Feature', () => {
+describe('FeatureStore', () => {
     const reducerSpy = jest.fn();
 
     function someReducer() {

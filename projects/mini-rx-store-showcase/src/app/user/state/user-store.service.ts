@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../user';
-import { createFeatureSelector, createSelector, Feature } from 'mini-rx-store';
+import { createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
 
 export interface UserState {
     maskUserName: boolean;
@@ -10,14 +10,13 @@ export interface UserState {
 
 const initialState: UserState = {
     maskUserName: true,
-    currentUser: null
+    currentUser: null,
 };
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
-export class UserStoreService extends Feature<UserState> {
-
+export class UserStoreService extends FeatureStore<UserState> {
     constructor() {
         super('users', initialState);
     }
@@ -26,10 +25,10 @@ export class UserStoreService extends Feature<UserState> {
 
     updateMaskUserName(maskUserName: boolean) {
         // Update State
-        this.setState({maskUserName});
+        this.setState({ maskUserName });
     }
 }
 
 // Demonstrate how to use memoized selectors with a Feature Store
 const getUserFeatureState = createFeatureSelector<UserState>(); // Omit the feature name
-const getMaskUser = createSelector(getUserFeatureState, (state => state.maskUserName));
+const getMaskUser = createSelector(getUserFeatureState, (state) => state.maskUserName);

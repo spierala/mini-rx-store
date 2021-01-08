@@ -1,7 +1,5 @@
-// TODO remove tap next, use just tap directly
-
 import { Injectable } from '@angular/core';
-import { Feature } from 'mini-rx-store';
+import { FeatureStore } from 'mini-rx-store';
 import { ProductService } from '../product.service';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { EMPTY, Observable, pipe } from 'rxjs';
@@ -18,7 +16,7 @@ import {
 @Injectable({
     providedIn: 'root',
 })
-export class ProductStateService extends Feature<ProductState> {
+export class ProductStateService extends FeatureStore<ProductState> {
     // SELECT STATE with memoized selectors
     displayCode$: Observable<boolean> = this.select(getShowProductCode);
     selectedProduct$: Observable<Product> = this.select(getCurrentProduct);
@@ -30,7 +28,6 @@ export class ProductStateService extends Feature<ProductState> {
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)
-    // The completed side effects (api calls) update the feature state directly
     loadProducts = this.createEffect<void>(
         mergeMap(() =>
             this.productService.getProducts().pipe(

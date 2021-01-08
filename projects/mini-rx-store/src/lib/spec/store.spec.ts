@@ -7,7 +7,7 @@ import { createActionTypePrefix, ofType } from '../utils';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
-import { Feature, nameUpdateAction } from '../feature';
+import { FeatureStore, nameUpdateAction } from '../feature-store';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 
@@ -84,7 +84,7 @@ const getCounter1 = createSelector(getCounterFeatureState, (state) => state.coun
 const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
 const getCounter2 = createSelector(getCounter2FeatureState, (state) => state.counter);
 
-class CounterFeatureState extends Feature<CounterState> {
+class CounterFeatureState extends FeatureStore<CounterState> {
     constructor() {
         super('counter3', counterInitialState);
     }

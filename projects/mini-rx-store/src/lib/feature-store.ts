@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, MetaReducer, Reducer } from './models';
+import { Action, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
@@ -10,7 +10,7 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
 export const nameUpdateAction = 'SET-STATE';
 
-export abstract class Feature<StateType> {
+export abstract class FeatureStore<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
     private readonly featureSelector: Selector<AppState, StateType>;

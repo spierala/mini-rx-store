@@ -3,7 +3,7 @@
  */
 
 export { actions$, store, Store } from './lib/store';
-export { Feature } from './lib/feature';
+export { FeatureStore } from './lib/feature-store';
 export { createFeatureSelector, createSelector } from './lib/selector';
 export { Action, Reducer, Actions, ReducerDictionary } from './lib/models';
 export { ofType } from './lib/utils';

@@ -7,10 +7,10 @@ import {
     CounterStringState,
 } from './_spec-helpers';
 import { undo, UndoExtension } from '../undo.extension';
-import { Feature } from '../feature';
+import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 
-class MyFeatureStore extends Feature<CounterStringState> {
+class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
 
     private lastAction: Action;
