@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 
-> **ℹ️ Version 2:** Currently I am working on version 2 of mini-rx-store. Please let me know if you have ideas for features that you wish to see in mini-rx-store@2. See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
+> **ℹ️  Version 2:** Currently I am working on version 2 of mini-rx-store. Please let me know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
 
 # MiniRx: The RxJS Redux Store
 
@@ -26,7 +26,6 @@
 -   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## RxJS
-
 MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
 
 ## Redux
@@ -69,21 +68,21 @@ A reducer function typically looks like this:
 
 ```ts
 const initialState: ProductState = {
-    showProductCode: true,
-    products: [],
+  showProductCode: true,
+  products: [],
 };
 
 export function reducer(state: ProductState = initialState, action: ProductActions): ProductState {
-    switch (action.type) {
-        case ProductActionTypes.ToggleProductCode:
-            return {
-                ...state,
-                showProductCode: action.payload,
-            };
+  switch (action.type) {
+    case ProductActionTypes.ToggleProductCode:
+      return {
+        ...state,
+        showProductCode: action.payload
+      };
 
-        default:
-            return state;
-    }
+    default:
+      return state;
+  }
 }
 ```
 
@@ -93,12 +92,12 @@ export function reducer(state: ProductState = initialState, action: ProductActio
 import { Action } from 'mini-rx-store';
 
 export enum ProductActionTypes {
-    CreateProduct = '[Product] Create Product',
+  CreateProduct = '[Product] Create Product',
 }
 
 export class CreateProduct implements Action {
-    readonly type = ProductActionTypes.CreateProduct;
-    constructor(public payload: Product) {}
+  readonly type = ProductActionTypes.CreateProduct;
+  constructor(public payload: Product) { }
 }
 ```
 
@@ -157,7 +156,10 @@ import { ProductState } from './product.reducer';
 
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
-export const getProducts = createSelector(getProductFeatureState, (state) => state.products);
+export const getProducts = createSelector(
+    getProductFeatureState,
+    state => state.products
+);
 ```
 
 `createSelector` creates a memoized selector. This improves performance especially if your selectors perform expensive computation.
@@ -208,7 +210,7 @@ import { on, reducer } from 'ts-action';
 
 export const productReducer = reducer(
     initialState,
-    on(toggleProductCode, (state, { payload }) => ({ ...state, showProductCode: payload }))
+    on(toggleProductCode, (state, {payload}) => ({...state, showProductCode: payload}))
 );
 ```
 
@@ -250,11 +252,11 @@ interface UserState {
 }
 
 const initialState: UserState = {
-    currentUser: undefined,
-    favProductIds: [],
+  currentUser: undefined,
+  favProductIds: []
 };
 
-export class UserStateService extends Feature<UserState> {
+export class UserStateService extends Feature<UserState>{
     constructor() {
         super('users', initialState);
     }
@@ -404,7 +406,7 @@ and the default reducer will update the feature state accordingly.
 ```ts
 import { Store } from 'mini-rx-store';
 
-Store.settings({ enableLogging: true });
+Store.settings({enableLogging: true});
 ```
 
 The code above sets the global Store settings.
@@ -456,13 +458,11 @@ export class AppModule {}
 ```ts
 import { Store, ReduxDevtoolsExtension } from 'mini-rx-store';
 
-Store.addExtension(
-    new ReduxDevtoolsExtension({
-        name: 'MiniRx Showcase',
-        maxAge: 25,
-        latency: 1000,
-    })
-);
+Store.addExtension(new ReduxDevtoolsExtension({
+    name: 'MiniRx Showcase',
+    maxAge: 25,
+    latency: 1000
+}));
 ```
 
 ## Showcases

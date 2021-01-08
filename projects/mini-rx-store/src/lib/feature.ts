@@ -47,7 +47,7 @@ export abstract class Feature<StateType> {
                     : stateOrCallback,
         };
 
-        StoreCore.dispatch(action);
+        StoreCore.dispatch(action, { onlyForFeature: this.featureName });
 
         return action;
     }
