@@ -3,13 +3,25 @@
 import { Action, Reducer, StoreExtension } from './interfaces';
 import StoreCore from './store-core';
 
+const defaultBufferSize = 100;
+
+export let isUndoExtensionInitialized: boolean;
+let executedActions: Array<Action> = [];
+let initialState = {};
+let bufferSize;
+
 export class UndoExtension implements StoreExtension {
+    constructor(_bufferSize: number = defaultBufferSize) {
+        bufferSize = _bufferSize;
+        isUndoExtensionInitialized = true;
+    }
+
     init(): void {
-        StoreCore.addMetaReducers(handleUndo);
+        StoreCore.addMetaReducers(undoMetaReducer);
     }
 }
 
-export const UNDO_ACTION = '@mini-rx/UNDO-ACTION';
+const UNDO_ACTION = '@mini-rx/UNDO-ACTION';
 
 export function undo(action: Action) {
     return {
@@ -18,16 +30,8 @@ export function undo(action: Action) {
     };
 }
 
-let executedActions: Array<Action> = [];
-let initialState;
-let bufferSize = 100;
-
-export function configureBufferSize(size: number): void {
-    bufferSize = size;
-}
-
-function handleUndo(rootReducer: Reducer<any>): Reducer<any> {
-    return (state: any, action: any) => {
+function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
+    return (state: any = {}, action: any) => {
         if (action.type === UNDO_ACTION) {
             // if the action is UNDO_ACTION,
             // then call all the actions again on the rootReducer,
@@ -36,11 +40,11 @@ function handleUndo(rootReducer: Reducer<any>): Reducer<any> {
             executedActions = executedActions.filter((eAct) => eAct !== action.payload);
             // update the state for every action untill we get the
             // exact same state as before, but without the action we want to rollback
-            executedActions.forEach((executedAction) => {
-                newState = rootReducer(newState, executedAction);
-            });
+            executedActions.forEach(
+                (executedAction) => (newState = rootReducer(newState, executedAction))
+            );
             return newState;
-        } else {
+        } else if (action.type !== '@mini-rx/store/init') {
             // push every action that isn't an UNDO_ACTION to the executedActions property
             executedActions.push(action);
         }

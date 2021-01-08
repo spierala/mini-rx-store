@@ -7,7 +7,7 @@ export class LoggerExtension implements StoreExtension {
     }
 }
 
-export function loggerMetaReducer(reducer) {
+function loggerMetaReducer(reducer) {
     return (state, action) => {
         const nextState = reducer(state, action);
 

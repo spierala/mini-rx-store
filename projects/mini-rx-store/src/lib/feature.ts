@@ -1,9 +1,9 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, AppState, MetaReducer, Reducer } from './interfaces';
 import StoreCore from './store-core';
-import { createActionTypePrefix } from './utils';
+import { createActionTypePrefix, miniRxError } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
-import { undo } from './undo.extension';
+import { isUndoExtensionInitialized, undo } from './undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
@@ -80,7 +80,9 @@ export abstract class Feature<StateType> {
     }
 
     protected undo(action: Action) {
-        StoreCore.dispatch(undo(action));
+        isUndoExtensionInitialized
+            ? StoreCore.dispatch(undo(action))
+            : miniRxError('UndoExtension is not initialized');
     }
 }
 
