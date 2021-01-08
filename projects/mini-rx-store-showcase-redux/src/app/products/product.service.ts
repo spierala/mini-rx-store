@@ -45,7 +45,7 @@ export class ProductService {
 
   updateProduct(product: Product): Observable<Product> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const url = `asdf/${product.id}`;
+    const url = `${this.productsUrl}/${product.id}`;
     return this.http.put<Product>(url, product, { headers })
       .pipe(
         tap(() => console.log('updateProduct: ' + product.id)),
