@@ -1,4 +1,4 @@
-import { Action } from '../interfaces';
+import { Action } from '../models';
 
 export interface CounterState {
     counter: number;

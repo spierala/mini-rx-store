@@ -1,6 +1,6 @@
 // Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
 
-import { Reducer, StoreExtension } from './interfaces';
+import { Reducer, StoreExtension } from './models';
 import StoreCore from './store-core';
 import deepFreeze from 'deep-freeze-strict';
 

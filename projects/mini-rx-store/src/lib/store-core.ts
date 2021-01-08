@@ -10,7 +10,7 @@ import {
     ReducerDictionary,
     StoreConfig,
     StoreExtension,
-} from './interfaces';
+} from './models';
 import {
     catchError,
     distinctUntilChanged,

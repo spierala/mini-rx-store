@@ -1,11 +1,11 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, StoreExtension } from './interfaces';
+import { AppState, StoreExtension } from './models';
 import StoreCore from './store-core';
 
 const win = window as any;
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
-    name: 'MiniRx - Redux Dev Tools'
+    name: 'MiniRx - Redux Dev Tools',
 };
 
 export interface ReduxDevtoolsOptions {
@@ -18,13 +18,10 @@ export class ReduxDevtoolsExtension implements StoreExtension {
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
 
-    constructor(
-        private readonly options: Partial<ReduxDevtoolsOptions>
-    ) {
-
+    constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
         this.options = {
             ...defaultOptions,
-            ...this.options
+            ...this.options,
         };
     }
 
@@ -32,10 +29,12 @@ export class ReduxDevtoolsExtension implements StoreExtension {
         if (this.devtoolsExtension) {
             this.devtoolsConnection = this.devtoolsExtension.connect(this.options);
 
-            StoreCore.actions$.pipe(
-                withLatestFrom(StoreCore.state$),
-                tap(([action, state]) => this.devtoolsConnection.send(action, state))
-            ).subscribe();
+            StoreCore.actions$
+                .pipe(
+                    withLatestFrom(StoreCore.state$),
+                    tap(([action, state]) => this.devtoolsConnection.send(action, state))
+                )
+                .subscribe();
 
             this.devtoolsConnection.subscribe(this.onDevToolsMessage.bind(this));
         }

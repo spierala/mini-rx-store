@@ -1,6 +1,6 @@
 import { counterInitialState, CounterState } from './_spec-helpers';
 import { ImmutableStateExtension, storeFreeze } from '../immutable-state.extension';
-import { Action, Reducer } from '../interfaces';
+import { Action, Reducer } from '../models';
 import { store } from '../store';
 import { createFeatureSelector } from '../selector';
 

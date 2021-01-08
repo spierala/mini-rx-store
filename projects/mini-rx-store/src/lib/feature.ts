@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, MetaReducer, Reducer } from './interfaces';
+import { Action, AppState, MetaReducer, Reducer } from './models';
 import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';

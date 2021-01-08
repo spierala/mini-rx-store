@@ -1,6 +1,6 @@
 // Credits go to https://github.com/brechtbilliet/ngrx-undo
 
-import { Action, Reducer, StoreExtension } from './interfaces';
+import { Action, Reducer, StoreExtension } from './models';
 import StoreCore from './store-core';
 
 const defaultBufferSize = 100;

@@ -1,6 +1,6 @@
 import { actions$, store } from '../store';
 import StoreCore from '../store-core';
-import { Action, Reducer } from '../interfaces';
+import { Action, Reducer } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { createActionTypePrefix, ofType } from '../utils';

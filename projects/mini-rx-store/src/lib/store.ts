@@ -6,7 +6,7 @@ import {
     ReducerDictionary,
     StoreConfig,
     StoreExtension,
-} from './interfaces';
+} from './models';
 import StoreCore from './store-core';
 
 // Expose public store API

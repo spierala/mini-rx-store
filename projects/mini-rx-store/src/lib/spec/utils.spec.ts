@@ -1,6 +1,6 @@
 import { actions$, store } from '../store';
 import { combineReducers, ofType } from '../utils';
-import { Action } from '../interfaces';
+import { Action } from '../models';
 
 const action1: Action = {
     type: 'updateUser',

@@ -1,6 +1,6 @@
 import { store } from '../store';
 import { createFeatureSelector, createSelector } from '../selector';
-import { Action } from '../interfaces';
+import { Action } from '../models';
 import {
     counterStringInitialState,
     counterStringReducer,

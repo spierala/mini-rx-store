@@ -1,6 +1,6 @@
 import { OperatorFunction } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { Action, AppState, MetaReducer, Reducer } from './interfaces';
+import { Action, AppState, MetaReducer, Reducer } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>

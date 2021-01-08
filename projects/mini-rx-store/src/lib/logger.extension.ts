@@ -1,4 +1,4 @@
-import { StoreExtension } from './interfaces';
+import { StoreExtension } from './models';
 import StoreCore from './store-core';
 
 export class LoggerExtension implements StoreExtension {

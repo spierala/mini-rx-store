@@ -6,7 +6,7 @@ import { cold, hot } from 'jest-marbles';
 import { actions$, store } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
-import { Action, Reducer } from '../interfaces';
+import { Action, Reducer } from '../models';
 import { createActionTypePrefix } from '../utils';
 
 interface UserState {

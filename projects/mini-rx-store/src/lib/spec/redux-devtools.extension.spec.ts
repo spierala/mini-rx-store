@@ -1,7 +1,7 @@
 import { store } from '../store';
 import StoreCore from '../store-core';
 import { ReduxDevtoolsExtension, ReduxDevtoolsOptions } from '../redux-devtools.extension';
-import { Action } from '../interfaces';
+import { Action } from '../models';
 import { counterReducer, CounterState } from './_spec-helpers';
 
 const win = window as any;
