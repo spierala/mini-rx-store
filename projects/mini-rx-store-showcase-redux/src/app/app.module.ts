@@ -13,29 +13,29 @@ import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
-import { ImmutableStateExtension, LoggerExtension, Store } from 'mini-rx-store';
+import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { environment } from '../environments/environment';
 import { UndoExtension } from '../../../mini-rx-store/src/lib/undo.extension';
+import { ImmutableStateExtension, store, LoggerExtension } from 'mini-rx-store';
 
 // Store Extensions
 if (!environment.production) {
-    Store.addExtension(new ImmutableStateExtension());
-    Store.addExtension(new LoggerExtension());
-    Store.addExtension(new UndoExtension());
+    store.addExtension(new ImmutableStateExtension());
+    store.addExtension(new LoggerExtension());
 }
 
 @NgModule({
     imports: [
         BrowserModule,
         HttpClientModule,
-        HttpClientInMemoryWebApiModule.forRoot(ProductData),
+        HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
         UserModule,
         AppRoutingModule,
+        StoreModule.forRoot(),
         NgReduxDevtoolsModule.instrument({
             name: 'MiniRx Redux Showcase',
             maxAge: 25,
-            latency: 1000,
+            latency: 250,
         }),
     ],
     declarations: [

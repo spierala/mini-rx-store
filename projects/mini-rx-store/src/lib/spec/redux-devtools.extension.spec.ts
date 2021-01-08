@@ -1,4 +1,4 @@
-import Store from '../store';
+import { store } from '../store';
 import StoreCore from '../store-core';
 import { ReduxDevtoolsExtension, ReduxDevtoolsOptions } from '../redux-devtools.extension';
 import { Action } from '../interfaces';
@@ -11,35 +11,35 @@ JSON.parse = jest.fn().mockImplementationOnce((data) => {
 
 let extension: ReduxDevtoolsExtension;
 const stateFromReduxDevTools = {
-    someProp: 'someValue'
+    someProp: 'someValue',
 };
-const action: Action = {type: 'counter'};
+const action: Action = { type: 'counter' };
 const sendFn = jest.fn();
 const subscribeFn = jest.fn();
 const connectFn = jest.fn().mockImplementation(() => {
     return {
         subscribe: subscribeFn,
-        send: sendFn
+        send: sendFn,
     };
 });
 
 describe('Redux Dev Tools', () => {
     beforeAll(() => {
-        Store.feature<CounterState>('devToolsCounter', counterReducer);
+        store.feature<CounterState>('devToolsCounter', counterReducer);
     });
     it('should connect to Store', () => {
         const options: Partial<ReduxDevtoolsOptions> = {
             name: 'test',
             maxAge: 50,
-            latency: 1000
+            latency: 1000,
         };
 
         win.__REDUX_DEVTOOLS_EXTENSION__ = {
-            connect: connectFn
+            connect: connectFn,
         };
 
         extension = new ReduxDevtoolsExtension(options);
-        Store.addExtension(extension);
+        store.addExtension(extension);
 
         expect(connectFn).toHaveBeenCalledTimes(1);
         expect(connectFn).toHaveBeenCalledWith(options);
@@ -47,14 +47,14 @@ describe('Redux Dev Tools', () => {
     });
 
     it('should receive state and actions', () => {
-        Store.dispatch(action);
+        store.dispatch(action);
         let currAppState;
-        Store.select(state => state).subscribe(state => currAppState = state);
+        store.select((state) => state).subscribe((state) => (currAppState = state));
 
         expect(sendFn).toHaveBeenCalledTimes(1);
         expect(sendFn).toHaveBeenCalledWith(action, {
             ...currAppState,
-            devToolsCounter: {counter: 2}
+            devToolsCounter: { counter: 2 },
         });
     });
 
@@ -64,9 +64,9 @@ describe('Redux Dev Tools', () => {
         extension['onDevToolsMessage']({
             type: 'DISPATCH',
             payload: {
-                type: 'JUMP_TO_STATE'
+                type: 'JUMP_TO_STATE',
             },
-            state: stateFromReduxDevTools
+            state: stateFromReduxDevTools,
         });
 
         expect(spy).toHaveBeenCalledTimes(1);
@@ -75,7 +75,7 @@ describe('Redux Dev Tools', () => {
         spy.mockReset();
 
         extension['onDevToolsMessage']({
-            type: 'NOT_SUPPORTED_TYPE'
+            type: 'NOT_SUPPORTED_TYPE',
         });
 
         expect(spy).toHaveBeenCalledTimes(0);

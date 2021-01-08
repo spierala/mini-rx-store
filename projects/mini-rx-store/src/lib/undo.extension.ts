@@ -5,7 +5,7 @@ import StoreCore from './store-core';
 
 export class UndoExtension implements StoreExtension {
     init(): void {
-        StoreCore.addMetaReducer(handleUndo);
+        StoreCore.addMetaReducers(handleUndo);
     }
 }
 
@@ -14,7 +14,7 @@ export const UNDO_ACTION = '@mini-rx/UNDO-ACTION';
 export function undo(action: Action) {
     return {
         type: UNDO_ACTION,
-        payload: action
+        payload: action,
     };
 }
 
@@ -33,10 +33,10 @@ function handleUndo(rootReducer: Reducer<any>): Reducer<any> {
             // then call all the actions again on the rootReducer,
             // except the one we want to rollback
             let newState: any = initialState;
-            executedActions = executedActions.filter(eAct => eAct !== action.payload);
+            executedActions = executedActions.filter((eAct) => eAct !== action.payload);
             // update the state for every action untill we get the
             // exact same state as before, but without the action we want to rollback
-            executedActions.forEach(executedAction => {
+            executedActions.forEach((executedAction) => {
                 newState = rootReducer(newState, executedAction);
             });
             return newState;
@@ -55,4 +55,3 @@ function handleUndo(rootReducer: Reducer<any>): Reducer<any> {
         return updatedState;
     };
 }
-

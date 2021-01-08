@@ -1,12 +1,14 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState } from './interfaces';
+import { Action, AppState, MetaReducer, Reducer } from './interfaces';
 import StoreCore from './store-core';
-import { createActionTypePrefix, nameUpdateAction } from './utils';
+import { createActionTypePrefix } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
 import { undo } from './undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
+
+export const nameUpdateAction = 'SET-STATE';
 
 export abstract class Feature<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
@@ -18,10 +20,14 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(featureName: string, initialState: StateType) {
-        StoreCore.addFeature<StateType>(featureName, initialState);
+    protected constructor(private featureName: string, initialState: StateType) {
+        const actionTypePrefix = createActionTypePrefix(featureName);
+        const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
+        StoreCore.addFeature<StateType>(featureName, reducer, {
+            isDefaultReducer: true,
+        });
 
-        this.actionTypePrefix = createActionTypePrefix(featureName);
+        this.actionTypePrefix = actionTypePrefix;
 
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
@@ -35,7 +41,10 @@ export abstract class Feature<StateType> {
     protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: Action = {
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-            payload: typeof stateOrCallback === 'function' ? stateOrCallback(this.state) : stateOrCallback
+            payload:
+                typeof stateOrCallback === 'function'
+                    ? stateOrCallback(this.state)
+                    : stateOrCallback,
         };
 
         StoreCore.dispatch(action);
@@ -53,10 +62,7 @@ export abstract class Feature<StateType> {
             return StoreCore.select(mapFn);
         }
 
-        const selector = createSelector(
-            this.featureSelector,
-            mapFn
-        );
+        const selector = createSelector(this.featureSelector, mapFn);
 
         return StoreCore.select(selector);
     }
@@ -66,9 +72,7 @@ export abstract class Feature<StateType> {
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();
 
-        subject.pipe(
-            effectFn
-        ).subscribe();
+        subject.pipe(effectFn).subscribe();
 
         return (payload?: PayLoadType) => {
             subject.next(payload);
@@ -78,4 +82,23 @@ export abstract class Feature<StateType> {
     protected undo(action: Action) {
         StoreCore.dispatch(undo(action));
     }
+}
+
+function createDefaultReducer<StateType>(
+    nameSpaceFeature: string,
+    initialState: StateType
+): Reducer<StateType> {
+    return (state: StateType = initialState, action: Action) => {
+        // Check for 'set-state' action (originates from Feature.setState())
+        if (
+            action.type.indexOf(nameSpaceFeature) > -1 &&
+            action.type.indexOf(nameUpdateAction) > -1
+        ) {
+            return {
+                ...state,
+                ...action.payload,
+            };
+        }
+        return state;
+    };
 }

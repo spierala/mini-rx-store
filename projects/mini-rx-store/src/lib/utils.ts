@@ -10,31 +10,27 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
     );
 }
 
-export function combineReducers<StateType>(
-    reducers: Reducer<any>[]
-): Reducer<StateType> {
-    return (state: AppState = {}, action: Action): StateType => {
+export function combineReducers(reducers: Reducer<any>[]): Reducer<AppState> {
+    return (state: AppState, action: Action): AppState => {
         return reducers.reduce((currState, reducer) => {
             return reducer(currState, action);
         }, state);
     };
 }
 
-export function combineReducerWithMetaReducers(
-    reducer: Reducer<AppState>,
-    metaReducers: MetaReducer<any>[]
-): Reducer<any> {
-    return metaReducers.reduceRight(
-        (previousValue: Reducer<any>, currentValue: MetaReducer<any>) => {
-            return currentValue(previousValue);
-        },
-        reducer
-    );
+export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+    return (reducer: Reducer<any>): Reducer<T> => {
+        return metaReducers.reduceRight(
+            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
+                return currentValue(previousValue);
+            },
+            reducer
+        );
+    };
 }
 
-// TODO rename to createFeatureActionTypePrefix
 export function createActionTypePrefix(featureName): string {
     return '@mini-rx/' + featureName;
 }
 
-export const nameUpdateAction = 'SET-STATE';
+export const storeInitActionType = '@mini-rx/store/init';

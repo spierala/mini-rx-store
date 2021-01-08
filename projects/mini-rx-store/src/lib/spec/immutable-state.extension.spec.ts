@@ -1,7 +1,7 @@
 import { counterInitialState, CounterState } from './_spec-helpers';
 import { ImmutableStateExtension, storeFreeze } from '../immutable-state.extension';
 import { Action, Reducer } from '../interfaces';
-import Store from '../store';
+import { store } from '../store';
 import { createFeatureSelector } from '../selector';
 
 export function counterReducerWithMutation(
@@ -46,8 +46,8 @@ describe('Without Immutable State Extension', () => {
     let counterStateRaw: CounterState;
 
     beforeAll(() => {
-        Store.feature<CounterState>('immutableCounter', counterReducerWithMutation);
-        Store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
+        store.feature<CounterState>('immutableCounter', counterReducerWithMutation);
+        store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
     });
 
     it('should NOT throw when mutating state outside the reducer', () => {
@@ -57,11 +57,11 @@ describe('Without Immutable State Extension', () => {
     it('should NOT throw when mutating state in a reducer', () => {
         const spy = jest.fn();
 
-        Store.select(featureSelector).subscribe(spy);
+        store.select(featureSelector).subscribe(spy);
 
         spy.mockReset();
 
-        Store.dispatch({ type: 'counterWithMutation' });
+        store.dispatch({ type: 'counterWithMutation' });
         expect(spy).toHaveBeenCalledTimes(1);
     });
 });
@@ -71,9 +71,9 @@ describe('Immutable State Extension', () => {
     let counterStateRaw: CounterState;
 
     beforeAll(() => {
-        Store.addExtension(new ImmutableStateExtension());
-        Store.feature<CounterState>('immutableCounter2', counterReducerWithMutation);
-        Store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
+        store.addExtension(new ImmutableStateExtension());
+        store.feature<CounterState>('immutableCounter2', counterReducerWithMutation);
+        store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
     });
 
     it('should throw when mutating state outside the reducer', () => {
@@ -83,27 +83,27 @@ describe('Immutable State Extension', () => {
     it('should not throw', () => {
         const spy = jest.fn();
 
-        Store.select(featureSelector).subscribe(spy);
+        store.select(featureSelector).subscribe(spy);
 
         spy.mockReset();
 
-        Store.dispatch({ type: 'counterWithoutMutation' });
+        store.dispatch({ type: 'counterWithoutMutation' });
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should throw when mutating state in a reducer', () => {
         const spy = jest.fn();
 
-        Store.select(featureSelector).subscribe(spy);
+        store.select(featureSelector).subscribe(spy);
 
         spy.mockReset();
 
         // Strangely the following expect does not throw
         // Why does Jest not detect the error (ERROR TypeError: Cannot assign to read only property 'xyz' of object '[object Object]')?
-        // expect(() => Store.dispatch({type: 'counterWithMutation'})).toThrow();
+        // expect(() => store.dispatch({type: 'counterWithMutation'})).toThrow();
 
         // However when mutating the state it does not emit a new state
-        Store.dispatch({ type: 'counterWithMutation' });
+        store.dispatch({ type: 'counterWithMutation' });
         expect(spy).toHaveBeenCalledTimes(0);
     });
 });

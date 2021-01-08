@@ -3,18 +3,24 @@ import {
     Action,
     AppState,
     Reducer,
+    ReducerDictionary,
+    StoreConfig,
     StoreExtension,
 } from './interfaces';
 import StoreCore from './store-core';
 
 // Expose public store API
-class Store {
+export class Store {
     feature<StateType>(
         featureName: string,
         reducer: Reducer<StateType>,
-        initialState?: StateType
+        config?: StoreConfig<StateType>
     ) {
-        StoreCore.addFeature<StateType>(featureName, initialState, reducer);
+        StoreCore.addFeature<StateType>(featureName, reducer);
+    }
+
+    config(reducers: ReducerDictionary, config?: StoreConfig<AppState>) {
+        StoreCore.config(reducers, config);
     }
 
     createEffect(effect: Observable<Action>) {
@@ -33,6 +39,6 @@ class Store {
 }
 
 // Created once to initialize singleton
-export default new Store();
+export const store = new Store();
 
 export const actions$ = StoreCore.actions$;

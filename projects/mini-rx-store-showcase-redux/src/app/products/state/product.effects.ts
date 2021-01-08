@@ -6,7 +6,7 @@ import { catchError, map, mergeMap, startWith } from 'rxjs/operators';
 import { ProductService } from '../product.service';
 import { Product } from '../product';
 
-import { Action, actions$, Store, undo } from 'mini-rx-store';
+import { Action, Actions, undo } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,
@@ -19,62 +19,57 @@ import {
     loadFail,
     loadSuccess,
     updateProduct,
-    updateProductFail, updateProductOptimistic,
-    updateProductSuccess
+    updateProductFail,
+    updateProductOptimistic,
+    updateProductSuccess,
 } from './product.actions';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ProductEffects {
+    constructor(private productService: ProductService, private actions$: Actions) {}
 
-    constructor(private productService: ProductService) {
-        Store.createEffect(this.loadProducts$);
-        Store.createEffect(this.updateProduct$);
-        Store.createEffect(this.createProduct$);
-        Store.createEffect(this.deleteProduct$);
-    }
-
-    loadProducts$: Observable<Action> = actions$.pipe(
+    loadProducts$: Observable<Action> = this.actions$.pipe(
         ofType(load),
-        mergeMap(action =>
+        mergeMap((action) =>
             this.productService.getProducts().pipe(
-                map(products => (loadSuccess(products))),
-                catchError(err => of(loadFail(err)))
+                map((products) => loadSuccess(products)),
+                catchError((err) => of(loadFail(err)))
             )
         )
     );
 
-    updateProduct$: Observable<Action> = actions$.pipe(
+    updateProduct$: Observable<Action> = this.actions$.pipe(
         ofType(updateProduct),
         toPayload(),
         mergeMap((product) => {
             const optimisticUpdateAction: Action = updateProductOptimistic(product);
 
             return this.productService.updateProduct(product).pipe(
-                map(updatedProduct => (updateProductSuccess(updatedProduct))),
-                catchError(err => of(undo(optimisticUpdateAction))),
+                map((updatedProduct) => updateProductSuccess(updatedProduct)),
+                catchError((err) => of(undo(optimisticUpdateAction))),
                 startWith(optimisticUpdateAction)
             );
         })
     );
 
-    createProduct$: Observable<Action> = actions$.pipe(
+    createProduct$: Observable<Action> = this.actions$.pipe(
         ofType(createProduct),
         map((action: Action) => action.payload),
         mergeMap((product: Product) =>
             this.productService.createProduct(product).pipe(
-                map(newProduct => (createProductSuccess(newProduct))),
-                catchError(err => of(createProductFail(err)))
+                map((newProduct) => createProductSuccess(newProduct)),
+                catchError((err) => of(createProductFail(err)))
             )
         )
     );
 
-    deleteProduct$: Observable<Action> = actions$.pipe(
+    deleteProduct$: Observable<Action> = this.actions$.pipe(
         ofType(deleteProduct),
         map((action: Action) => action.payload),
         mergeMap((productId: number) =>
             this.productService.deleteProduct(productId).pipe(
-                map(() => (deleteProductSuccess(productId))),
-                catchError(err => of(deleteProductFail(err)))
+                map(() => deleteProductSuccess(productId)),
+                catchError((err) => of(deleteProductFail(err)))
             )
         )
     );
