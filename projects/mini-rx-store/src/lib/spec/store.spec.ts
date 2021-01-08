@@ -3,11 +3,11 @@ import StoreCore from '../store-core';
 import { Action, Reducer } from '../interfaces';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
-import { ofType } from '../utils';
+import { createActionTypePrefix, ofType } from '../utils';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
-import { Feature } from '../feature';
+import { Feature, nameUpdateAction } from '../feature';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
 import { LoggerExtension } from '../logger.extension';
 
@@ -108,14 +108,14 @@ describe('Store', () => {
     it('should initialize a Feature state with a root reducer (and a meta reducer)', () => {
         const callOrder = [];
 
-        function metaReducer1(reducer) {
+        function rootMetaReducer1(reducer) {
             return (state, action) => {
                 callOrder.push('meta1');
                 return reducer(state, action);
             };
         }
 
-        function metaReducer2(reducer) {
+        function rootMetaReducer2(reducer) {
             return (state, action) => {
                 callOrder.push('meta2');
                 return reducer(state, action);
@@ -127,7 +127,7 @@ describe('Store', () => {
                 user: reducer,
             },
             {
-                metaReducers: [metaReducer1, metaReducer2],
+                metaReducers: [rootMetaReducer1, rootMetaReducer2],
             }
         );
 
@@ -416,74 +416,166 @@ describe('Store', () => {
     });
 });
 
-const nextStateSpy = jest.fn();
+describe('Store Root MetaReducers and Feature Meta Reducers', () => {
+    const nextStateSpy = jest.fn();
 
-function aReducer(state: string = 'a', action: Action): string {
-    switch (action.type) {
-        case 'metaTest':
-            return state + 'd';
-        default:
-            return state;
+    function aFeatureReducer(state: string = 'a', action: Action): string {
+        switch (action.type) {
+            case 'metaTest':
+                return state + 'e';
+            default:
+                return state;
+        }
     }
-}
 
-function metaReducer1(reducer: Reducer<any>): Reducer<any> {
-    return (state, action) => {
-        if (action.type === 'metaTest') {
-            state = {
-                ...state,
-                metaTestFeature: state.metaTestFeature + 'b',
-            };
-        }
+    function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
+        return (state, action) => {
+            if (action.type === 'metaTest') {
+                state = {
+                    ...state,
+                    metaTestFeature: state.metaTestFeature + 'b',
+                };
+            }
 
-        return reducer(state, action);
-    };
-}
+            return reducer(state, action);
+        };
+    }
 
-function metaReducer2(reducer: Reducer<any>): Reducer<any> {
-    return (state, action) => {
-        if (action.type === 'metaTest') {
-            state = {
-                ...state,
-                metaTestFeature: state.metaTestFeature + 'c',
-            };
-        }
+    function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
+        return (state, action) => {
+            if (action.type === 'metaTest') {
+                state = {
+                    ...state,
+                    metaTestFeature: state.metaTestFeature + 'c',
+                };
+            }
 
-        return reducer(state, action);
-    };
-}
+            return reducer(state, action);
+        };
+    }
 
-export function inTheMiddleMetaReducer(reducer) {
-    return (state, action) => {
-        const nextState = reducer(state, action);
+    function inTheMiddleRootMetaReducer(reducer) {
+        return (state, action) => {
+            const nextState = reducer(state, action);
 
-        nextStateSpy(nextState);
+            nextStateSpy(nextState);
 
-        return reducer(state, action);
-    };
-}
+            return reducer(state, action);
+        };
+    }
 
-const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+    function featureMetaReducer(reducer: Reducer<string>): Reducer<string> {
+        return (state, action) => {
+            if (action.type === 'metaTest') {
+                state = state + 'd';
+            }
 
-describe('Store MetaReducers', () => {
+            return reducer(state, action);
+        };
+    }
+
+    const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+
     beforeAll(() => {
-        StoreCore.addMetaReducers(metaReducer1);
-        StoreCore.addMetaReducers(inTheMiddleMetaReducer);
-        StoreCore.addMetaReducers(metaReducer2);
-        StoreCore.addFeature<string>('metaTestFeature', aReducer);
+        StoreCore.addMetaReducers(rootMetaReducer1);
+        StoreCore.addMetaReducers(inTheMiddleRootMetaReducer);
+        StoreCore.addMetaReducers(rootMetaReducer2);
+        StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
+            metaReducers: [featureMetaReducer],
+        });
     });
-    it('should run meta reducers first, then the normal reducer', () => {
+    it('should run meta reducers in order: 1.) root meta reducers 2.) feature meta reducers, 3.) feature reducer', () => {
         const spy = jest.fn();
         StoreCore.select(getMetaTestFeature).subscribe(spy);
         StoreCore.dispatch({ type: 'metaTest' });
-        expect(spy).toHaveBeenCalledWith('abcd');
+        expect(spy).toHaveBeenCalledWith('abcde');
     });
     it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
         expect(nextStateSpy).toHaveBeenCalledWith(
             expect.objectContaining({ metaTestFeature: 'a' })
         );
         expect(nextStateSpy).toHaveBeenCalledWith(
-            expect.objectContaining({ metaTestFeature: 'abcd' })
+            expect.objectContaining({ metaTestFeature: 'abcde' })
         );
+    });
+});
+
+describe('Store Feature MetaReducers', () => {
+    const getMetaTestFeature = createFeatureSelector<CounterStringState>('metaTestFeature2');
+    const getCount = createSelector(getMetaTestFeature, (state) => state.count);
+
+    interface CounterStringState {
+        count: string;
+    }
+
+    function aFeatureReducer(
+        state: CounterStringState = { count: '0' },
+        action: Action
+    ): CounterStringState {
+        switch (action.type) {
+            case 'metaTest2':
+                return {
+                    ...state,
+                    count: state.count + '3',
+                };
+            default:
+                return state;
+        }
+    }
+
+    function featureMetaReducer1(reducer): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === 'metaTest2') {
+                state = {
+                    ...state,
+                    count: state.count + '1',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    function featureMetaReducer2(reducer): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === 'metaTest2') {
+                state = {
+                    ...state,
+                    count: state.count + '2',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    const nextStateSpy = jest.fn();
+
+    function inTheMiddleMetaReducer(reducer) {
+        return (state, action) => {
+            const nextState = reducer(state, action);
+
+            debugger;
+            nextStateSpy(nextState);
+
+            return reducer(state, action);
+        };
+    }
+
+    it('should run meta reducers first, then the normal reducer', () => {
+        StoreCore.addFeature<CounterStringState>('metaTestFeature2', aFeatureReducer, {
+            metaReducers: [featureMetaReducer1, inTheMiddleMetaReducer, featureMetaReducer2],
+        });
+
+        const spy = jest.fn();
+        StoreCore.select(getCount).subscribe(spy);
+        StoreCore.dispatch({ type: 'metaTest2' });
+        expect(spy).toHaveBeenCalledWith('0');
+        expect(spy).toHaveBeenCalledWith('0123');
+    });
+    it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
+        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0' });
+        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0123' });
+        expect(nextStateSpy).toHaveBeenCalledTimes(4); // 4? Because inTheMiddleRootMetaReducer is calling `reducer` to calculate the nextstate
     });
 });

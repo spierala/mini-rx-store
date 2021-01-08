@@ -157,7 +157,7 @@ class StoreCore {
         );
     }
 
-    config(reducers, config: StoreConfig = {}) {
+    config(reducers, config: StoreConfig<AppState> = {}) {
         if (config.metaReducers && config.metaReducers.length > 0) {
             this.addMetaReducers(...config.metaReducers);
         }

@@ -22,8 +22,8 @@ export interface ActionWithMeta {
     meta: ActionMetaData;
 }
 
-export interface StoreConfig {
-    metaReducers?: MetaReducer<AppState>[];
+export interface StoreConfig<StateType> {
+    metaReducers?: MetaReducer<StateType>[];
 }
 
 export class Actions extends Observable<Action> {}

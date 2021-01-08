@@ -21,14 +21,12 @@ export abstract class Feature<StateType> {
 
     protected constructor(
         private featureName: string,
-        initialState: StateType,
-        config?: { metaReducers?: MetaReducer<StateType>[] }
+        initialState: StateType
     ) {
         const actionTypePrefix = createActionTypePrefix(featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
         StoreCore.addFeature<StateType>(featureName, reducer, {
-            isDefaultReducer: true,
-            metaReducers: config && config.metaReducers,
+            isDefaultReducer: true
         });
 
         this.actionTypePrefix = actionTypePrefix;
@@ -92,7 +90,7 @@ function createDefaultReducer<StateType>(
         ) {
             const stateOrCallback: StateOrCallback<StateType> = action.payload;
             const newState: Partial<StateType> =
-                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback; // TODO Undo
 
             return {
                 ...state,

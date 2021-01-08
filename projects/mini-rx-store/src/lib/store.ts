@@ -11,11 +11,15 @@ import StoreCore from './store-core';
 
 // Expose public store API
 export class Store {
-    feature<StateType>(featureName: string, reducer: Reducer<StateType>) {
+    feature<StateType>(
+        featureName: string,
+        reducer: Reducer<StateType>,
+        config?: StoreConfig<StateType>
+    ) {
         StoreCore.addFeature<StateType>(featureName, reducer);
     }
 
-    config(reducers: ReducerDictionary, config?: StoreConfig) {
+    config(reducers: ReducerDictionary, config?: StoreConfig<AppState>) {
         StoreCore.config(reducers, config);
     }
 
