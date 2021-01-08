@@ -35,7 +35,7 @@ export class ProductStateService extends Feature<ProductState> {
         mergeMap(() =>
             this.productService.getProducts().pipe(
                 tap({
-                    next: (products) => this.setState({ products }, 'load success'),
+                    next: (products) => this.setState((state) => ({ products }), 'load success'),
                 }),
                 catchError((error) => {
                     this.setState(

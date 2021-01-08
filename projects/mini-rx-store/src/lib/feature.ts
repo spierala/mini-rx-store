@@ -19,14 +19,11 @@ export abstract class Feature<StateType> {
         return this.state$.getValue();
     }
 
-    protected constructor(
-        private featureName: string,
-        initialState: StateType
-    ) {
+    protected constructor(private featureName: string, initialState: StateType) {
         const actionTypePrefix = createActionTypePrefix(featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
         StoreCore.addFeature<StateType>(featureName, reducer, {
-            isDefaultReducer: true
+            isDefaultReducer: true,
         });
 
         this.actionTypePrefix = actionTypePrefix;
@@ -44,7 +41,10 @@ export abstract class Feature<StateType> {
         StoreCore.dispatch(
             {
                 type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-                payload: stateOrCallback,
+                payload:
+                    typeof stateOrCallback === 'function'
+                        ? stateOrCallback(this.state)
+                        : stateOrCallback,
             },
             { onlyForFeature: this.featureName }
         );
@@ -88,13 +88,9 @@ function createDefaultReducer<StateType>(
             action.type.indexOf(nameSpaceFeature) > -1 &&
             action.type.indexOf(nameUpdateAction) > -1
         ) {
-            const stateOrCallback: StateOrCallback<StateType> = action.payload;
-            const newState: Partial<StateType> =
-                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback; // TODO Undo
-
             return {
                 ...state,
-                ...newState,
+                ...action.payload,
             };
         }
         return state;
