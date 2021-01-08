@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { catchError, map, mergeMap, startWith } from 'rxjs/operators';
 
 import { ProductService } from '../product.service';
@@ -46,7 +46,7 @@ export class ProductEffects {
 
             return this.productService.updateProduct(product).pipe(
                 map((updatedProduct) => updateProductSuccess(updatedProduct)),
-                catchError((err) => of(undo(optimisticUpdateAction))),
+                catchError((err) => from([updateProductFail(err), undo(optimisticUpdateAction)])),
                 startWith(optimisticUpdateAction)
             );
         })
