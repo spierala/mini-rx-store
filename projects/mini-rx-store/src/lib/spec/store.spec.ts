@@ -555,7 +555,6 @@ describe('Store Feature MetaReducers', () => {
         return (state, action) => {
             const nextState = reducer(state, action);
 
-            debugger;
             nextStateSpy(nextState);
 
             return reducer(state, action);

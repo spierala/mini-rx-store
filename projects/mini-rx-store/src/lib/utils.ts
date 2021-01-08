@@ -33,4 +33,8 @@ export function createActionTypePrefix(featureName): string {
     return '@mini-rx/' + featureName;
 }
 
+export function miniRxError(message: string) {
+    throw new Error(`MiniRx: ` + message);
+}
+
 export const storeInitActionType = '@mini-rx/store/init';

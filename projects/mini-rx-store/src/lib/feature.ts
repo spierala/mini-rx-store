@@ -1,8 +1,9 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, AppState, MetaReducer, Reducer } from './interfaces';
 import StoreCore from './store-core';
-import { createActionTypePrefix } from './utils';
+import { createActionTypePrefix, miniRxError } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
+import { isUndoExtensionInitialized, undo } from './undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
@@ -37,17 +38,18 @@ export abstract class Feature<StateType> {
         StoreCore.select(this.featureSelector).subscribe(this.state$);
     }
 
-    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
-        StoreCore.dispatch(
-            {
-                type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
-                payload:
-                    typeof stateOrCallback === 'function'
-                        ? stateOrCallback(this.state)
-                        : stateOrCallback,
-            },
-            { onlyForFeature: this.featureName }
-        );
+    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+        const action: Action = {
+            type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
+            payload:
+                typeof stateOrCallback === 'function'
+                    ? stateOrCallback(this.state)
+                    : stateOrCallback,
+        };
+
+        StoreCore.dispatch(action, { onlyForFeature: this.featureName });
+
+        return action;
     }
 
     protected select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
@@ -75,6 +77,12 @@ export abstract class Feature<StateType> {
         return (payload?: PayLoadType) => {
             subject.next(payload);
         };
+    }
+
+    protected undo(action: Action) {
+        isUndoExtensionInitialized
+            ? StoreCore.dispatch(undo(action))
+            : miniRxError('UndoExtension is not initialized');
     }
 }
 

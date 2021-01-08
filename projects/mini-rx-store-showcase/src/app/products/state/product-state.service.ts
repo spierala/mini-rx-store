@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { Feature } from 'mini-rx-store';
 import { ProductService } from '../product.service';
-import { catchError, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { EMPTY, Observable, pipe } from 'rxjs';
 import { Product } from '../product';
 import {
@@ -34,9 +34,7 @@ export class ProductStateService extends Feature<ProductState> {
     loadProducts = this.createEffect<void>(
         mergeMap(() =>
             this.productService.getProducts().pipe(
-                tap({
-                    next: (products) => this.setState((state) => ({ products }), 'load success'),
-                }),
+                tap((products) => this.setState((state) => ({ products }), 'load success')),
                 catchError((error) => {
                     this.setState(
                         {
@@ -55,17 +53,16 @@ export class ProductStateService extends Feature<ProductState> {
         return payload$.pipe(
             mergeMap((product) => {
                 return this.productService.createProduct(product).pipe(
-                    tap({
-                        next: (newProduct) =>
-                            this.setState(
-                                {
-                                    products: [...this.state.products, newProduct],
-                                    currentProductId: newProduct.id,
-                                    error: '',
-                                },
-                                'create success'
-                            ),
-                    }),
+                    tap((newProduct) =>
+                        this.setState(
+                            {
+                                products: [...this.state.products, newProduct],
+                                currentProductId: newProduct.id,
+                                error: '',
+                            },
+                            'create success'
+                        )
+                    ),
                     catchError((error) => {
                         this.setState({ error }, 'create error');
                         return EMPTY;
@@ -102,10 +99,9 @@ export class ProductStateService extends Feature<ProductState> {
     // Delete with Optimistic Update
     deleteProduct = this.createEffect<number>(
         pipe(
-            withLatestFrom(this.state$), // Get snapshot of state for undoing optimistic update
-            mergeMap(([productId, lastState]) => {
+            mergeMap((productId) => {
                 // Optimistic Update
-                this.setState(
+                const optimisticUpdate = this.setState(
                     {
                         products: this.state.products.filter((product) => product.id !== productId),
                     },
@@ -125,15 +121,10 @@ export class ProductStateService extends Feature<ProductState> {
                             'delete success'
                         )
                     ),
-                    catchError((err) => {
+                    catchError((error) => {
                         // Undo Optimistic Update
-                        this.setState(
-                            {
-                                products: lastState.products,
-                                error: err,
-                            },
-                            'delete error'
-                        );
+                        this.undo(optimisticUpdate);
+                        this.showError(error);
                         return EMPTY;
                     })
                 );
@@ -156,5 +147,9 @@ export class ProductStateService extends Feature<ProductState> {
 
     showProductCode(showProductCode: boolean) {
         this.setState({ showProductCode }, 'showProductCode');
+    }
+
+    showError(error) {
+        this.setState({ error }, 'show error');
     }
 }

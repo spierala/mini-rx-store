@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, of } from 'rxjs';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
+import { catchError, map, mergeMap, startWith } from 'rxjs/operators';
 
 import { ProductService } from '../product.service';
 import { Product } from '../product';
 
-import { Action, Actions } from 'mini-rx-store';
+import { Action, Actions, undo } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,
@@ -20,6 +20,7 @@ import {
     loadSuccess,
     updateProduct,
     updateProductFail,
+    updateProductOptimistic,
     updateProductSuccess,
 } from './product.actions';
 
@@ -41,9 +42,12 @@ export class ProductEffects {
         ofType(updateProduct),
         toPayload(),
         mergeMap((product) => {
+            const optimisticUpdateAction: Action = updateProductOptimistic(product);
+
             return this.productService.updateProduct(product).pipe(
                 map((updatedProduct) => updateProductSuccess(updatedProduct)),
-                catchError((err) => of(updateProductFail(err)))
+                catchError((err) => from([updateProductFail(err), undo(optimisticUpdateAction)])),
+                startWith(optimisticUpdateAction)
             );
         })
     );

@@ -26,6 +26,7 @@ import {
     combineMetaReducers,
     createActionTypePrefix,
     storeInitActionType,
+    miniRxError,
 } from './utils';
 
 class StoreCore {
@@ -217,7 +218,7 @@ function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reduc
 
 function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
     if (reducers.hasOwnProperty(featureName)) {
-        throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
+        miniRxError(`Feature "${featureName}" already exists.`);
     }
 }
 

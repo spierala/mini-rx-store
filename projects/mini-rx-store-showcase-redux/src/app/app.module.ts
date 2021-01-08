@@ -15,12 +15,13 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { environment } from '../environments/environment';
-import { ImmutableStateExtension, store, LoggerExtension } from 'mini-rx-store';
+import { ImmutableStateExtension, store, LoggerExtension, UndoExtension } from 'mini-rx-store';
 
 // Store Extensions
 if (!environment.production) {
     store.addExtension(new ImmutableStateExtension());
     store.addExtension(new LoggerExtension());
+    store.addExtension(new UndoExtension());
 }
 
 @NgModule({
@@ -32,7 +33,7 @@ if (!environment.production) {
         AppRoutingModule,
         StoreModule.forRoot(),
         NgReduxDevtoolsModule.instrument({
-            name: 'MiniRx Showcase',
+            name: 'MiniRx Redux Showcase',
             maxAge: 25,
             latency: 250,
         }),
