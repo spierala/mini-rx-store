@@ -5,11 +5,11 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { createActionTypePrefix, ofType } from '../utils';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
-import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
+import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { Feature, nameUpdateAction } from '../feature';
 import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
-import { LoggerExtension } from '../logger.extension';
+import { LoggerExtension } from '../extensions/logger.extension';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',

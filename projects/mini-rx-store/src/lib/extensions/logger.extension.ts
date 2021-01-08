@@ -1,5 +1,5 @@
-import { StoreExtension } from './models';
-import StoreCore from './store-core';
+import { StoreExtension } from '../models';
+import StoreCore from '../store-core';
 
 export class LoggerExtension implements StoreExtension {
     init(): void {

@@ -1,6 +1,9 @@
 import { store } from '../store';
 import StoreCore from '../store-core';
-import { ReduxDevtoolsExtension, ReduxDevtoolsOptions } from '../redux-devtools.extension';
+import {
+    ReduxDevtoolsExtension,
+    ReduxDevtoolsOptions,
+} from '../extensions/redux-devtools.extension';
 import { Action } from '../models';
 import { counterReducer, CounterState } from './_spec-helpers';
 
