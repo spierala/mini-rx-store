@@ -1,10 +1,10 @@
-import { store } from '../store';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Action } from '../models';
 import {
     counterStringInitialState,
     counterStringReducer,
     CounterStringState,
+    store,
 } from './_spec-helpers';
 import { undo, UndoExtension } from '../undo.extension';
 import { FeatureStore } from '../feature-store';

@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Product } from '../../product';
 import { ProductStateService } from '../../state/product-state.service';
-import { store } from 'mini-rx-store';
 
 @Component({
     templateUrl: './product-shell.component.html',

@@ -8,15 +8,29 @@ import {
     StoreExtension,
 } from './models';
 import StoreCore from './store-core';
+import { FeatureStore } from './feature-store';
+import { miniRxError } from './utils';
 
-// Expose public store API
+// Public Store API
 export class Store {
+    private static instance: Store;
+
+    // Prevent direct construction calls with the `new` operator.
+    private constructor() {}
+
+    static getInstance() {
+        if (!Store.instance) {
+            Store.instance = new Store();
+        }
+        return Store.instance;
+    }
+
     feature<StateType>(
         featureName: string,
         reducer: Reducer<StateType>,
         config?: StoreConfig<StateType>
     ) {
-        StoreCore.addFeature<StateType>(featureName, reducer);
+        StoreCore.addFeature<StateType>(featureName, reducer); // TODO handle config
     }
 
     config(reducers: ReducerDictionary, config?: StoreConfig<AppState>) {
@@ -38,7 +52,21 @@ export class Store {
     }
 }
 
+let store: Store;
+
 // Created once to initialize singleton
-export const store = new Store();
+export function createStore(reducers: ReducerDictionary, config?: StoreConfig<AppState>): Store {
+    if (store) {
+        miniRxError('Store is already created. Did you call `createStore` multiple times?');
+        return store;
+    }
+    store = Store.getInstance();
+    store.config(reducers, config);
+    return store;
+}
+
+export function createFeatureStore<T>(featureName: string, initialState: T): FeatureStore<T> {
+    return new FeatureStore<T>(featureName, initialState);
+}
 
 export const actions$ = StoreCore.actions$;

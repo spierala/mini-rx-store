@@ -10,17 +10,17 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
 export const nameUpdateAction = 'SET-STATE';
 
-export abstract class FeatureStore<StateType> {
+export class FeatureStore<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
     private readonly featureSelector: Selector<AppState, StateType>;
 
-    protected state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
+    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
     get state(): StateType {
         return this.state$.getValue();
     }
 
-    protected constructor(private featureName: string, initialState: StateType) {
+    constructor(private featureName: string, initialState: StateType) {
         const actionTypePrefix = createActionTypePrefix(featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
         StoreCore.addFeature<StateType>(featureName, reducer, {
@@ -38,7 +38,7 @@ export abstract class FeatureStore<StateType> {
         StoreCore.select(this.featureSelector).subscribe(this.state$);
     }
 
-    protected setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: Action = {
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
             payload:
@@ -52,9 +52,9 @@ export abstract class FeatureStore<StateType> {
         return action;
     }
 
-    protected select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
-    protected select<K>(mapFn: (state: AppState) => K, selectFromStore?: boolean): Observable<K>;
-    protected select<K, T extends (state: AppState | StateType) => K>(
+    select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
+    select<K>(mapFn: (state: AppState) => K, selectFromStore?: boolean): Observable<K>;
+    select<K, T extends (state: AppState | StateType) => K>(
         mapFn: T,
         selectFromStore: boolean = false
     ): Observable<K> {
@@ -67,7 +67,7 @@ export abstract class FeatureStore<StateType> {
         return StoreCore.select(selector);
     }
 
-    protected createEffect<PayLoadType = any>(
+    createEffect<PayLoadType = any>(
         effectFn: (payload: Observable<PayLoadType>) => Observable<any>
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();
@@ -79,7 +79,7 @@ export abstract class FeatureStore<StateType> {
         };
     }
 
-    protected undo(action: Action) {
+    undo(action: Action) {
         isUndoExtensionInitialized
             ? StoreCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized');

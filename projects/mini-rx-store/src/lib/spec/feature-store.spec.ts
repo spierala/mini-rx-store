@@ -1,13 +1,12 @@
-import { FeatureStore, nameUpdateAction } from '../feature-store';
+import { FeatureStore } from '../feature-store';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { EMPTY, Observable } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
-import { actions$, store } from '../store';
+import { actions$, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
-import { counterInitialState, counterReducer, CounterState } from './_spec-helpers';
+import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
 import { Action, Reducer } from '../models';
-import { createActionTypePrefix } from '../utils';
 
 interface UserState {
     firstName: string;
@@ -269,5 +268,33 @@ describe('FeatureStore', () => {
         counterFeature.increment();
 
         expect(metaReducerSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should create a Feature Store with functional creation methods', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
+            'funcFeatureStore',
+            counterInitialState
+        );
+
+        const getFeatureState = createFeatureSelector<CounterState>();
+        const getCounter = createSelector(getFeatureState, (state) => state.counter);
+
+        const counter$: Observable<number> = fs.select(getCounter);
+
+        function inc() {
+            fs.setState((state) => ({
+                counter: state.counter + 1,
+            }));
+        }
+
+        const spy = jest.fn();
+
+        counter$.subscribe(spy);
+
+        expect(spy).toHaveBeenCalledWith(1);
+
+        inc();
+
+        expect(spy).toHaveBeenCalledWith(2);
     });
 });

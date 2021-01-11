@@ -8,7 +8,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import * as fromUser from './state';
 import * as userActions from './state/user.actions';
-import { Store, store } from 'mini-rx-store';
+import { Store } from 'mini-rx-store';
 
 @Component({
     templateUrl: './login.component.html',

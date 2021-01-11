@@ -1,6 +1,7 @@
-import { actions$, store } from '../store';
+import { actions$ } from '../store';
 import { combineReducers, ofType } from '../utils';
 import { Action } from '../models';
+import { store } from './_spec-helpers';
 
 const action1: Action = {
     type: 'updateUser',

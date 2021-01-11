@@ -1,16 +1,17 @@
 import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { Actions, actions$, store, Store, ReducerDictionary, Reducer } from 'mini-rx-store';
+import { Actions, actions$, Store, ReducerDictionary, Reducer } from 'mini-rx-store';
+import { createStore } from '../../../mini-rx-store/src/lib/store';
 
 export const REDUCERS = new InjectionToken<ReducerDictionary>('@mini-rx/reducers');
 export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature_name');
 export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature_reducer');
 
+const storeFactory = (reducers: ReducerDictionary) => {
+    return createStore(reducers); // TODO config
+};
+
 @NgModule()
-export class StoreRootModule {
-    constructor(@Inject(REDUCERS) reducers: ReducerDictionary, private store: Store) {
-        this.store.config(reducers);
-    }
-}
+export class StoreRootModule {}
 
 @NgModule()
 export class StoreFeatureModule {
@@ -33,7 +34,8 @@ export class StoreModule {
                 { provide: REDUCERS, useValue: reducers },
                 {
                     provide: Store,
-                    useValue: store,
+                    useFactory: storeFactory,
+                    deps: [REDUCERS],
                 },
                 {
                     provide: Actions,
