@@ -14,15 +14,7 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
-import { environment } from '../environments/environment';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
-
-// Store Extensions
-// if (!environment.production) {
-//     store.addExtension(new ImmutableStateExtension());
-//     store.addExtension(new LoggerExtension());
-//     store.addExtension(new UndoExtension());
-// }
 
 @NgModule({
     imports: [
@@ -31,7 +23,9 @@ import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx
         HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
         UserModule,
         AppRoutingModule,
-        StoreModule.forRoot(),
+        StoreModule.forRoot({
+            extensions: [new ImmutableStateExtension(), new LoggerExtension(), new UndoExtension()],
+        }),
         NgReduxDevtoolsModule.instrument({
             name: 'MiniRx Redux Showcase',
             maxAge: 25,

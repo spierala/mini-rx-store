@@ -22,7 +22,13 @@ export interface ActionWithMeta {
     meta: ActionMetaData;
 }
 
-export interface StoreConfig<StateType> {
+export interface StoreConfig {
+    reducers: ReducerDictionary;
+    metaReducers: MetaReducer<AppState>[];
+    extensions: StoreExtension[];
+}
+
+export interface FeatureStoreConfig<StateType> {
     metaReducers?: MetaReducer<StateType>[];
 }
 

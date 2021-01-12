@@ -1,17 +1,28 @@
 import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { Actions, actions$, Store, ReducerDictionary, Reducer } from 'mini-rx-store';
-import { createStore } from '../../../mini-rx-store/src/lib/store';
+import {
+    Actions,
+    actions$,
+    Store,
+    ReducerDictionary,
+    Reducer,
+    configureStore,
+    StoreConfig,
+} from 'mini-rx-store';
 
-export const REDUCERS = new InjectionToken<ReducerDictionary>('@mini-rx/reducers');
-export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature_name');
-export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature_reducer');
+export const STORE_CONFIG = new InjectionToken<ReducerDictionary>('@mini-rx/store-config');
+export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature-name');
+export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature-reducer');
 
-const storeFactory = (reducers: ReducerDictionary) => {
-    return createStore(reducers); // TODO config
+const storeFactory = (config: StoreConfig) => {
+    return configureStore(config);
 };
 
 @NgModule()
-export class StoreRootModule {}
+export class StoreRootModule {
+    constructor(
+        private store: Store // Make sure store is initialized also if it is NOT injected in other services/components
+    ) {}
+}
 
 @NgModule()
 export class StoreFeatureModule {
@@ -27,15 +38,15 @@ export class StoreFeatureModule {
 
 @NgModule()
 export class StoreModule {
-    static forRoot(reducers: ReducerDictionary = {}): ModuleWithProviders<StoreRootModule> {
+    static forRoot(config?: Partial<StoreConfig>): ModuleWithProviders<StoreRootModule> {
         return {
             ngModule: StoreRootModule,
             providers: [
-                { provide: REDUCERS, useValue: reducers },
+                { provide: STORE_CONFIG, useValue: config },
                 {
                     provide: Store,
                     useFactory: storeFactory,
-                    deps: [REDUCERS],
+                    deps: [STORE_CONFIG],
                 },
                 {
                     provide: Actions,
@@ -47,7 +58,7 @@ export class StoreModule {
 
     static forFeature<T>(
         featureName: string,
-        reducer: Reducer<any>
+        reducer: Reducer<T>
     ): ModuleWithProviders<StoreFeatureModule> {
         return {
             ngModule: StoreFeatureModule,

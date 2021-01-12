@@ -2,10 +2,17 @@
  * Public API Surface of mini-rx-store
  */
 
-export { actions$, Store } from './lib/store';
+export { actions$, Store, configureStore, createFeatureStore } from './lib/store';
 export { FeatureStore } from './lib/feature-store';
 export { createFeatureSelector, createSelector } from './lib/selector';
-export { Action, Reducer, Actions, ReducerDictionary } from './lib/models';
+export {
+    Action,
+    Reducer,
+    Actions,
+    ReducerDictionary,
+    StoreConfig,
+    FeatureStoreConfig,
+} from './lib/models';
 export { ofType } from './lib/utils';
 export {
     ReduxDevtoolsExtension,

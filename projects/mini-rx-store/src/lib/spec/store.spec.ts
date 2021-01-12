@@ -1,13 +1,13 @@
-import { actions$, createFeatureStore, createStore } from '../store';
+import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
 import { Action, Reducer } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
-import { createActionTypePrefix, ofType } from '../utils';
+import { ofType } from '../utils';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
-import { FeatureStore, nameUpdateAction } from '../feature-store';
+import { FeatureStore } from '../feature-store';
 import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 
@@ -122,14 +122,10 @@ describe('Store', () => {
             };
         }
 
-        store.config(
-            {
-                user: reducer,
-            },
-            {
-                metaReducers: [rootMetaReducer1, rootMetaReducer2],
-            }
-        );
+        StoreCore.config({
+            reducers: { user: reducer },
+            metaReducers: [rootMetaReducer1, rootMetaReducer2],
+        });
 
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
@@ -416,7 +412,7 @@ describe('Store', () => {
     });
 
     it('should throw when creating store again with functional creation method', () => {
-        expect(() => createStore({})).toThrow();
+        expect(() => configureStore({})).toThrow();
     });
 });
 

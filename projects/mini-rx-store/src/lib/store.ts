@@ -2,8 +2,8 @@ import { Observable } from 'rxjs';
 import {
     Action,
     AppState,
+    FeatureStoreConfig,
     Reducer,
-    ReducerDictionary,
     StoreConfig,
     StoreExtension,
 } from './models';
@@ -28,13 +28,9 @@ export class Store {
     feature<StateType>(
         featureName: string,
         reducer: Reducer<StateType>,
-        config?: StoreConfig<StateType>
+        config?: FeatureStoreConfig<StateType>
     ) {
-        StoreCore.addFeature<StateType>(featureName, reducer); // TODO handle config
-    }
-
-    config(reducers: ReducerDictionary, config?: StoreConfig<AppState>) {
-        StoreCore.config(reducers, config);
+        StoreCore.addFeature<StateType>(featureName, reducer, config);
     }
 
     createEffect(effect: Observable<Action>) {
@@ -54,14 +50,13 @@ export class Store {
 
 let store: Store;
 
-// Created once to initialize singleton
-export function createStore(reducers: ReducerDictionary, config?: StoreConfig<AppState>): Store {
+export function configureStore(config?: Partial<StoreConfig>): Store {
     if (store) {
-        miniRxError('Store is already created. Did you call `createStore` multiple times?');
+        miniRxError('Store is already configured. Did you call `configureStore` multiple times?');
         return store;
     }
     store = Store.getInstance();
-    store.config(reducers, config);
+    StoreCore.config(config);
     return store;
 }
 

@@ -10,7 +10,8 @@ import {
     loadSuccess,
     setCurrentProduct,
     toggleProductCode,
-    updateProductFail, updateProductOptimistic,
+    updateProductFail,
+    updateProductOptimistic,
     updateProductSuccess,
 } from './product.actions';
 import { on, reducer } from 'ts-action';
@@ -30,7 +31,7 @@ const initialState: ProductState = {
     error: '',
 };
 
-export const productReducer = reducer(
+export const productReducer = reducer<ProductState>(
     initialState,
     on(toggleProductCode, (state, { payload }) => ({ ...state, showProductCode: payload })),
     on(setCurrentProduct, (state, { payload }) => ({ ...state, currentProductId: payload.id })),
@@ -57,9 +58,10 @@ export const productReducer = reducer(
             error: '',
         };
     }),
-    on(updateProductOptimistic, (state, {payload}) => {
-        const updatedProducts = state.products.map(
-            item => payload.id === item.id ? payload : item);
+    on(updateProductOptimistic, (state, { payload }) => {
+        const updatedProducts = state.products.map((item) =>
+            payload.id === item.id ? payload : item
+        );
         return {
             ...state,
             products: updatedProducts,

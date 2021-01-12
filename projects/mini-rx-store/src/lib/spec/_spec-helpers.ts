@@ -1,7 +1,7 @@
 import { Action } from '../models';
-import { createStore, Store } from '../store';
+import { configureStore, Store } from '../store';
 
-export const store: Store = createStore({});
+export const store: Store = configureStore({});
 
 export interface CounterState {
     counter: number;

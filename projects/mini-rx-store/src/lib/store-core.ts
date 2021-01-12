@@ -158,23 +158,29 @@ class StoreCore {
         );
     }
 
-    config(reducers, config: StoreConfig<AppState> = {}) {
+    config(config: Partial<StoreConfig> = {}) {
+        if (config.extensions && config.extensions.length > 0) {
+            config.extensions.forEach((extension) => this.addExtension(extension));
+        }
+
         if (config.metaReducers && config.metaReducers.length > 0) {
             this.addMetaReducers(...config.metaReducers);
         }
 
-        Object.keys(reducers).forEach((featureName) => {
-            checkFeatureExists(featureName, this.reducers);
-            const featureReducer: Reducer<AppState> = createFeatureReducer(
-                featureName,
-                reducers[featureName]
-            );
+        if (config.reducers) {
+            Object.keys(config.reducers).forEach((featureName) => {
+                checkFeatureExists(featureName, this.reducers);
+                const featureReducer: Reducer<AppState> = createFeatureReducer(
+                    featureName,
+                    config.reducers[featureName]
+                );
 
-            this.reducers = {
-                ...this.reducers,
-                [featureName]: featureReducer,
-            };
-        });
+                this.reducers = {
+                    ...this.reducers,
+                    [featureName]: featureReducer,
+                };
+            });
+        }
 
         this.dispatch({ type: storeInitActionType });
     }
