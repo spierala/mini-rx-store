@@ -41,7 +41,7 @@ describe('Redux Dev Tools', () => {
         };
 
         extension = new ReduxDevtoolsExtension(options);
-        store.addExtension(extension);
+        store._addExtension(extension);
 
         expect(connectFn).toHaveBeenCalledTimes(1);
         expect(connectFn).toHaveBeenCalledWith(options);

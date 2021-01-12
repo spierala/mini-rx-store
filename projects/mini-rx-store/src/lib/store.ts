@@ -11,7 +11,6 @@ import StoreCore from './store-core';
 import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
 
-// Public Store API
 export class Store {
     private static instance: Store;
 
@@ -37,14 +36,15 @@ export class Store {
         StoreCore.createEffect(effect);
     }
 
-    addExtension(extension: StoreExtension) {
-        StoreCore.addExtension(extension);
-    }
-
     dispatch = (action: Action) => StoreCore.dispatch(action);
 
     select<K>(mapFn: (state: AppState) => K): Observable<K> {
         return StoreCore.select(mapFn);
+    }
+
+    // @internal
+    _addExtension(extension: StoreExtension) {
+        StoreCore.addExtension(extension);
     }
 }
 

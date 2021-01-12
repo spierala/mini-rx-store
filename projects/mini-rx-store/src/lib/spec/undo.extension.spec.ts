@@ -38,7 +38,7 @@ describe('Undo Extension', () => {
             expect(featureStore.undoLastAction).toThrow();
         });
 
-        store.addExtension(new UndoExtension());
+        store._addExtension(new UndoExtension());
 
         const counterSpy = jest.fn();
         featureStore.count$.subscribe(counterSpy);

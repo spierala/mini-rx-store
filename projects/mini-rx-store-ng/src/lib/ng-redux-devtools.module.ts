@@ -25,7 +25,7 @@ export class NgReduxDevtoolsService {
         private store: Store,
         @Inject(DEVTOOLS_OPTIONS) private options: ReduxDevtoolsOptions
     ) {
-        this.store.addExtension(new NgReduxDevtoolsExtension(options, injector));
+        this.store._addExtension(new NgReduxDevtoolsExtension(options, injector));
     }
 }
 

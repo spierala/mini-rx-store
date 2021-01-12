@@ -70,7 +70,7 @@ describe('Immutable State Extension', () => {
     let counterStateRaw: CounterState;
 
     beforeAll(() => {
-        store.addExtension(new ImmutableStateExtension());
+        store._addExtension(new ImmutableStateExtension());
         store.feature<CounterState>('immutableCounter2', counterReducerWithMutation);
         store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
     });
