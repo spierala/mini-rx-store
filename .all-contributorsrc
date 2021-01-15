@@ -13,6 +13,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "spierala",
+      "name": "Florian Spier",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1272446?v=4",
+      "profile": "https://www.florian-spier.be",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
