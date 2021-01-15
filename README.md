@@ -505,10 +505,6 @@ These projects, articles and courses helped and inspired me to create MiniRx:
 
 MIT
 
-## Created By
-
-If you like this, follow [@spierala](https://twitter.com/spierala) on twitter.
-
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
