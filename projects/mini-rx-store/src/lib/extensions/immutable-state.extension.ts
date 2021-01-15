@@ -14,7 +14,7 @@ export class ImmutableStateExtension implements StoreExtension {
  * Meta-reducer that prevents state from being mutated anywhere in the app.
  */
 
-export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
+function storeFreeze(reducer: Reducer<any>): Reducer<any> {
     return function freeze(state, action): any {
         state = state || {};
 

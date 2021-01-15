@@ -3,7 +3,7 @@ import { Action, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
-import { isUndoExtensionInitialized, undo } from './undo.extension';
+import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;

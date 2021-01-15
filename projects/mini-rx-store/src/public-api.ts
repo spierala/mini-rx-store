@@ -20,4 +20,4 @@ export {
 } from './lib/extensions/redux-devtools.extension';
 export { LoggerExtension } from './lib/extensions/logger.extension';
 export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
-export { UndoExtension, undo } from './lib/undo.extension';
+export { UndoExtension, undo } from './lib/extensions/undo.extension';
