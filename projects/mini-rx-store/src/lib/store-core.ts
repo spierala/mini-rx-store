@@ -15,9 +15,7 @@ import {
     catchError,
     distinctUntilChanged,
     map,
-    mergeAll,
     observeOn,
-    scan,
     tap,
     withLatestFrom,
 } from 'rxjs/operators';
@@ -35,12 +33,6 @@ class StoreCore {
     actions$: Actions = this.actionsWithMetaSource
         .asObservable()
         .pipe(map((actionWithMeta) => actionWithMeta.action));
-
-    // EFFECTS
-    private effectsSource: Subject<Observable<Action>> = new Subject();
-    private effects$: Actions = this.effectsSource.pipe(
-        mergeAll() // Merge the effects into one single stream of (effect) actions
-    );
 
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
@@ -65,28 +57,26 @@ class StoreCore {
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
         map((reducers) => combineReducers(Object.values(reducers)))
     );
-
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
     constructor() {
-        // Listen to Actions which are emitted by Effects and dispatch
-        this.effects$.pipe(tap((action) => this.dispatch(action))).subscribe();
-
         // Listen to the Actions Stream and update state accordingly
         this.actionsWithMetaSource
             .pipe(
                 observeOn(queueScheduler),
                 withLatestFrom(
+                    this.state$,
                     this.combinedReducer$,
                     this.reducersSource,
                     this.combinedMetaReducer$
                 ),
-                scan(
+                tap(
                     (
-                        state,
-                        [actionWithMeta, combinedReducer, reducerDictionary, combinedMetaReducer]: [
+                        [actionWithMeta, state, combinedReducer, reducerDictionary, combinedMetaReducer]: [
+
                             ActionWithMeta,
+                            AppState,
                             Reducer<AppState>,
                             ReducerDictionary,
                             MetaReducer<AppState>
@@ -107,15 +97,11 @@ class StoreCore {
                         const reducerWithMetaReducers: Reducer<AppState> = combinedMetaReducer(
                             reducer
                         );
-                        return reducerWithMetaReducers(state, action);
-                    },
-                    {}
-                ),
-                tap((state: AppState) => {
-                    this.updateState(state);
-                })
-            )
-            .subscribe();
+                        const newState: AppState = reducerWithMetaReducers(state, action);
+                        this.updateState(newState);
+                    }
+                )
+            ).subscribe();
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {
@@ -187,7 +173,7 @@ class StoreCore {
 
     createEffect(effect$: Observable<Action>) {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        this.effectsSource.next(effectWithErrorHandler$);
+        effectWithErrorHandler$.subscribe(action => this.dispatch(action));
     }
 
     dispatch = (action: Action, meta?: ActionMetaData) =>
