@@ -1,7 +1,13 @@
-![MiniRx - RxJS Redux Store - Logo](.github/images/mini-rx-logo.png)
+![MiniRx - RxJS Redux Store - Logo](.github/images/mini-rx-logo-white-bg.png)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![npm version](https://badge.fury.io/js/mini-rx-store.svg)](https://www.npmjs.com/package/mini-rx-store)
+[![NPM](https://img.shields.io/npm/v/mini-rx-store)](https://www.npmjs.com/package/mini-rx-store)
+[![Downloads](https://img.shields.io/npm/dt/mini-rx-store)](https://npmcharts.com/compare/mini-rx-store?interval=30)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 > **ℹ️  Version 2:** Currently I am working on version 2 of mini-rx-store. Please let me know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
 
@@ -499,6 +505,22 @@ These projects, articles and courses helped and inspired me to create MiniRx:
 
 MIT
 
-## Created By
+## Contributors ✨
 
-If you like this, follow [@spierala](https://twitter.com/spierala) on twitter.
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/PieterVanPoyer"><img src="https://avatars2.githubusercontent.com/u/33040889?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pieter Van Poyer</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=PieterVanPoyer" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
