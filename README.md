@@ -499,6 +499,17 @@ These projects, articles and courses helped and inspired me to create MiniRx:
 
 MIT
 
-## Created By
+## Contributors
 
-If you like this, follow [@spierala](https://twitter.com/spierala) on twitter.
+Thanks everyone!
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
