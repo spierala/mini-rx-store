@@ -36,12 +36,12 @@ export function init(devtoolsService: NgReduxDevtoolsService) {
 }
 
 @NgModule()
-export class NgReduxDevtoolsModule {
+export class StoreDevtoolsModule {
     static instrument(
         config: Partial<ReduxDevtoolsOptions> = {}
-    ): ModuleWithProviders<NgReduxDevtoolsModule> {
+    ): ModuleWithProviders<StoreDevtoolsModule> {
         return {
-            ngModule: NgReduxDevtoolsModule,
+            ngModule: StoreDevtoolsModule,
             providers: [
                 {
                     provide: DEVTOOLS_OPTIONS,

@@ -13,7 +13,7 @@ import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
+import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
 
 @NgModule({
@@ -26,7 +26,7 @@ import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx
         StoreModule.forRoot({
             extensions: [new ImmutableStateExtension(), new LoggerExtension(), new UndoExtension()],
         }),
-        NgReduxDevtoolsModule.instrument({
+        StoreDevtoolsModule.instrument({
             name: 'MiniRx Redux Showcase',
             maxAge: 25,
             latency: 250,

@@ -14,7 +14,7 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
+import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { LoggerExtension } from 'mini-rx-store';
 
 @NgModule({
@@ -27,11 +27,11 @@ import { LoggerExtension } from 'mini-rx-store';
         StoreModule.forRoot({
             extensions: [new LoggerExtension()],
         }),
-        NgReduxDevtoolsModule.instrument({
+        StoreDevtoolsModule.instrument({
             name: 'MiniRx Showcase',
             maxAge: 25,
             latency: 250,
-        }),
+        })
     ],
     declarations: [
         AppComponent,
