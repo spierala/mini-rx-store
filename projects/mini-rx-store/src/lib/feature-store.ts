@@ -8,7 +8,7 @@ import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-export const nameUpdateAction = 'SET-STATE';
+export const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
     private readonly actionTypePrefix: string; // E.g. @mini-rx/products
