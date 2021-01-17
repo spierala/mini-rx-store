@@ -67,7 +67,7 @@ export class FeatureStore<StateType> {
         return StoreCore.select(selector);
     }
 
-    createEffect<PayLoadType = any>(
+    effect<PayLoadType = any>(
         effectFn: (payload: Observable<PayLoadType>) => Observable<any>
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();

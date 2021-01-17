@@ -28,7 +28,7 @@ export class ProductStateService extends FeatureStore<ProductState> {
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)
-    loadProducts = this.createEffect<void>(
+    loadProducts = this.effect<void>(
         mergeMap(() =>
             this.productService.getProducts().pipe(
                 tap((products) => this.setState((state) => ({ products }), 'load success')),
@@ -46,7 +46,7 @@ export class ProductStateService extends FeatureStore<ProductState> {
         )
     );
 
-    createProduct = this.createEffect<Product>((payload$) => {
+    createProduct = this.effect<Product>((payload$) => {
         return payload$.pipe(
             mergeMap((product) => {
                 return this.productService.createProduct(product).pipe(
@@ -69,7 +69,7 @@ export class ProductStateService extends FeatureStore<ProductState> {
         );
     });
 
-    updateProduct = this.createEffect<Product>(
+    updateProduct = this.effect<Product>(
         mergeMap((product) => {
             return this.productService.updateProduct(product).pipe(
                 tap((updatedProduct) => {
@@ -94,7 +94,7 @@ export class ProductStateService extends FeatureStore<ProductState> {
     );
 
     // Delete with Optimistic Update
-    deleteProduct = this.createEffect<number>(
+    deleteProduct = this.effect<number>(
         pipe(
             mergeMap((productId) => {
                 // Optimistic Update
