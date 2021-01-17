@@ -17,6 +17,7 @@ export class Store {
     // Prevent direct construction calls with the `new` operator.
     private constructor() {}
 
+    /** @deprecated This is an internal implementation detail, do not use. */
     static getInstance() {
         if (!Store.instance) {
             Store.instance = new Store();
@@ -42,7 +43,7 @@ export class Store {
         return StoreCore.select(mapFn);
     }
 
-    // @internal
+    /** @deprecated This is an internal implementation detail, do not use. */
     _addExtension(extension: StoreExtension) {
         StoreCore.addExtension(extension);
     }
