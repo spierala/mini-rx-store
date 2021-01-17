@@ -218,7 +218,7 @@ describe('FeatureStore', () => {
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
-            type: '@mini-rx/user2/SET-STATE/updateCity',
+            type: '@mini-rx/user2/set-state/updateCity',
             payload: { city: 'NY' },
         });
     });
@@ -231,7 +231,7 @@ describe('FeatureStore', () => {
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
             action: {
-                type: '@mini-rx/user2/SET-STATE/updateCity',
+                type: '@mini-rx/user2/set-state/updateCity',
                 payload: { city: 'NY' },
             },
             meta: {
