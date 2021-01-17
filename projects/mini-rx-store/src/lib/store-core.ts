@@ -171,7 +171,7 @@ class StoreCore {
         this.dispatch({ type: storeInitActionType });
     }
 
-    createEffect(effect$: Observable<Action>) {
+    effect(effect$: Observable<Action>) {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
         effectWithErrorHandler$.subscribe(action => this.dispatch(action));
     }

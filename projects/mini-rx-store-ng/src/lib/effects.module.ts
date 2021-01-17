@@ -17,7 +17,7 @@ export class EffectsModule {
             objectsWithEffects.splice(0, objectsWithEffects.length)
         );
         effects.forEach((effect: Observable<Action>) => {
-            this.store.createEffect(effect);
+            this.store.effect(effect);
         });
     }
 

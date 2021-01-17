@@ -33,8 +33,15 @@ export class Store {
         StoreCore.addFeature<StateType>(featureName, reducer, config);
     }
 
+    /**
+     * @deprecated Use effect instead.
+     */
     createEffect(effect: Observable<Action>) {
-        StoreCore.createEffect(effect);
+        StoreCore.effect(effect);
+    }
+
+    effect(effect: Observable<Action>) {
+        StoreCore.effect(effect);
     }
 
     dispatch = (action: Action) => StoreCore.dispatch(action);
