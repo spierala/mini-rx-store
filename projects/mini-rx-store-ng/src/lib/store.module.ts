@@ -1,5 +1,13 @@
 import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { Actions, actions$, Store, Reducer, configureStore, StoreConfig } from 'mini-rx-store';
+import {
+    Actions,
+    actions$,
+    Store,
+    Reducer,
+    configureStore,
+    StoreConfig,
+    ReducerDictionary,
+} from 'mini-rx-store';
 
 export const STORE_CONFIG = new InjectionToken<ReducerDictionary>('@mini-rx/store-config');
 export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature-name');
