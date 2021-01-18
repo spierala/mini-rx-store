@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, queueScheduler, ReplaySubject, Subject } from 'rxjs';
 import {
     Action,
     ActionMetaData,
@@ -20,11 +20,11 @@ import {
     withLatestFrom,
 } from 'rxjs/operators';
 import {
-    combineReducers,
     combineMetaReducers,
+    combineReducers,
     createActionTypePrefix,
-    storeInitActionType,
     miniRxError,
+    storeInitActionType,
 } from './utils';
 
 class StoreCore {
@@ -35,7 +35,7 @@ class StoreCore {
         .pipe(map((actionWithMeta) => actionWithMeta.action));
 
     // APP STATE
-    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
+    private stateSource: ReplaySubject<AppState> = new ReplaySubject(1);
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // META REDUCERS
@@ -72,16 +72,19 @@ class StoreCore {
                     this.combinedMetaReducer$
                 ),
                 tap(
-                    (
-                        [actionWithMeta, state, combinedReducer, reducerDictionary, combinedMetaReducer]: [
-
-                            ActionWithMeta,
-                            AppState,
-                            Reducer<AppState>,
-                            ReducerDictionary,
-                            MetaReducer<AppState>
-                        ]
-                    ) => {
+                    ([
+                        actionWithMeta,
+                        state,
+                        combinedReducer,
+                        reducerDictionary,
+                        combinedMetaReducer,
+                    ]: [
+                        ActionWithMeta,
+                        AppState,
+                        Reducer<AppState>,
+                        ReducerDictionary,
+                        MetaReducer<AppState>
+                    ]) => {
                         const forFeature: string =
                             actionWithMeta.meta && actionWithMeta.meta.onlyForFeature;
                         const action: Action = actionWithMeta.action;
@@ -101,7 +104,8 @@ class StoreCore {
                         this.updateState(newState);
                     }
                 )
-            ).subscribe();
+            )
+            .subscribe();
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {
@@ -114,9 +118,10 @@ class StoreCore {
         config: {
             isDefaultReducer?: boolean;
             metaReducers?: MetaReducer<StateType>[];
+            initialState?: StateType;
         } = {}
     ) {
-        const { isDefaultReducer, metaReducers } = config;
+        const { isDefaultReducer, metaReducers, initialState } = config;
 
         reducer =
             metaReducers && metaReducers.length > 0
@@ -124,6 +129,10 @@ class StoreCore {
                 : reducer;
 
         checkFeatureExists(featureName, this.reducers);
+
+        if (typeof initialState !== 'undefined') {
+            reducer = createReducerWithInitialState(reducer, initialState);
+        }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
@@ -168,12 +177,14 @@ class StoreCore {
             });
         }
 
+        this.updateState(config.initialState);
+
         this.dispatch({ type: storeInitActionType });
     }
 
     createEffect(effect$: Observable<Action>) {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        effectWithErrorHandler$.subscribe(action => this.dispatch(action));
+        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
     }
 
     dispatch = (action: Action, meta?: ActionMetaData) =>
@@ -201,10 +212,24 @@ class StoreCore {
 
 function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
     return (state: AppState, action: Action): AppState => {
-        return {
-            ...state,
-            [featureName]: reducer(state[featureName], action),
-        };
+        const newFeatureState: any = reducer(state[featureName], action);
+        if (newFeatureState !== state[featureName]) {
+            // Only return a new AppState if the feature state changed
+            return {
+                ...state,
+                [featureName]: newFeatureState,
+            };
+        }
+        return state;
+    };
+}
+
+function createReducerWithInitialState<StateType>(
+    reducer: Reducer<StateType>,
+    initialState: StateType
+): Reducer<StateType> {
+    return (state: StateType = initialState, action: Action): StateType => {
+        return reducer(state, action);
     };
 }
 

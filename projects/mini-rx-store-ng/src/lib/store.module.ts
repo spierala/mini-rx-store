@@ -7,11 +7,13 @@ import {
     Reducer,
     configureStore,
     StoreConfig,
+    FeatureStoreConfig,
 } from 'mini-rx-store';
 
-export const STORE_CONFIG = new InjectionToken<ReducerDictionary>('@mini-rx/store-config');
+export const STORE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/store-config');
 export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature-name');
 export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature-reducer');
+export const FEATURE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/feature-store-config');
 
 const storeFactory = (config: StoreConfig) => {
     return configureStore(config);
@@ -30,15 +32,16 @@ export class StoreFeatureModule {
         private store: Store,
         root: StoreRootModule, // Prevent feature states to be initialized before root state
         @Inject(FEATURE_NAME) featureName: string,
-        @Inject(FEATURE_REDUCER) reducer: Reducer<any>
+        @Inject(FEATURE_REDUCER) reducer: Reducer<any>,
+        @Inject(FEATURE_CONFIG) config: FeatureStoreConfig<any>
     ) {
-        this.store.feature(featureName, reducer);
+        this.store.feature(featureName, reducer, config);
     }
 }
 
 @NgModule()
 export class StoreModule {
-    static forRoot(config?: Partial<StoreConfig>): ModuleWithProviders<StoreRootModule> {
+    static forRoot(config: Partial<StoreConfig>): ModuleWithProviders<StoreRootModule> {
         return {
             ngModule: StoreRootModule,
             providers: [
@@ -58,13 +61,15 @@ export class StoreModule {
 
     static forFeature<T>(
         featureName: string,
-        reducer: Reducer<T>
+        reducer: Reducer<T>,
+        config?: Partial<FeatureStoreConfig<T>>
     ): ModuleWithProviders<StoreFeatureModule> {
         return {
             ngModule: StoreFeatureModule,
             providers: [
                 { provide: FEATURE_NAME, useValue: featureName },
                 { provide: FEATURE_REDUCER, useValue: reducer },
+                { provide: FEATURE_CONFIG, useValue: config },
             ],
         };
     }

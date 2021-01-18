@@ -50,7 +50,7 @@ export class Store {
 
 let store: Store;
 
-export function configureStore(config?: Partial<StoreConfig>): Store {
+export function configureStore(config: Partial<StoreConfig>): Store {
     if (store) {
         miniRxError('Store is already configured. Did you call `configureStore` multiple times?');
         return store;
