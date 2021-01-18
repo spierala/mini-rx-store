@@ -12,7 +12,7 @@ import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
 
 export class Store {
-    private static instance: Store;
+    private static instance: Store = undefined;
 
     // Prevent direct construction calls with the `new` operator.
     private constructor() {}
