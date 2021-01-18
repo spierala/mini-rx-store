@@ -11,8 +11,7 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 export const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
-    private readonly actionTypePrefix: string; // E.g. @mini-rx/products
-    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
+    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
     private readonly featureSelector: Selector<AppState, StateType>;
 
     state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
@@ -27,10 +26,8 @@ export class FeatureStore<StateType> {
             isDefaultReducer: true,
         });
 
-        this.actionTypePrefix = actionTypePrefix;
-
         // Create Default Action Type (needed for setState())
-        this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
+        this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
 
         this.featureSelector = createFeatureSelector<StateType>(featureName);
 
