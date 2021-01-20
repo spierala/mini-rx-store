@@ -8,7 +8,13 @@ import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
-import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
+import {
+    counterInitialState,
+    counterReducer,
+    CounterState,
+    resetStoreConfig,
+    store,
+} from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 
 const asyncUser: Partial<UserState> = {
@@ -97,19 +103,42 @@ class CounterFeatureState extends FeatureStore<CounterState> {
 const getCounter3FeatureState = createFeatureSelector<CounterState>('counter3');
 const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
 
-describe('Store', () => {
+describe('Store Config', () => {
+    afterEach(() => {
+        resetStoreConfig();
+    });
+
     it('should initialize the store with an empty object', () => {
+        StoreCore.config();
+
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({});
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should initialize a Feature state with a root reducer (and a meta reducer)', () => {
+    it('should initialize a Feature state with a root reducer', () => {
+        StoreCore.config({
+            reducers: { user: reducer },
+        });
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith({
+            user: initialState,
+        });
+    });
+
+    it('should initialize a Feature state with a root reducer (and meta reducers)', () => {
         const callOrder = [];
+        const rootMetaReducer1Spy = jest.fn();
+        const rootInitialState = {
+            user: {},
+        };
 
         function rootMetaReducer1(reducer) {
             return (state, action) => {
+                rootMetaReducer1Spy(state);
                 callOrder.push('meta1');
                 return reducer(state, action);
             };
@@ -123,23 +152,38 @@ describe('Store', () => {
         }
 
         StoreCore.config({
-            reducers: { user: reducer },
+            reducers: {
+                user: reducer,
+                user2: reducer,
+            },
             metaReducers: [rootMetaReducer1, rootMetaReducer2],
+            initialState: rootInitialState,
         });
 
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
+
+        // rootInitialState should not affect other root reducers
         expect(spy).toHaveBeenCalledWith({
-            user: initialState,
+            ...rootInitialState,
+            user2: initialState,
         });
-        expect(spy).toHaveBeenCalledTimes(1);
 
-        // Call meta reducers from left to right
+        // Meta reducers should be called from left to right
         expect(callOrder).toEqual(['meta1', 'meta2']);
-    });
 
-    it('should throw when reusing feature name', () => {
-        expect(() => store.feature<UserState>('user', reducer)).toThrowError();
+        // First meta reducer should be called with rootInitialState
+        expect(rootMetaReducer1Spy).toHaveBeenCalledWith(rootInitialState);
+    });
+});
+
+describe('Store', () => {
+    beforeAll(() => {
+        resetStoreConfig();
+
+        StoreCore.config({
+            reducers: { user: reducer },
+        });
     });
 
     it('should run the redux reducers when a new Feature state is added', () => {
@@ -152,6 +196,10 @@ describe('Store', () => {
         store.feature('oneMoreFeature', someReducer);
         store.feature('oneMoreFeature2', (state) => state);
         expect(reducerSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should throw when reusing feature name', () => {
+        expect(() => store.feature<UserState>('oneMoreFeature', reducer)).toThrowError();
     });
 
     it('should update the Feature state', () => {
@@ -391,6 +439,21 @@ describe('Store', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+    it('should overwrite reducers default state with a provided initialState', () => {
+        const featureName = 'counterWithCustomInitialState';
+        const customInitialState: CounterState = {
+            counter: 2,
+        };
+
+        store.feature<CounterState>(featureName, counterReducer, {
+            initialState: customInitialState,
+        });
+
+        const spy = jest.fn();
+        store.select((state) => state[featureName]).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(customInitialState);
+    });
+
     it('should resubscribe on action stream when side effect error is not handled', () => {
         const spy = jest.fn();
 
@@ -413,6 +476,16 @@ describe('Store', () => {
 
     it('should throw when creating store again with functional creation method', () => {
         expect(() => configureStore({})).toThrow();
+    });
+
+    it('should not emit a new AppState when dispatching unknown Actions ', () => {
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledTimes(1);
+        spy.mockReset();
+
+        store.dispatch({ type: 'unknownAction' });
+        expect(spy).toHaveBeenCalledTimes(0);
     });
 });
 

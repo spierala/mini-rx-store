@@ -1,7 +1,14 @@
 import { Action } from '../models';
 import { configureStore, Store } from '../store';
+import { default as StoreCore } from '../store-core';
 
 export const store: Store = configureStore({});
+
+export function resetStoreConfig() {
+    StoreCore['extensions'] = [];
+    StoreCore['metaReducersSource'].next([]);
+    StoreCore['reducersSource'].next({});
+}
 
 export interface CounterState {
     counter: number;
