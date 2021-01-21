@@ -117,6 +117,21 @@ describe('Store Config', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+    it('should initialize the store with an empty object when root reducers have no initial state', () => {
+        StoreCore.config({
+            reducers: {
+                test: (state, action) => {
+                    return state;
+                },
+            },
+        });
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith({});
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
     it('should initialize a Feature state with a root reducer', () => {
         StoreCore.config({
             reducers: { user: reducer },
