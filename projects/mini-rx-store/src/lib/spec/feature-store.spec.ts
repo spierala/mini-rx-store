@@ -57,11 +57,11 @@ class FeatureState extends FeatureStore<UserState> {
     city$ = this.select(getCity, true);
     someFeatureState$ = this.select(getSomeFeatureSelector, true);
 
-    loadFn = this.createEffect((payload$) =>
+    loadFn = this.effect((payload$) =>
         payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap((user) => this.setState(user)))))
     );
 
-    loadFnWithError = this.createEffect((payload$) =>
+    loadFnWithError = this.effect((payload$) =>
         payload$.pipe(
             mergeMap(() =>
                 fakeApiWithError().pipe(
@@ -218,7 +218,7 @@ describe('FeatureStore', () => {
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
-            type: '@mini-rx/user2/SET-STATE/updateCity',
+            type: '@mini-rx/user2/set-state/updateCity',
             payload: { city: 'NY' },
         });
     });
@@ -231,7 +231,7 @@ describe('FeatureStore', () => {
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
             action: {
-                type: '@mini-rx/user2/SET-STATE/updateCity',
+                type: '@mini-rx/user2/set-state/updateCity',
                 payload: { city: 'NY' },
             },
             meta: {

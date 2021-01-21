@@ -1,7 +1,8 @@
 // Credits go to https://github.com/brechtbilliet/ngrx-undo
 
-import { Action, Reducer, StoreExtension } from './models';
-import StoreCore from './store-core';
+import { Action, Reducer, StoreExtension } from '../models';
+import StoreCore from '../store-core';
+import { storeInitActionType } from '../utils';
 
 const defaultBufferSize = 100;
 
@@ -21,7 +22,7 @@ export class UndoExtension implements StoreExtension {
     }
 }
 
-const UNDO_ACTION = '@mini-rx/UNDO-ACTION';
+const UNDO_ACTION = '@mini-rx/undo';
 
 export function undo(action: Action) {
     return {
@@ -38,14 +39,14 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
             // except the one we want to rollback
             let newState: any = initialState;
             executedActions = executedActions.filter((eAct) => eAct !== action.payload);
-            // update the state for every action untill we get the
+            // update the state for every action until we get the
             // exact same state as before, but without the action we want to rollback
             executedActions.forEach(
                 (executedAction) => (newState = rootReducer(newState, executedAction))
             );
             return newState;
-        } else if (action.type !== '@mini-rx/store/init') {
-            // push every action that isn't an UNDO_ACTION to the executedActions property
+        } else if (action.type !== storeInitActionType) {
+            // push every action that isn't an UNDO_ACTION or STORE_INIT_ACTION to the executedActions property
             executedActions.push(action);
         }
         const updatedState = rootReducer(state, action);

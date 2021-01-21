@@ -3,7 +3,6 @@ import {
     Actions,
     actions$,
     Store,
-    ReducerDictionary,
     Reducer,
     configureStore,
     StoreConfig,
@@ -15,9 +14,9 @@ export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature-name');
 export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature-reducer');
 export const FEATURE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/feature-store-config');
 
-const storeFactory = (config: StoreConfig) => {
+export function storeFactory(config: StoreConfig) {
     return configureStore(config);
-};
+}
 
 @NgModule()
 export class StoreRootModule {

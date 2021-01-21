@@ -363,7 +363,7 @@ describe('Store', () => {
     it('should create and execute an effect', () => {
         store.dispatch({ type: 'resetUser' });
 
-        store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('loadUser'),
                 mergeMap(() =>
@@ -381,7 +381,7 @@ describe('Store', () => {
 
         // Lets be crazy and add another effect while the other effect is busy
         cold('-a').subscribe(() => {
-            store.createEffect(
+            store.effect(
                 actions$.pipe(
                     ofType('saveUser'),
                     mergeMap(() =>
@@ -406,7 +406,7 @@ describe('Store', () => {
     it('should create and execute an effect and handle side effect error', () => {
         store.dispatch({ type: 'resetUser' });
 
-        store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('someAction'),
                 mergeMap(() =>
@@ -484,7 +484,7 @@ describe('Store', () => {
 
         store.feature('someFeature', someReducer);
 
-        store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('someAction2'),
                 mergeMap(() => onEffectStarted())
@@ -530,7 +530,7 @@ describe('Store', () => {
 
         store.feature<CounterState>('counter2', counter2Reducer);
 
-        store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('counterEffectStart'),
                 mergeMap(() => of({ type: 'counterEffectSuccess' }))
@@ -577,7 +577,7 @@ describe('Store', () => {
     it('should resubscribe on action stream when side effect error is not handled', () => {
         const spy = jest.fn();
 
-        store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('someAction3'),
                 mergeMap(() => {

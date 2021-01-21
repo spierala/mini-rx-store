@@ -147,7 +147,7 @@ class StoreCore {
         const onlyForFeature: string = isDefaultReducer ? featureName : undefined;
         this.dispatch(
             {
-                type: `${actionTypePrefix}/INIT`,
+                type: `${actionTypePrefix}/init`,
             },
             { onlyForFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
         );
@@ -182,7 +182,7 @@ class StoreCore {
         this.dispatch({ type: storeInitActionType });
     }
 
-    createEffect(effect$: Observable<Action>) {
+    effect(effect$: Observable<Action>) {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
         effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
     }

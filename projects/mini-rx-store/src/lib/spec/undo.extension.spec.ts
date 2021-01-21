@@ -6,7 +6,7 @@ import {
     CounterStringState,
     store,
 } from './_spec-helpers';
-import { undo, UndoExtension } from '../undo.extension';
+import { undo, UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 

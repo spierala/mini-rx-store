@@ -12,11 +12,12 @@ import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
 
 export class Store {
-    private static instance: Store;
+    private static instance: Store = undefined;
 
     // Prevent direct construction calls with the `new` operator.
     private constructor() {}
 
+    /** @deprecated This is an internal implementation detail, do not use. */
     static getInstance() {
         if (!Store.instance) {
             Store.instance = new Store();
@@ -32,8 +33,15 @@ export class Store {
         StoreCore.addFeature<StateType>(featureName, reducer, config);
     }
 
+    /**
+     * @deprecated Use effect instead.
+     */
     createEffect(effect: Observable<Action>) {
-        StoreCore.createEffect(effect);
+        StoreCore.effect(effect);
+    }
+
+    effect(effect: Observable<Action>) {
+        StoreCore.effect(effect);
     }
 
     dispatch = (action: Action) => StoreCore.dispatch(action);
@@ -42,7 +50,7 @@ export class Store {
         return StoreCore.select(mapFn);
     }
 
-    // @internal
+    /** @deprecated This is an internal implementation detail, do not use. */
     _addExtension(extension: StoreExtension) {
         StoreCore.addExtension(extension);
     }

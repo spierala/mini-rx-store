@@ -22,10 +22,9 @@ export const DEVTOOLS_OPTIONS = new InjectionToken<ReduxDevtoolsOptions>(
 export class NgReduxDevtoolsService {
     constructor(
         private injector: Injector,
-        private store: Store,
         @Inject(DEVTOOLS_OPTIONS) private options: ReduxDevtoolsOptions
     ) {
-        this.store._addExtension(new NgReduxDevtoolsExtension(options, injector));
+        Store.getInstance()._addExtension(new NgReduxDevtoolsExtension(options, injector));
     }
 }
 
@@ -36,12 +35,12 @@ export function init(devtoolsService: NgReduxDevtoolsService) {
 }
 
 @NgModule()
-export class NgReduxDevtoolsModule {
+export class StoreDevtoolsModule {
     static instrument(
         config: Partial<ReduxDevtoolsOptions> = {}
-    ): ModuleWithProviders<NgReduxDevtoolsModule> {
+    ): ModuleWithProviders<StoreDevtoolsModule> {
         return {
-            ngModule: NgReduxDevtoolsModule,
+            ngModule: StoreDevtoolsModule,
             providers: [
                 {
                     provide: DEVTOOLS_OPTIONS,

@@ -3,16 +3,15 @@ import { Action, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError } from './utils';
 import { createFeatureSelector, createSelector, Selector } from './selector';
-import { isUndoExtensionInitialized, undo } from './undo.extension';
+import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-export const nameUpdateAction = 'SET-STATE';
+export const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
-    private readonly actionTypePrefix: string; // E.g. @mini-rx/products
-    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/SET-STATE
+    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
     private readonly featureSelector: Selector<AppState, StateType>;
 
     state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
@@ -27,10 +26,8 @@ export class FeatureStore<StateType> {
             isDefaultReducer: true,
         });
 
-        this.actionTypePrefix = actionTypePrefix;
-
         // Create Default Action Type (needed for setState())
-        this.actionTypeSetState = `${this.actionTypePrefix}/${nameUpdateAction}`;
+        this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
 
         this.featureSelector = createFeatureSelector<StateType>(featureName);
 
@@ -67,7 +64,7 @@ export class FeatureStore<StateType> {
         return StoreCore.select(selector);
     }
 
-    createEffect<PayLoadType = any>(
+    effect<PayLoadType = any>(
         effectFn: (payload: Observable<PayLoadType>) => Observable<any>
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();

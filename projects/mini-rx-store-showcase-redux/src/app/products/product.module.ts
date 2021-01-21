@@ -16,8 +16,8 @@ const productRoutes: Routes = [{ path: '', component: ProductShellComponent }];
     imports: [
         SharedModule,
         RouterModule.forChild(productRoutes),
-        StoreModule.forFeature('products', productReducer),
         EffectsModule.register([ProductEffects]),
+        StoreModule.forFeature('products', productReducer),
     ],
     declarations: [ProductShellComponent, ProductListComponent, ProductEditComponent],
 })

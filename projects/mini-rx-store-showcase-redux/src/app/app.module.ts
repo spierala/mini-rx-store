@@ -13,70 +13,20 @@ import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
-import {
-    Action,
-    ImmutableStateExtension,
-    LoggerExtension,
-    Store,
-    UndoExtension,
-} from 'mini-rx-store';
-import { MetaReducer } from '../../../mini-rx-store/src/lib/models';
-
-export interface CounterState {
-    counter: number;
-}
-
-export const counterInitialState: CounterState = {
-    counter: 1,
-};
-
-export function counterReducer(state: CounterState, action: Action) {
-    switch (action.type) {
-        case 'counter':
-            return {
-                ...state,
-                counter: state.counter + 1,
-            };
-        default:
-            return state;
-    }
-}
-
-const reducer = (state, action) => {
-    return state;
-};
-
-const metaReducer: MetaReducer<any> = (reducer) => {
-    return (state, action) => {
-        const nextState = reducer(state, action);
-        return nextState;
-    };
-};
+import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
+import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
 
 @NgModule({
     imports: [
         BrowserModule,
         HttpClientModule,
         HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
-        // UserModule,
+        UserModule,
         AppRoutingModule,
         StoreModule.forRoot({
-            // initialState: {
-            //     test: {
-            //         prop1: 'val1'
-            //     },
-            // },
-            reducers: {
-                test: reducer,
-            },
-            // metaReducers: [metaReducer],
-            extensions: [new LoggerExtension()],
+            extensions: [new ImmutableStateExtension(), new LoggerExtension(), new UndoExtension()],
         }),
-        StoreModule.forFeature('feature', counterReducer, {
-            initialState: counterInitialState,
-        }),
-        NgReduxDevtoolsModule.instrument({
+        StoreDevtoolsModule.instrument({
             name: 'MiniRx Redux Showcase',
             maxAge: 25,
             latency: 250,
@@ -91,14 +41,4 @@ const metaReducer: MetaReducer<any> = (reducer) => {
     ],
     bootstrap: [AppComponent],
 })
-export class AppModule {
-    constructor(store: Store) {
-        store.select((state) => state).subscribe((value) => console.log('####', value));
-
-        setTimeout(() => {
-            store.dispatch({ type: 'bla' });
-            store.dispatch({ type: 'bla' });
-            store.dispatch({ type: 'bla' });
-        }, 2000);
-    }
-}
+export class AppModule {}
