@@ -57,6 +57,7 @@ class StoreCore {
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
         map((reducers) => combineReducers(Object.values(reducers)))
     );
+
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
@@ -85,14 +86,14 @@ class StoreCore {
                         ReducerDictionary,
                         MetaReducer<AppState>
                     ]) => {
-                        const forFeature: string =
+                        const onlyForFeature: string =
                             actionWithMeta.meta && actionWithMeta.meta.onlyForFeature;
                         const action: Action = actionWithMeta.action;
 
                         let reducer: Reducer<AppState>;
-                        if (forFeature) {
-                            // Feature setState Actions only have to go through their own feature reducer
-                            reducer = reducerDictionary[forFeature];
+                        if (onlyForFeature) {
+                            // FeatureStore setState Actions only have to go through their own (default) reducer
+                            reducer = reducerDictionary[onlyForFeature];
                         } else {
                             reducer = combinedReducer;
                         }
@@ -149,7 +150,7 @@ class StoreCore {
             {
                 type: `${actionTypePrefix}/init`,
             },
-            { onlyForFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
+            { onlyForFeature } // Dispatch only for the feature´s own reducer (in case of using a FeatureStore with default reducer)
         );
     }
 

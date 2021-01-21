@@ -8,7 +8,7 @@ import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-export const nameUpdateAction = 'set-state';
+const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
@@ -88,7 +88,7 @@ function createDefaultReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action) => {
-        // Check for 'set-state' action (originates from Feature.setState())
+        // Check for 'set-state' action (originates from FeatureStore.setState())
         if (
             action.type.indexOf(nameSpaceFeature) > -1 &&
             action.type.indexOf(nameUpdateAction) > -1
