@@ -53,18 +53,15 @@ export class FeatureStore<StateType> {
         return action;
     }
 
-    select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
-    select<K>(mapFn: (state: AppState) => K, selectFromStore?: boolean): Observable<K>;
-    select<K, T extends (state: AppState | StateType) => K>(
-        mapFn: T,
-        selectFromStore: boolean = false
-    ): Observable<K> {
-        if (selectFromStore) {
-            return StoreCore.select(mapFn);
+    select(): Observable<StateType>;
+    select<K>(mapFn: (state: StateType) => K): Observable<K>;
+    select<K, T extends (state: StateType) => K>(
+        mapFn?: T,
+    ): Observable<K | StateType> {
+        if (!mapFn) {
+            return StoreCore.select(this.featureSelector);
         }
-
         const selector = createSelector(this.featureSelector, mapFn);
-
         return StoreCore.select(selector);
     }
 
