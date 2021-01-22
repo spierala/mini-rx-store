@@ -35,8 +35,8 @@
     - Immutable Extension: Enforce immutability
     - Undo Extension: Undo dispatched Actions
     - Logger Extension: console.log the current action and updated state
--   [Angular Integration](#angular-integration): Use MiniRx Store the Angular way (`StoreModule.forRoot()`, `StoreModule.forFeature()`, etc)    
--   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
+-   [Angular Integration](#angular-integration): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...    
+-   Framework agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## RxJS
 MiniRx is powered by [RxJS](https://rxjs.dev/). It uses RxJS Observables to notify subscribers about state changes.
@@ -271,6 +271,8 @@ With the FeatureStore API you can update state without writing actions and reduc
 
 #### Create a FeatureStore:
 ```ts
+import { FeatureStore } from 'mini-rx-store';
+
 interface UserState {
     currentUser: User;
     favProductIds: string[];
