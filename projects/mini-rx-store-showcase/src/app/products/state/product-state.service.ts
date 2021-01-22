@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Feature } from 'mini-rx-store';
+import { FeatureStore } from 'mini-rx-store';
 import { ProductService } from '../product.service';
-import { catchError, map, mapTo, mergeMap, startWith, withLatestFrom } from 'rxjs/operators';
-import { Observable, of, pipe } from 'rxjs';
+import { catchError, mergeMap, tap } from 'rxjs/operators';
+import { EMPTY, Observable, pipe } from 'rxjs';
 import { Product } from '../product';
 import {
     getCurrentProduct,
@@ -16,7 +16,7 @@ import {
 @Injectable({
     providedIn: 'root',
 })
-export class ProductStateService extends Feature<ProductState> {
+export class ProductStateService extends FeatureStore<ProductState> {
     // SELECT STATE with memoized selectors
     displayCode$: Observable<boolean> = this.select(getShowProductCode);
     selectedProduct$: Observable<Product> = this.select(getCurrentProduct);
@@ -28,91 +28,105 @@ export class ProductStateService extends Feature<ProductState> {
     }
 
     // FEATURE EFFECTS (scoped to the current feature state)
-    // The completed side effects (api calls) update the feature state directly
-    loadProducts = this.createEffect(
+    loadProducts = this.effect<void>(
         mergeMap(() =>
             this.productService.getProducts().pipe(
-                map((products) => ({
-                    products,
-                    error: '',
-                })),
-                catchError((error) =>
-                    of({
-                        error,
-                        products: [],
-                    })
-                )
-            )
-        ),
-        'load'
-    );
-
-    createProduct = this.createEffect<Product>(
-        mergeMap((product) =>
-            this.productService.createProduct(product).pipe(
-                map((newProduct) => ({
-                    products: [...this.state.products, newProduct],
-                    currentProductId: newProduct.id,
-                    error: '',
-                })),
-                catchError((error) =>
-                    of({
-                        error,
-                    })
-                )
-            )
-        ),
-        'create'
-    );
-
-    updateProduct = this.createEffect<Product>(
-        mergeMap((product) => {
-            return this.productService.updateProduct(product).pipe(
-                map((updatedProduct) => {
-                    const updatedProducts = this.state.products.map((item) =>
-                        updatedProduct.id === item.id ? updatedProduct : item
+                tap((products) => this.setState((state) => ({ products }), 'load success')),
+                catchError((error) => {
+                    this.setState(
+                        {
+                            error,
+                            products: [],
+                        },
+                        'load error'
                     );
-                    return {
-                        products: updatedProducts,
-                        currentProductId: product.id,
-                        error: '',
-                    };
-                }),
-                catchError((error) =>
-                    of({
-                        error,
-                    })
-                )
-            );
-        }),
-        'update'
+                    return EMPTY;
+                })
+            )
+        )
     );
 
-    // Delete with Optimistic Update
-    deleteProduct = this.createEffect<number>(
-        pipe(
-            withLatestFrom(this.state$), // Get snapshot of state for undoing optimistic update
-            mergeMap(([productId, lastState]) => {
-                return this.productService.deleteProduct(productId).pipe(
-                    mapTo({
-                        products: this.state.products.filter((product) => product.id !== productId),
-                        currentProductId: null,
-                        error: '',
-                    }),
-                    catchError((err) =>
-                        of({
-                            products: lastState.products, // Restore State before Optimistic Update
-                            error: err,
-                        })
+    createProduct = this.effect<Product>((payload$) => {
+        return payload$.pipe(
+            mergeMap((product) => {
+                return this.productService.createProduct(product).pipe(
+                    tap((newProduct) =>
+                        this.setState(
+                            {
+                                products: [...this.state.products, newProduct],
+                                currentProductId: newProduct.id,
+                                error: '',
+                            },
+                            'create success'
+                        )
                     ),
-                    // Example for an Optimistic Update
-                    startWith({
-                        products: this.state.products.filter((product) => product.id !== productId),
+                    catchError((error) => {
+                        this.setState({ error }, 'create error');
+                        return EMPTY;
                     })
                 );
             })
-        ),
-        'delete'
+        );
+    });
+
+    updateProduct = this.effect<Product>(
+        mergeMap((product) => {
+            return this.productService.updateProduct(product).pipe(
+                tap((updatedProduct) => {
+                    const updatedProducts = this.state.products.map((item) =>
+                        updatedProduct.id === item.id ? updatedProduct : item
+                    );
+                    this.setState(
+                        {
+                            products: updatedProducts,
+                            currentProductId: product.id,
+                            error: '',
+                        },
+                        'update success'
+                    );
+                }),
+                catchError((error) => {
+                    this.setState({ error }, 'update error');
+                    return EMPTY;
+                })
+            );
+        })
+    );
+
+    // Delete with Optimistic Update
+    deleteProduct = this.effect<number>(
+        pipe(
+            mergeMap((productId) => {
+                // Optimistic Update
+                const optimisticUpdate = this.setState(
+                    {
+                        products: this.state.products.filter((product) => product.id !== productId),
+                    },
+                    'delete optimistic'
+                );
+
+                return this.productService.deleteProduct(productId).pipe(
+                    tap(() =>
+                        this.setState(
+                            {
+                                products: this.state.products.filter(
+                                    (product) => product.id !== productId
+                                ),
+                                currentProductId: null,
+                                error: '',
+                            },
+                            'delete success'
+                        )
+                    ),
+                    catchError((error) => {
+                        // Undo Optimistic Update
+                        this.undo(optimisticUpdate);
+                        this.showError(error);
+                        return EMPTY;
+                    })
+                );
+            })
+        )
     );
 
     // UPDATE STATE
@@ -130,5 +144,9 @@ export class ProductStateService extends Feature<ProductState> {
 
     showProductCode(showProductCode: boolean) {
         this.setState({ showProductCode }, 'showProductCode');
+    }
+
+    showError(error) {
+        this.setState({ error }, 'show error');
     }
 }

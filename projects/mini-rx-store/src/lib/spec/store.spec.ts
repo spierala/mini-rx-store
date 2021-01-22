@@ -1,18 +1,21 @@
-import Store, { actions$ } from '../store';
+import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
-import { Action, Settings } from '../interfaces';
+import { Action, Reducer } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
-import { ReduxDevtoolsExtension } from '../redux-devtools.extension';
+import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
-import { Feature } from '../feature';
+import { FeatureStore } from '../feature-store';
 import {
     counterInitialState,
     counterReducer,
     CounterState,
+    resetStoreConfig,
+    store,
 } from './_spec-helpers';
+import { LoggerExtension } from '../extensions/logger.extension';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -45,14 +48,14 @@ interface UserState {
     err: string;
 }
 
-const initialState: UserState = {
+const userInitialState: UserState = {
     firstName: 'Bruce',
     lastName: 'Willis',
     age: 30,
     err: undefined,
 };
 
-function reducer(state: UserState = initialState, action: Action): UserState {
+function userReducer(state: UserState = userInitialState, action: Action): UserState {
     switch (action.type) {
         case 'updateUser':
         case 'loadUserSuccess':
@@ -62,7 +65,7 @@ function reducer(state: UserState = initialState, action: Action): UserState {
                 ...action.payload,
             };
         case 'resetUser':
-            return initialState;
+            return userInitialState;
         case 'incAge':
             return {
                 ...state,
@@ -79,60 +82,244 @@ function reducer(state: UserState = initialState, action: Action): UserState {
 }
 
 const getUserFeatureState = createFeatureSelector<UserState>('user');
-const getFirstName = createSelector(
-    getUserFeatureState,
-    (user) => user.firstName
-);
+const getFirstName = createSelector(getUserFeatureState, (user) => user.firstName);
 const getAge = createSelector(getUserFeatureState, (user) => user.age);
 
 const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
-const getCounter1 = createSelector(
-    getCounterFeatureState,
-    (state) => state.counter
-);
+const getCounter1 = createSelector(getCounterFeatureState, (state) => state.counter);
 const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
-const getCounter2 = createSelector(
-    getCounter2FeatureState,
-    (state) => state.counter
-);
+const getCounter2 = createSelector(getCounter2FeatureState, (state) => state.counter);
 
-class CounterFeatureState extends Feature<CounterState> {
+class CounterFeatureState extends FeatureStore<CounterState> {
     constructor() {
         super('counter3', counterInitialState);
     }
 
     increment() {
-        this.setState({ counter: this.state.counter + 1 });
+        this.setState((state) => ({ counter: state.counter + 1 }));
     }
 }
 
 const getCounter3FeatureState = createFeatureSelector<CounterState>('counter3');
-const getCounter3 = createSelector(
-    getCounter3FeatureState,
-    (state) => state.counter
-);
+const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
 
-describe('Store', () => {
+describe('Store Config', () => {
+    afterEach(() => {
+        resetStoreConfig();
+    });
+
     it('should initialize the store with an empty object', () => {
+        StoreCore.config();
+
         const spy = jest.fn();
-        Store.select((state) => state).subscribe(spy);
+        store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({});
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should initialize a Feature state', () => {
-        Store.feature<UserState>('user', reducer);
+    it('should initialize the store with an empty object when root reducers have no initial state', () => {
+        StoreCore.config({
+            reducers: {
+                test: (state, action) => {
+                    return state;
+                },
+            },
+        });
 
         const spy = jest.fn();
-        Store.select((state) => state).subscribe(spy);
-        expect(spy).toHaveBeenCalledWith({
-            user: initialState,
-        });
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith({});
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+    it('should initialize a Feature state with a root reducer', () => {
+        StoreCore.config({
+            reducers: { user: userReducer },
+        });
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith({
+            user: userInitialState,
+        });
+    });
+
+    it('should initialize the store with root initial state', () => {
+        const rootInitialState = {
+            user: {},
+        };
+
+        StoreCore.config({
+            initialState: rootInitialState,
+            reducers: {
+                user: userReducer,
+                user2: userReducer
+            }
+        });
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+
+        expect(spy).toHaveBeenCalledWith({
+            user: {}, // userReducer initial state is overwritten by the root initial state
+            user2: userInitialState, // Root initial state does not affect User2 initial state
+        });
+    });
+
+    describe('Root Meta Reducers', () => {
+        const nextStateSpy = jest.fn();
+
+        it('should call root meta reducer with root initial state', () => {
+            const rootMetaReducerSpy = jest.fn();
+            const rootInitialState = {
+                user: {},
+            };
+
+            function rootMetaReducer1(reducer) {
+                return (state, action) => {
+                    rootMetaReducerSpy(state);
+                    return reducer(state, action);
+                };
+            }
+
+            StoreCore.config({
+                metaReducers: [rootMetaReducer1],
+                initialState: rootInitialState,
+            });
+
+            expect(rootMetaReducerSpy).toHaveBeenCalledWith(rootInitialState);
+        });
+
+        it('should call root meta reducers from left to right', () => {
+            const callOrder = [];
+
+            function rootMetaReducer1(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta1');
+                    return reducer(state, action);
+                };
+            }
+
+            function rootMetaReducer2(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta2');
+                    return reducer(state, action);
+                };
+            }
+
+            StoreCore.config({
+                metaReducers: [rootMetaReducer1, rootMetaReducer2]
+            });
+
+            expect(callOrder).toEqual(['meta1', 'meta2']);
+        });
+
+        it('should run reducers in order: 1.) root meta reducers 2.) feature meta reducers, 3.) feature reducer', () => {
+            function aFeatureReducer(state: string = 'a', action: Action): string {
+                switch (action.type) {
+                    case 'metaTest':
+                        return state + 'e';
+                    default:
+                        return state;
+                }
+            }
+
+            function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
+                return (state, action) => {
+                    if (action.type === 'metaTest') {
+                        state = {
+                            ...state,
+                            metaTestFeature: state.metaTestFeature + 'b',
+                        };
+                    }
+
+                    return reducer(state, action);
+                };
+            }
+
+            function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
+                return (state, action) => {
+                    if (action.type === 'metaTest') {
+                        state = {
+                            ...state,
+                            metaTestFeature: state.metaTestFeature + 'c',
+                        };
+                    }
+
+                    return reducer(state, action);
+                };
+            }
+
+            function inTheMiddleRootMetaReducer(reducer) {
+                return (state, action) => {
+                    const nextState = reducer(state, action);
+
+                    nextStateSpy(nextState);
+
+                    return reducer(state, action);
+                };
+            }
+
+            function featureMetaReducer(reducer: Reducer<string>): Reducer<string> {
+                return (state, action) => {
+                    if (action.type === 'metaTest') {
+                        state = state + 'd';
+                    }
+
+                    return reducer(state, action);
+                };
+            }
+
+            const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+
+            StoreCore.config({
+                metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2]
+            });
+
+            StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
+                metaReducers: [featureMetaReducer],
+            });
+
+            const spy = jest.fn();
+            StoreCore.select(getMetaTestFeature).subscribe(spy);
+            StoreCore.dispatch({ type: 'metaTest' });
+            expect(spy).toHaveBeenCalledWith('abcde');
+        });
+
+        it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
+            expect(nextStateSpy).toHaveBeenCalledWith(
+                expect.objectContaining({ metaTestFeature: 'a' })
+            );
+            expect(nextStateSpy).toHaveBeenCalledWith(
+                expect.objectContaining({ metaTestFeature: 'abcde' })
+            );
+        });
+    });
+});
+
+describe('Store', () => {
+    beforeAll(() => {
+        resetStoreConfig();
+
+        StoreCore.config({
+            reducers: { user: userReducer },
+        });
+    });
+
+    it('should run the redux reducers when a new Feature state is added', () => {
+        const reducerSpy = jest.fn();
+
+        function someReducer() {
+            reducerSpy();
+        }
+
+        store.feature('oneMoreFeature', someReducer);
+        store.feature('oneMoreFeature2', (state) => state);
+        expect(reducerSpy).toHaveBeenCalledTimes(2);
+    });
+
     it('should throw when reusing feature name', () => {
-        expect(() => Store.feature<UserState>('user', reducer)).toThrowError();
+        expect(() => store.feature<UserState>('oneMoreFeature', userReducer)).toThrowError();
     });
 
     it('should update the Feature state', () => {
@@ -141,26 +328,26 @@ describe('Store', () => {
             lastName: 'Cage',
         };
 
-        Store.dispatch({
+        store.dispatch({
             type: 'updateUser',
             payload: user,
         });
 
         const spy = jest.fn();
-        Store.select(getFirstName).subscribe(spy);
+        store.select(getFirstName).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(user.firstName);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should update the Feature state #1', () => {
-        const age$ = Store.select(getAge);
-        hot('-a-b').subscribe((value) => Store.dispatch({ type: 'incAge' }));
+        const age$ = store.select(getAge);
+        hot('-a-b').subscribe((value) => store.dispatch({ type: 'incAge' }));
         expect(age$).toBeObservable(hot('ab-c', { a: 30, b: 31, c: 32 }));
     });
 
     it('should update the Feature state #2', () => {
-        const age$ = Store.select(getAge);
-        hot('(ab)').subscribe((value) => Store.dispatch({ type: 'incAge' }));
+        const age$ = store.select(getAge);
+        hot('(ab)').subscribe((value) => store.dispatch({ type: 'incAge' }));
         expect(age$).toBeObservable(hot('(abc)', { a: 32, b: 33, c: 34 }));
     });
 
@@ -168,15 +355,15 @@ describe('Store', () => {
         const featureSelector = createFeatureSelector('notExistingFeature');
 
         const spy = jest.fn();
-        Store.select(featureSelector).subscribe(spy);
+        store.select(featureSelector).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(undefined);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should create and execute an effect', () => {
-        Store.dispatch({ type: 'resetUser' });
+        store.dispatch({ type: 'resetUser' });
 
-        Store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('loadUser'),
                 mergeMap(() =>
@@ -190,11 +377,11 @@ describe('Store', () => {
             )
         );
 
-        Store.dispatch({ type: 'loadUser' });
+        store.dispatch({ type: 'loadUser' });
 
         // Lets be crazy and add another effect while the other effect is busy
         cold('-a').subscribe(() => {
-            Store.createEffect(
+            store.effect(
                 actions$.pipe(
                     ofType('saveUser'),
                     mergeMap(() =>
@@ -208,18 +395,18 @@ describe('Store', () => {
                 )
             );
 
-            Store.dispatch({ type: 'saveUser' });
+            store.dispatch({ type: 'saveUser' });
         });
 
-        expect(Store.select(getUserFeatureState)).toBeObservable(
-            hot('a-xb', { a: initialState, b: asyncUser, x: updatedAsyncUser })
+        expect(store.select(getUserFeatureState)).toBeObservable(
+            hot('a-xb', { a: userInitialState, b: asyncUser, x: updatedAsyncUser })
         );
     });
 
     it('should create and execute an effect and handle side effect error', () => {
-        Store.dispatch({ type: 'resetUser' });
+        store.dispatch({ type: 'resetUser' });
 
-        Store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('someAction'),
                 mergeMap(() =>
@@ -227,34 +414,16 @@ describe('Store', () => {
                         map((user) => ({
                             type: 'whatever',
                         })),
-                        catchError((err) =>
-                            of({ type: 'error', payload: 'error' })
-                        )
+                        catchError((err) => of({ type: 'error', payload: 'error' }))
                     )
                 )
             )
         );
 
-        Store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
 
-        expect(Store.select(getUserFeatureState)).toBeObservable(
-            hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
-        );
-    });
-
-    it('should set the settings', () => {
-        const settings: Settings = { enableLogging: true };
-        Store.settings(settings);
-        expect(StoreCore.settings).toEqual(settings);
-    });
-
-    it('should warn if settings are set again', () => {
-        console.warn = jest.fn();
-
-        const settings: Settings = { enableLogging: true };
-        Store.settings(settings);
-        expect(console.warn).toHaveBeenCalledWith(
-            'MiniRx: Settings are already set.'
+        expect(store.select(getUserFeatureState)).toBeObservable(
+            hot('ab', { a: userInitialState, b: { ...userInitialState, err: 'error' } })
         );
     });
 
@@ -272,11 +441,9 @@ describe('Store', () => {
             user,
         };
 
-        const settings: Settings = { enableLogging: true };
-        Store.settings(settings);
-        expect(StoreCore.settings).toEqual(settings);
+        store._addExtension(new LoggerExtension());
 
-        Store.dispatch({
+        store.dispatch({
             type: 'updateUser',
             payload: user,
         });
@@ -295,17 +462,19 @@ describe('Store', () => {
 
     it('should add extension', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
-        Store.addExtension(new ReduxDevtoolsExtension({}));
+        store._addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(StoreCore['extensions'].length).toBe(1);
+        expect(StoreCore['extensions'].length).toBe(2);
     });
 
     it('should call the reducer before running the effect', () => {
         const callOrder = [];
-        const someReducer = (state, action: Action) => {
+        const someReducer = (state = {}, action: Action) => {
             switch (action.type) {
                 case 'someAction2':
                     callOrder.push('reducer');
+                default:
+                    return state;
             }
         };
         const onEffectStarted = (): Observable<Action> => {
@@ -313,16 +482,16 @@ describe('Store', () => {
             return of({ type: 'whatever' });
         };
 
-        Store.feature('someFeature', someReducer, {});
+        store.feature('someFeature', someReducer);
 
-        Store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('someAction2'),
                 mergeMap(() => onEffectStarted())
             )
         );
 
-        Store.dispatch({ type: 'someAction2' });
+        store.dispatch({ type: 'someAction2' });
 
         expect(callOrder).toEqual(['reducer', 'effect']);
     });
@@ -330,13 +499,13 @@ describe('Store', () => {
     it('should queue actions', () => {
         const callLimit = 5000;
 
-        Store.feature<CounterState>('counter', counterReducer);
+        store.feature<CounterState>('counter', counterReducer);
 
         const spy = jest.fn().mockImplementation((value) => {
-            Store.dispatch({ type: 'counter' });
+            store.dispatch({ type: 'counter' });
         });
 
-        const counter1$ = Store.select(getCounter1);
+        const counter1$ = store.select(getCounter1);
 
         counter1$.pipe(take(callLimit)).subscribe(spy);
 
@@ -347,7 +516,7 @@ describe('Store', () => {
     it('should queue effect actions', () => {
         const callLimit = 5000;
 
-        function counter2Reducer(state: CounterState, action: Action) {
+        function counter2Reducer(state: CounterState = counterInitialState, action: Action) {
             switch (action.type) {
                 case 'counterEffectSuccess':
                     return {
@@ -359,13 +528,9 @@ describe('Store', () => {
             }
         }
 
-        Store.feature<CounterState>(
-            'counter2',
-            counter2Reducer,
-            counterInitialState
-        );
+        store.feature<CounterState>('counter2', counter2Reducer);
 
-        Store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('counterEffectStart'),
                 mergeMap(() => of({ type: 'counterEffectSuccess' }))
@@ -373,10 +538,10 @@ describe('Store', () => {
         );
 
         const spy2 = jest.fn().mockImplementation((value) => {
-            Store.dispatch({ type: 'counterEffectStart' });
+            store.dispatch({ type: 'counterEffectStart' });
         });
 
-        const counter2$ = Store.select(getCounter2);
+        const counter2$ = store.select(getCounter2);
 
         counter2$.pipe(take(callLimit)).subscribe(spy2);
 
@@ -389,31 +554,30 @@ describe('Store', () => {
         counterFeatureState.increment();
 
         const spy = jest.fn();
-        Store.select(getCounter3).subscribe(spy);
+        store.select(getCounter3).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(2);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should overwrite reducers default state with a provided initialState', () => {
+        const featureName = 'counterWithCustomInitialState';
         const customInitialState: CounterState = {
             counter: 2,
         };
 
-        Store.feature<CounterState>(
-            'counter4',
-            counterReducer,
-            customInitialState
-        );
+        store.feature<CounterState>(featureName, counterReducer, {
+            initialState: customInitialState,
+        });
 
         const spy = jest.fn();
-        Store.select((state) => state.counter4).subscribe(spy);
+        store.select((state) => state[featureName]).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(customInitialState);
     });
 
     it('should resubscribe on action stream when side effect error is not handled', () => {
         const spy = jest.fn();
 
-        Store.createEffect(
+        store.effect(
             actions$.pipe(
                 ofType('someAction3'),
                 mergeMap(() => {
@@ -423,10 +587,104 @@ describe('Store', () => {
             )
         );
 
-        Store.dispatch({ type: 'someAction3' });
-        Store.dispatch({ type: 'someAction3' });
-        Store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
 
         expect(spy).toHaveBeenCalledTimes(3);
+    });
+
+    it('should throw when creating store again with functional creation method', () => {
+        expect(() => configureStore({})).toThrow();
+    });
+
+    it('should not emit a new AppState when dispatching unknown Actions ', () => {
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledTimes(1);
+        spy.mockReset();
+
+        store.dispatch({ type: 'unknownAction' });
+        expect(spy).toHaveBeenCalledTimes(0);
+    });
+});
+
+describe('Store Feature MetaReducers', () => {
+    const getMetaTestFeature = createFeatureSelector<CounterStringState>('metaTestFeature2');
+    const getCount = createSelector(getMetaTestFeature, (state) => state.count);
+
+    interface CounterStringState {
+        count: string;
+    }
+
+    function aFeatureReducer(
+        state: CounterStringState = { count: '0' },
+        action: Action
+    ): CounterStringState {
+        switch (action.type) {
+            case 'metaTest2':
+                return {
+                    ...state,
+                    count: state.count + '3',
+                };
+            default:
+                return state;
+        }
+    }
+
+    function featureMetaReducer1(reducer): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === 'metaTest2') {
+                state = {
+                    ...state,
+                    count: state.count + '1',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    function featureMetaReducer2(reducer): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === 'metaTest2') {
+                state = {
+                    ...state,
+                    count: state.count + '2',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    const nextStateSpy = jest.fn();
+
+    function inTheMiddleMetaReducer(reducer) {
+        return (state, action) => {
+            const nextState = reducer(state, action);
+
+            nextStateSpy(nextState);
+
+            return reducer(state, action);
+        };
+    }
+
+    it('should run meta reducers first, then the normal reducer', () => {
+        StoreCore.addFeature<CounterStringState>('metaTestFeature2', aFeatureReducer, {
+            metaReducers: [featureMetaReducer1, inTheMiddleMetaReducer, featureMetaReducer2],
+        });
+
+        const spy = jest.fn();
+        StoreCore.select(getCount).subscribe(spy);
+        StoreCore.dispatch({ type: 'metaTest2' });
+        expect(spy).toHaveBeenCalledWith('0');
+        expect(spy).toHaveBeenCalledWith('0123');
+    });
+    
+    it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
+        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0' });
+        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0123' });
+        expect(nextStateSpy).toHaveBeenCalledTimes(2);
     });
 });

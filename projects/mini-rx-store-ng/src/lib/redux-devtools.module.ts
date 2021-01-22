@@ -7,19 +7,24 @@ import {
     InjectionToken,
     Injector,
     ModuleWithProviders,
-    NgModule
+    NgModule,
 } from '@angular/core';
 import { NgReduxDevtoolsExtension } from './ng-redux-devtools.extension';
 import { ReduxDevtoolsOptions, Store } from 'mini-rx-store';
 
-export const DEVTOOLS_OPTIONS = new InjectionToken<ReduxDevtoolsOptions>('ReduxDevtoolsOptions');
+export const DEVTOOLS_OPTIONS = new InjectionToken<ReduxDevtoolsOptions>(
+    '@mini-rx/reduxDevtoolsOptions'
+);
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class NgReduxDevtoolsService {
-    constructor(private injector: Injector, @Inject(DEVTOOLS_OPTIONS) private options: ReduxDevtoolsOptions) {
-        Store.addExtension(new NgReduxDevtoolsExtension(options, injector));
+    constructor(
+        private injector: Injector,
+        @Inject(DEVTOOLS_OPTIONS) private options: ReduxDevtoolsOptions
+    ) {
+        Store.getInstance()._addExtension(new NgReduxDevtoolsExtension(options, injector));
     }
 }
 
@@ -30,24 +35,24 @@ export function init(devtoolsService: NgReduxDevtoolsService) {
 }
 
 @NgModule()
-export class NgReduxDevtoolsModule {
+export class StoreDevtoolsModule {
     static instrument(
         config: Partial<ReduxDevtoolsOptions> = {}
-    ): ModuleWithProviders<NgReduxDevtoolsModule> {
+    ): ModuleWithProviders<StoreDevtoolsModule> {
         return {
-            ngModule: NgReduxDevtoolsModule,
+            ngModule: StoreDevtoolsModule,
             providers: [
                 {
                     provide: DEVTOOLS_OPTIONS,
-                    useValue: config
+                    useValue: config,
                 },
                 {
                     provide: APP_INITIALIZER,
                     useFactory: init,
                     deps: [NgReduxDevtoolsService],
-                    multi: true
-                }
-            ]
+                    multi: true,
+                },
+            ],
         };
     }
 }

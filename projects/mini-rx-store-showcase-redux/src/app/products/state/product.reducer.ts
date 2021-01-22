@@ -11,7 +11,8 @@ import {
     setCurrentProduct,
     toggleProductCode,
     updateProductFail,
-    updateProductSuccess
+    updateProductOptimistic,
+    updateProductSuccess,
 } from './product.actions';
 import { on, reducer } from 'ts-action';
 
@@ -27,57 +28,67 @@ const initialState: ProductState = {
     showProductCode: true,
     currentProductId: null,
     products: [],
-    error: ''
+    error: '',
 };
 
-export const productReducer = reducer(
+export const productReducer = reducer<ProductState>(
     initialState,
-    on(toggleProductCode, (state, {payload}) => ({...state, showProductCode: payload})),
-    on(setCurrentProduct, (state, {payload}) => ({...state, currentProductId: payload.id})),
-    on(clearCurrentProduct, (state) => ({...state, currentProductId: null})),
-    on(initializeCurrentProduct, (state) => ({...state, currentProductId: 0})),
-    on(loadSuccess, (state, {payload}) => ({
+    on(toggleProductCode, (state, { payload }) => ({ ...state, showProductCode: payload })),
+    on(setCurrentProduct, (state, { payload }) => ({ ...state, currentProductId: payload.id })),
+    on(clearCurrentProduct, (state) => ({ ...state, currentProductId: null })),
+    on(initializeCurrentProduct, (state) => ({ ...state, currentProductId: 0 })),
+    on(loadSuccess, (state, { payload }) => ({
         ...state,
         products: payload,
-        error: ''
+        error: '',
     })),
-    on(loadFail, (state, {payload}) => ({
+    on(loadFail, (state, { payload }) => ({
         ...state,
         products: [],
-        error: payload
+        error: payload,
     })),
-    on(updateProductSuccess, (state, {payload}) => {
-        const updatedProducts = state.products.map(
-            item => payload.id === item.id ? payload : item);
+    on(updateProductSuccess, (state, { payload }) => {
+        const updatedProducts = state.products.map((item) =>
+            payload.id === item.id ? payload : item
+        );
         return {
             ...state,
             products: updatedProducts,
             currentProductId: payload.id,
-            error: ''
+            error: '',
         };
     }),
-    on(updateProductFail, (state, {payload}) => ({
+    on(updateProductOptimistic, (state, { payload }) => {
+        const updatedProducts = state.products.map((item) =>
+            payload.id === item.id ? payload : item
+        );
+        return {
+            ...state,
+            products: updatedProducts,
+        };
+    }),
+    on(updateProductFail, (state, { payload }) => ({
         ...state,
-        error: payload
+        error: payload,
     })),
-    on(createProductSuccess, (state, {payload}) => ({
+    on(createProductSuccess, (state, { payload }) => ({
         ...state,
         products: [...state.products, payload],
         currentProductId: payload.id,
-        error: ''
+        error: '',
     })),
-    on(createProductFail, (state, {payload}) => ({
+    on(createProductFail, (state, { payload }) => ({
         ...state,
-        error: payload
+        error: payload,
     })),
-    on(deleteProductSuccess, (state, {payload}) => ({
+    on(deleteProductSuccess, (state, { payload }) => ({
         ...state,
-        products: state.products.filter(product => product.id !== payload),
+        products: state.products.filter((product) => product.id !== payload),
         currentProductId: null,
-        error: ''
+        error: '',
     })),
-    on(deleteProductFail, (state, {payload}) => ({
+    on(deleteProductFail, (state, { payload }) => ({
         ...state,
-        error: payload
-    })),
+        error: payload,
+    }))
 );

@@ -8,26 +8,14 @@ import { ProductListComponent } from './components/product-list/product-list.com
 import { ProductEditComponent } from './components/product-edit/product-edit.component';
 import { ProductStateService } from './state/product-state.service';
 
-const productRoutes: Routes = [
-    {path: '', component: ProductShellComponent}
-];
+const productRoutes: Routes = [{ path: '', component: ProductShellComponent }];
 
 @NgModule({
-    imports: [
-        SharedModule,
-        RouterModule.forChild(productRoutes),
-    ],
-    declarations: [
-        ProductShellComponent,
-        ProductListComponent,
-        ProductEditComponent
-    ]
+    imports: [SharedModule, RouterModule.forChild(productRoutes)],
+    declarations: [ProductShellComponent, ProductListComponent, ProductEditComponent],
 })
 export class ProductModule {
-    constructor(
-        private productStateService: ProductStateService
-    ) {
-        // DEMO MiniEffects
+    constructor(private productStateService: ProductStateService) {
         this.productStateService.loadProducts();
     }
 }

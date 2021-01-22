@@ -1,124 +1,198 @@
-import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import { Action, AppState, Reducer, Settings, StoreExtension } from './interfaces';
+import { BehaviorSubject, Observable, queueScheduler, ReplaySubject, Subject } from 'rxjs';
+import {
+    Action,
+    ActionMetaData,
+    Actions,
+    ActionWithMeta,
+    AppState,
+    MetaReducer,
+    Reducer,
+    ReducerDictionary,
+    StoreConfig,
+    StoreExtension,
+} from './models';
 import {
     catchError,
     distinctUntilChanged,
     map,
-    mergeAll,
     observeOn,
-    scan,
     tap,
     withLatestFrom,
 } from 'rxjs/operators';
-import { combineReducers, createActionTypePrefix, nameUpdateAction } from './utils';
+import {
+    combineMetaReducers,
+    combineReducers,
+    createActionTypePrefix,
+    miniRxError,
+    storeInitActionType,
+} from './utils';
 
 class StoreCore {
     // ACTIONS
-    private actionsSource: Subject<Action> = new Subject();
-    actions$: Observable<Action> = this.actionsSource.asObservable();
-
-    // EFFECTS
-    private effectsSource: Subject<Observable<Action>> = new Subject();
-    private effects$: Observable<Action> = this.effectsSource.pipe(
-        mergeAll() // Merge the effects into one single stream of (effect) actions
-    );
+    private actionsWithMetaSource: Subject<ActionWithMeta> = new Subject();
+    actions$: Actions = this.actionsWithMetaSource
+        .asObservable()
+        .pipe(map((actionWithMeta) => actionWithMeta.action));
 
     // APP STATE
-    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
+    private stateSource: ReplaySubject<AppState> = new ReplaySubject(1);
     state$: Observable<AppState> = this.stateSource.asObservable();
 
-    // COMBINED REDUCERS
-    private reducersSource: BehaviorSubject<{
-        [key: string]: Reducer<any>;
-    }> = new BehaviorSubject({});
-    combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        map((reducers) => combineReducers(Object.values(reducers)))
+    // META REDUCERS
+    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject([]);
+    private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
+        map((metaReducers) => combineMetaReducers(metaReducers))
     );
 
-    // SETTINGS
-    // tslint:disable-next-line:variable-name
-    private _settings: Partial<Settings>;
-    private defaultSettings: Settings = {
-        enableLogging: false,
-    };
-
-    set settings(settings: Partial<Settings>) {
-        if (this._settings) {
-            // Set settings only once
-            console.warn(`MiniRx: Settings are already set.`);
-            return;
-        }
-
-        this._settings = {
-            ...this.defaultSettings,
-            ...settings,
-        };
+    // REDUCER DICTIONARY
+    private reducersSource: BehaviorSubject<ReducerDictionary> = new BehaviorSubject({});
+    private get reducers() {
+        return this.reducersSource.getValue();
+    }
+    private set reducers(reducers: ReducerDictionary) {
+        this.reducersSource.next(reducers);
     }
 
-    get settings(): Partial<Settings> {
-        return this._settings ? this._settings : this.defaultSettings;
-    }
+    // COMBINED REDUCERS
+    private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
+        map((reducers) => combineReducers(Object.values(reducers)))
+    );
 
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
     constructor() {
-        // Listen to Actions which are emitted by Effects
-        this.effects$.pipe(tap((action) => this.dispatch(action))).subscribe();
-
         // Listen to the Actions Stream and update state accordingly
-        this.actions$
+        this.actionsWithMetaSource
             .pipe(
                 observeOn(queueScheduler),
-                withLatestFrom(this.combinedReducer$),
-                scan((acc, [action, reducer]: [Action, Reducer<AppState>]) => {
-                    const state = reducer(acc, action);
-                    this.log({ action, state });
-                    return state;
-                }, {}),
-                tap((state) => {
-                    this.updateState(state);
-                })
+                withLatestFrom(
+                    this.state$,
+                    this.combinedReducer$,
+                    this.reducersSource,
+                    this.combinedMetaReducer$
+                ),
+                tap(
+                    ([
+                        actionWithMeta,
+                        state,
+                        combinedReducer,
+                        reducerDictionary,
+                        combinedMetaReducer,
+                    ]: [
+                        ActionWithMeta,
+                        AppState,
+                        Reducer<AppState>,
+                        ReducerDictionary,
+                        MetaReducer<AppState>
+                    ]) => {
+                        const onlyForFeature: string =
+                            actionWithMeta.meta && actionWithMeta.meta.onlyForFeature;
+                        const action: Action = actionWithMeta.action;
+
+                        let reducer: Reducer<AppState>;
+                        if (onlyForFeature) {
+                            // FeatureStore setState Actions only have to go through their own (default) reducer
+                            reducer = reducerDictionary[onlyForFeature];
+                        } else {
+                            reducer = combinedReducer;
+                        }
+
+                        const reducerWithMetaReducers: Reducer<AppState> = combinedMetaReducer(
+                            reducer
+                        );
+                        const newState: AppState = reducerWithMetaReducers(state, action);
+                        this.updateState(newState);
+                    }
+                )
             )
             .subscribe();
     }
 
+    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
+        this.metaReducersSource.next([...this.metaReducersSource.getValue(), ...reducers]);
+    }
+
     addFeature<StateType>(
         featureName: string,
-        initialState: StateType,
-        reducer?: Reducer<StateType>
+        reducer: Reducer<StateType>,
+        config: {
+            isDefaultReducer?: boolean;
+            metaReducers?: MetaReducer<StateType>[];
+            initialState?: StateType;
+        } = {}
     ) {
-        const reducers = this.reducersSource.getValue();
+        const { isDefaultReducer, metaReducers, initialState } = config;
 
-        // Check if feature already exists
-        if (reducers.hasOwnProperty(featureName)) {
-            throw new Error(`MiniRx: Feature "${featureName}" already exists.`);
+        reducer =
+            metaReducers && metaReducers.length > 0
+                ? combineMetaReducers<StateType>(metaReducers)(reducer)
+                : reducer;
+
+        checkFeatureExists(featureName, this.reducers);
+
+        if (typeof initialState !== 'undefined') {
+            reducer = createReducerWithInitialState(reducer, initialState);
         }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
-
-        reducer = reducer ? reducer : createDefaultReducer(actionTypePrefix);
-
-        reducer = initialState ? createReducerWithInitialState(reducer, initialState) : reducer;
-
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
 
         // Add reducer
-        this.reducersSource.next({
-            ...reducers,
+        this.reducers = {
+            ...this.reducers,
             [featureName]: featureReducer,
-        });
+        };
 
         // Dispatch an initial action to let reducers create the initial state
-        this.dispatch({ type: `${actionTypePrefix}/INIT` });
+        const onlyForFeature: string = isDefaultReducer ? featureName : undefined;
+        this.dispatch(
+            {
+                type: `${actionTypePrefix}/init`,
+            },
+            { onlyForFeature } // Dispatch only for the feature´s own reducer (in case of using a FeatureStore with default reducer)
+        );
     }
 
-    createEffect(effect$: Observable<Action>) {
+    config(config: Partial<StoreConfig> = {}) {
+        if (config.extensions && config.extensions.length > 0) {
+            config.extensions.forEach((extension) => this.addExtension(extension));
+        }
+
+        if (config.metaReducers && config.metaReducers.length > 0) {
+            this.addMetaReducers(...config.metaReducers);
+        }
+
+        if (config.reducers) {
+            Object.keys(config.reducers).forEach((featureName) => {
+                checkFeatureExists(featureName, this.reducers);
+                const featureReducer: Reducer<AppState> = createFeatureReducer(
+                    featureName,
+                    config.reducers[featureName]
+                );
+
+                this.reducers = {
+                    ...this.reducers,
+                    [featureName]: featureReducer,
+                };
+            });
+        }
+
+        this.updateState(config.initialState);
+
+        this.dispatch({ type: storeInitActionType });
+    }
+
+    effect(effect$: Observable<Action>) {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        this.effectsSource.next(effectWithErrorHandler$);
+        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
     }
 
-    dispatch = (action: Action) => this.actionsSource.next(action);
+    dispatch = (action: Action, meta?: ActionMetaData) =>
+        this.actionsWithMetaSource.next({
+            action,
+            meta,
+        });
 
     updateState(state: AppState) {
         this.stateSource.next(state);
@@ -135,33 +209,16 @@ class StoreCore {
         extension.init();
         this.extensions.push(extension);
     }
-
-    private log({ action, state }) {
-        if (this.settings.enableLogging) {
-            console.log(
-                '%cACTION',
-                'font-weight: bold; color: #ff9900',
-                '\nType:',
-                action.type,
-                '\nPayload: ',
-                action.payload,
-                '\nState: ',
-                state
-            );
-        }
-    }
 }
 
-function createDefaultReducer<StateType>(nameSpaceFeature: string): Reducer<StateType> {
-    return (state: StateType, action: Action) => {
-        // Check for 'set-state' (can originate from setState() or feature effect)
-        if (
-            action.type.indexOf(nameSpaceFeature) > -1 &&
-            action.type.indexOf(nameUpdateAction) > -1
-        ) {
+function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
+    return (state: AppState, action: Action): AppState => {
+        const newFeatureState: any = reducer(state[featureName], action);
+        if (newFeatureState !== state[featureName]) {
+            // Only return a new AppState if the feature state changed
             return {
                 ...state,
-                ...action.payload,
+                [featureName]: newFeatureState,
             };
         }
         return state;
@@ -177,13 +234,10 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
-    return (state: AppState, action: Action): AppState => {
-        return {
-            ...state,
-            [featureName]: reducer(state[featureName], action),
-        };
-    };
+function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
+    if (reducers.hasOwnProperty(featureName)) {
+        miniRxError(`Feature "${featureName}" already exists.`);
+    }
 }
 
 // Prevent effect to unsubscribe from the actions stream

@@ -5,7 +5,7 @@ import { ProductStateService } from '../../state/product-state.service';
 
 @Component({
     templateUrl: './product-shell.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductShellComponent {
     displayCode$: Observable<boolean> = this.productState.displayCode$;
@@ -13,11 +13,7 @@ export class ProductShellComponent {
     products$: Observable<Product[]> = this.productState.products$;
     errorMessage$: Observable<string> = this.productState.errorMessage$;
 
-    constructor(
-        private productState: ProductStateService
-    ) {
-
-    }
+    constructor(private productState: ProductStateService) {}
 
     checkChanged(value: boolean): void {
         this.productState.showProductCode(value);

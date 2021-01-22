@@ -2,9 +2,22 @@
  * Public API Surface of mini-rx-store
  */
 
-export { actions$, default as Store } from './lib/store';
-export { Feature as Feature } from './lib/feature';
-export { createFeatureSelector, createSelector, } from './lib/selector';
-export { Action, Settings } from './lib/interfaces';
+export { actions$, Store, configureStore, createFeatureStore } from './lib/store';
+export { FeatureStore } from './lib/feature-store';
+export { createFeatureSelector, createSelector } from './lib/selector';
+export {
+    Action,
+    Reducer,
+    Actions,
+    ReducerDictionary,
+    StoreConfig,
+    FeatureStoreConfig,
+} from './lib/models';
 export { ofType } from './lib/utils';
-export { ReduxDevtoolsExtension, ReduxDevtoolsOptions } from './lib/redux-devtools.extension';
+export {
+    ReduxDevtoolsExtension,
+    ReduxDevtoolsOptions,
+} from './lib/extensions/redux-devtools.extension';
+export { LoggerExtension } from './lib/extensions/logger.extension';
+export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
+export { UndoExtension, undo } from './lib/extensions/undo.extension';

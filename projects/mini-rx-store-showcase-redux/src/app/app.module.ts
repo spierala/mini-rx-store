@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
-// Imports for loading & configuring the in-memory web api
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { ProductData } from './products/product-data';
 
@@ -13,31 +12,33 @@ import { ShellComponent } from './home/shell.component';
 import { MenuComponent } from './home/menu.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
-
-/* Feature Modules */
 import { UserModule } from './user/user.module';
-import { NgReduxDevtoolsModule } from '../../../mini-rx-ng-devtools/src/lib/ng-redux-devtools.module';
+import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
+import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
 
 @NgModule({
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    HttpClientInMemoryWebApiModule.forRoot(ProductData),
-    UserModule,
-    AppRoutingModule,
-    NgReduxDevtoolsModule.instrument({
-      name: 'MiniRx Showcase',
-      maxAge: 25,
-      latency: 1000
-    }),
-  ],
-  declarations: [
-    AppComponent,
-    ShellComponent,
-    MenuComponent,
-    WelcomeComponent,
-    PageNotFoundComponent
-  ],
-  bootstrap: [AppComponent]
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+        HttpClientInMemoryWebApiModule.forRoot(ProductData, { delay: 500 }),
+        UserModule,
+        AppRoutingModule,
+        StoreModule.forRoot({
+            extensions: [new ImmutableStateExtension(), new LoggerExtension(), new UndoExtension()],
+        }),
+        StoreDevtoolsModule.instrument({
+            name: 'MiniRx Redux Showcase',
+            maxAge: 25,
+            latency: 250,
+        }),
+    ],
+    declarations: [
+        AppComponent,
+        ShellComponent,
+        MenuComponent,
+        WelcomeComponent,
+        PageNotFoundComponent,
+    ],
+    bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

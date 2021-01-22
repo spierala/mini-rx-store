@@ -1,15 +1,18 @@
 {
-    "name": "mini-rx-ng-devtools",
-    "version": "0.0.5",
+    "name": "mini-rx-store-ng",
+    "version": "2.0.0",
+    "peerDependencies": {
+        "@angular/common": "^9.1.11",
+        "@angular/core": "^9.1.11"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0"
+    },
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
     "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
-    "description": "MiniRx: Redux DevTools Integration for Angular",
-    "peerDependencies": {
-        "@angular/common": "^8.2.14",
-        "@angular/core": "^8.2.14"
-    },
+    "description": "Angular friendly API for mini rx store",
     "keywords": [
         "RxJS",
         "Redux",
