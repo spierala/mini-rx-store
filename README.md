@@ -27,13 +27,13 @@
     -   Memoized Selectors
     -   Effects
     -   [Support for ts-action](#ts-action): Create and consume actions with as little boilerplate as possible
--   [FeatureStore](#feature-store): Update state without actions and reducers:
+-   [FeatureStore](#featurestore): Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `effect()` run side effects like API calls and update feature state
     -   `undo()` easily undo setState actions
 -   [Extensions](#extensions):
-    - [Redux Dev Tools Extension](#redux-dev-tools): Inspect State with the Redux Dev Tools
+    - Redux Dev Tools Extension: Inspect State with the Redux Dev Tools
     - Immutable Extension: Enforce immutability
     - Undo Extension: Undo dispatched Actions
     - Logger Extension: console.log the current action and updated state
@@ -101,7 +101,7 @@ const initialState: ProductState = {
   products: [],
 };
 
-export function productReducer(state: ProductState = initialState, action: ProductActions): ProductState {
+function productReducer(state: ProductState = initialState, action: ProductActions): ProductState {
   switch (action.type) {
     case ProductActionTypes.ToggleProductCode:
       return {
@@ -120,22 +120,22 @@ export function productReducer(state: ProductState = initialState, action: Produ
 ```ts
 import { Action } from 'mini-rx-store';
 
-export enum ProductActionTypes {
+enum ProductActionTypes {
     Load = '[Product] Load',
     CreateProduct = '[Product] Create Product',
 }
 
-export class Load implements Action {
+class Load implements Action {
     readonly type = ProductActionTypes.Load;
 }
 
-export class CreateProduct implements Action {
+class CreateProduct implements Action {
   readonly type = ProductActionTypes.CreateProduct;
   constructor(public payload: Product) { }
 }
 
 // Union the valid types
-export type ProductActions = CreateProduct | Load;
+type ProductActions = CreateProduct | Load;
 ```
 
 #### Dispatch an Action:
@@ -185,7 +185,7 @@ import { createFeatureSelector, createSelector } from 'mini-rx-store';
 
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
-export const getProducts = createSelector(
+const getProducts = createSelector(
     getProductFeatureState,
     state => state.products
 );
@@ -236,7 +236,7 @@ store.dispatch(toggleProductCode());
 ```ts
 import { on, reducer } from 'ts-action';
 
-export const productReducer = reducer(
+const productReducer = reducer(
     initialState,
     on(toggleProductCode, (state, {payload}) => ({...state, showProductCode: payload})),
     // ...
@@ -324,14 +324,14 @@ export class UserStateService extends FeatureStore<UserState>{
 ```
 
 #### Update state with `setState`
+`setState` accepts a Partial Type. This allows us to pass only some properties of a bigger state interface.
 ```ts
 updateUser(user: User) {
     this.setState({currentUser: user});
 }
 ```
-
-`setState` accepts a Partial Type. This allows us to pass only some properties of a bigger state interface.
-
+Do you need to update the new state based on the current state?
+`setState` accepts a callback function which gives you access to the current state.
 ```ts
 // Update state based on current state
 addFavorite(productId) {
@@ -340,10 +340,6 @@ addFavorite(productId) {
     }));
 }
 ```
-
-Do you need to update the new state based on the current state?
-`setState` accepts a callback function which gives you access to the current state.
-
 For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
 
 ```ts
@@ -352,7 +348,7 @@ this.setState({currentUser: user}, 'updateUser');
 
 #### Create an Effect with `effect`
 `effect` offers a simple way to trigger side effects (e.g. API calls)
-and update feature state straight away.
+and update feature state straight away (by using `setState()`).
 
 Example:
 
