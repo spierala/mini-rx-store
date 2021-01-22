@@ -20,6 +20,7 @@ export function storeFactory(config: StoreConfig) {
 @NgModule()
 export class StoreRootModule {
     constructor(
+        // TODO is this really necessary?
         private store: Store // Make sure store is initialized also if it is NOT injected in other services/components
     ) {}
 }
