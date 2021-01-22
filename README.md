@@ -263,7 +263,7 @@ updateProduct$ = actions$.pipe(
 );
 ```
 
-## Feature Store:
+## FeatureStore:
 
 > Make simple things simple
 
@@ -313,7 +313,7 @@ const getCurrentUser = createSelector(
 );
 
 
-// Inside the Feature state service
+// Inside the User state service
 export class UserStateService extends FeatureStore<UserState>{
     currentUser$ = this.select(getCurrentUser);
 
@@ -373,6 +373,7 @@ createProduct = this.effect<Product>((payload$) => {
                         'create success'
                     )
                 ),
+                // Handle potential error within inner pipe.
                 catchError((error) => {
                     this.setState({ error }, 'create error');
                     return EMPTY;
@@ -392,6 +393,10 @@ The API call `productApiService.createProduct` is the side effect which needs to
 
 Inside the `payload$.pipe` we can define how to handle the side effect. 
 With RxJS flattening operators (mergeMap, switchMap, concatMap, exhaustMap) we can easily define how to treat race conditions (e.g. if you trigger a lot of API calls at the same time).
+
+Inside the RxJS `tap` and `catchError` operators we can call `this.setState()` to update state.
+
+ℹ️ It is important to handle possible API errors with `catchError` to make sure that the `payload$` stream does not die.
 
 **FYI: See how RxJS flattening operators are handling race conditions:**
 
