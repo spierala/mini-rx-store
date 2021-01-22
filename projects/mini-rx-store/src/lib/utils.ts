@@ -11,7 +11,7 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
 }
 
 export function combineReducers(reducers: Reducer<any>[]): Reducer<AppState> {
-    return (state: AppState, action: Action): AppState => {
+    return (state: AppState = {}, action: Action): AppState => {
         return reducers.reduce((currState, reducer) => {
             return reducer(currState, action);
         }, state);

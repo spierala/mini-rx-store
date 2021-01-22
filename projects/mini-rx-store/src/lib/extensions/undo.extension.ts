@@ -8,7 +8,7 @@ const defaultBufferSize = 100;
 
 export let isUndoExtensionInitialized: boolean;
 let executedActions: Array<Action> = [];
-let initialState = {};
+let initialState;
 let bufferSize;
 
 export class UndoExtension implements StoreExtension {
