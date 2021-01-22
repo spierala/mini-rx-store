@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, queueScheduler, ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
 import {
     Action,
     ActionMetaData,
@@ -35,7 +35,7 @@ class StoreCore {
         .pipe(map((actionWithMeta) => actionWithMeta.action));
 
     // APP STATE
-    private stateSource: ReplaySubject<AppState> = new ReplaySubject(1);
+    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // META REDUCERS

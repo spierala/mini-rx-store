@@ -109,8 +109,6 @@ describe('Store Config', () => {
     });
 
     it('should initialize the store with an empty object', () => {
-        StoreCore.config();
-
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({});
@@ -153,8 +151,8 @@ describe('Store Config', () => {
             initialState: rootInitialState,
             reducers: {
                 user: userReducer,
-                user2: userReducer
-            }
+                user2: userReducer,
+            },
         });
 
         const spy = jest.fn();
@@ -208,7 +206,7 @@ describe('Store Config', () => {
             }
 
             StoreCore.config({
-                metaReducers: [rootMetaReducer1, rootMetaReducer2]
+                metaReducers: [rootMetaReducer1, rootMetaReducer2],
             });
 
             expect(callOrder).toEqual(['meta1', 'meta2']);
@@ -273,7 +271,7 @@ describe('Store Config', () => {
             const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
 
             StoreCore.config({
-                metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2]
+                metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
             });
 
             StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
@@ -681,7 +679,7 @@ describe('Store Feature MetaReducers', () => {
         expect(spy).toHaveBeenCalledWith('0');
         expect(spy).toHaveBeenCalledWith('0123');
     });
-    
+
     it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
         expect(nextStateSpy).toHaveBeenCalledWith({ count: '0' });
         expect(nextStateSpy).toHaveBeenCalledWith({ count: '0123' });
