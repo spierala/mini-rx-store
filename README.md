@@ -11,7 +11,9 @@
 
 > **ℹ️  Version 2:** Currently we are working on version 2 of mini-rx-store. Please let us know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
 
-# MiniRx: The RxJS Redux Store
+# MiniRx Store 2 (beta)
+
+### FOR 1.X PLEASE GO TO [THE 1.x BRANCH](https://github.com/spierala/mini-rx-store/tree/1.x)
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
 
