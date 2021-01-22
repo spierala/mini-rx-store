@@ -35,6 +35,7 @@
     - Immutable Extension: Enforce immutability
     - Undo Extension: Undo dispatched Actions
     - Logger Extension: console.log the current action and updated state
+-   [Angular Integration](#angular-integration): Use MiniRx Store the Angular way (`StoreModule.forRoot()`, `StoreModule.forFeature()`, etc)    
 -   Framework agnostic: Works with any front-end project built with JavaScript or TypeScript (Angular, React, Vue, or anything else)
 
 ## RxJS
@@ -57,7 +58,7 @@ The code examples below are also written in TypeScript.
 
 ## Installation:
 
-`npm i mini-rx-store`
+`npm i mini-rx-store@beta`
 
 ## Store (Redux):
 
