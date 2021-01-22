@@ -14,9 +14,13 @@ export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
     private readonly featureSelector: Selector<AppState, StateType>;
 
-    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
+    /**
+     * @deprecated Use `this.select()` instead.
+     */
+    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined); // TODO remove BehaviorSubject
+
     get state(): StateType {
-        return this.state$.getValue();
+        return this.state$.getValue(); // TODO return "raw" state object
     }
 
     constructor(private featureName: string, initialState: StateType) {
@@ -32,7 +36,7 @@ export class FeatureStore<StateType> {
         this.featureSelector = createFeatureSelector<StateType>(featureName);
 
         // Select Feature State and delegate to local BehaviorSubject
-        StoreCore.select(this.featureSelector).subscribe(this.state$);
+        StoreCore.select(this.featureSelector).subscribe(this.state$); // TODO store state in a "raw" state object instead of BehaviorSubject
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
