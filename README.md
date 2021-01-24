@@ -56,6 +56,10 @@ MiniRx is TypeScript friendly. If you really want to, you could use MiniRx also 
 However, MiniRx is so much more fun in a TypeScript environment. 
 The code examples below are also written in TypeScript.
 
+## Demos
+- [Todos App using FeatureStore](https://stackblitz.com/edit/mini-rx-angular-todos?file=src%2Fapp%2Fmodules%2Ftodo%2Fservices%2Ftodos-state.service.ts)
+- Coming soon: Redux Demo
+
 ## Installation:
 
 `npm i mini-rx-store@beta`
