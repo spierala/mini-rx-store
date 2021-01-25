@@ -50,15 +50,11 @@ export class FeatureStore<StateType> {
 
     select(): Observable<StateType>;
     select<K>(mapFn: (state: StateType) => K): Observable<K>;
-    select<K, T extends (state: StateType) => K>(
-        mapFn?: T,
-    ): Observable<K | StateType> {
+    select<K, T extends (state: StateType) => K>(mapFn?: T): Observable<K | StateType> {
         if (!mapFn) {
             return this.state$;
         }
-        return this.state$.pipe(
-            select(mapFn)
-        );
+        return this.state$.pipe(select(mapFn));
     }
 
     effect<PayLoadType = any>(
