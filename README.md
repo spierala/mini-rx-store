@@ -351,6 +351,15 @@ For better logging in the JS Console / Redux Dev Tools you can provide an option
 this.setState({currentUser: user}, 'updateUser');
 ```
 
+#### Undo a setState with `undo`
+We can easily undo setState Actions with the [Undo Extension](#undo-extension) installed.
+
+Example:
+```ts 
+const deleteAction: Action = this.setState({currentUser: undefined}); // Get hold of the Action which is returned by `setState`
+this.undo(deleteAction); // Undo the Action
+```
+
 #### Create an Effect with `effect`
 `effect` offers a simple way to trigger side effects (e.g. API calls)
 and update feature state straight away (by using `setState()`).
@@ -421,7 +430,10 @@ For example:
 import { ImmutableStateExtension, LoggerExtension} from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [new LoggerExtension(), new ImmutableStateExtension()]
+    extensions: [
+        new LoggerExtension(), 
+        new ImmutableStateExtension()
+    ]
 });
 ```
 ### Immutable State Extension:
@@ -429,14 +441,26 @@ Make sure that the state is not mutated accidentally.
 State should only be changed by dispatching an action or by using `setState`.
 
 ```ts 
-const immutableExt = new ImmutableStateExtension();
+import { ImmutableStateExtension } from 'mini-rx-store';
+
+const store: Store = configureStore({
+    extensions: [
+        new ImmutableStateExtension()
+    ]
+});
 ```
 
 ### Logger Extension:
 Enables simple Logging: console.log every action and the updated state.
 
 ```ts 
-const loggerExt = new LoggerExtension();
+import { LoggerExtension } from 'mini-rx-store';
+
+const store: Store = configureStore({
+    extensions: [
+        new LoggerExtension()
+    ]
+});
 ```
 
 ### Redux Dev Tools Extension:
@@ -458,15 +482,46 @@ Currently, these options are available to configure the DevTools:
 ```ts
 import { ReduxDevtoolsExtension } from 'mini-rx-store';
 
-const devToolsExt = new ReduxDevtoolsExtension({
-    name: 'MiniRx Showcase',
-    maxAge: 25,
-    latency: 1000
+const store: Store = configureStore({
+    extensions: [
+        new ReduxDevtoolsExtension({
+            name: 'MiniRx Showcase',
+            maxAge: 25,
+            latency: 1000
+        })
+    ]
+});
+```
+ℹ️ If you are using Angular you have to register the `StoreDevtoolsModule` from 'mini-rx-store-ng'.
+See [Angular Redux Dev Tools](#redux-dev-tools) for more information.
+
+### Undo Extension
+With the Undo Extension we can easily undo Actions which have been dispatched to the Store.
+
+```ts 
+import { UndoExtension } from 'mini-rx-store';
+
+const store: Store = configureStore({
+    extensions: [
+        new UndoExtension()
+    ]
 });
 ```
 
-### Undo Extension
-TODO
+Example
+
+```ts 
+import { Action, undo } from 'mini-rx-store';
+
+const deleteAction: Action = new DeleteProduct(3); // Get hold of the Action which we want to undo
+store.dispatch(deleteAction); // Dispatch the Action to the Store
+store.dispatch(undo(deleteAction)); // Undo the dispatched Action
+```
+
+ℹ️ The Undo Extension buffers the last 100 Actions by default to be able to undo an Action. You can configure the buffer like this:
+```ts 
+new UndoExtension({bufferSize: 200})
+```
 
 ## Angular Integration
 [![npm version](https://badge.fury.io/js/mini-rx-store-ng.svg)](https://www.npmjs.com/package/mini-rx-store-ng)
