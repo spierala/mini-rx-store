@@ -71,18 +71,8 @@ export function createSelector<State, S1, S2, S3, S4, S5, S6, S7, S8, Result>(
     s6: Selector<State, S6>,
     s7: Selector<State, S7>,
     s8: Selector<State, S8>,
-    projector: (
-        s1: S1,
-        s2: S2,
-        s3: S3,
-        s4: S4,
-        s5: S5,
-        s6: S6,
-        s7: S7,
-        s8: S8
-    ) => Result
+    projector: (s1: S1, s2: S2, s3: S3, s4: S4, s5: S5, s6: S6, s7: S7, s8: S8) => Result
 ): Selector<State, Result>;
-
 
 export function createSelector(...args: any[]): Selector<any, any> {
     const selectors = args.slice(0, args.length - 1);
@@ -90,21 +80,21 @@ export function createSelector(...args: any[]): Selector<any, any> {
     const memoizedProjector = memoizeOne(projector);
 
     return memoizeOne((state) => {
-        const selectorResults = selectors.map(fn => fn(state));
+        const selectorResults = selectors.map((fn) => fn(state));
         return memoizedProjector.apply(null, selectorResults);
     });
 }
 
-
-export function createFeatureSelector<T>(
-    featureName?: string
-): Selector<object, T>;
-
+export function createFeatureSelector<T>(featureName?: string): Selector<object, T>;
+export function createFeatureSelector<T, V>(featureName: keyof T): Selector<T, V>;
 export function createFeatureSelector(featureName?: string): Selector<any, any> {
-    return createSelector((state: any) => {
-        if (featureName) {
-            return state[featureName];
-        }
-        return state;
-    }, (featureState) => featureState);
+    return createSelector(
+        (state: any) => {
+            if (featureName) {
+                return state[featureName];
+            }
+            return state;
+        },
+        (featureState) => featureState
+    );
 }

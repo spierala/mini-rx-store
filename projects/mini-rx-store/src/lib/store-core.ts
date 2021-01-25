@@ -11,19 +11,13 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import {
-    catchError,
-    distinctUntilChanged,
-    map,
-    observeOn,
-    tap,
-    withLatestFrom,
-} from 'rxjs/operators';
+import { catchError, map, observeOn, tap, withLatestFrom } from 'rxjs/operators';
 import {
     combineMetaReducers,
     combineReducers,
     createActionTypePrefix,
     miniRxError,
+    select,
     storeInitActionType,
 } from './utils';
 
@@ -199,10 +193,7 @@ class StoreCore {
     }
 
     select<K>(mapFn: (state: AppState) => K): Observable<K> {
-        return this.state$.pipe(
-            map((state: AppState) => mapFn(state)),
-            distinctUntilChanged()
-        );
+        return this.state$.pipe(select(mapFn));
     }
 
     addExtension(extension: StoreExtension) {

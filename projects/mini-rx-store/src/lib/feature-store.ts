@@ -1,8 +1,8 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, AppState, Reducer } from './models';
 import StoreCore from './store-core';
-import { createActionTypePrefix, miniRxError } from './utils';
-import { createFeatureSelector, createSelector, Selector } from './selector';
+import { createActionTypePrefix, miniRxError, select } from './utils';
+import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
@@ -12,15 +12,14 @@ const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
-    private readonly featureSelector: Selector<AppState, StateType>;
 
     /**
      * @deprecated Use `this.select()` instead.
      */
-    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined); // TODO remove BehaviorSubject
+    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
 
     get state(): StateType {
-        return this.state$.getValue(); // TODO return "raw" state object
+        return this.state$.getValue();
     }
 
     constructor(private featureName: string, initialState: StateType) {
@@ -33,10 +32,9 @@ export class FeatureStore<StateType> {
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
 
-        this.featureSelector = createFeatureSelector<StateType>(featureName);
-
         // Select Feature State and delegate to local BehaviorSubject
-        StoreCore.select(this.featureSelector).subscribe(this.state$); // TODO store state in a "raw" state object instead of BehaviorSubject
+        const featureSelector = createFeatureSelector<AppState, StateType>(featureName);
+        StoreCore.select(featureSelector).subscribe(this.state$);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
@@ -59,10 +57,11 @@ export class FeatureStore<StateType> {
         mapFn?: T,
     ): Observable<K | StateType> {
         if (!mapFn) {
-            return StoreCore.select(this.featureSelector);
+            return this.state$;
         }
-        const selector = createSelector(this.featureSelector, mapFn);
-        return StoreCore.select(selector);
+        return this.state$.pipe(
+            select(mapFn)
+        );
     }
 
     effect<PayLoadType = any>(
