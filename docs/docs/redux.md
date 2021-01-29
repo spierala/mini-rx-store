@@ -14,5 +14,5 @@ The Store uses the Redux Pattern to make state management easy and predictable.
 The Redux Pattern is based on this 3 key principles:
 
 -   Single Source of Truth
--   State is read-only and is only changed by dispatching actions
--   Changes are made using pure functions called reducers
+-   State is read-only and is only changed by dispatching Actions
+-   Changes are made using pure functions called Reducers
