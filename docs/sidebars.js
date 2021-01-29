@@ -11,7 +11,7 @@ module.exports = {
         {
             type: 'category',
             label: 'The "Redux" Store',
-            items: ['redux', 'redux-setup', 'actions', 'reducers', 'selectors', 'ts-action'],
+            items: ['redux', 'redux-setup', 'actions', 'reducers', 'selectors', 'effects', 'ts-action'],
         },
     ],
 };
