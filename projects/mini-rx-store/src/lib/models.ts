@@ -10,7 +10,6 @@ export interface StoreExtension {
 
 export interface Action {
     type: string;
-    payload?: any;
 }
 
 export interface ActionMetaData {
