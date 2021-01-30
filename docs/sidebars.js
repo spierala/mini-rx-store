@@ -10,8 +10,13 @@ module.exports = {
         },
         {
             type: 'category',
-            label: 'The "Redux" Store',
+            label: 'Store (Redux API)',
             items: ['redux', 'redux-setup', 'actions', 'reducers', 'selectors', 'effects', 'ts-action'],
+        },
+        {
+            type: 'category',
+            label: 'Feature Store',
+            items: ['fs-quick-start', 'fs-setup', 'fs-set-state', 'fs-select'],
         },
     ],
 };
