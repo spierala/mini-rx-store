@@ -24,11 +24,13 @@ export interface ActionWithMeta {
 
 export interface StoreConfig {
     reducers: ReducerDictionary;
+    initialState: AppState;
     metaReducers: MetaReducer<AppState>[];
     extensions: StoreExtension[];
 }
 
 export interface FeatureStoreConfig<StateType> {
+    initialState: StateType;
     metaReducers?: MetaReducer<StateType>[];
 }
 

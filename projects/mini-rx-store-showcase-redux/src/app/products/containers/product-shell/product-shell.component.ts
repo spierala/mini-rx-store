@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
 
 import * as fromProduct from './../../state';
 import {
@@ -20,19 +19,15 @@ import { Store } from 'mini-rx-store';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductShellComponent implements OnInit {
-    displayCode$: Observable<boolean>;
-    selectedProduct$: Observable<Product>;
-    products$: Observable<Product[]>;
-    errorMessage$: Observable<string>;
+    displayCode$ = this.store.select(fromProduct.getShowProductCode);
+    selectedProduct$ = this.store.select(fromProduct.getCurrentProduct);
+    products$ = this.store.select(fromProduct.getProducts);
+    errorMessage$ = this.store.select(fromProduct.getError);
 
     constructor(private store: Store) {}
 
     ngOnInit(): void {
         this.store.dispatch(load());
-        this.products$ = this.store.select(fromProduct.getProducts);
-        this.errorMessage$ = this.store.select(fromProduct.getError);
-        this.selectedProduct$ = this.store.select(fromProduct.getCurrentProduct);
-        this.displayCode$ = this.store.select(fromProduct.getShowProductCode);
     }
 
     checkChanged(value: boolean): void {

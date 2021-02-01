@@ -1,5 +1,5 @@
-import { OperatorFunction } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { OperatorFunction, pipe } from 'rxjs';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { Action, AppState, MetaReducer, Reducer } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
@@ -10,8 +10,15 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
     );
 }
 
+export function select<T, K>(mapFn: (state: T) => K) {
+    return pipe(
+        map((state: T) => mapFn(state)),
+        distinctUntilChanged()
+    );
+}
+
 export function combineReducers(reducers: Reducer<any>[]): Reducer<AppState> {
-    return (state: AppState, action: Action): AppState => {
+    return (state: AppState = {}, action: Action): AppState => {
         return reducers.reduce((currState, reducer) => {
             return reducer(currState, action);
         }, state);

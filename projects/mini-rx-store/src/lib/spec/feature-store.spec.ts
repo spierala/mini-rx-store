@@ -46,16 +46,15 @@ const getCity = createSelector(getUserFeatureState, (state) => state.city);
 const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
 const getCountry = createSelector(getUserFeatureState2, (state) => state.country);
 
-store.feature('someFeature', counterReducer);
-const getSomeFeatureSelector = createFeatureSelector('someFeature');
+store.feature<CounterState>('someFeature', counterReducer);
+const getSomeFeatureSelector = createFeatureSelector<CounterState>('someFeature');
 
 class FeatureState extends FeatureStore<UserState> {
-    state$ = this.state$;
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
     country$ = this.select(getCountry);
-    city$ = this.select(getCity, true);
-    someFeatureState$ = this.select(getSomeFeatureSelector, true);
+    city$ = store.select(getCity);
+    someFeatureState$ = store.select(getSomeFeatureSelector);
 
     loadFn = this.effect((payload$) =>
         payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap((user) => this.setState(user)))))
@@ -136,7 +135,7 @@ describe('FeatureStore', () => {
 
     it('should initialize the feature', () => {
         const spy = jest.fn();
-        userFeature.state$.subscribe(spy);
+        userFeature.select().subscribe(spy);
         expect(spy).toHaveBeenCalledWith(initialState);
         expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -206,7 +205,7 @@ describe('FeatureStore', () => {
     it('should create and execute an effect and handle error', () => {
         userFeature.resetState();
         userFeature.loadFnWithError();
-        expect(userFeature.state$).toBeObservable(
+        expect(userFeature.select()).toBeObservable(
             hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
         );
     });

@@ -11,20 +11,14 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
+import { catchError, map, observeOn, tap, withLatestFrom } from 'rxjs/operators';
 import {
-    catchError,
-    distinctUntilChanged,
-    map,
-    observeOn,
-    tap,
-    withLatestFrom,
-} from 'rxjs/operators';
-import {
-    combineReducers,
     combineMetaReducers,
+    combineReducers,
     createActionTypePrefix,
-    storeInitActionType,
     miniRxError,
+    select,
+    storeInitActionType,
 } from './utils';
 
 class StoreCore {
@@ -57,6 +51,7 @@ class StoreCore {
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
         map((reducers) => combineReducers(Object.values(reducers)))
     );
+
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
@@ -72,24 +67,27 @@ class StoreCore {
                     this.combinedMetaReducer$
                 ),
                 tap(
-                    (
-                        [actionWithMeta, state, combinedReducer, reducerDictionary, combinedMetaReducer]: [
-
-                            ActionWithMeta,
-                            AppState,
-                            Reducer<AppState>,
-                            ReducerDictionary,
-                            MetaReducer<AppState>
-                        ]
-                    ) => {
-                        const forFeature: string =
+                    ([
+                        actionWithMeta,
+                        state,
+                        combinedReducer,
+                        reducerDictionary,
+                        combinedMetaReducer,
+                    ]: [
+                        ActionWithMeta,
+                        AppState,
+                        Reducer<AppState>,
+                        ReducerDictionary,
+                        MetaReducer<AppState>
+                    ]) => {
+                        const onlyForFeature: string =
                             actionWithMeta.meta && actionWithMeta.meta.onlyForFeature;
                         const action: Action = actionWithMeta.action;
 
                         let reducer: Reducer<AppState>;
-                        if (forFeature) {
-                            // Feature setState Actions only have to go through their own feature reducer
-                            reducer = reducerDictionary[forFeature];
+                        if (onlyForFeature) {
+                            // FeatureStore setState Actions only have to go through their own (default) reducer
+                            reducer = reducerDictionary[onlyForFeature];
                         } else {
                             reducer = combinedReducer;
                         }
@@ -101,7 +99,8 @@ class StoreCore {
                         this.updateState(newState);
                     }
                 )
-            ).subscribe();
+            )
+            .subscribe();
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {
@@ -114,9 +113,10 @@ class StoreCore {
         config: {
             isDefaultReducer?: boolean;
             metaReducers?: MetaReducer<StateType>[];
+            initialState?: StateType;
         } = {}
     ) {
-        const { isDefaultReducer, metaReducers } = config;
+        const { isDefaultReducer, metaReducers, initialState } = config;
 
         reducer =
             metaReducers && metaReducers.length > 0
@@ -124,6 +124,10 @@ class StoreCore {
                 : reducer;
 
         checkFeatureExists(featureName, this.reducers);
+
+        if (typeof initialState !== 'undefined') {
+            reducer = createReducerWithInitialState(reducer, initialState);
+        }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
         const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
@@ -140,7 +144,7 @@ class StoreCore {
             {
                 type: `${actionTypePrefix}/init`,
             },
-            { onlyForFeature } // Dispatch only for the feature reducer (in case of using a defaultReducer)
+            { onlyForFeature } // Dispatch only for the feature´s own reducer (in case of using a FeatureStore with default reducer)
         );
     }
 
@@ -168,12 +172,14 @@ class StoreCore {
             });
         }
 
+        this.updateState(config.initialState);
+
         this.dispatch({ type: storeInitActionType });
     }
 
     effect(effect$: Observable<Action>) {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        effectWithErrorHandler$.subscribe(action => this.dispatch(action));
+        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
     }
 
     dispatch = (action: Action, meta?: ActionMetaData) =>
@@ -187,10 +193,7 @@ class StoreCore {
     }
 
     select<K>(mapFn: (state: AppState) => K): Observable<K> {
-        return this.state$.pipe(
-            map((state: AppState) => mapFn(state)),
-            distinctUntilChanged()
-        );
+        return this.state$.pipe(select(mapFn));
     }
 
     addExtension(extension: StoreExtension) {
@@ -201,10 +204,24 @@ class StoreCore {
 
 function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
     return (state: AppState, action: Action): AppState => {
-        return {
-            ...state,
-            [featureName]: reducer(state[featureName], action),
-        };
+        const newFeatureState: any = reducer(state[featureName], action);
+        if (newFeatureState !== state[featureName]) {
+            // Only return a new AppState if the feature state changed
+            return {
+                ...state,
+                [featureName]: newFeatureState,
+            };
+        }
+        return state;
+    };
+}
+
+function createReducerWithInitialState<StateType>(
+    reducer: Reducer<StateType>,
+    initialState: StateType
+): Reducer<StateType> {
+    return (state: StateType = initialState, action: Action): StateType => {
+        return reducer(state, action);
     };
 }
 

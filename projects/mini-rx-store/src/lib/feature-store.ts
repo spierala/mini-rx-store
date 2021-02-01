@@ -1,20 +1,20 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, AppState, Reducer } from './models';
 import StoreCore from './store-core';
-import { createActionTypePrefix, miniRxError } from './utils';
-import { createFeatureSelector, createSelector, Selector } from './selector';
+import { createActionTypePrefix, miniRxError, select } from './utils';
+import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-export const nameUpdateAction = 'set-state';
+const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
-    private readonly featureSelector: Selector<AppState, StateType>;
 
     state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
+
     get state(): StateType {
         return this.state$.getValue();
     }
@@ -29,10 +29,9 @@ export class FeatureStore<StateType> {
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
 
-        this.featureSelector = createFeatureSelector<StateType>(featureName);
-
         // Select Feature State and delegate to local BehaviorSubject
-        StoreCore.select(this.featureSelector).subscribe(this.state$);
+        const featureSelector = createFeatureSelector<AppState, StateType>(featureName);
+        StoreCore.select(featureSelector).subscribe(this.state$);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
@@ -49,19 +48,13 @@ export class FeatureStore<StateType> {
         return action;
     }
 
-    select<K>(mapFn: (state: StateType) => K, selectFromStore?: boolean): Observable<K>;
-    select<K>(mapFn: (state: AppState) => K, selectFromStore?: boolean): Observable<K>;
-    select<K, T extends (state: AppState | StateType) => K>(
-        mapFn: T,
-        selectFromStore: boolean = false
-    ): Observable<K> {
-        if (selectFromStore) {
-            return StoreCore.select(mapFn);
+    select(): Observable<StateType>;
+    select<K>(mapFn: (state: StateType) => K): Observable<K>;
+    select<K, T extends (state: StateType) => K>(mapFn?: T): Observable<K | StateType> {
+        if (!mapFn) {
+            return this.state$;
         }
-
-        const selector = createSelector(this.featureSelector, mapFn);
-
-        return StoreCore.select(selector);
+        return this.state$.pipe(select(mapFn));
     }
 
     effect<PayLoadType = any>(
@@ -88,7 +81,7 @@ function createDefaultReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action) => {
-        // Check for 'set-state' action (originates from Feature.setState())
+        // Check for 'set-state' action (originates from FeatureStore.setState())
         if (
             action.type.indexOf(nameSpaceFeature) > -1 &&
             action.type.indexOf(nameUpdateAction) > -1
