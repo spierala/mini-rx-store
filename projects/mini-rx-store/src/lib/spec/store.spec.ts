@@ -144,7 +144,7 @@ describe('Store Config', () => {
 
     it('should initialize the store with root initial state', () => {
         const rootInitialState = {
-            user: {},
+            user: { name: 'Nicolas' },
         };
 
         StoreCore.config({
@@ -159,7 +159,7 @@ describe('Store Config', () => {
         store.select((state) => state).subscribe(spy);
 
         expect(spy).toHaveBeenCalledWith({
-            user: {}, // userReducer initial state is overwritten by the root initial state
+            user: { name: 'Nicolas' }, // userReducer initial state is overwritten by the root initial state
             user2: userInitialState, // Root initial state does not affect User2 initial state
         });
     });
