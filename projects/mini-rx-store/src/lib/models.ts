@@ -10,6 +10,8 @@ export interface StoreExtension {
 
 export interface Action {
     type: string;
+    /** @deprecated Do not use payload directly, extend Action instead */
+    payload?: any;
 }
 
 export interface ActionMetaData {
