@@ -5,6 +5,8 @@ export interface AppState {
 }
 
 export interface StoreExtension {
+    sortOrder?: number;
+
     init(): void;
 }
 

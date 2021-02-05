@@ -12,6 +12,8 @@ let initialState;
 let bufferSize;
 
 export class UndoExtension implements StoreExtension {
+    sortOrder = 100;
+
     constructor(config: {bufferSize: number} = {bufferSize: defaultBufferSize}) {
         bufferSize = config.bufferSize;
         isUndoExtensionInitialized = true;

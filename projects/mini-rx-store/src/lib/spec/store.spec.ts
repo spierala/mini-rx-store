@@ -212,6 +212,57 @@ describe('Store Config', () => {
             expect(callOrder).toEqual(['meta1', 'meta2']);
         });
 
+        it('should call root meta reducers from extensions depending on sortOrder', () => {
+            const callOrder = [];
+
+            function rootMetaReducerForExtension(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta1');
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension implements StoreExtension {
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                }
+            }
+
+            function rootMetaReducerForExtension2(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta2');
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension2 implements StoreExtension {
+                sortOrder = 100;
+
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension2);
+                }
+            }
+
+            function rootMetaReducerForExtension3(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta3');
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension3 implements StoreExtension {
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension3);
+                }
+            }
+
+            StoreCore.config({
+                extensions: [new Extension(), new Extension2(), new Extension3()],
+            });
+
+            expect(callOrder).toEqual(['meta1', 'meta3', 'meta2']);
+        });
+
         it('should run reducers in order: ' +
             '1.) root meta reducers ' +
             '2.) root meta reducers from extensions' +

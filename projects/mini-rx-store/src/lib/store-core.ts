@@ -154,7 +154,8 @@ class StoreCore {
         }
 
         if (config.extensions && config.extensions.length > 0) {
-            config.extensions.forEach((extension) => this.addExtension(extension));
+            const sortedExtensions: StoreExtension[] = sortExtensions(config.extensions);
+            sortedExtensions.forEach((extension) => this.addExtension(extension));
         }
 
         if (config.reducers) {
@@ -186,7 +187,7 @@ class StoreCore {
         this.actionsWithMetaSource.next({
             action,
             meta,
-        });
+        })
 
     updateState(state: AppState) {
         this.stateSource.next(state);
@@ -229,6 +230,14 @@ function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
     if (reducers.hasOwnProperty(featureName)) {
         miniRxError(`Feature "${featureName}" already exists.`);
     }
+}
+
+function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
+    // Fix undefined sortOrders to 0
+    extensions = extensions.map(item => typeof item.sortOrder !== 'undefined' ? item : Object.assign(item, {sortOrder: 0}));
+    return extensions.sort((a, b) => {
+        return a.sortOrder - b.sortOrder;
+    });
 }
 
 // Prevent effect to unsubscribe from the actions stream
