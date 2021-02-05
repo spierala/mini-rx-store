@@ -14,7 +14,7 @@ import { Todo } from "./todo";
 
 export interface TodoState {
     todos: Todo[];
-    selectedTodoId: string
+    selectedTodoId: number
 }
 
 export const initialState: TodoState = {
@@ -22,7 +22,7 @@ export const initialState: TodoState = {
     selectedTodoId: undefined
 };
 
-class TodoFeatureStore extends FeatureStore<TodoState> {
+export class TodoFeatureStore extends FeatureStore<TodoState> {
     constructor() {
         super('todo', initialState)
     }

@@ -7,7 +7,7 @@ slug: /update-feature-state
 Use `setState` to update the state of a Feature Store right away.
 `setState` accepts a Partial Type. This allows us to pass only some properties of a bigger state interface.
 ```ts title="todo-feature-store.ts"
-selectTodo(id: string) {
+selectTodo(id: number) {
     this.setState({selectedTodoId: id});
 }
 ```

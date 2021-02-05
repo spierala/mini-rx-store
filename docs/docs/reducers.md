@@ -12,7 +12,7 @@ import { TodoActionTypes, TodoActions } from './todo-actions';
 
 export interface TodoState {
     todos: Todo[];
-    selectedTodoId: string
+    selectedTodoId: number
 }
 
 export const initialState: TodoState = {
@@ -71,8 +71,8 @@ store.feature('todo', todoReducer)
 Now we are all set for updating the *todos* feature state.
 Let's dispatch the `AddTodo` action:
 ```ts
-store.dispatch(new AddTodo({id: '1', title: 'Use Redux'}));
+store.dispatch(new AddTodo({id: 1, title: 'Use Redux'}));
 
-store.select(state => state).subscribe(console.log); // Output: {"todo":{"todos":[{id: "1", title: "Use Redux"}]}}
+store.select(state => state).subscribe(console.log); // Output: {"todo":{"todos":[{id: 1, title: "Use Redux"}]}}
 ```
 Yes, we did it! The todoReducer processed the action and the new todo landed in the `todos` array.

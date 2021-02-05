@@ -26,7 +26,7 @@ export const loadTodosFail = action('LOAD_TODOS_FAIL', payload<Error>());
 #### Dispatch an Action:
 
 ```ts
-store.dispatch(addTodo({id: '1', title: 'Use Redux'}))
+store.dispatch(addTodo({id: 1, title: 'Use Redux'}))
 ```
 
 #### Reducer

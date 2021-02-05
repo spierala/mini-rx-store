@@ -16,7 +16,7 @@ module.exports = {
         {
             type: 'category',
             label: 'Feature Store',
-            items: ['fs-quick-start', 'fs-setup', 'fs-set-state', 'fs-select'],
+            items: ['fs-quick-start', 'fs-setup', 'fs-set-state', 'fs-select', 'fs-effect'],
         },
     ],
 };

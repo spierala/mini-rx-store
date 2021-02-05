@@ -37,14 +37,14 @@ export function addTodo(payload) {
 ```
 Dispatch the action:
 ```ts
-store.dispatch(addTodo({id: '1', name: 'Use Redux'}));
+store.dispatch(addTodo({id: 1, name: 'Use Redux'}));
 ```
 
 
 ### Class-based Action Creators (TypeScript)
 ```ts title="todo.ts"
 export interface Todo {
-    id: string,
+    id: number,
     name: string
 }
 ```
@@ -65,7 +65,7 @@ export class AddTodo implements Action {
 
 export class RemoveTodo implements Action {
     readonly type = TodoActionTypes.RemoveTodo;
-    constructor(public payload: string) {}
+    constructor(public payload: number) {}
 }
 
 // Union the valid types
@@ -74,9 +74,9 @@ export type TodoActions = AddTodo | RemoveTodo;
 
 Dispatch the actions:
 ```ts
-store.dispatch(new AddTodo({id: '1', title: 'Use Redux'}));
+store.dispatch(new AddTodo({id: 1, title: 'Use Redux'}));
 
-store.dispatch(new RemoveTodo('1'))
+store.dispatch(new RemoveTodo(1))
 ```
 
 The following code examples use Class-based Action Creators.

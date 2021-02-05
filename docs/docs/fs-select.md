@@ -62,7 +62,7 @@ class TodoFeatureStore extends FeatureStore<TodoState> {
         }))
     }
 
-    selectTodo(id: string) {
+    selectTodo(id: number) {
         this.setState({selectedTodoId: id});
     }
 }
