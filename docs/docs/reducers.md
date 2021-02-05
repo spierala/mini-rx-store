@@ -7,14 +7,17 @@ slug: /reducers
 Reducers specify how the feature state changes in response to actions sent to the store. A reducer function typically looks like this:
 
 ```ts title="todo-reducer.ts"
+import { Todo } from './todo';
 import { TodoActionTypes, TodoActions } from './todo-actions';
 
 export interface TodoState {
-    todos: string[];
+    todos: Todo[];
+    selectedTodoId: string
 }
 
-const initialState: TodoState = {
-    todos: []
+export const initialState: TodoState = {
+    todos: [],
+    selectedTodoId: undefined
 };
 
 export function todoReducer(
@@ -27,11 +30,16 @@ export function todoReducer(
                 ...state,
                 todos: [...state.todos, action.payload]
             };
-
+        case TodoActionTypes.RemoveTodo:
+            return {
+                ...state,
+                todos: state.todos.filter(item => item.id !== action.payload)
+            };
         default:
             return state;
     }
 }
+
 ```
 
 ### Register feature reducer
@@ -49,7 +57,9 @@ const store: Store = configureStore({
 });
 ```
 
-#### Option 2: Add feature reducer dynamically
+Like this the reducers are ready when the Store is initialized.
+
+#### Option 2: Add feature reducers dynamically
 We can add feature reducers at any time with `store.feature`.
 
 ```ts
@@ -61,8 +71,8 @@ store.feature('todo', todoReducer)
 Now we are all set for updating the *todos* feature state.
 Let's dispatch the `AddTodo` action:
 ```ts
-store.dispatch(new AddTodo('Use Redux'));
+store.dispatch(new AddTodo({id: '1', title: 'Use Redux'}));
 
-store.select(state => state).subscribe(console.log); // Log: {"todo":{"todos":["Use Redux"]}}
+store.select(state => state).subscribe(console.log); // Output: {"todo":{"todos":[{id: "1", title: "Use Redux"}]}}
 ```
 Yes, we did it! The todoReducer processed the action and the new todo landed in the `todos` array.

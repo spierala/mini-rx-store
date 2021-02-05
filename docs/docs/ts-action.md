@@ -11,18 +11,22 @@ Install the packages using npm:
 
 `npm install ts-action ts-action-operators`
 
-#### Create an Action:
+#### Create Actions:
 
-```ts
+```ts title="ts-todo-actions.ts"
 import { action, payload } from 'ts-action';
+import { Todo } from './todo';
 
-const addTodo = action('Add Todo', payload<string>());
+export const addTodo = action('ADD_TODO', payload<Todo>());
+export const loadTodos = action('LOAD_TODOS');
+export const loadTodosSuccess = action('LOAD_TODOS_SUCCESS', payload<Todo[]>());
+export const loadTodosFail = action('LOAD_TODOS_FAIL', payload<Error>());
 ```
 
 #### Dispatch an Action:
 
 ```ts
-store.dispatch(addTodo('Use Redux'))
+store.dispatch(addTodo({id: '1', title: 'Use Redux'}))
 ```
 
 #### Reducer
@@ -30,11 +34,15 @@ store.dispatch(addTodo('Use Redux'))
 ```ts
 import { on, reducer } from 'ts-action';
 
-const initialState = {
-    todos: []
+export interface TodoState {
+    todos: Todo[];
 }
 
-const todoReducer = reducer(
+export const initialState: TodoState = {
+    todos: [],
+};
+
+export const todoReducer = reducer(
     initialState,
     on(addTodo, (state, {payload}) => ({...state, todos: [...state.todos, payload]}))
 );
@@ -45,18 +53,23 @@ const todoReducer = reducer(
 Consume actions in Effects
 
 ```ts
-import { actions$ } from 'mini-rx-store';
-import { ofType, toPayload } from 'ts-action-operators';
-import { mergeMap, map, catchError } from 'rxjs/operators';
+import { actions$ } from "mini-rx-store";
+import { mergeMap, map, catchError } from "rxjs/operators";
+import { ofType } from "ts-action-operators";
+import { ajax } from "rxjs/ajax";
+import { of } from "rxjs";
+import { loadTodos, loadTodosFail, loadTodosSuccess } from "./ts-todo-actions";
 
-updateProduct$ = actions$.pipe(
-    ofType(updateProduct),
-    toPayload(),
-    mergeMap((product) => {
-        return this.productService.updateProduct(product).pipe(
-            map(updatedProduct => (updateProductSuccess(updatedProduct))),
-            catchError(err => of(updateProductFail(err)))
-        );
-    })
+export const loadEffect = actions$.pipe(
+    ofType(loadTodos), // Use ofType from "ts-action-operators"
+    mergeMap(() =>
+        ajax("https://jsonplaceholder.typicode.com/todos").pipe(
+            map(res => loadTodosSuccess(res.response)),
+            catchError(err => of(loadTodosFail(err)))
+        )
+    )
 );
+
+// Register the effect
+store.effect(loadEffect);
 ```

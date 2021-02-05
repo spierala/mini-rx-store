@@ -6,10 +6,10 @@ slug: select-feature-state
 ---
 
 ## Reactive Select
-```ts
+```ts title="todo-feature-store.ts"
 import { Observable } from 'rxjs';
 
-public currentUser$: Observable<User> = this.select(state => state.currentUser);
+todos$: Observable<Todo[]> = this.select(state => state.todos);
 ```
 
 `select` takes a callback function which gives you access to the current feature state (see the `state` parameter).
@@ -23,23 +23,47 @@ You only have to omit the feature name when using `createFeatureSelector`.
 This is because the `FeatureStore` is operating on a specific feature state already 
 (the corresponding feature name has been provided in the constructor).
 
-```ts
+```ts title="todo-feature-store.ts"
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
 
-const getUserFeatureState = createFeatureSelector<UserState>(); // Omit the feature name!
+// Memoized Selectors
+const getTodoFeatureState = createFeatureSelector<TodoState>(); // Omit the feature name!
 
-const getCurrentUser = createSelector(
-    getUserFeatureState,
-    state => state.currentUser
+const getTodos = createSelector(
+    getTodoFeatureState,
+    state => state.todos
 );
 
+const getSelectedTodoId = createSelector(
+    getTodoFeatureState,
+    state => state.selectedTodoId
+)
 
-// Inside the User state service
-export class UserStateService extends FeatureStore<UserState>{
-    currentUser$ = this.select(getCurrentUser);
+const getSelectedTodo = createSelector(
+    getTodos,
+    getSelectedTodoId,
+    (todos, id) => todos.find(item => item.id === id)
+)
+
+class TodoFeatureStore extends FeatureStore<TodoState> {
+
+    // State Observables
+    todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
+    todos$: Observable<Todo[]> = this.select(getTodos);
+    selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
 
     constructor() {
-        super('products', initialState); // Feature name 'products' is provided here already...
+        super('todoFs', initialState) // Feature name 'todos' is provided here already...
+    }
+
+    addTodo(todo: Todo) {
+        this.setState(state => ({
+            todos: [...state.todos, todo]
+        }))
+    }
+
+    selectTodo(id: string) {
+        this.setState({selectedTodoId: id});
     }
 }
 ```

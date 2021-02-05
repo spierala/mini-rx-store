@@ -19,9 +19,9 @@ const store: Store = configureStore({});
 
 We can add feature reducers dynamically later like this:
 ```ts
-import productReducer from './productReducer';
+import todoReducer from './todo-reducer';
 
-store.feature('product', productReducer)
+store.feature('todo', todoReducer);
 ```
 
 ## Root Reducers
@@ -29,8 +29,8 @@ If we need the feature reducers to be ready at Store initialization then we can 
 
 ```ts
 import { configureStore, Store } from 'mini-rx-store';
-import productReducer from './productReducer';
-import userReducer from './userReducer';
+import productReducer from './product-reducer';
+import userReducer from './user-reducer';
 
 const store: Store = configureStore({
     reducers: {

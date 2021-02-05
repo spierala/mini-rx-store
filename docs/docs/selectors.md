@@ -22,11 +22,11 @@ const todoState$: Observable<TodoState> = store.select(state => state['todo']);
 
 ## Memoized Selectors
 
-MiniRx comes with Memoized Selectors out of the box. With these selectors we can easily select and combine state.
+MiniRx comes with memoized selectors out of the box. With the selectors we can easily select and combine state. The MiniRx selectors are memoized to prevent unnecessary executions of the projector function.
 
 ### createFeatureSelector
 `createFeatureSelector`: Select a feature state from the global state object. 
-We have to use the same key that we used for registering the todoReducer ('todo').
+We have to use the same key that we used for registering the feature reducer (e.g. we used the 'todo' key for the todoReducer).
 ```ts title="todo-selectors.ts"
 import { createFeatureSelector } from 'mini-rx-store';
 import { TodoState } from './todo-reducer';
@@ -35,23 +35,27 @@ export const getTodoFeatureState = createFeatureSelector<TodoState>('todo');
 ```
 
 ### createSelector
-With `createSelector` we can combine many other selectors to create a new selector. 
+With `createSelector` we can require many other selectors to create a new selector. 
 The last argument passed to `createSelector` is the projection function. 
-In the projection function we can access the return values of the other selectors.
-
-The MiniRx selectors are memoized to prevent unnecessary executions of the projector function.
+In the projection function we can access the return values of the required selectors.
 
 ```ts title="todo-selectors.ts"
-import { createSelector } from 'mini-rx-store';
+import { createSelector } from 'mini-rx-store'
 
 export const getTodos = createSelector(
     getTodoFeatureState,
-    todoState => todoState.todos // Projection function
+    state => state.todos
 );
 
-export const getTodosCount = createSelector(
+export const getSelectedTodoId = createSelector(
+    getTodoFeatureState,
+    state => state.selectedTodoId
+)
+
+export const getSelectedTodo = createSelector(
     getTodos,
-    todos => todos.length
+    getSelectedTodoId,
+    (todos, id) => todos.find(item => item.id === id)
 )
 ```
 Let's use the memoized selectors to create our State Observables:
@@ -59,6 +63,6 @@ Let's use the memoized selectors to create our State Observables:
 import { getTodoFeatureState, getTodos, getTodosCount } from './todo-selectors';
 
 const todoState$: Observable<TodoState> = store.select(getTodoFeatureState);
-const todos$: Observable<string[]> = store.select(getTodos);
-const todosCount$: Observable<number> = store.select(getTodosCount);
+const todos$: Observable<Todo[]> = store.select(getTodos);
+const selectedTodo$: Observable<Todo> = store.select(getSelectedTodo);
 ```

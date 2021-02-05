@@ -10,14 +10,13 @@ Actions represent unique events in our application. Reducer functions will proce
 An action is a simple object with a `type` property:
 
 ```ts
-import { Action } from 'mini-rx-store';
-
-const addTodo: Action = {
-    type: 'ADD_TODO', 
-    payload: 'Use Redux' // Optional Payload
+const addTodo = {
+    type: 'ADD_TODO',
+    // Besides `type`, the structure of an action object is really up to you.
+    payload: 'Use Redux' 
 }
 ```
-Now we can dispatch the `addReduxTodo` action to the Store and let the reducers calculate the new global state.
+Now we can dispatch the `addTodo` action to the Store and let the reducers calculate the new global state.
 
 ```ts
 store.dispatch(addTodo);
@@ -30,44 +29,54 @@ Action creators will do the repetitive work for us.
 ### "Classic" Action Creators
 ```ts
 export function addTodo(payload) {
-  return {
-    type: 'ADD_TODO',
-    payload
-  }
+    return {
+        type: 'ADD_TODO',
+        title: string
+    }
 }
 ```
 Dispatch the action:
 ```ts
-store.dispatch(addTodo('Use Redux'))
+store.dispatch(addTodo({id: '1', name: 'Use Redux'}));
 ```
 
 
 ### Class-based Action Creators (TypeScript)
+```ts title="todo.ts"
+export interface Todo {
+    id: string,
+    name: string
+}
+```
+
 ```ts title="todo-actions.ts"
-import { Action } from 'mini-rx-store';
+import { Action } from "mini-rx-store";
+import { Todo } from "./todo";
 
-enum TodoActionTypes {
-    AddTodo = 'Add Todo',
-    RemoveTodo = 'Remove Todo',
+export enum TodoActionTypes {
+    AddTodo = "ADD_TODO",
+    RemoveTodo = "REMOVE_TODO"
 }
 
-class AddTodo implements Action {
-  readonly type = TodoActionTypes.AddTodo;
-  constructor(public payload: string) { }
+export class AddTodo implements Action {
+    readonly type = TodoActionTypes.AddTodo;
+    constructor(public payload: Todo) {}
 }
 
-class RemoveTodo implements Action {
+export class RemoveTodo implements Action {
     readonly type = TodoActionTypes.RemoveTodo;
-    constructor(public payload: string) { }
+    constructor(public payload: string) {}
 }
 
 // Union the valid types
-type TodoActions = AddTodo | RemoveTodo;
+export type TodoActions = AddTodo | RemoveTodo;
 ```
 
-Dispatch the action:
+Dispatch the actions:
 ```ts
-store.dispatch(new CreateProduct(product))
+store.dispatch(new AddTodo({id: '1', title: 'Use Redux'}));
+
+store.dispatch(new RemoveTodo('1'))
 ```
 
 The following code examples use Class-based Action Creators.
