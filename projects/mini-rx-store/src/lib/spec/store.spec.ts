@@ -1,6 +1,6 @@
 import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
-import { Action, Reducer } from '../models';
+import { Action, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
@@ -212,7 +212,30 @@ describe('Store Config', () => {
             expect(callOrder).toEqual(['meta1', 'meta2']);
         });
 
-        it('should run reducers in order: 1.) root meta reducers 2.) feature meta reducers, 3.) feature reducer', () => {
+        it('should run reducers in order: ' +
+            '1.) root meta reducers ' +
+            '2.) root meta reducers from extensions' +
+            '3.) feature meta reducers, ' +
+            '4.) feature reducer', () => {
+            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+                return (state, action) => {
+                    if (action.type === 'metaTest') {
+                        state = {
+                            ...state,
+                            metaTestFeature: state.metaTestFeature + 'x',
+                        };
+                    }
+
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension implements StoreExtension {
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                }
+            }
+
             function aFeatureReducer(state: string = 'a', action: Action): string {
                 switch (action.type) {
                     case 'metaTest':
@@ -272,6 +295,7 @@ describe('Store Config', () => {
 
             StoreCore.config({
                 metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
+                extensions: [new Extension()]
             });
 
             StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
@@ -281,7 +305,7 @@ describe('Store Config', () => {
             const spy = jest.fn();
             StoreCore.select(getMetaTestFeature).subscribe(spy);
             StoreCore.dispatch({ type: 'metaTest' });
-            expect(spy).toHaveBeenCalledWith('abcde');
+            expect(spy).toHaveBeenCalledWith('abcxde');
         });
 
         it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
@@ -289,7 +313,7 @@ describe('Store Config', () => {
                 expect.objectContaining({ metaTestFeature: 'a' })
             );
             expect(nextStateSpy).toHaveBeenCalledWith(
-                expect.objectContaining({ metaTestFeature: 'abcde' })
+                expect.objectContaining({ metaTestFeature: 'abcxde' })
             );
         });
     });

@@ -149,12 +149,12 @@ class StoreCore {
     }
 
     config(config: Partial<StoreConfig> = {}) {
-        if (config.extensions && config.extensions.length > 0) {
-            config.extensions.forEach((extension) => this.addExtension(extension));
-        }
-
         if (config.metaReducers && config.metaReducers.length > 0) {
             this.addMetaReducers(...config.metaReducers);
+        }
+
+        if (config.extensions && config.extensions.length > 0) {
+            config.extensions.forEach((extension) => this.addExtension(extension));
         }
 
         if (config.reducers) {
