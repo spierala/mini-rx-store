@@ -4,7 +4,7 @@ import { Action, Reducer } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap, take } from 'rxjs/operators';
+import { catchError, map, mergeMap, take, withLatestFrom } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
@@ -467,10 +467,14 @@ describe('Store', () => {
 
     it('should call the reducer before running the effect', () => {
         const callOrder = [];
-        const someReducer = (state = {}, action: Action) => {
+        const someReducer = (state = { value: 0 }, action: Action) => {
             switch (action.type) {
                 case 'someAction2':
                     callOrder.push('reducer');
+                    return {
+                        ...state,
+                        value: state.value + 1,
+                    };
                 default:
                     return state;
             }
@@ -480,18 +484,25 @@ describe('Store', () => {
             return of({ type: 'whatever' });
         };
 
+        const valueSpy = jest.fn();
+
         store.feature('someFeature', someReducer);
 
         store.effect(
             actions$.pipe(
                 ofType('someAction2'),
-                mergeMap(() => onEffectStarted())
+                withLatestFrom(store.select((state) => state.someFeature.value)),
+                mergeMap(([, value]) => {
+                    valueSpy(value);
+                    return onEffectStarted();
+                })
             )
         );
 
         store.dispatch({ type: 'someAction2' });
 
         expect(callOrder).toEqual(['reducer', 'effect']);
+        expect(valueSpy).toHaveBeenCalledWith(1); // Effect can select the updated state immediately
     });
 
     it('should queue actions', () => {
