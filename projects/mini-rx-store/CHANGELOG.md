@@ -8,7 +8,7 @@
 * Store instance: `Store` does not hold the Store instance anymore: use `const store: Store = configureStore({})`
 * Removed `Store.settings`: No settings anymore for logging, use LoggerExtension instead
 * Renamed Feature -> FeatureStore
-* `Feature.createEffect`: do not return new state anymore, instead call setState to update state.
+* `Feature.createEffect`: do not return new state anymore, instead call setState to update state
 * Renamed `Feature.createEffect` to `Feature.effect`
 * `Feature.select`: Removed selectFromStore parameter, use store.select instead
 * `Store.feature`: Removed initial state parameter, use config parameter instead
@@ -16,7 +16,7 @@
 
 
 ### DEPRECATIONS
-* Store: `createEffect`: Use `effect` instead.
+* Store: `createEffect`: Use `effect` instead
 
 ### Features
 * MetaReducers: Root MetaReducers, Feature MetaReducers
@@ -51,7 +51,7 @@
 * Feature API: expose state snapshot via `this.state`
 
 ### Bug Fixes
-* Fix typing issue with `Feature.select
+* Fix typing issue with `Feature.select`
 
 # 1.0.0-rc.1 (2020-06-09)
 
