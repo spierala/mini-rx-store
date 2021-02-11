@@ -222,7 +222,7 @@ describe('Store Config', () => {
                 };
             }
 
-            class Extension implements StoreExtension {
+            class Extension extends StoreExtension {
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension);
                 }
@@ -235,7 +235,7 @@ describe('Store Config', () => {
                 };
             }
 
-            class Extension2 implements StoreExtension {
+            class Extension2 extends StoreExtension {
                 sortOrder = 100;
 
                 init(): void {
@@ -250,7 +250,7 @@ describe('Store Config', () => {
                 };
             }
 
-            class Extension3 implements StoreExtension {
+            class Extension3 extends StoreExtension {
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension3);
                 }
@@ -281,7 +281,7 @@ describe('Store Config', () => {
                 };
             }
 
-            class Extension implements StoreExtension {
+            class Extension extends StoreExtension {
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension);
                 }

@@ -233,9 +233,7 @@ function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
 }
 
 function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
-    // Fix undefined sortOrders to 0
-    extensions = extensions.map(item => typeof item.sortOrder !== 'undefined' ? item : Object.assign(item, {sortOrder: 0}));
-    return extensions.sort((a, b) => {
+    return [...extensions].sort((a, b) => {
         return a.sortOrder - b.sortOrder;
     });
 }

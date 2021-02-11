@@ -1,6 +1,6 @@
 // Credits go to https://github.com/brechtbilliet/ngrx-undo
 
-import { Action, Reducer, StoreExtension } from '../models';
+import { Action, ExtensionSortOrder, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import { storeInitActionType } from '../utils';
 
@@ -11,10 +11,12 @@ let executedActions: Array<Action> = [];
 let initialState;
 let bufferSize;
 
-export class UndoExtension implements StoreExtension {
-    sortOrder = 100;
+export class UndoExtension extends StoreExtension {
+    sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
 
     constructor(config: {bufferSize: number} = {bufferSize: defaultBufferSize}) {
+        super();
+
         bufferSize = config.bufferSize;
         isUndoExtensionInitialized = true;
     }

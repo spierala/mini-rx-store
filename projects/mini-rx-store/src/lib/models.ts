@@ -1,13 +1,21 @@
 import { Observable } from 'rxjs';
 
+export enum ExtensionSortOrder {
+    DEFAULT,
+    // The Undo Extension Meta Reducer should be the last one to be executed before "normal" reducers (for performance)
+    // Reason: The Undo Extension may send many Actions through all Reducers to undo an Action
+    // Also, we want to prevent that the replay of Actions shows up e.g. in the LoggerExtension Meta Reducer
+    UNDO_EXTENSION
+}
+
 export interface AppState {
     [key: string]: any;
 }
 
-export interface StoreExtension {
-    sortOrder?: number;
+export abstract class StoreExtension {
+    sortOrder: ExtensionSortOrder = ExtensionSortOrder.DEFAULT;
 
-    init(): void;
+    abstract init(): void;
 }
 
 export interface Action {
