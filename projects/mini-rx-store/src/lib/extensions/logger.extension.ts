@@ -1,7 +1,7 @@
 import { StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
-export class LoggerExtension implements StoreExtension {
+export class LoggerExtension extends StoreExtension {
     init(): void {
         StoreCore.addMetaReducers(loggerMetaReducer);
     }

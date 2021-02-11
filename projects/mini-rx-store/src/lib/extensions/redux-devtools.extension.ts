@@ -14,11 +14,13 @@ export interface ReduxDevtoolsOptions {
     latency: number;
 }
 
-export class ReduxDevtoolsExtension implements StoreExtension {
+export class ReduxDevtoolsExtension extends StoreExtension {
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
+        super();
+
         this.options = {
             ...defaultOptions,
             ...this.options,

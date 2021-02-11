@@ -4,7 +4,7 @@ import { ActionWithPayload, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import deepFreeze from 'deep-freeze-strict';
 
-export class ImmutableStateExtension implements StoreExtension {
+export class ImmutableStateExtension extends StoreExtension {
     init(): void {
         StoreCore.addMetaReducers(storeFreeze);
     }
