@@ -12,7 +12,12 @@ export interface StoreExtension {
 
 export interface Action {
     type: string;
-    payload?: any;
+    // Allows any extra properties to be defined in an action.
+    [x: string]: any;
+}
+
+export interface ActionWithPayload extends Action {
+    payload: any;
 }
 
 export interface ActionMetaData {

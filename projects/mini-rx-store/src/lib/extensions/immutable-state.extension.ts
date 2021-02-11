@@ -1,6 +1,6 @@
 // Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
 
-import { Reducer, StoreExtension } from '../models';
+import { ActionWithPayload, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import deepFreeze from 'deep-freeze-strict';
 
@@ -14,7 +14,7 @@ export class ImmutableStateExtension implements StoreExtension {
  * Meta-reducer that prevents state from being mutated anywhere in the app.
  */
 export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return function freeze(state, action): any {
+    return function freeze(state, action: ActionWithPayload): any {
         state = state || {};
 
         deepFreeze(state);
