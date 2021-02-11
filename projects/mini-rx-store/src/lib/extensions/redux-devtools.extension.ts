@@ -1,5 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, ExtensionSortOrder, StoreExtension } from '../models';
+import { AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
 const win = window as any;
@@ -19,7 +19,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
     private devtoolsConnection: any;
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
-        super()
+        super();
 
         this.options = {
             ...defaultOptions,
