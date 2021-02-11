@@ -1,4 +1,4 @@
-import { Action } from '../models';
+import { Action, ActionWithPayload } from '../models';
 import { configureStore, Store } from '../store';
 import { default as StoreCore } from '../store-core';
 
@@ -40,7 +40,7 @@ export const counterStringInitialState: CounterStringState = {
 
 export function counterStringReducer(
     state: CounterStringState = counterStringInitialState,
-    action: Action
+    action: ActionWithPayload
 ) {
     switch (action.type) {
         case 'counterString':

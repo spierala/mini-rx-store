@@ -54,7 +54,7 @@ export class ProductEffects {
 
     createProduct$ = this.actions$.pipe(
         ofType(createProduct),
-        map((action: Action) => action.payload),
+        toPayload(),
         mergeMap((product: Product) =>
             this.productService.createProduct(product).pipe(
                 map((newProduct) => createProductSuccess(newProduct)),
@@ -65,7 +65,7 @@ export class ProductEffects {
 
     deleteProduct$ = this.actions$.pipe(
         ofType(deleteProduct),
-        map((action: Action) => action.payload),
+        toPayload(),
         mergeMap((productId: number) =>
             this.productService.deleteProduct(productId).pipe(
                 map(() => deleteProductSuccess(productId)),

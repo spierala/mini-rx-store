@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, Reducer } from './models';
+import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError, select } from './utils';
 import { createFeatureSelector } from './selector';
@@ -35,7 +35,7 @@ export class FeatureStore<StateType> {
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        const action: Action = {
+        const action: ActionWithPayload = {
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
             payload:
                 typeof stateOrCallback === 'function'
@@ -80,7 +80,7 @@ function createDefaultReducer<StateType>(
     nameSpaceFeature: string,
     initialState: StateType
 ): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action) => {
+    return (state: StateType = initialState, action: ActionWithPayload) => {
         // Check for 'set-state' action (originates from FeatureStore.setState())
         if (
             action.type.indexOf(nameSpaceFeature) > -1 &&
