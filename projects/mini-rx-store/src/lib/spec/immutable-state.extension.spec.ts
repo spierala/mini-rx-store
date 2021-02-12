@@ -2,6 +2,8 @@ import { counterInitialState, CounterState, store } from './_spec-helpers';
 import { ImmutableStateExtension, storeFreeze } from '../extensions/immutable-state.extension';
 import { Action, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
+import { FeatureStore } from '../feature-store';
+import { createFeatureStore } from '../store';
 
 export function counterReducerWithMutation(
     state: CounterState = counterInitialState,
@@ -104,5 +106,19 @@ describe('Immutable State Extension', () => {
         // However when mutating the state it does not emit a new state
         store.dispatch({ type: 'counterWithMutation' });
         expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should throw when mutating state in a FeatureStore', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore('fsImmutable', counterInitialState);
+
+        function updateCount() {
+            fs.setState(state => {
+                state.counter = 123;
+                return state;
+            });
+        }
+
+        expect(() => updateCount()).toThrow(TypeError);
+        expect(() => (fs.state.counter = 123)).toThrow(TypeError);
     });
 });

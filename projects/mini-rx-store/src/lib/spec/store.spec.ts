@@ -1,10 +1,10 @@
 import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
-import { Action, Reducer } from '../models';
+import { Action, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap, take } from 'rxjs/operators';
+import { catchError, map, mergeMap, take, withLatestFrom } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
@@ -212,7 +212,81 @@ describe('Store Config', () => {
             expect(callOrder).toEqual(['meta1', 'meta2']);
         });
 
-        it('should run reducers in order: 1.) root meta reducers 2.) feature meta reducers, 3.) feature reducer', () => {
+        it('should call root meta reducers from extensions depending on sortOrder', () => {
+            const callOrder = [];
+
+            function rootMetaReducerForExtension(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta1');
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension extends StoreExtension {
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                }
+            }
+
+            function rootMetaReducerForExtension2(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta2');
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension2 extends StoreExtension {
+                sortOrder = 100;
+
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension2);
+                }
+            }
+
+            function rootMetaReducerForExtension3(reducer) {
+                return (state, action) => {
+                    callOrder.push('meta3');
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension3 extends StoreExtension {
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension3);
+                }
+            }
+
+            StoreCore.config({
+                extensions: [new Extension(), new Extension2(), new Extension3()],
+            });
+
+            expect(callOrder).toEqual(['meta1', 'meta3', 'meta2']);
+        });
+
+        it('should run reducers in order: ' +
+            '1.) root meta reducers ' +
+            '2.) root meta reducers from extensions' +
+            '3.) feature meta reducers, ' +
+            '4.) feature reducer', () => {
+            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+                return (state, action) => {
+                    if (action.type === 'metaTest') {
+                        state = {
+                            ...state,
+                            metaTestFeature: state.metaTestFeature + 'x',
+                        };
+                    }
+
+                    return reducer(state, action);
+                };
+            }
+
+            class Extension extends StoreExtension {
+                init(): void {
+                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                }
+            }
+
             function aFeatureReducer(state: string = 'a', action: Action): string {
                 switch (action.type) {
                     case 'metaTest':
@@ -272,6 +346,7 @@ describe('Store Config', () => {
 
             StoreCore.config({
                 metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
+                extensions: [new Extension()]
             });
 
             StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
@@ -281,7 +356,7 @@ describe('Store Config', () => {
             const spy = jest.fn();
             StoreCore.select(getMetaTestFeature).subscribe(spy);
             StoreCore.dispatch({ type: 'metaTest' });
-            expect(spy).toHaveBeenCalledWith('abcde');
+            expect(spy).toHaveBeenCalledWith('abcxde');
         });
 
         it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
@@ -289,7 +364,7 @@ describe('Store Config', () => {
                 expect.objectContaining({ metaTestFeature: 'a' })
             );
             expect(nextStateSpy).toHaveBeenCalledWith(
-                expect.objectContaining({ metaTestFeature: 'abcde' })
+                expect.objectContaining({ metaTestFeature: 'abcxde' })
             );
         });
     });
@@ -467,10 +542,14 @@ describe('Store', () => {
 
     it('should call the reducer before running the effect', () => {
         const callOrder = [];
-        const someReducer = (state = {}, action: Action) => {
+        const someReducer = (state = { value: 0 }, action: Action) => {
             switch (action.type) {
                 case 'someAction2':
                     callOrder.push('reducer');
+                    return {
+                        ...state,
+                        value: state.value + 1,
+                    };
                 default:
                     return state;
             }
@@ -480,18 +559,25 @@ describe('Store', () => {
             return of({ type: 'whatever' });
         };
 
+        const valueSpy = jest.fn();
+
         store.feature('someFeature', someReducer);
 
         store.effect(
             actions$.pipe(
                 ofType('someAction2'),
-                mergeMap(() => onEffectStarted())
+                withLatestFrom(store.select((state) => state.someFeature.value)),
+                mergeMap(([, value]) => {
+                    valueSpy(value);
+                    return onEffectStarted();
+                })
             )
         );
 
         store.dispatch({ type: 'someAction2' });
 
         expect(callOrder).toEqual(['reducer', 'effect']);
+        expect(valueSpy).toHaveBeenCalledWith(1); // Effect can select the updated state immediately
     });
 
     it('should queue actions', () => {

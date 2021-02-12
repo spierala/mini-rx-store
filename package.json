@@ -5,6 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:all": "ng build mini-rx-store --prod && ng build mini-rx-store-ng --prod && ng build mini-rx-store-showcase --prod && ng build mini-rx-store-showcase-redux --prod",
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
