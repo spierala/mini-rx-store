@@ -23,5 +23,9 @@ module.exports = {
             label: 'Extensions',
             items: ['ext-quick-start', 'ext-redux-dev-tools', 'ext-immutable', 'ext-undo-extension', 'ext-logger'],
         },
+        {
+            type: 'doc',
+            id: 'angular',
+        },
     ],
 };
