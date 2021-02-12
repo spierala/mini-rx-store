@@ -5,11 +5,7 @@ sidebar_label: Redux
 slug: /redux
 ---
 
-The Store represents the Single Source of Truth for the global application state.
-
-## Redux
-
-The Store uses the Redux Pattern to make state management easy and predictable.
+MiniRx Store uses the Redux pattern to make state management easy and predictable.
 
 The Redux Pattern is based on this 3 key principles:
 
