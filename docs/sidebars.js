@@ -18,5 +18,10 @@ module.exports = {
             label: 'Feature Store',
             items: ['fs-quick-start', 'fs-setup', 'fs-set-state', 'fs-select', 'fs-effect'],
         },
+        {
+            type: 'category',
+            label: 'Extensions',
+            items: ['ext-quick-start', 'ext-redux-dev-tools', 'ext-immutable', 'ext-undo-extension', 'ext-logger'],
+        },
     ],
 };

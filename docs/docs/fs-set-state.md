@@ -27,12 +27,18 @@ For better logging in the JS Console / Redux Dev Tools you can provide an option
 this.setState({selectedTodoId: id}, 'selectTodo');
 ```
 ### Undo setState Actions with `undo`
-We can easily undo setState Actions with the Undo Extension installed.
+We can easily undo setState Actions with the [Undo Extension](ext-undo-extension) installed.
 
 Calling `setState` returns an Action which can be used to perform an Undo.
 
 ```ts title="todo-feature-store.ts"
 import { Action } from "mini-rx-store";
+
+removeTodo(id: number): Action {
+    return this.setState(state => ({
+        todos: state.todos.filter(item => item.id !== id)
+    }))
+}
 
 removeAndUndo() {
     const todoRemoveAction: Action = this.removeTodo(2);

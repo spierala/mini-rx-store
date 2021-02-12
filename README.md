@@ -423,7 +423,7 @@ MiniRx dispatches the default action when calling `setState()` and the default r
 
 ## Extensions
 
-Extensions can be registered by providing a config object to the `store`. The `extensions` property accecpts an array of Extension instances.
+Extensions can be registered by providing a config object to the `store`. The `extensions` property accepts an array of Extension instances.
 
 For example:
 ```ts
