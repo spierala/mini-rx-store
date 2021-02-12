@@ -6,7 +6,7 @@ title: Setup
 MiniRx Store requires only a minimum of configuration to get started.
 
 ## No Setup
-The most basic setup is no setup... we can pass an empty configuration to `configureStore` 
+The most basic setup is no setup... we can pass an empty configuration to `configureStore`
 and get hold of the Store instance.
 
 ```ts
@@ -14,7 +14,7 @@ import { configureStore, Store } from 'mini-rx-store';
 
 const store: Store = configureStore({});
 ```
-With the `store` instance we can already add Reducers (dynamically), select state, dispatch Actions and create Effects.
+With the `store` instance we can already add reducers (dynamically), select state, dispatch actions and create Effects.
 
 ## Redux Setup
 Read ["Redux" Store Setup](redux-setup) to see the Redux related configuration options.

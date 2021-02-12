@@ -28,7 +28,7 @@ new UndoExtension({bufferSize: 200})
 In order to undo an action, we need to cache the action which we want to undo. Later we can dispatch an `undo` Action which takes the cached action as payload.
 
 Example:
-```ts 
+```ts
 import { Action, undo } from 'mini-rx-store';
 import { RemoveTodo } from './todo-actions';
 

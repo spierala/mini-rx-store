@@ -37,8 +37,7 @@ const store: Store = configureStore({
 });
 ```
 ℹ️ If you are using Angular you have to register the `StoreDevtoolsModule` from 'mini-rx-store-ng'.
-See [Angular Redux Dev Tools](#redux-dev-tools) for more information.
-```
+See [Angular Redux Dev Tools](angular.md#redux-dev-tools) for more information.
 
 ## Options
 Currently, these options are available to configure the DevTools:

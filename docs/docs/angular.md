@@ -147,3 +147,22 @@ export class MyComponent {
     }
 }
 ```
+### Redux Dev Tools
+Small wrapper for the ReduxDevtoolsExtension from 'mini-rx-store'.
+It is needed to trigger Angular Change Detection when using time travel in the Redux Dev Tools Browser PlugIn.
+
+```ts
+import { StoreDevtoolsModule } from 'mini-rx-store-ng';
+
+@NgModule({
+    imports: [
+        // ...
+        StoreDevtoolsModule.instrument({
+            name: 'MiniRx Store',
+            maxAge: 25,
+            latency: 250,
+        }),
+    ]
+})
+export class AppModule {} 
+```

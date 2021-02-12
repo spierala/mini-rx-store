@@ -1,9 +1,8 @@
 module.exports = {
     docs: [
         {
-            type: 'category',
-            label: 'Introduction',
-            items: ['intro'],
+            type: 'doc',
+            id: 'intro',
         },
         {
             type: 'doc',

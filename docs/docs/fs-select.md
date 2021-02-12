@@ -18,9 +18,9 @@ Within that function you can pick a specific piece of state.
 
 ## Memoized Selectors
 
-You can use memoized selectors also with the FeatureStore... 
+You can use memoized selectors also with the FeatureStore...
 You only have to omit the feature name when using `createFeatureSelector`.
-This is because the `FeatureStore` is operating on a specific feature state already 
+This is because the `FeatureStore` is operating on a specific feature state already
 (the corresponding feature name has been provided in the constructor).
 
 ```ts title="todo-feature-store.ts"
@@ -53,7 +53,7 @@ class TodoFeatureStore extends FeatureStore<TodoState> {
     selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
 
     constructor() {
-        super('todoFs', initialState) // Feature name 'todos' is provided here already...
+        super('todoFs', initialState) // Feature name 'todosFs' is provided here already...
     }
 
     addTodo(todo: Todo) {

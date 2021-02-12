@@ -4,7 +4,7 @@ title: Setup
 ---
 
 With `configureStore` we get hold of the global Store object. 
-At the same time we can pass a configuration to initialize our Root Reducers, Meta Reducers, initial state and extensions.
+At the same time we can pass a configuration to initialize our Root Reducers, Root Meta Reducers, initial state and extensions.
 
 ## No Setup
 At first we do not need any configuration to get started.
