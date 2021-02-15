@@ -30,7 +30,7 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
     - Undo Extension: Undo dispatched Actions
     - Logger Extension: console.log the current action and updated state
 -   Framework agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
--   TypeScript support (MiniRx is written in TypeScript itself)
+-   TypeScript support: The MiniRx API comes with TypeScript type definitions
 -   [Angular Integration](angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
 
 ## Key Concepts
@@ -39,11 +39,11 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 - For each "feature" we can decide to use the **Redux API** with actions and reducers or the **FeatureStore API** with `setState`
 - State is read-only and can only be changed by dispatching actions (Redux API) or by using setState (FeatureStore)
 
-## Tutorial
-Let's dive into some code to see MiniRx in Action
+## Basic Tutorial
+Let's dive into some code to see MiniRx in action
 
 ### Store (Redux API)
-MiniRx supports the classic Redux API with registering reducers and dispatching Actions. 
+MiniRx supports the classic Redux API with registering reducers and dispatching Actions.
 Observable state can be selected with memoized selectors.
 
 ```ts
