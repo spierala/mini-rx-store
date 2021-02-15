@@ -8,32 +8,36 @@ import styles from './styles.module.css';
 
 const features = [
     {
-        title: 'Easy to Use',
-        imageUrl: 'img/undraw_docusaurus_mountain.svg',
+        title: 'Redux Store',
         description: (
             <>
-                Docusaurus was designed from the ground up to be easily installed and used to get
-                your website up and running quickly.
+                MiniRx is a full-blown Redux Store to manage global, application-wide state: It includes <strong>actions, reducers, meta reducers, memoized selectors</strong> and <strong>redux dev tools</strong> support.
             </>
         ),
     },
     {
-        title: 'Focus on What Matters',
-        imageUrl: 'img/undraw_docusaurus_tree.svg',
+        title: 'Feature Stores',
         description: (
             <>
-                Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go ahead and
-                move your docs into the <code>docs</code> directory.
+                <strong>Bypass Redux Boilerplate</strong> for simple feature states: Update state without actions and reducers with the <code>FeatureStore</code> API.
             </>
         ),
     },
     {
-        title: 'Powered by React',
-        imageUrl: 'img/undraw_docusaurus_react.svg',
+        title: 'RxJS',
         description: (
             <>
-                Extend or customize your website layout by reusing React. Docusaurus can be extended
-                while reusing the same header and footer.
+                State and actions are exposed as <strong>RxJS Observable</strong>.
+                MiniRx has a <strong>RxJS-based side effects model</strong>: Let the action stream trigger side effects like API calls and <strong>handle race conditions</strong> with RxJS flattening operators.
+            </>
+        ),
+    },
+    {
+        title: 'Framework agnostic and TypeScript friendly',
+        description: (
+            <>
+                MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else).
+                The MiniRx API comes with TypeScript type definitions.
             </>
         ),
     },
@@ -42,7 +46,7 @@ const features = [
 function Feature({ imageUrl, title, description }) {
     const imgUrl = useBaseUrl(imageUrl);
     return (
-        <div className={clsx('col col--4', styles.feature)}>
+        <div className={clsx('col col--3', styles.feature)}>
             {imgUrl && (
                 <div className="text--center">
                     <img className={styles.featureImage} src={imgUrl} alt={title} />

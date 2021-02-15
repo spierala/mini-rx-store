@@ -7,9 +7,9 @@ slug: /intro
 
 ## Purpose
 **MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
-It is a global, application-wide solution to manage state and is powered by [RxJS](https://rxjs.dev/). 
+It is a global, application-wide solution to manage state and is powered by [RxJS](https://rxjs.dev/).
 
-## MiniRx Store Features
+## What's Included
 -   RxJS powered global state management
 -   State and Actions are exposed as RxJS Observable
 -   [Store (Redux API)](redux):
@@ -32,6 +32,12 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 -   Framework agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
 -   TypeScript support (MiniRx is written in TypeScript itself)
 -   [Angular Integration](angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
+
+## Key Concepts
+- State is exposed as RxJS Observable
+- State has a flat hierarchy and is devided into "features" (also called "slices" in Redux world)
+- For each "feature" we can decide to use the **Redux API** with actions and reducers or the **FeatureStore API** with `setState`
+- State is read-only and can only be changed by dispatching actions (Redux API) or by using setState (FeatureStore)
 
 ## Tutorial
 Let's dive into some code to see MiniRx in Action
@@ -94,7 +100,7 @@ store.dispatch({ type: "inc" });
 // OUTPUT: count: 1
 // OUTPUT: count: 2
 ```
-### Feature Store
+### Feature Store API
 `FeatureStore` allows us to manage feature state without actions and reducers. 
 The API of a FeatureStore is optimized to select and update a feature state directly with a minimum of boilerplate.
 
@@ -128,6 +134,7 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
 }
 ```
 
+Use the "counter" feature store like this:
 ```ts
 import { CounterFeatureStore } from "./counter-feature-store";
 
@@ -139,15 +146,19 @@ counterFs.inc();
 // OUTPUT: count: 12
 ```
 
-#### The FeatureStore states become part of the global state too.
+:::info
+**The FeatureStore states become part of the global state too.**
 
-Both the Redux feature state and the FeatureStore state are living next to each other in the store:
+Both the Redux feature state and the FeatureStore state are living next to each other in the global state object:
 
 ```ts
 store.select(state => state).subscribe(console.log);
 
 //OUTPUT: {"counter":{"count":2},"counterFs":{"counter":12}}
 ```
+:::
+
+
 
 
 ## Demos

@@ -1,6 +1,6 @@
 module.exports = {
-    title: 'MiniRx',
-    tagline: 'Simple yet powerful reactive state management',
+    title: 'MiniRx - The RxJS Redux Store',
+    tagline: 'Make hard things simple - Keep simple things simple',
     url: 'https://your-docusaurus-test-site.com',
     baseUrl: '/',
     onBrokenLinks: 'throw',
@@ -36,12 +36,24 @@ module.exports = {
                     title: 'Docs',
                     items: [
                         {
-                            label: 'Style Guide',
-                            to: 'docs/',
+                            label: 'QuickStart',
+                            to: 'docs/intro',
                         },
                         {
-                            label: 'Second Doc',
-                            to: 'docs/doc2/',
+                            label: 'Store (Redux)',
+                            to: 'docs/redux',
+                        },
+                        {
+                            label: 'Feature Store',
+                            to: 'docs/fs-quick-start',
+                        },
+                        {
+                            label: 'Extensions',
+                            to: 'docs/ext-quick-start',
+                        },
+                        {
+                            label: 'Angular Integration',
+                            to: 'docs/angular',
                         },
                     ],
                 },
@@ -49,16 +61,8 @@ module.exports = {
                     title: 'Community',
                     items: [
                         {
-                            label: 'Stack Overflow',
-                            href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-                        },
-                        {
-                            label: 'Discord',
-                            href: 'https://discordapp.com/invite/docusaurus',
-                        },
-                        {
                             label: 'Twitter',
-                            href: 'https://twitter.com/docusaurus',
+                            href: 'https://twitter.com/spierala',
                         },
                     ],
                 },
@@ -66,17 +70,13 @@ module.exports = {
                     title: 'More',
                     items: [
                         {
-                            label: 'Blog',
-                            to: 'blog',
-                        },
-                        {
                             label: 'GitHub',
-                            href: 'https://github.com/facebook/docusaurus',
+                            href: 'https://github.com/spierala/mini-rx-store',
                         },
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+            copyright: `Copyright © ${new Date().getFullYear()}`,
         },
     },
     presets: [
