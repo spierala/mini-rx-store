@@ -134,7 +134,7 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
 }
 ```
 
-Use the "counter" feature store like this:
+Use the "counterFs" feature store like this:
 ```ts
 import { CounterFeatureStore } from "./counter-feature-store";
 
@@ -157,9 +157,6 @@ store.select(state => state).subscribe(console.log);
 //OUTPUT: {"counter":{"count":2},"counterFs":{"counter":12}}
 ```
 :::
-
-
-
 
 ## Demos
 - [Todos App using FeatureStore](https://stackblitz.com/edit/mini-rx-angular-todos?file=src%2Fapp%2Fmodules%2Ftodo%2Fservices%2Ftodos-state.service.ts)
