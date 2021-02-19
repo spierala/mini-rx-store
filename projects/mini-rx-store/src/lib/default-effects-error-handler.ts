@@ -1,41 +1,8 @@
-// Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
-// See MIT licence below
-
-import { ActionWithPayload, Reducer, StoreExtension } from '../models';
-import StoreCore from '../store-core';
-import deepFreeze from 'deep-freeze-strict';
-
-export class ImmutableStateExtension extends StoreExtension {
-    init(): void {
-        StoreCore.addMetaReducers(storeFreeze);
-    }
-}
-
-/**
- * Meta-reducer that prevents state from being mutated anywhere in the app.
- */
-export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return function freeze(state, action: ActionWithPayload): any {
-        state = state || {};
-
-        deepFreeze(state);
-
-        // guard against trying to freeze null or undefined types
-        if (action.payload) {
-            deepFreeze(action.payload);
-        }
-
-        const nextState = reducer(state, action);
-
-        deepFreeze(nextState);
-
-        return nextState;
-    };
-}
+// Credits go to NgRx: https://github.com/ngrx/platform/blob/9.2.0/modules/effects/src/effects_error_handler.ts
 
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 Brandon Roberts
+// Copyright (c) 2017 Brandon Roberts, Mike Ryan, Victor Savkin, Rob Wormald
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,3 +21,25 @@ export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+import { Action } from './models';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+const MAX_NUMBER_OF_RETRY_ATTEMPTS = 10;
+
+// Prevent effect to unsubscribe from the actions stream
+export function defaultEffectsErrorHandler<T extends Action>(
+    observable$: Observable<T>,
+    retryAttemptLeft: number = MAX_NUMBER_OF_RETRY_ATTEMPTS
+): Observable<T> {
+    return observable$.pipe(
+        catchError((error) => {
+            if (retryAttemptLeft <= 1) {
+                return observable$; // last attempt
+            }
+            // Return observable that produces this particular effect
+            return defaultEffectsErrorHandler(observable$, retryAttemptLeft - 1);
+        })
+    );
+}
