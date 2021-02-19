@@ -1,3 +1,18 @@
+# 2.0.0-beta.3 (2021-02-19)
+
+### BREAKING CHANGES
+* Action class: removed payload property
+
+### DEPRECATIONS
+* FeatureStore.state$: use FeatureStore.select instead
+
+### Refactor
+* Cleanup FeatureStore.select: createSelector mapFn should not be a memoized selector
+* Extensions: use sortOrder prop for metaReducers execution order
+
+### Features
+* Cleanup README and create docs (docusaurus)
+
 # 2.0.0-beta.2 (2021-01-22)
 ### Bug Fixes
 * FeatureStores not working if StoreCore.config is not called (in case only FeatureStores are created without using StoreModule or configureStore)
