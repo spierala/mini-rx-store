@@ -1,13 +1,13 @@
 module.exports = {
     title: 'MiniRx - The RxJS Redux Store',
     tagline: 'Make hard things simple - Keep simple things simple',
-    url: 'https://your-docusaurus-test-site.com',
-    baseUrl: '/',
+    url: 'https://github.com/spierala/mini-rx-store',
+    baseUrl: '/mini-rx-store/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
-    organizationName: 'MiniRx', // Usually your GitHub org/user name.
-    projectName: 'Store', // Usually your repo name.
+    organizationName: 'spierala', // Usually your GitHub org/user name.
+    projectName: 'mini-rx-store', // Usually your repo name.
     themeConfig: {
         navbar: {
             title: 'MiniRx',
