@@ -26,14 +26,26 @@
 
 .mrx-flex {
     display: flex;
+    flex-wrap: wrap;
 }
 
-.mrx-schema-container {
-    flex-grow: 1;
-    justify-content: center;
+.mrx-title-container {
+    flex: 1 1 450px;
     align-items: center;
 }
 
+.mrx-schema-container {
+    flex: 1 1 420px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
 .mrx-schema {
-    width:  320px;
+    max-width: 420px;
+    margin-bottom: 20px;
+}
+
+.mrx-start-btn {
+    margin-bottom: 30px;
 }
