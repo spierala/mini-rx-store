@@ -64,7 +64,7 @@ function Home() {
     return (
         <Layout
             title={`Hello from ${siteConfig.title}`}
-            description="Description will go into a meta tag in <head />"
+            description="Reactive State Management inspired by Redux"
         >
             <header className={clsx('hero hero--primary', styles.heroBanner)}>
                 <div className="container">
