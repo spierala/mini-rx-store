@@ -7,7 +7,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-> **ℹ️  Version 2:** Currently we are working on version 2 of mini-rx-store. Please let us know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
+> **ℹ Version 2:** Currently we are working on version 2 of mini-rx-store. Please let us know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
 
 # MiniRx Store 2 (beta)
 
@@ -23,26 +23,26 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 ## What's Included
 -   RxJS powered global state management
 -   State and Actions are exposed as RxJS Observable
--   [Store (Redux API)](redux):
+-   [Store (Redux API)](https://spierala.github.io/mini-rx-store/docs/redux):
     -   Actions
     -   Reducers
     -   Meta Reducers
     -   Memoized Selectors
     -   Effects
-    -   [Support for ts-action](ts-action): Create and consume actions with as little boilerplate as possible
--   [FeatureStore](fs-quick-start): Update state without actions and reducers:
+    -   [Support for ts-action](https://spierala.github.io/mini-rx-store/docs/ts-action): Create and consume actions with as little boilerplate as possible
+-   [FeatureStore](https://spierala.github.io/mini-rx-store/docs/fs-quick-start): Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `effect()` run side effects like API calls and update feature state
     -   `undo()` easily undo setState actions
--   [Extensions](ext-quick-start):
+-   [Extensions](https://spierala.github.io/mini-rx-store/docs/effects-for-feature-store):
     - Redux Dev Tools Extension: Inspect State with the Redux Dev Tools
     - Immutable Extension: Enforce immutability
     - Undo Extension: Undo dispatched Actions
     - Logger Extension: console.log the current action and updated state
 -   Framework agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
 -   TypeScript support: The MiniRx API comes with TypeScript type definitions
--   [Angular Integration](angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
+-   [Angular Integration](https://spierala.github.io/mini-rx-store/docs/angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
 
 ## Key Concepts
 - State is exposed as RxJS Observable
@@ -157,8 +157,7 @@ counterFs.inc();
 // OUTPUT: count: 12
 ```
 
-:::info
-**The FeatureStore states become part of the global state too.**
+** ℹ The FeatureStore states become part of the global state too.**
 
 Both the Redux feature state and the FeatureStore state are living next to each other in the global state object:
 
@@ -167,11 +166,6 @@ store.select(state => state).subscribe(console.log);
 
 //OUTPUT: {"counter":{"count":2},"counterFs":{"counter":12}}
 ```
-:::
-
-## Demos
-- [Todos App using FeatureStore](https://stackblitz.com/edit/mini-rx-angular-todos?file=src%2Fapp%2Fmodules%2Ftodo%2Fservices%2Ftodos-state.service.ts)
-- Coming soon: Redux Demo
 
 ## References
 
