@@ -157,7 +157,7 @@ counterFs.inc();
 // OUTPUT: count: 12
 ```
 
-** ℹ The FeatureStore states become part of the global state too.**
+**ℹ The FeatureStore states become part of the global state too.**
 
 Both the Redux feature state and the FeatureStore state are living next to each other in the global state object:
 
