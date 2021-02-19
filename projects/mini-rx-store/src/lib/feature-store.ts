@@ -13,6 +13,10 @@ const nameUpdateAction = 'set-state';
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
 
+    /**
+     * @deprecated Use `this.select()` instead.
+     * state$ will become private in an upcoming major version
+     */
     state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
 
     get state(): StateType {
