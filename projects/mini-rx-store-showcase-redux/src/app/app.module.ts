@@ -14,13 +14,7 @@ import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
-import {
-    configureStore,
-    ImmutableStateExtension,
-    LoggerExtension,
-    Store,
-    UndoExtension,
-} from 'mini-rx-store';
+import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
 
 @NgModule({
     imports: [
