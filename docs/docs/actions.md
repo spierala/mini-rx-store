@@ -13,7 +13,7 @@ An action is a simple object with a `type` property:
 const addTodo = {
     type: 'ADD_TODO',
     // Besides `type`, the structure of an action object is really up to you.
-    payload: 'Use Redux' 
+    payload: 'Use Redux'
 }
 ```
 Now we can dispatch the `addTodo` action to the Store and let the reducers calculate the new global state.
@@ -31,21 +31,21 @@ Action creators will do the repetitive work for us.
 export function addTodo(payload) {
     return {
         type: 'ADD_TODO',
-        title: string
+        payload
     }
 }
 ```
 Dispatch the action:
 ```ts
-store.dispatch(addTodo({id: 1, name: 'Use Redux'}));
+store.dispatch(addTodo({id: 1, title: 'Use Redux'}));
 ```
 
 
 ### Class-based Action Creators (TypeScript)
 ```ts title="todo.ts"
 export interface Todo {
-    id: number,
-    name: string
+    id: number;
+    title: string;
 }
 ```
 
