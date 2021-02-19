@@ -72,16 +72,17 @@ function Home() {
                         <div className="mrx-title-container">
                             <h1 className="hero__title">{siteConfig.title}</h1>
                             <p className="hero__subtitle">{siteConfig.tagline}</p>
-                            <div>
+                            <div className="mrx-flex-buttons">
                                 <Link
                                     className={clsx(
-                                        'mrx-start-btn button button--outline button--secondary button--lg',
+                                        'button button--outline button--secondary button--lg',
                                         styles.getStarted
                                     )}
                                     to={useBaseUrl('docs/intro')}
                                 >
                                     Get Started
                                 </Link>
+                                <iframe src="https://ghbtns.com/github-btn.html?user=spierala&repo=mini-rx-store&type=star&count=true&size=large"></iframe>
                             </div>
                         </div>
                         <div className="mrx-schema-container">

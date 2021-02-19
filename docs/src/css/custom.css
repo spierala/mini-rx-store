@@ -46,6 +46,16 @@
     margin-bottom: 20px;
 }
 
-.mrx-start-btn {
-    margin-bottom: 30px;
+.mrx-flex-buttons {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
 }
+
+iframe {
+    border: none;
+    height: 30px;
+    margin-left: 20px;
+    width: 100%;
+}
+
