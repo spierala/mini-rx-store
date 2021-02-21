@@ -12,12 +12,12 @@ module.exports = {
         navbar: {
             title: 'MiniRx',
             logo: {
-                alt: 'My Site Logo',
+                alt: 'MiniRx Logo',
                 src: 'img/logo.svg',
             },
             items: [
                 {
-                    to: 'docs/',
+                    to: 'docs/intro',
                     activeBasePath: 'docs',
                     label: 'Docs',
                     position: 'left',
@@ -86,7 +86,7 @@ module.exports = {
                 docs: {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
-                    editUrl: 'https://github.com/facebook/docusaurus/edit/master/website/',
+                    editUrl: 'https://github.com/spierala/mini-rx-store/edit/master/docs/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
