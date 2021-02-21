@@ -23,6 +23,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "Thocaten",
+      "name": "Carsten",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79323279?v=4",
+      "profile": "https://github.com/Thocaten",
+      "contributions": [
+        "design"
+      ]
     }
   ],
   "contributorsPerLine": 7,
