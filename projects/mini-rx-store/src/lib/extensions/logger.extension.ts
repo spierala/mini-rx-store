@@ -16,8 +16,8 @@ function loggerMetaReducer(reducer) {
             'font-weight: bold; color: #ff9900',
             '\nType:',
             action.type,
-            '\nPayload: ',
-            action.payload,
+            '\nAction: ',
+            action,
             '\nState: ',
             nextState
         );
