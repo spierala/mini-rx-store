@@ -5,7 +5,7 @@ sidebar_label: Immutable State
 ---
 
 Let's make sure that the state is not mutated accidentally.
-State should only be changed by dispatching an action or by using `setState`.
+State should only be changed explicitly by dispatching an action or by using `setState`.
 
 The Immutable State Extension will throw an error if you mutate state.
 

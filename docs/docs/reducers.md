@@ -43,7 +43,7 @@ export function todoReducer(
 ```
 
 ### Register feature reducer
-Before we can update state by dispatching actions, we need to add the reducer to the Store.
+Before we can update state by dispatching actions, we need to add the reducer to the store.
 There are 2 options to register a feature reducer:
 #### Option 1: Store Config
 ```ts
@@ -57,7 +57,7 @@ const store: Store = configureStore({
 });
 ```
 
-Like this the reducers are ready when the Store is initialized.
+Like this the reducers are ready when the store is initialized.
 
 #### Option 2: Add feature reducers dynamically
 We can add feature reducers at any time with `store.feature`.
@@ -75,4 +75,4 @@ store.dispatch(new AddTodo({id: 1, title: 'Use Redux'}));
 
 store.select(state => state).subscribe(console.log); // Output: {"todo":{"todos":[{id: 1, title: "Use Redux"}]}}
 ```
-Yes, we did it! The todoReducer processed the action and the new todo landed in the `todos` array.
+Yes, we did it! The todoReducer processed the action, and the new todo landed in the `todos` array.

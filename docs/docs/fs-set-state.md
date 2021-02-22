@@ -1,7 +1,7 @@
 ---
 id: fs-set-state
 title: Update State
-sidebar_label: Set State
+sidebar_label: Update State
 slug: /update-feature-state
 ---
 Use `setState` to update the state of a Feature Store right away.
@@ -11,7 +11,7 @@ selectTodo(id: number) {
     this.setState({selectedTodoId: id});
 }
 ```
-Do you need to update the new state based on the current state?
+Do you need to update the state based on the current state?
 `setState` accepts a callback function which gives you access to the current state.
 ```ts title="todo-feature-store.ts"
 // Update state based on current state
@@ -27,9 +27,9 @@ For better logging in the JS Console / Redux Dev Tools you can provide an option
 this.setState({selectedTodoId: id}, 'selectTodo');
 ```
 ### Undo setState Actions with `undo`
-We can easily undo setState Actions with the [Undo Extension](ext-undo-extension) installed.
+We can easily undo `setState` actions with the [Undo Extension](ext-undo-extension) installed.
 
-Calling `setState` returns an Action which can be used to perform an Undo.
+Calling `setState` returns an action which can be used to perform an Undo.
 
 ```ts title="todo-feature-store.ts"
 import { Action } from "mini-rx-store";

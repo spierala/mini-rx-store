@@ -5,7 +5,7 @@ slug: /ts-action
 ---
 MiniRx supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action) to reduce boilerplate code.
 
-There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in Effects.
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in effects.
 
 Install the packages using npm:
 
@@ -50,7 +50,7 @@ export const todoReducer = reducer(
 
 #### Effects
 
-Consume actions in Effects
+Consume actions in effects
 
 ```ts
 import { actions$ } from "mini-rx-store";

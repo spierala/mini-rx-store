@@ -16,15 +16,15 @@ const addTodo = {
     payload: 'Use Redux'
 }
 ```
-Now we can dispatch the `addTodo` action to the Store and let the reducers calculate the new global state.
+Now we can dispatch the `addTodo` action to the store and let the reducers calculate the new global state.
 
 ```ts
 store.dispatch(addTodo);
 ```
 
 ## Action Creators
-Of course, we do not want to create these action objects by hand when we need to dispatch an action.
-Action creators will do the repetitive work for us.
+Of course, we do not want to create these action objects "by hand" when we need to dispatch an action.
+Action Creators will do the repetitive work for us.
 
 ### "Classic" Action Creators
 ```ts

@@ -4,7 +4,7 @@ title: Effects
 sidebar_label: Effects 
 slug: /effects-for-feature-store
 ---
-`effect` offers a simple way to trigger side effects (e.g. API calls) for a FeatureStore. 
+`effect` offers a simple way to trigger side effects (e.g. API calls) for a Feature Store. 
 When the side effect completed we can update feature state straight away (by using `setState()`).
 
 Example:
@@ -41,18 +41,21 @@ loadTodoById = this.effect<number>(payload$ => {
 this.loadTodos();
 this.loadTodoById(5);
 ```
-The code above creates an Effect for _fetching the todos_.
+The code above creates an effect for _fetching the todos_.
 The API call is the side effect which needs to be performed.
-`effect` returns a function which can be called later to start the Effect with an optional payload (see `this.loadTodoById(5)`).
+`effect` returns a function which can be called later to start the effect with an optional payload (see `this.loadTodoById(5)`).
 
 Inside the `payload$.pipe` we can define how to handle the side effect.
-With RxJS flattening operators (mergeMap, switchMap, concatMap, exhaustMap) we can easily define how to treat race conditions (e.g. if you trigger a lot of API calls at the same time).
+With RxJS flattening operators (mergeMap, switchMap, concatMap, exhaustMap) we can easily take care of race conditions (e.g. if you trigger a lot of API calls at the same time).
 
 Inside the RxJS `tap` and `catchError` operators we can call `this.setState()` to update state.
 
-ℹ️ It is important to handle possible API errors with `catchError` to make sure that the `payload$` stream does not die.
+:::warning
+It is important to handle possible API errors with `catchError` to make sure that the `payload$` stream does not die.
+:::warning
 
-ℹ️ We can skip the `payload$.pipe` if we use only one RxJS operator:
+:::info
+We can skip the `payload$.pipe` if we use only one RxJS operator:
 ```ts
 loadTodoById = this.effect<number>(
     mergeMap((id) =>
@@ -63,3 +66,4 @@ loadTodoById = this.effect<number>(
     )
 );
 ```
+:::info

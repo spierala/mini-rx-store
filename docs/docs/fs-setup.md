@@ -5,7 +5,7 @@ sidebar_label: Setup
 slud: /feature-store-setup
 ---
 
-There are 2 Options to create a new FeatureStore.
+There are 2 Options to create a new Feature Store.
 
 ### Option 1: Extend `FeatureStore`
 ```ts title="todo-feature-store.ts"
@@ -34,7 +34,7 @@ We have to provide a TypeScript interface to `FeatureStore` to get type safety: 
 
 ### Option2 : Functional creation method
 
-We can create a FeatureStore with `createFeatureStore`
+We can create a Feature Store with `createFeatureStore`
 
 ```ts
 const todoFs: FeatureStore<TodoState> = createFeatureStore<TodoState>('todo', initialState);

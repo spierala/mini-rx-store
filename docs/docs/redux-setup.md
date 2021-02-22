@@ -52,7 +52,7 @@ const store: Store = configureStore({
 store.select(state => state).subscribe(console.log);
 //OUTPUT: {counter: 123}
 ```
-See how the initial state of the store is available in the feature reducers:
+See how the initial state is available in the feature reducers:
 ```ts
 import { Action, Store, configureStore } from "mini-rx-store";
 
@@ -103,11 +103,11 @@ Most MiniRx Extensions like the Undo Extension, Logger Extension or the Immutabl
 
 A meta reducer is a function which takes a reducer and returns a new reducer.
 
-Let's have a look how to implement a simple Debug meta reducer:
+Let's see how to implement a simple Debug meta reducer:
 
 ```ts
-export function debug( reducer ) {
-  return function newReducer( state, action ) {
+export function debug(reducer) {
+  return function newReducer(state, action) {
     const nextState = reducer(state, action);
     console.log("state", state);
     console.log("action", action);

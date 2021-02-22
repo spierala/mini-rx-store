@@ -58,7 +58,7 @@ export const getSelectedTodo = createSelector(
     (todos, id) => todos.find(item => item.id === id)
 )
 ```
-Let's use the memoized selectors to create our State Observables:
+Let's use the memoized selectors to create our state Observables:
 ```ts
 import { getTodoFeatureState, getTodos, getTodosCount } from './todo-selectors';
 

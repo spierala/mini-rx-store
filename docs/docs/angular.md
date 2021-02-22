@@ -10,8 +10,8 @@ sidebar_label: Angular Integration
 With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can use MiniRx Store the Angular way:
 
 - [Configure the store](#configure-the-store-in-the-app-module) using `StoreModule.forRoot()`
-- [Register Feature States](#register-feature-states-in-angular-feature-modules) using `StoreModule.forFeature()`
-- [Register Effects](#register-effects) using `EffectsModule.register()`
+- [Register feature reducers](#register-feature-states-in-angular-feature-modules) using `StoreModule.forFeature()`
+- [Register effects](#register-effects) using `EffectsModule.register()`
 - [Use Angular Dependency Injection](#get-hold-of-the-store-and-actions-via-the-angular-dependency-injection) for `Store` and `Actions`
 - [Redux Devtools Extension](#redux-dev-tools)
 
@@ -34,11 +34,11 @@ import { StoreModule } from 'mini-rx-store-ng';
                 // new LoggerExtension()
             ],
             reducers: {
-                // Add root reducers here
+                // Add feature reducers here
                 // todo: todoReducer
             },
             metaReducers: [
-                // Add root meta reducers
+                // Add meta reducers here
             ]
         }),
     ]
@@ -46,7 +46,7 @@ import { StoreModule } from 'mini-rx-store-ng';
 export class AppModule {}
 ```
 
-### Register Feature States in Angular Feature Modules
+### Register Feature Reducers in Angular Feature Modules
 
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
@@ -97,7 +97,7 @@ export class TodoEffects {
   
 ```
 
-Register the Effects
+Register the effects
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
 
@@ -126,7 +126,6 @@ For example in a component:
 import { Component } from '@angular/core';
 import { Store } from 'mini-rx-store';
 import { Observable } from 'rxjs';
-import { Actions } from './models';
 
 @Component({
     selector: 'my-component',
@@ -148,7 +147,7 @@ export class MyComponent {
 }
 ```
 ### Redux Dev Tools
-Small wrapper for the ReduxDevtoolsExtension from 'mini-rx-store'.
+`StoreDevtoolsModule` is a thin wrapper for the ReduxDevtoolsExtension from 'mini-rx-store'.
 It is needed to trigger Angular Change Detection when using time travel in the Redux Dev Tools Browser PlugIn.
 
 ```ts

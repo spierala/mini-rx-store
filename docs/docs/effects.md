@@ -35,7 +35,7 @@ export const loadEffect = actions$.pipe(
 store.effect(loadEffect);
 ```
 
-The code above creates an Effect. As soon as the `LoadTodos` action has been dispatched the API call will be executed. Depending on the result of the API call a new action will be dispatched:
+The code above creates an effect. As soon as the `LoadTodos` action has been dispatched the API call will be executed. Depending on the result of the API call a new action will be dispatched:
 `LoadTodosSuccess` or `LoadTodosFail`.
 
 The effect needs to be registered using `store.effect`.
