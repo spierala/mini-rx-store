@@ -46,9 +46,22 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 
 ## Key Concepts
 - State is exposed as RxJS Observable
-- State has a flat hierarchy and is devided into "features" (also called "slices" in Redux world)
+- State has a flat hierarchy and is divided into "features" (also called "slices" in Redux world)
 - For each "feature" we can decide to use the **Redux API** with actions and reducers or the **FeatureStore API** with `setState`
 - State is read-only and can only be changed by dispatching actions (Redux API) or by using setState (FeatureStore)
+
+## Installation
+Install from the NPM repository using npm:
+
+```
+npm install mini-rx-store@beta
+```
+
+Install the RxJS peer dependency:
+```
+npm install rxjs
+```
+
 
 ## Basic Tutorial
 Let's dive into some code to see MiniRx in action
