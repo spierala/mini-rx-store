@@ -38,7 +38,7 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 - State is exposed as RxJS Observable
 - State has a flat hierarchy and is divided into "feature states" (also called "slices" in Redux world)
 - For each "feature state" we can decide to use the **Redux API** with actions and a reducer or the **Feature Store API** with `setState`
-- State is read-only (immutable) and can only be changed by dispatching actions (Redux API) or by using setState (Feature Store)
+- State is read-only (immutable) and can only be changed by dispatching actions (Redux API) or by using setState (Feature Store API)
 
 ## Basic Tutorial
 Let's dive into some code to see MiniRx in action
