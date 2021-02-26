@@ -54,10 +54,13 @@ Consume actions in effects
 
 ```ts
 import { actions$ } from "mini-rx-store";
+
 import { mergeMap, map, catchError } from "rxjs/operators";
-import { ofType } from "ts-action-operators";
 import { ajax } from "rxjs/ajax";
 import { of } from "rxjs";
+
+import { ofType } from "ts-action-operators";
+
 import { loadTodos, loadTodosFail, loadTodosSuccess } from "./ts-todo-actions";
 
 export const loadEffect = actions$.pipe(
@@ -72,4 +75,7 @@ export const loadEffect = actions$.pipe(
 
 // Register the effect
 store.effect(loadEffect);
+
+// Trigger the effect
+store.dispatch(loadTodos())
 ```

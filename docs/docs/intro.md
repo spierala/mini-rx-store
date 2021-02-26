@@ -93,7 +93,7 @@ const getCount = createSelector(
 
 // 6.) Select state as RxJS Observable
 const count$: Observable<number> = store.select(getCount);
-count$.subscribe(count => console.log('count:', count));
+count$.subscribe(count => console.log("count:", count));
 
 // 7.) Dispatch an action
 store.dispatch({ type: "inc" });
@@ -125,7 +125,7 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
   counter$: Observable<number> = this.select(state => state.counter);
 
   constructor() {
-    super('counterFs', counterInitialState)
+    super("counterFs", counterInitialState)
   }
 
   // Update state with `setState`
@@ -140,7 +140,7 @@ Use the "counterFs" Feature Store like this:
 import { CounterFeatureStore } from "./counter-feature-store";
 
 const counterFs = new CounterFeatureStore();
-counterFs.counter$.subscribe(count => console.log('count:', count));
+counterFs.counter$.subscribe(count => console.log("count:", count));
 counterFs.inc();
 
 // OUTPUT: count: 11

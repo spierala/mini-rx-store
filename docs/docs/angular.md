@@ -17,7 +17,10 @@ With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can u
 
 ## Usage
 
-### Installation:
+### Requirements
+- Angular >= 9 
+
+### Installation
 
 `npm i mini-rx-store-ng`
 

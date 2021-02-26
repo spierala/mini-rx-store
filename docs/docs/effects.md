@@ -13,8 +13,9 @@ Effects trigger side effects like API calls and handle the result:
 ```ts
 import { actions$, ofType } from "mini-rx-store";
 import {
-    LoadTodosFail,
+    LoadTodos,
     LoadTodosSuccess,
+    LoadTodosFail,
     TodoActionTypes
 } from "./todo-actions";
 import { mergeMap, map, catchError } from "rxjs/operators";
@@ -33,6 +34,9 @@ export const loadEffect = actions$.pipe(
 
 // Register the effect
 store.effect(loadEffect);
+
+// Trigger the effect
+store.dispatch(new LoadTodos())
 ```
 
 The code above creates an effect. As soon as the `LoadTodos` action has been dispatched the API call will be executed. Depending on the result of the API call a new action will be dispatched:

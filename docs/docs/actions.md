@@ -79,4 +79,8 @@ store.dispatch(new AddTodo({id: 1, title: 'Use Redux'}));
 store.dispatch(new RemoveTodo(1))
 ```
 
-The following code examples use Class-based Action Creators.
+The upcoming code examples use Class-based Action Creators.
+
+### Ts-action
+With ts-action you can create actions and reducers with a minimum of boilerplate code.
+Read more in the [ts-action section](ts-action.md).
