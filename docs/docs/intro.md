@@ -48,8 +48,8 @@ MiniRx supports the classic Redux API with registering reducers and dispatching 
 Observable state can be selected with memoized selectors.
 
 ```ts
-import { Action, Store, configureStore, createFeatureSelector, createSelector } from "mini-rx-store";
-import { Observable } from "rxjs";
+import { Action, Store, configureStore, createFeatureSelector, createSelector } from 'mini-rx-store';
+import { Observable } from 'rxjs';
 
 // 1.) State interface
 interface CounterState {
@@ -67,7 +67,7 @@ function counterReducer(
   action: Action
 ): CounterState {
   switch (action.type) {
-    case "inc":
+    case 'inc':
       return {
         ...state,
         count: state.count + 1
@@ -85,7 +85,7 @@ const store: Store = configureStore({
 });
 
 // 5.) Create memoized selectors
-const getCounterFeatureState = createFeatureSelector<CounterState>("counter");
+const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
 const getCount = createSelector(
   getCounterFeatureState,
   state => state.count
@@ -93,10 +93,10 @@ const getCount = createSelector(
 
 // 6.) Select state as RxJS Observable
 const count$: Observable<number> = store.select(getCount);
-count$.subscribe(count => console.log("count:", count));
+count$.subscribe(count => console.log('count:', count));
 
 // 7.) Dispatch an action
-store.dispatch({ type: "inc" });
+store.dispatch({ type: 'inc' });
 
 // OUTPUT: count: 1
 // OUTPUT: count: 2
@@ -106,8 +106,8 @@ Feature Stores allow us to manage feature states without actions and reducers.
 The `FeatureStore` API is optimized to select and update a feature state directly with a minimum of boilerplate.
 
 ```ts title="counter-feature-store.ts"
-import { FeatureStore } from "mini-rx-store";
-import { Observable } from "rxjs";
+import { FeatureStore } from 'mini-rx-store';
+import { Observable } from 'rxjs';
 
 // 1.) State interface
 interface CounterState {
@@ -125,7 +125,7 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
   counter$: Observable<number> = this.select(state => state.counter);
 
   constructor() {
-    super("counterFs", counterInitialState)
+    super('counterFs', counterInitialState)
   }
 
   // Update state with `setState`
@@ -137,10 +137,10 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
 
 Use the "counterFs" Feature Store like this:
 ```ts
-import { CounterFeatureStore } from "./counter-feature-store";
+import { CounterFeatureStore } from './counter-feature-store';
 
 const counterFs = new CounterFeatureStore();
-counterFs.counter$.subscribe(count => console.log("count:", count));
+counterFs.counter$.subscribe(count => console.log('count:', count));
 counterFs.inc();
 
 // OUTPUT: count: 11

@@ -9,8 +9,8 @@ There are 2 Options to create a new Feature Store.
 
 ### Option 1: Extend `FeatureStore`
 ```ts title="todo-feature-store.ts"
-import { FeatureStore } from "mini-rx-store";
-import { Todo } from "./todo";
+import { FeatureStore } from 'mini-rx-store';
+import { Todo } from './todo';
 
 export interface TodoState {
     todos: Todo[];

@@ -53,20 +53,20 @@ export const todoReducer = reducer(
 Consume actions in effects
 
 ```ts
-import { actions$ } from "mini-rx-store";
+import { actions$ } from 'mini-rx-store';
 
-import { mergeMap, map, catchError } from "rxjs/operators";
-import { ajax } from "rxjs/ajax";
-import { of } from "rxjs";
+import { mergeMap, map, catchError } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
+import { of } from 'rxjs';
 
-import { ofType } from "ts-action-operators";
+import { ofType } from 'ts-action-operators';
 
-import { loadTodos, loadTodosFail, loadTodosSuccess } from "./ts-todo-actions";
+import { loadTodos, loadTodosFail, loadTodosSuccess } from './ts-todo-actions';
 
 export const loadEffect = actions$.pipe(
-    ofType(loadTodos), // Use ofType from "ts-action-operators"
+    ofType(loadTodos), // Use ofType from 'ts-action-operators'
     mergeMap(() =>
-        ajax("https://jsonplaceholder.typicode.com/todos").pipe(
+        ajax('https://jsonplaceholder.typicode.com/todos').pipe(
             map(res => loadTodosSuccess(res.response)),
             catchError(err => of(loadTodosFail(err)))
         )

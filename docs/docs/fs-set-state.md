@@ -32,7 +32,7 @@ We can easily undo `setState` actions with the [Undo Extension](ext-undo-extensi
 Calling `setState` returns an action which can be used to perform an Undo.
 
 ```ts title="todo-feature-store.ts"
-import { Action } from "mini-rx-store";
+import { Action } from 'mini-rx-store';
 
 removeTodo(id: number): Action {
     return this.setState(state => ({

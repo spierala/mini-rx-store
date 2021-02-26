@@ -54,7 +54,7 @@ store.select(state => state).subscribe(console.log);
 ```
 See how the initial state is available in the feature reducers:
 ```ts
-import { Action, Store, configureStore } from "mini-rx-store";
+import { Action, Store, configureStore } from 'mini-rx-store';
 
 interface CounterState {
   count: number;
@@ -63,7 +63,7 @@ interface CounterState {
 // Reducer
 function counterReducer(state: CounterState, action: Action): CounterState {
   switch (action.type) {
-    case "inc":
+    case 'inc':
       return {
         ...state,
         count: state.count + 1
@@ -86,11 +86,11 @@ const store: Store = configureStore({
 // Select global state
 store.select(state => state).subscribe(console.log);
 
-// Dispatch the "increment" action
-store.dispatch({ type: "inc" });
+// Dispatch the 'increment' action
+store.dispatch({ type: 'inc' });
 
-// OUTPUT: {"counter":{"count":123}}
-// OUTPUT: {"counter":{"count":124}}
+// OUTPUT: {'counter':{'count':123}}
+// OUTPUT: {'counter':{'count':124}}
 ```
 
 ## Meta reducers
@@ -109,9 +109,9 @@ Let's see how to implement a simple Debug meta reducer:
 export function debug(reducer) {
   return function newReducer(state, action) {
     const nextState = reducer(state, action);
-    console.log("state", state);
-    console.log("action", action);
-    console.log("next state", nextState);
+    console.log('state', state);
+    console.log('action', action);
+    console.log('next state', nextState);
     return nextState;
   }
 }

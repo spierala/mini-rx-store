@@ -50,12 +50,12 @@ export interface Todo {
 ```
 
 ```ts title="todo-actions.ts"
-import { Action } from "mini-rx-store";
-import { Todo } from "./todo";
+import { Action } from 'mini-rx-store';
+import { Todo } from './todo';
 
 export enum TodoActionTypes {
-    AddTodo = "ADD_TODO",
-    RemoveTodo = "REMOVE_TODO"
+    AddTodo = 'ADD_TODO',
+    RemoveTodo = 'REMOVE_TODO'
 }
 
 export class AddTodo implements Action {
