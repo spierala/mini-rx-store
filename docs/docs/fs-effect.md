@@ -10,14 +10,14 @@ When the side effect completed we can update feature state straight away (by usi
 Example:
 
 ```ts title="todo-feature-store.ts"
-import { EMPTY } from "rxjs";
-import { catchError, mergeMap, tap } from "rxjs/operators";
-import { ajax } from "rxjs/ajax";
+import { EMPTY } from 'rxjs';
+import { catchError, mergeMap, tap } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
 
 loadTodos = this.effect(payload$ => {
     return payload$.pipe(
         mergeMap(() =>
-            ajax("https://jsonplaceholder.typicode.com/todos").pipe(
+            ajax('https://jsonplaceholder.typicode.com/todos').pipe(
                 tap(res => this.setState({todos: res.response})),
                 catchError(err => EMPTY)
             )
@@ -29,7 +29,7 @@ loadTodos = this.effect(payload$ => {
 loadTodoById = this.effect<number>(payload$ => {
     return payload$.pipe(
         mergeMap((id) =>
-            ajax("https://jsonplaceholder.typicode.com/todos?id=" + id).pipe(
+            ajax('https://jsonplaceholder.typicode.com/todos?id=' + id).pipe(
                 tap(res => this.setState({todos: res.response})),
                 catchError(err => EMPTY)
             )
@@ -59,7 +59,7 @@ We can skip the `payload$.pipe` if we use only one RxJS operator:
 ```ts
 loadTodoById = this.effect<number>(
     mergeMap((id) =>
-        ajax("https://jsonplaceholder.typicode.com/todos?id=" + id).pipe(
+        ajax('https://jsonplaceholder.typicode.com/todos?id=' + id).pipe(
             tap(res => this.setState({todos: res.response})),
             catchError(err => EMPTY)
         )

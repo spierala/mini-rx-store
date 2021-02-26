@@ -11,21 +11,21 @@ Effects trigger side effects like API calls and handle the result:
 -   The Effect needs to return a new action as soon as the side effect completed
 
 ```ts
-import { actions$, ofType } from "mini-rx-store";
+import { actions$, ofType } from 'mini-rx-store';
 import {
     LoadTodos,
     LoadTodosSuccess,
     LoadTodosFail,
     TodoActionTypes
-} from "./todo-actions";
-import { mergeMap, map, catchError } from "rxjs/operators";
-import { ajax } from "rxjs/ajax";
-import { of } from "rxjs";
+} from './todo-actions';
+import { mergeMap, map, catchError } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
+import { of } from 'rxjs';
 
 export const loadEffect = actions$.pipe(
     ofType(TodoActionTypes.LoadTodos),
     mergeMap(() =>
-        ajax("https://jsonplaceholder.typicode.com/todos").pipe(
+        ajax('https://jsonplaceholder.typicode.com/todos').pipe(
             map(res => new LoadTodosSuccess(res.response)),
             catchError(err => of(new LoadTodosFail(err)))
         )
