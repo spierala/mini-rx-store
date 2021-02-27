@@ -11,35 +11,34 @@ import { Todo } from './todo';
 import { TodoActionTypes, TodoActions } from './todo-actions';
 
 export interface TodoState {
-    todos: Todo[];
-    selectedTodoId: number
+  todos: Todo[];
+  selectedTodoId: number
 }
 
 export const initialState: TodoState = {
-    todos: [],
-    selectedTodoId: undefined
+  todos: [],
+  selectedTodoId: undefined
 };
 
 export function todoReducer(
-    state: TodoState = initialState,
-    action: TodoActions
+  state: TodoState = initialState,
+  action: TodoActions
 ): TodoState {
-    switch (action.type) {
-        case TodoActionTypes.AddTodo:
-            return {
-                ...state,
-                todos: [...state.todos, action.payload]
-            };
-        case TodoActionTypes.RemoveTodo:
-            return {
-                ...state,
-                todos: state.todos.filter(item => item.id !== action.payload)
-            };
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case TodoActionTypes.AddTodo:
+      return {
+        ...state,
+        todos: [...state.todos, action.payload]
+      };
+    case TodoActionTypes.RemoveTodo:
+      return {
+        ...state,
+        todos: state.todos.filter(item => item.id !== action.payload)
+      };
+    default:
+      return state;
+  }
 }
-
 ```
 
 ### Register feature reducer
@@ -51,9 +50,9 @@ import { configureStore, Store } from 'mini-rx-store';
 import todoReducer from './todo-reducer';
 
 const store: Store = configureStore({
-    reducers: {
-        todo: todoReducer
-    }
+  reducers: {
+    todo: todoReducer
+  }
 });
 ```
 

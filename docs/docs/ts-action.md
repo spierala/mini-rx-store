@@ -35,16 +35,16 @@ store.dispatch(addTodo({id: 1, title: 'Use Redux'}))
 import { on, reducer } from 'ts-action';
 
 export interface TodoState {
-    todos: Todo[];
+  todos: Todo[];
 }
 
 export const initialState: TodoState = {
-    todos: [],
+  todos: [],
 };
 
 export const todoReducer = reducer(
-    initialState,
-    on(addTodo, (state, {payload}) => ({...state, todos: [...state.todos, payload]}))
+  initialState,
+  on(addTodo, (state, {payload}) => ({...state, todos: [...state.todos, payload]}))
 );
 ```
 
@@ -64,13 +64,13 @@ import { ofType } from 'ts-action-operators';
 import { loadTodos, loadTodosFail, loadTodosSuccess } from './ts-todo-actions';
 
 export const loadEffect = actions$.pipe(
-    ofType(loadTodos), // Use ofType from 'ts-action-operators'
-    mergeMap(() =>
-        ajax('https://jsonplaceholder.typicode.com/todos').pipe(
-            map(res => loadTodosSuccess(res.response)),
-            catchError(err => of(loadTodosFail(err)))
-        )
+  ofType(loadTodos), // Use ofType from 'ts-action-operators'
+  mergeMap(() =>
+    ajax('https://jsonplaceholder.typicode.com/todos').pipe(
+      map(res => loadTodosSuccess(res.response)),
+      catchError(err => of(loadTodosFail(err)))
     )
+  )
 );
 
 // Register the effect

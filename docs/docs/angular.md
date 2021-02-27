@@ -30,23 +30,24 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from 'mini-rx-store-ng';
 
 @NgModule({
-    imports: [
-        StoreModule.forRoot({
-            extensions: [
-                // Add extensions here
-                // new LoggerExtension()
-            ],
-            reducers: {
-                // Add feature reducers here
-                // todo: todoReducer
-            },
-            metaReducers: [
-                // Add meta reducers here
-            ]
-        }),
-    ]
+  imports: [
+    StoreModule.forRoot({
+      extensions: [
+        // Add extensions here
+        // new LoggerExtension()
+      ],
+      reducers: {
+        // Add feature reducers here
+        // todo: todoReducer
+      },
+      metaReducers: [
+        // Add meta reducers here
+      ]
+    }),
+  ]
 })
-export class AppModule {}
+export class AppModule {
+}
 ```
 
 ### Register Feature Reducers in Angular Feature Modules
@@ -57,12 +58,13 @@ import { StoreModule } from 'mini-rx-store-ng';
 import todoReducer from './todo-reducer';
 
 @NgModule({
-    imports: [
-        StoreModule.forFeature('todo', todoReducer),
-    ]
+  imports: [
+    StoreModule.forFeature('todo', todoReducer),
+  ]
 })
 export class TodoModule {
-    constructor() {}
+  constructor() {
+  }
 }
 ```
 
@@ -82,22 +84,21 @@ import { LoadTodosFail, LoadTodosSuccess, TodoActionTypes } from './todo-actions
 
 @Injectable({providedIn: 'root'})
 export class TodoEffects {
-    loadTodos$ = this.actions$.pipe(
-        ofType(TodoActionTypes.LoadTodos),
-        mergeMap(() =>
-            ajax('https://jsonplaceholder.typicode.com/todos').pipe(
-                map(res => new LoadTodosSuccess(res.response)),
-                catchError(err => of(new LoadTodosFail(err)))
-            )
-        )
-    );
+  loadTodos$ = this.actions$.pipe(
+    ofType(TodoActionTypes.LoadTodos),
+    mergeMap(() =>
+      ajax('https://jsonplaceholder.typicode.com/todos').pipe(
+        map(res => new LoadTodosSuccess(res.response)),
+        catchError(err => of(new LoadTodosFail(err)))
+      )
+    )
+  );
 
-    constructor(
-        private actions$: Actions
-    ) {
-    }
+  constructor(
+    private actions$: Actions
+  ) {
+  }
 }
-  
 ```
 
 Register the effects
@@ -110,10 +111,10 @@ import { TodoEffects } from './todo-effects.service';
 import { todoReducer } from './todo-reducer';
 
 @NgModule({
-    imports: [
-        StoreModule.forFeature('todo', todoReducer),
-        EffectsModule.register([TodoEffects]),
-    ]
+  imports: [
+    StoreModule.forFeature('todo', todoReducer),
+    EffectsModule.register([TodoEffects]),
+  ]
 })
 export class TodoModule {
 }
@@ -131,22 +132,22 @@ import { Store } from 'mini-rx-store';
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'my-component',
-    template: ''
+  selector: 'my-component',
+  template: ''
 })
 export class MyComponent {
-    // Select state from the Store
-    someState$: Observable<any> = this.store.select(state => state);
+  // Select state from the Store
+  someState$: Observable<any> = this.store.select(state => state);
 
-    constructor(
-        private store: Store,
-    ) {
-        
-    }
+  constructor(
+    private store: Store,
+  ) {
 
-    doSomething() {
-        this.store.dispatch({type: 'some action'})
-    }
+  }
+
+  doSomething() {
+    this.store.dispatch({type: 'some action'})
+  }
 }
 ```
 ### Redux Dev Tools
@@ -157,14 +158,15 @@ It is needed to trigger Angular Change Detection when using time travel in the R
 import { StoreDevtoolsModule } from 'mini-rx-store-ng';
 
 @NgModule({
-    imports: [
-        // ...
-        StoreDevtoolsModule.instrument({
-            name: 'MiniRx Store',
-            maxAge: 25,
-            latency: 250,
-        }),
-    ]
+  imports: [
+    // ...
+    StoreDevtoolsModule.instrument({
+      name: 'MiniRx Store',
+      maxAge: 25,
+      latency: 250,
+    }),
+  ]
 })
-export class AppModule {} 
+export class AppModule {
+} 
 ```

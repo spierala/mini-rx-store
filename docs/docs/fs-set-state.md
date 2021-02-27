@@ -8,7 +8,7 @@ Use `setState` to update the state of a Feature Store right away.
 `setState` accepts a Partial Type. This allows us to pass only some properties of a bigger state interface.
 ```ts title="todo-feature-store.ts"
 selectTodo(id: number) {
-    this.setState({selectedTodoId: id});
+  this.setState({selectedTodoId: id});
 }
 ```
 Do you need to update the state based on the current state?
@@ -16,9 +16,9 @@ Do you need to update the state based on the current state?
 ```ts title="todo-feature-store.ts"
 // Update state based on current state
 addTodo(todo: Todo) {
-    this.setState(state => ({
-        todos: [...state.todos, todo]
-    }))
+  this.setState(state => ({
+    todos: [...state.todos, todo]
+  }))
 }
 ```
 For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
@@ -35,13 +35,13 @@ Calling `setState` returns an action which can be used to perform an Undo.
 import { Action } from 'mini-rx-store';
 
 removeTodo(id: number): Action {
-    return this.setState(state => ({
-        todos: state.todos.filter(item => item.id !== id)
-    }))
+  return this.setState(state => ({
+    todos: state.todos.filter(item => item.id !== id)
+  }))
 }
 
 removeAndUndo() {
-    const todoRemoveAction: Action = this.removeTodo(2);
-    this.undo(todoRemoveAction);   
+  const todoRemoveAction: Action = this.removeTodo(2);
+  this.undo(todoRemoveAction);   
 }
 ```

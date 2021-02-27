@@ -30,40 +30,40 @@ import { createFeatureSelector, createSelector } from 'mini-rx-store';
 const getTodoFeatureState = createFeatureSelector<TodoState>(); // Omit the feature name!
 
 const getTodos = createSelector(
-    getTodoFeatureState,
-    state => state.todos
+  getTodoFeatureState,
+  state => state.todos
 );
 
 const getSelectedTodoId = createSelector(
-    getTodoFeatureState,
-    state => state.selectedTodoId
+  getTodoFeatureState,
+  state => state.selectedTodoId
 )
 
 const getSelectedTodo = createSelector(
-    getTodos,
-    getSelectedTodoId,
-    (todos, id) => todos.find(item => item.id === id)
+  getTodos,
+  getSelectedTodoId,
+  (todos, id) => todos.find(item => item.id === id)
 )
 
 class TodoFeatureStore extends FeatureStore<TodoState> {
 
-    // State Observables
-    todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
-    todos$: Observable<Todo[]> = this.select(getTodos);
-    selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
+  // State Observables
+  todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
+  todos$: Observable<Todo[]> = this.select(getTodos);
+  selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
 
-    constructor() {
-        super('todoFs', initialState) // Feature key 'todosFs' is provided here already...
-    }
+  constructor() {
+    super('todoFs', initialState) // Feature key 'todosFs' is provided here already...
+  }
 
-    addTodo(todo: Todo) {
-        this.setState(state => ({
-            todos: [...state.todos, todo]
-        }))
-    }
+  addTodo(todo: Todo) {
+    this.setState(state => ({
+      todos: [...state.todos, todo]
+    }))
+  }
 
-    selectTodo(id: number) {
-        this.setState({selectedTodoId: id});
-    }
+  selectTodo(id: number) {
+    this.setState({selectedTodoId: id});
+  }
 }
 ```

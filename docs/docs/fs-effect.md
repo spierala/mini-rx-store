@@ -15,26 +15,26 @@ import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 
 loadTodos = this.effect(payload$ => {
-    return payload$.pipe(
-        mergeMap(() =>
-            ajax('https://jsonplaceholder.typicode.com/todos').pipe(
-                tap(res => this.setState({todos: res.response})),
-                catchError(err => EMPTY)
-            )
-        )
-    );
+  return payload$.pipe(
+    mergeMap(() =>
+      ajax('https://jsonplaceholder.typicode.com/todos').pipe(
+        tap(res => this.setState({todos: res.response})),
+        catchError(err => EMPTY)
+      )
+    )
+  );
 });
 
 // Effect using the payload value
 loadTodoById = this.effect<number>(payload$ => {
-    return payload$.pipe(
-        mergeMap((id) =>
-            ajax('https://jsonplaceholder.typicode.com/todos?id=' + id).pipe(
-                tap(res => this.setState({todos: res.response})),
-                catchError(err => EMPTY)
-            )
-        )
-    );
+  return payload$.pipe(
+    mergeMap((id) =>
+      ajax('https://jsonplaceholder.typicode.com/todos?id=' + id).pipe(
+        tap(res => this.setState({todos: res.response})),
+        catchError(err => EMPTY)
+      )
+    )
+  );
 });
 
 // Start the effects
@@ -58,12 +58,12 @@ It is important to handle possible API errors with `catchError` to make sure tha
 We can skip the `payload$.pipe` if we use only one RxJS operator:
 ```ts
 loadTodoById = this.effect<number>(
-    mergeMap((id) =>
-        ajax('https://jsonplaceholder.typicode.com/todos?id=' + id).pipe(
-            tap(res => this.setState({todos: res.response})),
-            catchError(err => EMPTY)
-        )
+  mergeMap((id) =>
+    ajax('https://jsonplaceholder.typicode.com/todos?id=' + id).pipe(
+      tap(res => this.setState({todos: res.response})),
+      catchError(err => EMPTY)
     )
+  )
 );
 ```
 :::info
