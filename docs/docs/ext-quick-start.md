@@ -8,7 +8,7 @@ With extensions, we can extend the functionality of the MiniRx Store.
 
 ## What's Included
 MiniRx Store comes with following extensions:
-- Redux Dev Tools Extension: Inspect state with the Redux Dev Tools
+- Redux Dev Tools Extension: Inspect global state with the Redux Dev Tools
 - Immutable Extension: Enforce state immutability 
 - Undo Extension: Undo dispatched actions
 - Logger Extension: console.log the current action and updated state

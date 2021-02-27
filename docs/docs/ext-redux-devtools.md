@@ -1,7 +1,7 @@
 ---
 id: ext-redux-dev-tools
-title: Redux Dev Tools
-sidebar_label: Redux Dev Tools Extension
+title: Redux Dev Tools Extension
+sidebar_label: Redux Dev Tools
 ---
 With the Redux Dev Tools Extension we can easily inspect state and actions.
 

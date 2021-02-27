@@ -151,7 +151,7 @@ export class MyComponent {
 }
 ```
 ### Redux Dev Tools
-`StoreDevtoolsModule` is a thin wrapper for the ReduxDevtoolsExtension from 'mini-rx-store'.
+`StoreDevtoolsModule` is a thin wrapper for the [ReduxDevtoolsExtension](ext-redux-devtools.md) from 'mini-rx-store'.
 It is needed to trigger Angular Change Detection when using time travel in the Redux Dev Tools Browser PlugIn.
 
 ```ts

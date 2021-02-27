@@ -25,7 +25,7 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
     -   `effect()` run side effects like API calls and update feature state
     -   `undo()` easily undo *setState* actions
 -   [Extensions](ext-quick-start):
-    - Redux Dev Tools Extension: Inspect state with the Redux Dev Tools
+    - Redux Dev Tools Extension: Inspect global state with the Redux Dev Tools
     - Immutable Extension: Enforce state immutability
     - Undo Extension: Undo dispatched actions
     - Logger Extension: console.log the current action and updated state
@@ -156,7 +156,7 @@ counterFs.inc();
 :::info
 **The state of a Feature Store becomes part of the global state**
 
-Every new Feature Store will show up in the global state with the corresponding feature key (e.g. "counterFs").
+Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs').
 ```ts
 store.select(state => state).subscribe(console.log);
 
