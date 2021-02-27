@@ -43,22 +43,22 @@ In the projection function we can access the return values of the required selec
 import { createSelector } from 'mini-rx-store'
 
 export const getTodos = createSelector(
-    getTodoFeatureState,
-    state => state.todos
+  getTodoFeatureState,
+  state => state.todos
 );
 
 export const getSelectedTodoId = createSelector(
-    getTodoFeatureState,
-    state => state.selectedTodoId
+  getTodoFeatureState,
+  state => state.selectedTodoId
 )
 
 export const getSelectedTodo = createSelector(
-    getTodos,
-    getSelectedTodoId,
-    (todos, id) => todos.find(item => item.id === id)
+  getTodos,
+  getSelectedTodoId,
+  (todos, id) => todos.find(item => item.id === id)
 )
 ```
-Let's use the memoized selectors to create our State Observables:
+Let's use the memoized selectors to create our state Observables:
 ```ts
 import { getTodoFeatureState, getTodos, getTodosCount } from './todo-selectors';
 

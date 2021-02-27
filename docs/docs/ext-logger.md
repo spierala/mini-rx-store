@@ -9,12 +9,13 @@ The Logger Extension enables simple Logging: console.log every action and the up
 ## Register the extension
 
 Configure the store with the `LoggerExtension`:
+
 ```ts 
 import { LoggerExtension } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [
-        new LoggerExtension()
-    ]
+  extensions: [
+    new LoggerExtension()
+  ]
 });
 ```

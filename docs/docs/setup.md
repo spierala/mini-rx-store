@@ -33,6 +33,6 @@ Example: Add the LoggerExtension
 import { LoggerExtension } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [new LoggerExtension()]
+  extensions: [new LoggerExtension()]
 });
 ```

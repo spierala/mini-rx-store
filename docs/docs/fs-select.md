@@ -18,10 +18,10 @@ Within that function you can pick a specific piece of state.
 
 ## Memoized Selectors
 
-You can use memoized selectors also with the FeatureStore...
+You can use memoized selectors also with the Feature Store...
 You only have to omit the feature name when using `createFeatureSelector`.
-This is because the `FeatureStore` is operating on a specific feature state already
-(the corresponding feature name has been provided in the constructor).
+This is because the Feature Store is operating on a specific feature state already
+(the corresponding feature key has been provided in the constructor).
 
 ```ts title="todo-feature-store.ts"
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
@@ -30,40 +30,40 @@ import { createFeatureSelector, createSelector } from 'mini-rx-store';
 const getTodoFeatureState = createFeatureSelector<TodoState>(); // Omit the feature name!
 
 const getTodos = createSelector(
-    getTodoFeatureState,
-    state => state.todos
+  getTodoFeatureState,
+  state => state.todos
 );
 
 const getSelectedTodoId = createSelector(
-    getTodoFeatureState,
-    state => state.selectedTodoId
+  getTodoFeatureState,
+  state => state.selectedTodoId
 )
 
 const getSelectedTodo = createSelector(
-    getTodos,
-    getSelectedTodoId,
-    (todos, id) => todos.find(item => item.id === id)
+  getTodos,
+  getSelectedTodoId,
+  (todos, id) => todos.find(item => item.id === id)
 )
 
 class TodoFeatureStore extends FeatureStore<TodoState> {
 
-    // State Observables
-    todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
-    todos$: Observable<Todo[]> = this.select(getTodos);
-    selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
+  // State Observables
+  todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
+  todos$: Observable<Todo[]> = this.select(getTodos);
+  selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
 
-    constructor() {
-        super('todoFs', initialState) // Feature name 'todosFs' is provided here already...
-    }
+  constructor() {
+    super('todoFs', initialState) // Feature key 'todosFs' is provided here already...
+  }
 
-    addTodo(todo: Todo) {
-        this.setState(state => ({
-            todos: [...state.todos, todo]
-        }))
-    }
+  addTodo(todo: Todo) {
+    this.setState(state => ({
+      todos: [...state.todos, todo]
+    }))
+  }
 
-    selectTodo(id: number) {
-        this.setState({selectedTodoId: id});
-    }
+  selectTodo(id: number) {
+    this.setState({selectedTodoId: id});
+  }
 }
 ```

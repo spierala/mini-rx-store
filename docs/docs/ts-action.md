@@ -5,7 +5,7 @@ slug: /ts-action
 ---
 MiniRx supports writing and consuming actions with [ts-action](https://www.npmjs.com/package/ts-action) to reduce boilerplate code.
 
-There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in Effects.
+There are also [ts-action-operators](https://www.npmjs.com/package/ts-action-operators) to consume actions in effects.
 
 Install the packages using npm:
 
@@ -35,41 +35,47 @@ store.dispatch(addTodo({id: 1, title: 'Use Redux'}))
 import { on, reducer } from 'ts-action';
 
 export interface TodoState {
-    todos: Todo[];
+  todos: Todo[];
 }
 
 export const initialState: TodoState = {
-    todos: [],
+  todos: [],
 };
 
 export const todoReducer = reducer(
-    initialState,
-    on(addTodo, (state, {payload}) => ({...state, todos: [...state.todos, payload]}))
+  initialState,
+  on(addTodo, (state, {payload}) => ({...state, todos: [...state.todos, payload]}))
 );
 ```
 
 #### Effects
 
-Consume actions in Effects
+Consume actions in effects
 
 ```ts
-import { actions$ } from "mini-rx-store";
-import { mergeMap, map, catchError } from "rxjs/operators";
-import { ofType } from "ts-action-operators";
-import { ajax } from "rxjs/ajax";
-import { of } from "rxjs";
-import { loadTodos, loadTodosFail, loadTodosSuccess } from "./ts-todo-actions";
+import { actions$ } from 'mini-rx-store';
+
+import { mergeMap, map, catchError } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
+import { of } from 'rxjs';
+
+import { ofType } from 'ts-action-operators';
+
+import { loadTodos, loadTodosFail, loadTodosSuccess } from './ts-todo-actions';
 
 export const loadEffect = actions$.pipe(
-    ofType(loadTodos), // Use ofType from "ts-action-operators"
-    mergeMap(() =>
-        ajax("https://jsonplaceholder.typicode.com/todos").pipe(
-            map(res => loadTodosSuccess(res.response)),
-            catchError(err => of(loadTodosFail(err)))
-        )
+  ofType(loadTodos), // Use ofType from 'ts-action-operators'
+  mergeMap(() =>
+    ajax('https://jsonplaceholder.typicode.com/todos').pipe(
+      map(res => loadTodosSuccess(res.response)),
+      catchError(err => of(loadTodosFail(err)))
     )
+  )
 );
 
 // Register the effect
 store.effect(loadEffect);
+
+// Trigger the effect
+store.dispatch(loadTodos())
 ```

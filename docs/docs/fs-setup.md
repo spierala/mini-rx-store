@@ -5,27 +5,27 @@ sidebar_label: Setup
 slud: /feature-store-setup
 ---
 
-There are 2 Options to create a new FeatureStore.
+There are 2 Options to create a new Feature Store.
 
 ### Option 1: Extend `FeatureStore`
 ```ts title="todo-feature-store.ts"
-import { FeatureStore } from "mini-rx-store";
-import { Todo } from "./todo";
+import { FeatureStore } from 'mini-rx-store';
+import { Todo } from './todo';
 
 export interface TodoState {
-    todos: Todo[];
-    selectedTodoId: number
+  todos: Todo[];
+  selectedTodoId: number
 }
 
 export const initialState: TodoState = {
-    todos: [],
-    selectedTodoId: undefined
+  todos: [],
+  selectedTodoId: undefined
 };
 
 export class TodoFeatureStore extends FeatureStore<TodoState> {
-    constructor() {
-        super('todo', initialState)
-    }
+  constructor() {
+    super('todo', initialState)
+  }
 }
 ```
 
@@ -34,7 +34,7 @@ We have to provide a TypeScript interface to `FeatureStore` to get type safety: 
 
 ### Option2 : Functional creation method
 
-We can create a FeatureStore with `createFeatureStore`
+We can create a Feature Store with `createFeatureStore`
 
 ```ts
 const todoFs: FeatureStore<TodoState> = createFeatureStore<TodoState>('todo', initialState);

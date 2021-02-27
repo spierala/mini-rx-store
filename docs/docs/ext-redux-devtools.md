@@ -1,7 +1,7 @@
 ---
 id: ext-redux-dev-tools
-title: Redux Dev Tools
-sidebar_label: Redux Dev Tools Extension
+title: Redux Dev Tools Extension
+sidebar_label: Redux Dev Tools
 ---
 With the Redux Dev Tools Extension we can easily inspect state and actions.
 
@@ -10,7 +10,7 @@ With the Redux Dev Tools Extension we can easily inspect state and actions.
 MiniRx has basic support for the [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension).
 These are the current possibilities:
 - Inspect current state
-- See a history of actions
+- See the history of actions
 - Inspect the action payload of all actions in the history
 - Time travel to previous actions to restore previous states
 
@@ -23,20 +23,23 @@ You need to install the Browser Plugin to make it work.
 ## Register the extension
 
 Configure the store with the `ReduxDevtoolsExtension`:
+
 ```ts
 import { ReduxDevtoolsExtension } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [
-        new ReduxDevtoolsExtension({
-            name: 'MiniRx Showcase',
-            maxAge: 25,
-            latency: 1000
-        })
-    ]
+  extensions: [
+    new ReduxDevtoolsExtension({
+      name: 'MiniRx Showcase',
+      maxAge: 25,
+      latency: 1000
+    })
+  ]
 });
 ```
-ℹ️ If you are using Angular you have to register the `StoreDevtoolsModule` from 'mini-rx-store-ng'.
+
+### Angular
+If you are using Angular you have to register the `StoreDevtoolsModule` from 'mini-rx-store-ng'.
 See [Angular Redux Dev Tools](angular.md#redux-dev-tools) for more information.
 
 ## Options

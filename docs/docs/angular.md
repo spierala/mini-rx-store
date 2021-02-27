@@ -10,14 +10,17 @@ sidebar_label: Angular Integration
 With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can use MiniRx Store the Angular way:
 
 - [Configure the store](#configure-the-store-in-the-app-module) using `StoreModule.forRoot()`
-- [Register Feature States](#register-feature-states-in-angular-feature-modules) using `StoreModule.forFeature()`
-- [Register Effects](#register-effects) using `EffectsModule.register()`
+- [Register feature reducers](#register-feature-states-in-angular-feature-modules) using `StoreModule.forFeature()`
+- [Register effects](#register-effects) using `EffectsModule.register()`
 - [Use Angular Dependency Injection](#get-hold-of-the-store-and-actions-via-the-angular-dependency-injection) for `Store` and `Actions`
 - [Redux Devtools Extension](#redux-dev-tools)
 
 ## Usage
 
-### Installation:
+### Requirements
+- Angular >= 9 
+
+### Installation
 
 `npm i mini-rx-store-ng`
 
@@ -27,26 +30,27 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from 'mini-rx-store-ng';
 
 @NgModule({
-    imports: [
-        StoreModule.forRoot({
-            extensions: [
-                // Add extensions here
-                // new LoggerExtension()
-            ],
-            reducers: {
-                // Add root reducers here
-                // todo: todoReducer
-            },
-            metaReducers: [
-                // Add root meta reducers
-            ]
-        }),
-    ]
+  imports: [
+    StoreModule.forRoot({
+      extensions: [
+        // Add extensions here
+        // new LoggerExtension()
+      ],
+      reducers: {
+        // Add feature reducers here
+        // todo: todoReducer
+      },
+      metaReducers: [
+        // Add meta reducers here
+      ]
+    }),
+  ]
 })
-export class AppModule {}
+export class AppModule {
+}
 ```
 
-### Register Feature States in Angular Feature Modules
+### Register Feature Reducers in Angular Feature Modules
 
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
@@ -54,12 +58,13 @@ import { StoreModule } from 'mini-rx-store-ng';
 import todoReducer from './todo-reducer';
 
 @NgModule({
-    imports: [
-        StoreModule.forFeature('todo', todoReducer),
-    ]
+  imports: [
+    StoreModule.forFeature('todo', todoReducer),
+  ]
 })
 export class TodoModule {
-    constructor() {}
+  constructor() {
+  }
 }
 ```
 
@@ -79,25 +84,24 @@ import { LoadTodosFail, LoadTodosSuccess, TodoActionTypes } from './todo-actions
 
 @Injectable({providedIn: 'root'})
 export class TodoEffects {
-    loadTodos$ = this.actions$.pipe(
-        ofType(TodoActionTypes.LoadTodos),
-        mergeMap(() =>
-            ajax('https://jsonplaceholder.typicode.com/todos').pipe(
-                map(res => new LoadTodosSuccess(res.response)),
-                catchError(err => of(new LoadTodosFail(err)))
-            )
-        )
-    );
+  loadTodos$ = this.actions$.pipe(
+    ofType(TodoActionTypes.LoadTodos),
+    mergeMap(() =>
+      ajax('https://jsonplaceholder.typicode.com/todos').pipe(
+        map(res => new LoadTodosSuccess(res.response)),
+        catchError(err => of(new LoadTodosFail(err)))
+      )
+    )
+  );
 
-    constructor(
-        private actions$: Actions
-    ) {
-    }
+  constructor(
+    private actions$: Actions
+  ) {
+  }
 }
-  
 ```
 
-Register the Effects
+Register the effects
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
 
@@ -107,10 +111,10 @@ import { TodoEffects } from './todo-effects.service';
 import { todoReducer } from './todo-reducer';
 
 @NgModule({
-    imports: [
-        StoreModule.forFeature('todo', todoReducer),
-        EffectsModule.register([TodoEffects]),
-    ]
+  imports: [
+    StoreModule.forFeature('todo', todoReducer),
+    EffectsModule.register([TodoEffects]),
+  ]
 })
 export class TodoModule {
 }
@@ -126,43 +130,43 @@ For example in a component:
 import { Component } from '@angular/core';
 import { Store } from 'mini-rx-store';
 import { Observable } from 'rxjs';
-import { Actions } from './models';
 
 @Component({
-    selector: 'my-component',
-    template: ''
+  selector: 'my-component',
+  template: ''
 })
 export class MyComponent {
-    // Select state from the Store
-    someState$: Observable<any> = this.store.select(state => state);
+  // Select state from the Store
+  someState$: Observable<any> = this.store.select(state => state);
 
-    constructor(
-        private store: Store,
-    ) {
-        
-    }
+  constructor(
+    private store: Store,
+  ) {
 
-    doSomething() {
-        this.store.dispatch({type: 'some action'})
-    }
+  }
+
+  doSomething() {
+    this.store.dispatch({type: 'some action'})
+  }
 }
 ```
 ### Redux Dev Tools
-Small wrapper for the ReduxDevtoolsExtension from 'mini-rx-store'.
+`StoreDevtoolsModule` is a thin wrapper for the [ReduxDevtoolsExtension](ext-redux-devtools.md) from 'mini-rx-store'.
 It is needed to trigger Angular Change Detection when using time travel in the Redux Dev Tools Browser PlugIn.
 
 ```ts
 import { StoreDevtoolsModule } from 'mini-rx-store-ng';
 
 @NgModule({
-    imports: [
-        // ...
-        StoreDevtoolsModule.instrument({
-            name: 'MiniRx Store',
-            maxAge: 25,
-            latency: 250,
-        }),
-    ]
+  imports: [
+    // ...
+    StoreDevtoolsModule.instrument({
+      name: 'MiniRx Store',
+      maxAge: 25,
+      latency: 250,
+    }),
+  ]
 })
-export class AppModule {} 
+export class AppModule {
+} 
 ```
