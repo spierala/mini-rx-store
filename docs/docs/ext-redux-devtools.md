@@ -23,17 +23,18 @@ You need to install the Browser Plugin to make it work.
 ## Register the extension
 
 Configure the store with the `ReduxDevtoolsExtension`:
+
 ```ts
 import { ReduxDevtoolsExtension } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [
-        new ReduxDevtoolsExtension({
-            name: 'MiniRx Showcase',
-            maxAge: 25,
-            latency: 1000
-        })
-    ]
+  extensions: [
+    new ReduxDevtoolsExtension({
+      name: 'MiniRx Showcase',
+      maxAge: 25,
+      latency: 1000
+    })
+  ]
 });
 ```
 

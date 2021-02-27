@@ -48,7 +48,13 @@ MiniRx supports the classic Redux API with registering reducers and dispatching 
 Observable state can be selected with memoized selectors.
 
 ```ts
-import { Action, Store, configureStore, createFeatureSelector, createSelector } from 'mini-rx-store';
+import {
+  Action,
+  Store,
+  configureStore,
+  createFeatureSelector,
+  createSelector
+} from 'mini-rx-store';
 import { Observable } from 'rxjs';
 
 // 1.) State interface

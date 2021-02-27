@@ -9,13 +9,14 @@ With the Undo Extension we can easily undo actions which have been dispatched to
 ## Register the extension
 
 Configure the store with the `UndoExtension`:
+
 ```ts 
 import { UndoExtension } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [
-        new UndoExtension()
-    ]
+  extensions: [
+    new UndoExtension()
+  ]
 });
 ```
 ## Options

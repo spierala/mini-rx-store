@@ -33,10 +33,10 @@ import productReducer from './product-reducer';
 import userReducer from './user-reducer';
 
 const store: Store = configureStore({
-    reducers: {
-        product: productReducer,
-        user: userReducer
-    }
+  reducers: {
+    product: productReducer,
+    user: userReducer
+  }
 });
 ```
 
@@ -46,7 +46,7 @@ Set the initial state of the store via the configuration object:
 import { configureStore, Store } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    initialState: {counter: 123}
+  initialState: {counter: 123}
 });
 
 store.select(state => state).subscribe(console.log);
@@ -119,9 +119,9 @@ export function debug(reducer) {
 Now we can add the `debug` meta reducer to the `metaReducers` array of the configuration object:
 ```ts
 const store: Store = configureStore({
-    // reducers: {...},
-    // initialState: {...},
-    metaReducers: [debug]
+  // reducers: {...},
+  // initialState: {...},
+  metaReducers: [debug]
 });
 ```
 You can add many meta reducers to the array. The meta reducers will be executed from "left to right".

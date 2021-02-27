@@ -19,12 +19,12 @@ The `extensions` property accepts an array of Extension instances.
 
 For example:
 ```ts
-import { ImmutableStateExtension, LoggerExtension} from 'mini-rx-store';
+import { ImmutableStateExtension, LoggerExtension } from 'mini-rx-store';
 
 const store: Store = configureStore({
-    extensions: [
-        new LoggerExtension(), 
-        new ImmutableStateExtension()
-    ]
+  extensions: [
+    new LoggerExtension(),
+    new ImmutableStateExtension()
+  ]
 });
 ```

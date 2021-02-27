@@ -11,9 +11,9 @@ An action is a simple object with a `type` property:
 
 ```ts
 const addTodo = {
-    type: 'ADD_TODO',
-    // Besides `type`, the structure of an action object is really up to you.
-    payload: 'Use Redux'
+  type: 'ADD_TODO',
+  // Besides `type`, the structure of an action object is really up to you.
+  payload: 'Use Redux'
 }
 ```
 Now we can dispatch the `addTodo` action to the store and let the reducers calculate the new global state.
@@ -29,10 +29,10 @@ Action Creators will do the repetitive work for us.
 ### "Classic" Action Creators
 ```ts
 export function addTodo(payload) {
-    return {
-        type: 'ADD_TODO',
-        payload
-    }
+  return {
+    type: 'ADD_TODO',
+    payload
+  }
 }
 ```
 Dispatch the action:
@@ -44,8 +44,8 @@ store.dispatch(addTodo({id: 1, title: 'Use Redux'}));
 ### Class-based Action Creators (TypeScript)
 ```ts title="todo.ts"
 export interface Todo {
-    id: number;
-    title: string;
+  id: number;
+  title: string;
 }
 ```
 
@@ -54,18 +54,18 @@ import { Action } from 'mini-rx-store';
 import { Todo } from './todo';
 
 export enum TodoActionTypes {
-    AddTodo = 'ADD_TODO',
-    RemoveTodo = 'REMOVE_TODO'
+  AddTodo = 'ADD_TODO',
+  RemoveTodo = 'REMOVE_TODO'
 }
 
 export class AddTodo implements Action {
-    readonly type = TodoActionTypes.AddTodo;
-    constructor(public payload: Todo) {}
+  readonly type = TodoActionTypes.AddTodo;
+  constructor(public payload: Todo) {}
 }
 
 export class RemoveTodo implements Action {
-    readonly type = TodoActionTypes.RemoveTodo;
-    constructor(public payload: number) {}
+  readonly type = TodoActionTypes.RemoveTodo;
+  constructor(public payload: number) {}
 }
 
 // Union the valid types

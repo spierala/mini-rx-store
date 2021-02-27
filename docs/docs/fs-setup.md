@@ -13,19 +13,19 @@ import { FeatureStore } from 'mini-rx-store';
 import { Todo } from './todo';
 
 export interface TodoState {
-    todos: Todo[];
-    selectedTodoId: number
+  todos: Todo[];
+  selectedTodoId: number
 }
 
 export const initialState: TodoState = {
-    todos: [],
-    selectedTodoId: undefined
+  todos: [],
+  selectedTodoId: undefined
 };
 
 export class TodoFeatureStore extends FeatureStore<TodoState> {
-    constructor() {
-        super('todo', initialState)
-    }
+  constructor() {
+    super('todo', initialState)
+  }
 }
 ```
 
