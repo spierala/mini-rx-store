@@ -13,14 +13,14 @@ const nameUpdateAction = 'set-state';
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
 
+    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
     /**
      * @deprecated Use `this.select()` instead.
      * state$ will become private in an upcoming major version
      */
-    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
-
+    state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
-        return this.state$.getValue();
+        return this.stateSource.getValue();
     }
 
     constructor(private featureName: string, initialState: StateType) {
@@ -35,7 +35,7 @@ export class FeatureStore<StateType> {
 
         // Select Feature State and delegate to local BehaviorSubject
         const featureSelector = createFeatureSelector<AppState, StateType>(featureName);
-        StoreCore.select(featureSelector).subscribe(this.state$);
+        StoreCore.select(featureSelector).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
