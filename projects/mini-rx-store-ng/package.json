@@ -2,8 +2,9 @@
     "name": "mini-rx-store-ng",
     "version": "1.0.0-beta.0",
     "peerDependencies": {
-        "@angular/common": "8-11",
-        "@angular/core": "8-11"
+        "@angular/common": ">= 9.0.0",
+        "@angular/core": ">= 9.0.0",
+        "mini-rx-store": ">= 2.0.0"
     },
     "dependencies": {
         "tslib": "^1.10.0"
@@ -12,7 +13,7 @@
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
     "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
-    "description": "Angular friendly API for mini rx store",
+    "description": "Angular friendly API for MiniRx Store",
     "keywords": [
         "RxJS",
         "Redux",
