@@ -189,7 +189,7 @@ These projects, articles and courses helped and inspired us to create MiniRx:
 -   [Observable Store](https://github.com/DanWahlin/Observable-Store)
 -   [RxJS Observable Store](https://github.com/jurebajt/rxjs-observable-store)
 -   [Juliette Store](https://github.com/markostanimirovic/juliette) 
--   [Basic State Managment with an Observable Service](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)
+-   [Basic State Management with an Observable Service](https://dev.to/avatsaev/simple-state-management-in-angular-with-only-services-and-rxjs-41p8)
 -   [Redux From Scratch With Angular and RxJS](https://www.youtube.com/watch?v=hG7v7quMMwM)
 -   [How I wrote NgRx Store in 63 lines of code](https://medium.com/angular-in-depth/how-i-wrote-ngrx-store-in-63-lines-of-code-dfe925fe979b)
 -   [NGRX VS. NGXS VS. AKITA VS. RXJS: FIGHT!](https://ordina-jworks.github.io/angular/2018/10/08/angular-state-management-comparison.html?utm_source=dormosheio&utm_campaign=dormosheio)
