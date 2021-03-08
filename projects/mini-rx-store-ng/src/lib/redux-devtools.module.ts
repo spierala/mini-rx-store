@@ -1,4 +1,4 @@
-// Credits: Akita: https://github.com/datorama/akita/blob/master/libs/akita-ng-devtools/src/lib/ng-devtools.module.ts)
+// Inspired by: Akita: https://github.com/datorama/akita/blob/master/libs/akita-ng-devtools/src/lib/ng-devtools.module.ts)
 
 import {
     APP_INITIALIZER,

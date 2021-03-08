@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Action, AppState, Reducer } from './models';
+import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError, select } from './utils';
 import { createFeatureSelector } from './selector';
@@ -13,10 +13,14 @@ const nameUpdateAction = 'set-state';
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
 
-    state$: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
-
+    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
+    /**
+     * @deprecated Use `this.select()` instead.
+     * state$ will become private in an upcoming major version
+     */
+    state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
-        return this.state$.getValue();
+        return this.stateSource.getValue();
     }
 
     constructor(private featureName: string, initialState: StateType) {
@@ -31,11 +35,11 @@ export class FeatureStore<StateType> {
 
         // Select Feature State and delegate to local BehaviorSubject
         const featureSelector = createFeatureSelector<AppState, StateType>(featureName);
-        StoreCore.select(featureSelector).subscribe(this.state$);
+        StoreCore.select(featureSelector).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        const action: Action = {
+        const action: ActionWithPayload = {
             type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
             payload:
                 typeof stateOrCallback === 'function'
@@ -80,7 +84,7 @@ function createDefaultReducer<StateType>(
     nameSpaceFeature: string,
     initialState: StateType
 ): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action) => {
+    return (state: StateType = initialState, action: ActionWithPayload) => {
         // Check for 'set-state' action (originates from FeatureStore.setState())
         if (
             action.type.indexOf(nameSpaceFeature) > -1 &&

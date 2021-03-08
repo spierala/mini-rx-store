@@ -20,6 +20,7 @@ import {
     select,
     storeInitActionType,
 } from './utils';
+import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
 class StoreCore {
     // ACTIONS
@@ -149,12 +150,13 @@ class StoreCore {
     }
 
     config(config: Partial<StoreConfig> = {}) {
-        if (config.extensions && config.extensions.length > 0) {
-            config.extensions.forEach((extension) => this.addExtension(extension));
-        }
-
         if (config.metaReducers && config.metaReducers.length > 0) {
             this.addMetaReducers(...config.metaReducers);
+        }
+
+        if (config.extensions && config.extensions.length > 0) {
+            const sortedExtensions: StoreExtension[] = sortExtensions(config.extensions);
+            sortedExtensions.forEach((extension) => this.addExtension(extension));
         }
 
         if (config.reducers) {
@@ -231,22 +233,10 @@ function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
     }
 }
 
-// Prevent effect to unsubscribe from the actions stream
-// Credits: NgRx: https://github.com/ngrx/platform/blob/9.2.0/modules/effects/src/effects_error_handler.ts
-const MAX_NUMBER_OF_RETRY_ATTEMPTS = 10;
-function defaultEffectsErrorHandler<T extends Action>(
-    observable$: Observable<T>,
-    retryAttemptLeft: number = MAX_NUMBER_OF_RETRY_ATTEMPTS
-): Observable<T> {
-    return observable$.pipe(
-        catchError((error) => {
-            if (retryAttemptLeft <= 1) {
-                return observable$; // last attempt
-            }
-            // Return observable that produces this particular effect
-            return defaultEffectsErrorHandler(observable$, retryAttemptLeft - 1);
-        })
-    );
+function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
+    return [...extensions].sort((a, b) => {
+        return a.sortOrder - b.sortOrder;
+    });
 }
 
 // Created once to initialize singleton
