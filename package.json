@@ -9,16 +9,17 @@
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "test:minirxng:watch": "jest --config ./projects/mini-rx-store-ng/jest.config.js --watch",
+        "minirx-version++": "cd projects/mini-rx-store && npm version prerelease",
+        "minirx-build": "npm run minirx-version++ && ng build mini-rx-store --prod && copy LICENSE dist/mini-rx-store && copy README.md dist/mini-rx-store",
         "test:minirx": "jest --config ./projects/mini-rx-store/jest.config.js",
         "test:minirx:watch": "jest --config ./projects/mini-rx-store/jest.config.js --watch",
         "test:minirx:coverage": "jest --config ./projects/mini-rx-store/jest.config.js --coverage",
-        "pretty-quick": "pretty-quick",
-        "minirx-version++": "cd projects/mini-rx-store && npm version prerelease",
-        "minirx-build": "npm run minirx-version++ && ng build mini-rx-store --prod && copy LICENSE dist/mini-rx-store && copy README.md dist/mini-rx-store",
         "minirx-ng-version++": "cd projects/mini-rx-store-ng && npm version prerelease",
         "minirx-ng-build": "ng build mini-rx-store --prod && npm run minirx-ng-version++ && ng build mini-rx-store-ng --prod",
-        "showcase-analyze": "ng build  mini-rx-store-showcase --outputPath=dist --prod --stats-json && webpack-bundle-analyzer dist/stats-es2015.json --port 4201"
+        "test:minirx-ng": "jest --config ./projects/mini-rx-store-ng/jest.config.js",
+        "test:minirx-ng:watch": "jest --config ./projects/mini-rx-store-ng/jest.config.js --watch",
+        "showcase-analyze": "ng build  mini-rx-store-showcase --outputPath=dist --prod --stats-json && webpack-bundle-analyzer dist/stats-es2015.json --port 4201",
+        "pretty-quick": "pretty-quick"
     },
     "private": true,
     "dependencies": {
