@@ -1,7 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, TestBedStatic } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
 import { Action, Actions, FeatureStore, Store } from 'mini-rx-store';
 import { StoreExtension } from '../../../../mini-rx-store/src/lib/models';
+import { NgModule } from '@angular/core';
 
 interface CounterState {
     counter: number;
@@ -35,10 +36,14 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 }
 
-let store: Store;
+@NgModule({
+    imports: [StoreModule.forFeature('counter4', counterReducer)],
+})
+class Counter4Module {}
 
 describe(`StoreModule`, () => {
     let actions$: Actions;
+    let store: Store;
 
     const rootMetaReducerSpy = jest.fn();
 
@@ -74,6 +79,7 @@ describe(`StoreModule`, () => {
                     metaReducers: [rootMetaReducer],
                     extensions: [new SomeExtension()],
                 }),
+                Counter4Module
             ],
         });
 
@@ -92,10 +98,11 @@ describe(`StoreModule`, () => {
             counter1: { counter: 111 }, // Reducer initial state is overwritten by initial state from forRoot config
             counter2: { counter: 1 }, // Reducer initial state
             counter3: { counter: 333 }, // forRoot config initial state
+            counter4: { counter: 1 },
         });
         expect(spy).toHaveBeenCalledTimes(1);
 
-        expect(rootMetaReducerSpy).toHaveBeenCalledTimes(1);
+        expect(rootMetaReducerSpy).toHaveBeenCalledTimes(2);
         expect(extensionSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -112,45 +119,14 @@ describe(`StoreModule`, () => {
             counter1: { counter: 112 },
             counter2: { counter: 2 },
             counter3: { counter: 333 },
+            counter4: { counter: 2 },
         });
     });
-
-    // describe(`: With slice object`, () => {
-    //     @NgModule({
-    //         imports: [
-    //             StoreModule.forFeature('a', counterReducer),
-    //         ],
-    //     })
-    //     class FeatureAModule {}
-    //
-    //     @NgModule({
-    //         imports: [FeatureAModule],
-    //     })
-    //     class RootModule {}
-    //
-    //     beforeEach(() => {
-    //         TestBed.configureTestingModule({
-    //             imports: [RootModule],
-    //         });
-    //
-    //         store = TestBed.inject(Store);
-    //     });
-    //
-    //     it('should set up a feature state', () => {
-    //         const spy = jest.fn();
-    //         store.select((state) => state).subscribe(spy);
-    //         expect(spy).toHaveBeenCalledWith({
-    //             counter1: { counter: 112 },
-    //             counter2: { counter: 2 },
-    //             counter3: { counter: 333 },
-    //         });
-    //     });
-    // });
 
     describe(`FeatureStore`, () => {
         let fs: CounterFeatureStore;
 
-        it(`should add featureStore`, () => {
+        it(`should add Feature Store`, () => {
             fs = new CounterFeatureStore();
 
             const spy = jest.fn();
@@ -161,6 +137,7 @@ describe(`StoreModule`, () => {
                 counter2: { counter: 2 },
                 counter3: { counter: 333 },
                 counterFs: { counter: 1 },
+                counter4: { counter: 2 },
             });
         });
 
@@ -174,36 +151,8 @@ describe(`StoreModule`, () => {
                 counter2: { counter: 2 },
                 counter3: { counter: 333 },
                 counterFs: { counter: 2 },
+                counter4: { counter: 2 },
             });
         });
     });
 });
-
-// describe(`StoreModule forFeature`, () => {
-//     @NgModule({
-//         imports: [StoreModule.forFeature('counter4', counterReducer)],
-//     })
-//     class Counter4Module {}
-//
-//     beforeAll(() => {
-//         TestBed.configureTestingModule(
-//             {
-//                 imports: [
-//                     Counter4Module
-//                 ]
-//             }
-//         )
-//     });
-//
-//     it(`should add reducer dynamically`, () => {
-//         const spy = jest.fn();
-//         store.select((state) => state).subscribe(spy);
-//         expect(spy).toHaveBeenCalledWith({
-//             counter1: { counter: 112 },
-//             counter2: { counter: 2 },
-//             counter3: { counter: 333 },
-//             counterFs: { counter: 2},
-//             // counter4: { counter: 1 },
-//         });
-//     });
-// });
