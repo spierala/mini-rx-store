@@ -1,8 +1,42 @@
 import { TestBed, TestBedStatic } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
-import { Action, Actions, FeatureStore, Store } from 'mini-rx-store';
+import { Action, Actions, FeatureStore, ofType, Store } from 'mini-rx-store';
 import { StoreExtension } from '../../../../mini-rx-store/src/lib/models';
-import { NgModule } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
+import { catchError, map, mergeMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ajax } from 'rxjs/ajax';
+import { EffectsModule } from 'mini-rx-store-ng';
+
+export const loadAction: Action = {
+    type: 'LOAD'
+}
+
+export const loadSuccessAction: Action = {
+    type: 'LOAD_SUCCESS'
+}
+
+export const loadFailAction: Action = {
+    type: 'LOAD_FAIL'
+}
+
+@Injectable({providedIn: 'root'})
+export class TodoEffects {
+    loadTodos$ = this.actions$.pipe(
+        ofType(loadAction.type),
+        mergeMap(() =>
+            of('some result').pipe(
+                map(res => loadSuccessAction),
+                catchError(err => of(loadFailAction))
+            )
+        )
+    );
+
+    constructor(
+        private actions$: Actions
+    ) {
+    }
+}
 
 interface CounterState {
     counter: number;
@@ -79,7 +113,8 @@ describe(`StoreModule`, () => {
                     metaReducers: [rootMetaReducer],
                     extensions: [new SomeExtension()],
                 }),
-                Counter4Module
+                Counter4Module,
+                EffectsModule.register([TodoEffects]),
             ],
         });
 
@@ -121,6 +156,16 @@ describe(`StoreModule`, () => {
             counter3: { counter: 333 },
             counter4: { counter: 2 },
         });
+    });
+
+    it(`should run effect`, () => {
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+
+        store.dispatch(loadAction);
+
+        expect(spy).toHaveBeenCalledWith(loadAction);
+        expect(spy).toHaveBeenCalledWith(loadSuccessAction);
     });
 
     describe(`FeatureStore`, () => {
