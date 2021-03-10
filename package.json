@@ -18,6 +18,7 @@
         "minirx-ng-build": "ng build mini-rx-store --prod && npm run minirx-ng-version++ && ng build mini-rx-store-ng --prod",
         "test:minirx-ng": "jest --config ./projects/mini-rx-store-ng/jest.config.js",
         "test:minirx-ng:watch": "jest --config ./projects/mini-rx-store-ng/jest.config.js --watch",
+        "test:minirx-ng:coverage": "jest --config ./projects/mini-rx-store-ng/jest.config.js --coverage",
         "showcase-analyze": "ng build  mini-rx-store-showcase --outputPath=dist --prod --stats-json && webpack-bundle-analyzer dist/stats-es2015.json --port 4201",
         "pretty-quick": "pretty-quick"
     },

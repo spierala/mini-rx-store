@@ -1,12 +1,10 @@
-import { TestBed, TestBedStatic } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
-import { Action, Actions, FeatureStore, ofType, Store } from 'mini-rx-store';
-import { StoreExtension } from '../../../../mini-rx-store/src/lib/models';
+import { Action, Actions, FeatureStore, ofType, Store, StoreExtension } from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import { EffectsModule } from 'mini-rx-store-ng';
+import { EffectsModule } from '../effects.module';
 
 export const loadAction: Action = {
     type: 'LOAD'
@@ -75,7 +73,7 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
 })
 class Counter4Module {}
 
-describe(`StoreModule`, () => {
+describe(`Ng Modules`, () => {
     let actions$: Actions;
     let store: Store;
 
