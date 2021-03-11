@@ -12,7 +12,9 @@ import {
 export const STORE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/store-config');
 export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature-name');
 export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature-reducer');
-export const FEATURE_CONFIG = new InjectionToken<FeatureStoreConfig<any>>('@mini-rx/feature-store-config');
+export const FEATURE_CONFIG = new InjectionToken<FeatureStoreConfig<any>>(
+    '@mini-rx/feature-store-config'
+);
 
 export function storeFactory(config: StoreConfig) {
     return configureStore(config);
@@ -21,7 +23,6 @@ export function storeFactory(config: StoreConfig) {
 @NgModule()
 export class StoreRootModule {
     constructor(
-        // TODO is this really necessary?
         private store: Store // Make sure store is initialized also if it is NOT injected in other services/components
     ) {}
 }
