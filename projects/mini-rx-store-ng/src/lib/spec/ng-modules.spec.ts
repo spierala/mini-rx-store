@@ -18,24 +18,6 @@ export const loadFailAction: Action = {
     type: 'LOAD_FAIL'
 }
 
-@Injectable({providedIn: 'root'})
-export class TodoEffects {
-    loadTodos$ = this.actions$.pipe(
-        ofType(loadAction.type),
-        mergeMap(() =>
-            of('some result').pipe(
-                map(res => loadSuccessAction),
-                catchError(err => of(loadFailAction))
-            )
-        )
-    );
-
-    constructor(
-        private actions$: Actions
-    ) {
-    }
-}
-
 interface CounterState {
     counter: number;
 }
@@ -56,6 +38,48 @@ function counterReducer(state: CounterState = counterInitialState, action: Actio
     }
 }
 
+@NgModule({
+    imports: [StoreModule.forFeature<CounterState>('counter4', counterReducer)],
+})
+class Counter4Module {}
+
+const featureMetaReducerSpy = jest.fn();
+
+function featureMetaReducer(reducer) {
+    return (state, action) => {
+        featureMetaReducerSpy(state);
+        return reducer(state, action);
+    };
+}
+
+@NgModule({
+    imports: [StoreModule.forFeature<CounterState>('counter5', counterReducer, {
+        initialState: {
+            counter: 555,
+        },
+        metaReducers: [featureMetaReducer]
+    })],
+})
+class Counter5Module {}
+
+@Injectable({providedIn: 'root'})
+export class TodoEffects {
+    loadTodos$ = this.actions$.pipe(
+        ofType(loadAction.type),
+        mergeMap(() =>
+            of('some result').pipe(
+                map(res => loadSuccessAction),
+                catchError(err => of(loadFailAction))
+            )
+        )
+    );
+
+    constructor(
+        private actions$: Actions
+    ) {
+    }
+}
+
 class CounterFeatureStore extends FeatureStore<CounterState> {
     constructor() {
         super('counterFs', counterInitialState);
@@ -67,11 +91,6 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
         }));
     }
 }
-
-@NgModule({
-    imports: [StoreModule.forFeature('counter4', counterReducer)],
-})
-class Counter4Module {}
 
 describe(`Ng Modules`, () => {
     let actions$: Actions;
@@ -97,6 +116,8 @@ describe(`Ng Modules`, () => {
     beforeAll(() => {
         TestBed.configureTestingModule({
             imports: [
+                Counter4Module,
+                EffectsModule.register([TodoEffects]),
                 StoreModule.forRoot({
                     reducers: {
                         counter1: counterReducer,
@@ -111,8 +132,7 @@ describe(`Ng Modules`, () => {
                     metaReducers: [rootMetaReducer],
                     extensions: [new SomeExtension()],
                 }),
-                Counter4Module,
-                EffectsModule.register([TodoEffects]),
+                Counter5Module
             ],
         });
 
@@ -132,10 +152,12 @@ describe(`Ng Modules`, () => {
             counter2: { counter: 1 }, // Reducer initial state
             counter3: { counter: 333 }, // forRoot config initial state
             counter4: { counter: 1 },
+            counter5: { counter: 555 }, // forFeature config initial state
         });
         expect(spy).toHaveBeenCalledTimes(1);
 
-        expect(rootMetaReducerSpy).toHaveBeenCalledTimes(2);
+        expect(rootMetaReducerSpy).toHaveBeenCalledTimes(3);
+        expect(featureMetaReducerSpy).toHaveBeenCalledTimes(1);
         expect(extensionSpy).toHaveBeenCalledTimes(1);
     });
 
@@ -153,7 +175,11 @@ describe(`Ng Modules`, () => {
             counter2: { counter: 2 },
             counter3: { counter: 333 },
             counter4: { counter: 2 },
+            counter5: { counter: 556 },
         });
+
+        expect(rootMetaReducerSpy).toHaveBeenCalledTimes(4);
+        expect(featureMetaReducerSpy).toHaveBeenCalledTimes(2);
     });
 
     it(`should run effect`, () => {
@@ -181,6 +207,7 @@ describe(`Ng Modules`, () => {
                 counter3: { counter: 333 },
                 counterFs: { counter: 1 },
                 counter4: { counter: 2 },
+                counter5: { counter: 556 },
             });
         });
 
@@ -195,6 +222,7 @@ describe(`Ng Modules`, () => {
                 counter3: { counter: 333 },
                 counterFs: { counter: 2 },
                 counter4: { counter: 2 },
+                counter5: { counter: 556 },
             });
         });
     });
