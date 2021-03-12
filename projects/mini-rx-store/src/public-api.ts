@@ -12,6 +12,7 @@ export {
     ReducerDictionary,
     StoreConfig,
     FeatureStoreConfig,
+    StoreExtension
 } from './lib/models';
 export { ofType } from './lib/utils';
 export {

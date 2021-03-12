@@ -46,3 +46,5 @@ testem.log
 Thumbs.db
 projects/mini-rx-store/node_modules/
 projects/mini-rx-store/coverage/
+docs/node_modules/
+docs/.docusaurus/
