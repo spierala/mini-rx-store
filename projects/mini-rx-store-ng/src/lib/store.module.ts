@@ -10,9 +10,9 @@ import {
 } from 'mini-rx-store';
 
 export const STORE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/store-config');
-export const FEATURE_NAME = new InjectionToken<string>('@mini-rx/feature-name');
-export const FEATURE_REDUCER = new InjectionToken<Reducer<any>>('@mini-rx/feature-reducer');
-export const FEATURE_CONFIG = new InjectionToken<FeatureStoreConfig<any>>(
+export const FEATURE_NAMES = new InjectionToken<string[]>('@mini-rx/feature-name');
+export const FEATURE_REDUCERS = new InjectionToken<Reducer<any>[]>('@mini-rx/feature-reducer');
+export const FEATURE_CONFIGS = new InjectionToken<FeatureStoreConfig<any>[]>(
     '@mini-rx/feature-store-config'
 );
 
@@ -32,11 +32,13 @@ export class StoreFeatureModule {
     constructor(
         private store: Store,
         root: StoreRootModule, // Prevent feature states to be initialized before root state
-        @Inject(FEATURE_NAME) featureName: string,
-        @Inject(FEATURE_REDUCER) reducer: Reducer<any>,
-        @Inject(FEATURE_CONFIG) config: FeatureStoreConfig<any>
+        @Inject(FEATURE_NAMES) featureNames: string[],
+        @Inject(FEATURE_REDUCERS) reducers: Reducer<any[]>,
+        @Inject(FEATURE_CONFIGS) configs: FeatureStoreConfig<any[]>
     ) {
-        this.store.feature(featureName, reducer, config);
+        featureNames.forEach((featureName, index) => {
+            this.store.feature(featureName, reducers[index], configs[index]);
+        });
     }
 }
 
@@ -68,9 +70,9 @@ export class StoreModule {
         return {
             ngModule: StoreFeatureModule,
             providers: [
-                { provide: FEATURE_NAME, useValue: featureName },
-                { provide: FEATURE_REDUCER, useValue: reducer },
-                { provide: FEATURE_CONFIG, useValue: config },
+                { provide: FEATURE_NAMES, multi: true, useValue: featureName },
+                { provide: FEATURE_REDUCERS, multi: true, useValue: reducer },
+                { provide: FEATURE_CONFIGS, multi: true, useValue: config },
             ],
         };
     }
