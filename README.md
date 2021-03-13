@@ -180,6 +180,9 @@ store.select(state => state).subscribe(console.log);
 //OUTPUT: {"counter":{"count":2},"counterFs":{"counter":12}}
 ```
 
+## MiniRx Blog Posts:
+- [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
+
 ## References
 
 These projects, articles and courses helped and inspired us to create MiniRx:
