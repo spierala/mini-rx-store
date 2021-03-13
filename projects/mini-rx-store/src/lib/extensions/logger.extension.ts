@@ -12,12 +12,10 @@ function loggerMetaReducer(reducer) {
         const nextState = reducer(state, action);
 
         console.log(
-            '%cACTION',
-            'font-weight: bold; color: #ff9900',
-            '\nType:',
-            action.type,
-            '\nPayload: ',
-            action.payload,
+            '%c' + action.type,
+            'color: #25c2a0',
+            '\nAction:',
+            action,
             '\nState: ',
             nextState
         );
