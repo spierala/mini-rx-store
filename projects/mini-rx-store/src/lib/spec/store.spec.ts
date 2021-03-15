@@ -263,101 +263,104 @@ describe('Store Config', () => {
             expect(callOrder).toEqual(['meta1', 'meta3', 'meta2']);
         });
 
-        it('should run reducers in order: ' +
-            '1.) root meta reducers ' +
-            '2.) root meta reducers from extensions' +
-            '3.) feature meta reducers, ' +
-            '4.) feature reducer', () => {
-            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
-                return (state, action) => {
-                    if (action.type === 'metaTest') {
-                        state = {
-                            ...state,
-                            metaTestFeature: state.metaTestFeature + 'x',
-                        };
-                    }
+        it(
+            'should run reducers in order: ' +
+                '1.) root meta reducers ' +
+                '2.) root meta reducers from extensions' +
+                '3.) feature meta reducers, ' +
+                '4.) feature reducer',
+            () => {
+                function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+                    return (state, action) => {
+                        if (action.type === 'metaTest') {
+                            state = {
+                                ...state,
+                                metaTestFeature: state.metaTestFeature + 'x',
+                            };
+                        }
 
-                    return reducer(state, action);
-                };
-            }
-
-            class Extension extends StoreExtension {
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                        return reducer(state, action);
+                    };
                 }
-            }
 
-            function aFeatureReducer(state: string = 'a', action: Action): string {
-                switch (action.type) {
-                    case 'metaTest':
-                        return state + 'e';
-                    default:
-                        return state;
+                class Extension extends StoreExtension {
+                    init(): void {
+                        StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                    }
                 }
-            }
 
-            function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
-                return (state, action) => {
-                    if (action.type === 'metaTest') {
-                        state = {
-                            ...state,
-                            metaTestFeature: state.metaTestFeature + 'b',
-                        };
+                function aFeatureReducer(state: string = 'a', action: Action): string {
+                    switch (action.type) {
+                        case 'metaTest':
+                            return state + 'e';
+                        default:
+                            return state;
                     }
+                }
 
-                    return reducer(state, action);
-                };
+                function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
+                    return (state, action) => {
+                        if (action.type === 'metaTest') {
+                            state = {
+                                ...state,
+                                metaTestFeature: state.metaTestFeature + 'b',
+                            };
+                        }
+
+                        return reducer(state, action);
+                    };
+                }
+
+                function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
+                    return (state, action) => {
+                        if (action.type === 'metaTest') {
+                            state = {
+                                ...state,
+                                metaTestFeature: state.metaTestFeature + 'c',
+                            };
+                        }
+
+                        return reducer(state, action);
+                    };
+                }
+
+                function inTheMiddleRootMetaReducer(reducer) {
+                    return (state, action) => {
+                        const nextState = reducer(state, action);
+
+                        nextStateSpy(nextState);
+
+                        return reducer(state, action);
+                    };
+                }
+
+                function featureMetaReducer(reducer: Reducer<string>): Reducer<string> {
+                    return (state, action) => {
+                        if (action.type === 'metaTest') {
+                            state = state + 'd';
+                        }
+
+                        return reducer(state, action);
+                    };
+                }
+
+                const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+
+                StoreCore.config({
+                    metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
+                    extensions: [new Extension()],
+                });
+
+                StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
+                    metaReducers: [featureMetaReducer],
+                });
+
+                const spy = jest.fn();
+                StoreCore.select(getMetaTestFeature).subscribe(spy);
+                StoreCore.dispatch({ type: 'metaTest' });
+                expect(spy).toHaveBeenCalledWith('abcxde');
             }
-
-            function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
-                return (state, action) => {
-                    if (action.type === 'metaTest') {
-                        state = {
-                            ...state,
-                            metaTestFeature: state.metaTestFeature + 'c',
-                        };
-                    }
-
-                    return reducer(state, action);
-                };
-            }
-
-            function inTheMiddleRootMetaReducer(reducer) {
-                return (state, action) => {
-                    const nextState = reducer(state, action);
-
-                    nextStateSpy(nextState);
-
-                    return reducer(state, action);
-                };
-            }
-
-            function featureMetaReducer(reducer: Reducer<string>): Reducer<string> {
-                return (state, action) => {
-                    if (action.type === 'metaTest') {
-                        state = state + 'd';
-                    }
-
-                    return reducer(state, action);
-                };
-            }
-
-            const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
-
-            StoreCore.config({
-                metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
-                extensions: [new Extension()]
-            });
-
-            StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
-                metaReducers: [featureMetaReducer],
-            });
-
-            const spy = jest.fn();
-            StoreCore.select(getMetaTestFeature).subscribe(spy);
-            StoreCore.dispatch({ type: 'metaTest' });
-            expect(spy).toHaveBeenCalledWith('abcxde');
-        });
+        );
 
         it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
             expect(nextStateSpy).toHaveBeenCalledWith(
@@ -514,21 +517,21 @@ describe('Store', () => {
             user,
         };
 
-        store._addExtension(new LoggerExtension());
-
-        store.dispatch({
+        const action: Action = {
             type: 'updateUser',
             payload: user,
-        });
+        };
+
+        store._addExtension(new LoggerExtension());
+
+        store.dispatch(action);
 
         expect(console.log).toHaveBeenCalledWith(
-            expect.stringContaining('ACTION'),
-            expect.anything(),
-            expect.stringContaining('Type'),
-            expect.stringContaining('updateUser'),
-            expect.stringContaining('Payload'),
-            user,
-            expect.stringContaining('State'),
+            expect.stringContaining('%cupdateUser'),
+            expect.stringContaining('color: #25c2a0'),
+            expect.stringContaining('Action:'),
+            action,
+            expect.stringContaining('State: '),
             newState
         );
     });
