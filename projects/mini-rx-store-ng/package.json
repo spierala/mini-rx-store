@@ -12,7 +12,7 @@
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
-    "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/projects/mini-rx-store-ng/README.md",
     "description": "Angular friendly API for MiniRx Store",
     "keywords": [
         "RxJS",

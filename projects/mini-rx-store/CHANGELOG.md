@@ -1,3 +1,11 @@
+# 2.0.0-beta.4 (2021-03-15)
+
+### Bugfixes
+* LoggerExtension: log action instead of action.payload
+
+### Refactor
+* FeatureStore state$: expose state as Observable
+
 # 2.0.0-beta.3 (2021-02-19)
 
 ### BREAKING CHANGES

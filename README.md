@@ -7,8 +7,6 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-> **ℹ Version 2:** Currently we are working on version 2 of mini-rx-store. Please let us know if you have ideas for features that you wish to see in mini-rx-store@2.  See discussion here: https://github.com/spierala/mini-rx-store/discussions/19
-
 # MiniRx Store 2 (beta)
 
 ### FOR 1.X PLEASE GO TO [THE 1.x BRANCH](https://github.com/spierala/mini-rx-store/tree/1.x)
@@ -35,7 +33,7 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
     -   `select()` read feature state
     -   `effect()` run side effects like API calls and update feature state
     -   `undo()` easily undo setState actions
--   [Extensions](https://spierala.github.io/mini-rx-store/docs/effects-for-feature-store):
+-   [Extensions](https://spierala.github.io/mini-rx-store/docs/ext-quick-start):
     - Redux Dev Tools Extension: Inspect State with the Redux Dev Tools
     - Immutable Extension: Enforce immutability
     - Undo Extension: Undo dispatched Actions
@@ -45,10 +43,11 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 -   [Angular Integration](https://spierala.github.io/mini-rx-store/docs/angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
 
 ## Key Concepts
+- The store is a single object which holds the global application state. It is the "single source of truth"
 - State is exposed as RxJS Observable
-- State has a flat hierarchy and is divided into "features" (also called "slices" in Redux world)
-- For each "feature" we can decide to use the **Redux API** with actions and reducers or the **FeatureStore API** with `setState`
-- State is read-only and can only be changed by dispatching actions (Redux API) or by using setState (FeatureStore)
+- State has a flat hierarchy and is divided into "feature states" (also called "slices" in Redux world)
+- For each "feature state" we can decide to use the **Redux API** with actions and a reducer or the **Feature Store API** with `setState`
+- State is read-only (immutable) and can only be changed by dispatching actions (Redux API) or by using setState (Feature Store API)
 
 ## Installation
 Install from the NPM repository using npm:
