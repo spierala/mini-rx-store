@@ -71,6 +71,8 @@ describe('Immutable State Extension', () => {
     const featureSelector = createFeatureSelector<CounterState>('immutableCounter2');
     let counterStateRaw: CounterState;
 
+    const fs: FeatureStore<CounterState> = createFeatureStore('fsImmutable', counterInitialState);
+
     beforeAll(() => {
         store._addExtension(new ImmutableStateExtension());
         store.feature<CounterState>('immutableCounter2', counterReducerWithMutation);
@@ -109,8 +111,6 @@ describe('Immutable State Extension', () => {
     });
 
     it('should throw when mutating state in a FeatureStore', () => {
-        const fs: FeatureStore<CounterState> = createFeatureStore('fsImmutable', counterInitialState);
-
         function updateCount() {
             fs.setState(state => {
                 state.counter = 123;
@@ -120,5 +120,13 @@ describe('Immutable State Extension', () => {
 
         expect(() => updateCount()).toThrow(TypeError);
         expect(() => (fs.state.counter = 123)).toThrow(TypeError);
+    });
+
+    it('should throw when mutating selected state from a FeatureStore', () => {
+        let selectedFeatureState: CounterState;
+
+        fs.select().subscribe(state => selectedFeatureState = state);
+
+        expect(() => (selectedFeatureState.counter = 123)).toThrow();
     });
 });
