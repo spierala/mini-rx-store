@@ -1,10 +1,7 @@
 {
     "name": "mini-rx-store",
-    "version": "2.0.0-beta.4",
+    "version": "2.0.0",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
-    "peerDependencies": {
-        "rxjs": ">= 6.4.0 < 7"
-    },
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
     "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
@@ -30,5 +27,8 @@
     "dependencies": {
         "memoize-one": "^5.1.1",
         "deep-freeze-strict": "^1.1.1"
+    },
+    "peerDependencies": {
+        "rxjs": ">= 6.4.0 < 7"
     }
 }

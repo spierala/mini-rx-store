@@ -7,16 +7,14 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Store 2 (beta)
-
-### FOR 1.X PLEASE GO TO [THE 1.x BRANCH](https://github.com/spierala/mini-rx-store/tree/1.x)
+# MiniRx Store
 
 **MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
 It is a global, application-wide solution to manage state and is powered by [RxJS](https://rxjs.dev/).
 
 
-- 🤓 Learn about it on the [docs site](https://spierala.github.io/mini-rx-store/)
-- 🚀 See it in action on [StackBlitz](https://stackblitz.com/edit/mini-rx-angular-todos?file=src%2Fapp%2Fmodules%2Ftodo%2Fservices%2Ftodos-state.service.ts)
+- 🤓 Learn about MiniRx on the [docs site](https://spierala.github.io/mini-rx-store)
+- 🚀 See MiniRx in action on [StackBlitz](https://stackblitz.com/edit/mini-rx-store-demo)
 
 ## What's Included
 -   RxJS powered global state management
@@ -43,17 +41,17 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 -   [Angular Integration](https://spierala.github.io/mini-rx-store/docs/angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
 
 ## Key Concepts
-- The store is a single object which holds the global application state. It is the "single source of truth"
-- State is exposed as RxJS Observable
-- State has a flat hierarchy and is divided into "feature states" (also called "slices" in Redux world)
+- The store is a single object which holds the global application state. It is the **"single source of truth"**
+- State is exposed as **RxJS Observable**
+- State has a **flat hierarchy** and is divided into "feature states" (also called "slices" in Redux world)
 - For each "feature state" we can decide to use the **Redux API** with actions and a reducer or the **Feature Store API** with `setState`
-- State is read-only (immutable) and can only be changed by dispatching actions (Redux API) or by using setState (Feature Store API)
+- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using setState (Feature Store API)
 
 ## Installation
 Install from the NPM repository using npm:
 
 ```
-npm install mini-rx-store@beta
+npm install mini-rx-store
 ```
 
 Install the RxJS peer dependency:
@@ -61,12 +59,11 @@ Install the RxJS peer dependency:
 npm install rxjs
 ```
 
-
 ## Basic Tutorial
 Let's dive into some code to see MiniRx in action
 
 ### Store (Redux API)
-MiniRx supports the classic Redux API with registering reducers and dispatching Actions.
+MiniRx supports the classic Redux API with registering reducers and dispatching actions.
 Observable state can be selected with memoized selectors.
 
 ```ts
@@ -115,7 +112,7 @@ const getCount = createSelector(
 
 // 6.) Select state as RxJS Observable
 const count$: Observable<number> = store.select(getCount);
-count$.subscribe(count => console.log('count:', count));
+count$.subscribe(count => console.log("count:", count));
 
 // 7.) Dispatch an action
 store.dispatch({ type: "inc" });
@@ -169,9 +166,9 @@ counterFs.inc();
 // OUTPUT: count: 12
 ```
 
-**ℹ The FeatureStore states become part of the global state too.**
+**ℹ The state of a Feature Store becomes part of the global state**
 
-Both the Redux feature state and the FeatureStore state are living next to each other in the global state object:
+Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs').
 
 ```ts
 store.select(state => state).subscribe(console.log);
