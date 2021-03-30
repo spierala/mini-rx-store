@@ -9,8 +9,9 @@
 
 # MiniRx Store
 
-**MiniRx Store** provides Reactive State Management for Javascript Applications inspired by [Redux](https://redux.js.org/).
-It is a global, application-wide solution to manage state and is powered by [RxJS](https://rxjs.dev/).
+MiniRx Store provides **Reactive State Management** for JavaScript and TypeScript applications.
+It is a **global**, application-wide solution to manage state and is powered by [**RxJS**](https://rxjs.dev/).
+MiniRx will help you to manage state at large scale (with the **Redux** pattern), but it also offers a simple form of state management: **Feature Stores**.
 
 
 - 🤓 Learn about MiniRx on the [docs site](https://spierala.github.io/mini-rx-store)
