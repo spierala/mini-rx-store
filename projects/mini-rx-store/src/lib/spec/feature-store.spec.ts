@@ -296,4 +296,18 @@ describe('FeatureStore', () => {
 
         expect(spy).toHaveBeenCalledWith(2);
     });
+
+    it('should remove the feature state when Feature Store is destroyed', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
+            'tempFsState',
+            counterInitialState
+        );
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(expect.objectContaining({ tempFsState: counterInitialState }));
+
+        fs.destroy();
+        expect(spy).toHaveBeenCalledWith(expect.not.objectContaining({ tempCounter: counterInitialState }));
+    });
 });

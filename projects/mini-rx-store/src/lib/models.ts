@@ -55,4 +55,6 @@ export type Reducer<StateType> = (state: StateType, action: Action) => StateType
 
 export type MetaReducer<StateType> = (reducer: Reducer<any>) => Reducer<StateType>;
 
-export type ReducerDictionary = { [key: string]: Reducer<any> };
+export interface ReducerDictionary { [key: string]: Reducer<any>; }
+
+export type ReducerMap = Map<string, Reducer<any>>;

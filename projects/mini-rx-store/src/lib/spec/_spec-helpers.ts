@@ -7,7 +7,7 @@ export const store: Store = configureStore({});
 export function resetStoreConfig() {
     StoreCore['extensions'] = [];
     StoreCore['metaReducersSource'].next([]);
-    StoreCore['reducersSource'].next({});
+    StoreCore['reducersSource'].next(new Map());
 }
 
 export interface CounterState {
