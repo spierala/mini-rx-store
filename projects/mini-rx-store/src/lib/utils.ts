@@ -1,6 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, AppState, MetaReducer, Reducer, ReducerDictionary, ReducerMap } from './models';
+import { Action, AppState, MetaReducer, Reducer, ReducerDictionary } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -17,32 +17,26 @@ export function select<T, K>(mapFn: (state: T) => K) {
     );
 }
 
-export function createFeatureReducer(featureName: string, reducer: Reducer<any>): Reducer<AppState> {
+export function combineReducers(reducers: ReducerDictionary): Reducer<AppState> {
+    const reducerKeys = Object.keys(reducers);
+    const reducerKeyLength = reducerKeys.length;
+
     return (state: AppState = {}, action: Action): AppState => {
-        const newFeatureState: any = reducer(state[featureName], action);
-        if (newFeatureState !== state[featureName]) {
-            // Only return a new AppState if the feature state changed
-            return {
-                ...state,
-                [featureName]: newFeatureState,
-            };
+        const stateKeysLength = Object.keys(state).length;
+
+        let hasChanged = stateKeysLength !== reducerKeyLength;
+        const nextState: AppState = {};
+
+        for (let i = 0; i < reducerKeyLength; i++) {
+            const key = reducerKeys[i];
+            const reducer: any = reducers[key];
+            const previousStateForKey = state[key];
+            const nextStateForKey = reducer(previousStateForKey, action);
+
+            nextState[key] = nextStateForKey;
+            hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
         }
-        return state;
-    };
-}
-
-export function combineReducers(reducers: ReducerMap): Reducer<AppState> {
-    return (state: AppState = {}, action: Action): AppState => {
-        const keyToDelete = Object.keys(state).find(key => !reducers.has(key));
-
-        const newState = Array.from(reducers).reduce((currState: AppState, [, reducer]) => {
-            return reducer(currState, action);
-        }, state);
-
-        if (keyToDelete) {
-            return omit(newState, keyToDelete);
-        }
-        return newState;
+        return hasChanged ? nextState : state;
     };
 }
 

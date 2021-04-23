@@ -6,8 +6,7 @@ import {
     ActionWithMeta,
     AppState,
     MetaReducer,
-    Reducer,
-    ReducerMap,
+    Reducer, ReducerDictionary,
     StoreConfig,
     StoreExtension,
 } from './models';
@@ -15,8 +14,8 @@ import { map, observeOn, tap, withLatestFrom } from 'rxjs/operators';
 import {
     combineMetaReducers,
     combineReducers,
-    createActionTypePrefix, createFeatureReducer,
-    miniRxError,
+    createActionTypePrefix,
+    miniRxError, omit,
     select,
     storeInitActionType,
 } from './utils';
@@ -39,10 +38,10 @@ class StoreCore {
         map((metaReducers) => combineMetaReducers(metaReducers))
     );
 
-    // REDUCER DICTIONARY
-    private reducersSource: BehaviorSubject<ReducerMap> = new BehaviorSubject(new Map());
+    // FEATURE REDUCER DICTIONARY
+    private reducersSource: BehaviorSubject<ReducerDictionary> = new BehaviorSubject({});
 
-    // COMBINED REDUCERS
+    // COMBINED FEATURE REDUCERS
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
         map((reducers) => combineReducers(reducers))
     );
@@ -58,7 +57,6 @@ class StoreCore {
                 withLatestFrom(
                     this.state$,
                     this.combinedReducer$,
-                    this.reducersSource,
                     this.combinedMetaReducer$
                 ),
                 tap(
@@ -66,32 +64,16 @@ class StoreCore {
                          actionWithMeta,
                          state,
                          combinedReducer,
-                         reducerMap,
                          combinedMetaReducer,
                      ]: [
                         ActionWithMeta,
                         AppState,
                         Reducer<AppState>,
-                        ReducerMap,
                         MetaReducer<AppState>
                     ]) => {
-                        const onlyForFeature: string =
-                            actionWithMeta.meta && actionWithMeta.meta.onlyForFeature;
                         const action: Action = actionWithMeta.action;
-
-                        let reducer: Reducer<AppState>;
-                        if (onlyForFeature) {
-                            // FeatureStore setState Actions only have to go through their own (default) reducer
-                            reducer = reducerMap.get(onlyForFeature);
-                        } else {
-                            reducer = combinedReducer;
-                        }
-
-                        const reducerWithMetaReducers: Reducer<AppState> = combinedMetaReducer(
-                            reducer
-                        );
-
-                        const newState: AppState = reducerWithMetaReducers(state, action);
+                        const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
+                        const newState: AppState = reducer(state, action);
                         this.updateState(newState);
                     }
                 )
@@ -107,12 +89,11 @@ class StoreCore {
         featureName: string,
         reducer: Reducer<StateType>,
         config: {
-            isDefaultReducer?: boolean;
             metaReducers?: MetaReducer<StateType>[];
             initialState?: StateType;
         } = {}
     ) {
-        const {isDefaultReducer, metaReducers, initialState} = config;
+        const {metaReducers, initialState} = config;
 
         reducer =
             metaReducers && metaReducers.length > 0
@@ -126,18 +107,10 @@ class StoreCore {
         }
 
         const actionTypePrefix = createActionTypePrefix(featureName);
-        const featureReducer: Reducer<AppState> = createFeatureReducer(featureName, reducer);
 
-        this.addReducer(featureName, featureReducer);
+        this.addReducer(featureName, reducer);
 
-        // Dispatch an initial action to let reducers create the initial state
-        const onlyForFeature: string = isDefaultReducer ? featureName : undefined;
-        this.dispatch(
-            {
-                type: `${actionTypePrefix}/init`,
-            },
-            {onlyForFeature} // Dispatch only for the feature´s own reducer (in case of using a FeatureStore with default reducer)
-        );
+        this.dispatch({type: `${actionTypePrefix}/init`});
     }
 
     removeFeature(featureName: string) {
@@ -163,12 +136,7 @@ class StoreCore {
         if (config.reducers) {
             Object.keys(config.reducers).forEach((featureName) => {
                 checkFeatureExists(featureName, this.reducersSource.getValue());
-                const featureReducer: Reducer<AppState> = createFeatureReducer(
-                    featureName,
-                    config.reducers[featureName]
-                );
-
-                this.addReducer(featureName, featureReducer);
+                this.addReducer(featureName, config.reducers[featureName]);
             });
         }
 
@@ -203,13 +171,12 @@ class StoreCore {
 
     private addReducer(featureName: string, reducer: Reducer<any>) {
         const reducers = this.reducersSource.getValue();
-        reducers.set(featureName, reducer);
+        this.reducersSource.getValue()[featureName] = reducer;
         this.reducersSource.next(reducers);
     }
 
     private removeReducer(featureName: string) {
-        const reducers: ReducerMap = this.reducersSource.getValue();
-        reducers.delete(featureName);
+        const reducers: ReducerDictionary = omit(this.reducersSource.getValue(), featureName);
         this.reducersSource.next(reducers);
     }
 }
@@ -223,8 +190,8 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function checkFeatureExists(featureName: string, reducers: ReducerMap) {
-    if (reducers.has(featureName)) {
+function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
+    if (reducers.hasOwnProperty(featureName)) {
         miniRxError(`Feature "${featureName}" already exists.`);
     }
 }
@@ -237,3 +204,4 @@ function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
 
 // Created once to initialize singleton
 export default new StoreCore();
+

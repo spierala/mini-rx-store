@@ -33,9 +33,7 @@ export class FeatureStore<StateType> {
     constructor(private _featureName: string, initialState: StateType) {
         const actionTypePrefix = createActionTypePrefix(_featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
-        StoreCore.addFeature<StateType>(_featureName, reducer, {
-            isDefaultReducer: true,
-        });
+        StoreCore.addFeature<StateType>(_featureName, reducer);
 
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
@@ -56,7 +54,7 @@ export class FeatureStore<StateType> {
                     : stateOrCallback,
         };
 
-        StoreCore.dispatch(action, { onlyForFeature: this._featureName });
+        StoreCore.dispatch(action);
 
         return action;
     }

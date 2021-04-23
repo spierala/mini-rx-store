@@ -125,9 +125,6 @@ describe(`Ng Modules`, () => {
                     },
                     initialState: {
                         counter1: { counter: 111 },
-                        counter3: {
-                            counter: 333,
-                        },
                     },
                     metaReducers: [rootMetaReducer],
                     extensions: [new SomeExtension()],
@@ -150,7 +147,6 @@ describe(`Ng Modules`, () => {
         expect(spy).toHaveBeenCalledWith({
             counter1: { counter: 111 }, // Reducer initial state is overwritten by initial state from forRoot config
             counter2: { counter: 1 }, // Reducer initial state
-            counter3: { counter: 333 }, // forRoot config initial state
             counter4: { counter: 1 },
             counter5: { counter: 555 }, // forFeature config initial state
         });
@@ -173,7 +169,6 @@ describe(`Ng Modules`, () => {
         expect(spy).toHaveBeenCalledWith({
             counter1: { counter: 112 },
             counter2: { counter: 2 },
-            counter3: { counter: 333 },
             counter4: { counter: 2 },
             counter5: { counter: 556 },
         });
@@ -204,7 +199,6 @@ describe(`Ng Modules`, () => {
             expect(spy).toHaveBeenCalledWith({
                 counter1: { counter: 112 },
                 counter2: { counter: 2 },
-                counter3: { counter: 333 },
                 counterFs: { counter: 1 },
                 counter4: { counter: 2 },
                 counter5: { counter: 556 },
@@ -219,7 +213,6 @@ describe(`Ng Modules`, () => {
             expect(spy).toHaveBeenCalledWith({
                 counter1: { counter: 112 },
                 counter2: { counter: 2 },
-                counter3: { counter: 333 },
                 counterFs: { counter: 2 },
                 counter4: { counter: 2 },
                 counter5: { counter: 556 },

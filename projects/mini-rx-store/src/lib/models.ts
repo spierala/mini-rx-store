@@ -28,8 +28,9 @@ export interface ActionWithPayload extends Action {
     payload: any;
 }
 
+// tslint:disable-next-line:no-empty-interface
 export interface ActionMetaData {
-    onlyForFeature: string;
+    // onlyForFeature: string;
 }
 
 export interface ActionWithMeta {
@@ -56,5 +57,3 @@ export type Reducer<StateType> = (state: StateType, action: Action) => StateType
 export type MetaReducer<StateType> = (reducer: Reducer<any>) => Reducer<StateType>;
 
 export interface ReducerDictionary { [key: string]: Reducer<any>; }
-
-export type ReducerMap = Map<string, Reducer<any>>;
