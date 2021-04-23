@@ -1,15 +1,13 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
-import { createActionTypePrefix, miniRxError, select } from './utils';
+import { createMiniRxActionType, isMiniRxAction, miniRxError, select } from './utils';
 import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { takeUntil } from 'rxjs/operators';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
-
-const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
@@ -31,12 +29,11 @@ export class FeatureStore<StateType> {
 
     // tslint:disable-next-line:variable-name
     constructor(private _featureName: string, initialState: StateType) {
-        const actionTypePrefix = createActionTypePrefix(_featureName);
-        const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
+        const reducer: Reducer<StateType> = createDefaultReducer(_featureName, initialState);
         StoreCore.addFeature<StateType>(_featureName, reducer);
 
         // Create Default Action Type (needed for setState())
-        this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
+        this.actionTypeSetState = createMiniRxActionType(_featureName, 'set-state');
 
         // Select Feature State and delegate to local BehaviorSubject
         const featureSelector = createFeatureSelector<AppState, StateType>(_featureName);
@@ -102,14 +99,12 @@ export class FeatureStore<StateType> {
 }
 
 function createDefaultReducer<StateType>(
-    nameSpaceFeature: string,
+    featureName: string,
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload) => {
-        // Check for 'set-state' action (originates from FeatureStore.setState())
         if (
-            action.type.indexOf(nameSpaceFeature) > -1 &&
-            action.type.indexOf(nameUpdateAction) > -1
+            isMiniRxAction(action.type, 'set-state', featureName)
         ) {
             return {
                 ...state,

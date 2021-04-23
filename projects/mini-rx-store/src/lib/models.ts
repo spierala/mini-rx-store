@@ -57,3 +57,5 @@ export type Reducer<StateType> = (state: StateType, action: Action) => StateType
 export type MetaReducer<StateType> = (reducer: Reducer<any>) => Reducer<StateType>;
 
 export interface ReducerDictionary { [key: string]: Reducer<any>; }
+
+export type ActionName = 'destroy' | 'init' | 'set-state';
