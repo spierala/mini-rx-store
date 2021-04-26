@@ -28,16 +28,6 @@ export interface ActionWithPayload extends Action {
     payload: any;
 }
 
-// tslint:disable-next-line:no-empty-interface
-export interface ActionMetaData {
-    // onlyForFeature: string;
-}
-
-export interface ActionWithMeta {
-    action: Action;
-    meta: ActionMetaData;
-}
-
 export interface StoreConfig {
     reducers: ReducerDictionary;
     initialState: AppState;

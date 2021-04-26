@@ -1,9 +1,7 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
 import {
     Action,
-    ActionMetaData,
     Actions,
-    ActionWithMeta,
     AppState,
     MetaReducer,
     Reducer, ReducerDictionary,
@@ -23,10 +21,8 @@ import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
 class StoreCore {
     // ACTIONS
-    private actionsWithMetaSource: Subject<ActionWithMeta> = new Subject();
-    actions$: Actions = this.actionsWithMetaSource
-        .asObservable()
-        .pipe(map((actionWithMeta) => actionWithMeta.action));
+    private actionsSource: Subject<Action> = new Subject();
+    actions$: Actions = this.actionsSource.asObservable();
 
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
@@ -51,7 +47,7 @@ class StoreCore {
 
     constructor() {
         // Listen to the Actions Stream and update state accordingly
-        this.actionsWithMetaSource
+        this.actions$
             .pipe(
                 observeOn(queueScheduler),
                 withLatestFrom(
@@ -61,17 +57,16 @@ class StoreCore {
                 ),
                 tap(
                     ([
-                         actionWithMeta,
+                         action,
                          state,
                          combinedReducer,
                          combinedMetaReducer,
                      ]: [
-                        ActionWithMeta,
+                        Action,
                         AppState,
                         Reducer<AppState>,
                         MetaReducer<AppState>
                     ]) => {
-                        const action: Action = actionWithMeta.action;
                         const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
                         const newState: AppState = reducer(state, action);
                         this.updateState(newState);
@@ -144,11 +139,9 @@ class StoreCore {
         effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
     }
 
-    dispatch = (action: Action, meta?: ActionMetaData) =>
-        this.actionsWithMetaSource.next({
-            action,
-            meta,
-        })
+    dispatch(action: Action) {
+        this.actionsSource.next(action);
+    }
 
     updateState(state: AppState) {
         this.stateSource.next(state);
