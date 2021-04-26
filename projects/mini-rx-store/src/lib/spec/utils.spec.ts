@@ -1,6 +1,6 @@
 import { actions$ } from '../store';
 import { combineReducers, ofType } from '../utils';
-import { Action } from '../models';
+import { Action, AppState, Reducer } from '../models';
 import { store } from './_spec-helpers';
 
 const action1: Action = {
@@ -49,7 +49,7 @@ function reducer2(state: any, action: Action): any {
 
 function reducer3(state: any, action: Action): any {
     switch (action.type) {
-        case action4.type:
+        case action5.type:
             return {
                 ...state,
                 showProductCode3: undefined,
@@ -89,21 +89,48 @@ describe('ofType', () => {
 });
 
 describe('combine Reducers', () => {
+    let combinedReducer: Reducer<AppState>;
+
     it('should combine reducers', () => {
-        const combinedReducer = combineReducers([reducer, reducer2]);
+        combinedReducer = combineReducers({
+            feature1: reducer,
+            feature2: reducer2
+        });
 
         const newState = combinedReducer({}, action3);
-        expect(newState).toEqual({ showProductCode: true });
+        expect(newState).toEqual({ feature1: {showProductCode: true }});
 
         const newState2 = combinedReducer(newState, action4);
-        expect(newState2).toEqual({ showProductCode: true, showProductCode2: false });
+        expect(newState2).toEqual({
+            feature1: {showProductCode: true},
+            feature2: {showProductCode2: false}
+        });
 
-        const combinedReducer2 = combineReducers([combinedReducer, reducer3]);
+        const combinedReducer2 = combineReducers({
+            feature1: reducer,
+            feature2: reducer2,
+            feature3: reducer3,
+        });
+
         const newState3 = combinedReducer2(newState2, action5);
+
         expect(newState3).toEqual({
-            showProductCode: true,
-            showProductCode2: false,
-            showProductCode3: undefined,
+            feature1: {showProductCode: true},
+            feature2: {showProductCode2: false},
+            feature3: {showProductCode3: undefined}
+        });
+    });
+
+    it('should remove keys from state which are not present in the reducer map', () => {
+        const newState = combinedReducer({
+            feature1: {showProductCode: true },
+            feature2: {showProductCode2: false },
+            feature3: {showProductCode2: false }
+        }, action4);
+
+        expect(newState).toEqual({
+            feature1: {showProductCode: true },
+            feature2: {showProductCode2: false }
         });
     });
 });

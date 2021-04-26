@@ -222,34 +222,6 @@ describe('FeatureStore', () => {
         });
     });
 
-    it('should dispatch a set-state default action with meta data', () => {
-        userFeature.resetState();
-
-        const spy = jest.fn();
-        StoreCore['actionsWithMetaSource'].subscribe(spy);
-        userFeature.updateCity('NY');
-        expect(spy).toHaveBeenCalledWith({
-            action: {
-                type: '@mini-rx/user2/set-state/updateCity',
-                payload: { city: 'NY' },
-            },
-            meta: {
-                onlyForFeature: 'user2',
-            },
-        });
-    });
-
-    it('should only run its own feature state reducer when Feature.setState is called', () => {
-        expect(reducerSpy).toHaveBeenCalledTimes(1); // 1 for initializing the feature state reducer with an initial action
-        reducerSpy.mockReset();
-    });
-
-    it('should NOT run the redux reducers when a new feature state is added', () => {
-        const counterFeature = new CounterFeature2();
-        expect(reducerSpy).toHaveBeenCalledTimes(0);
-        reducerSpy.mockReset();
-    });
-
     it('should run the meta reducers when state changes', () => {
         const metaReducerSpy = jest.fn();
 
@@ -295,5 +267,19 @@ describe('FeatureStore', () => {
         inc();
 
         expect(spy).toHaveBeenCalledWith(2);
+    });
+
+    it('should remove the feature state when Feature Store is destroyed', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
+            'tempFsState',
+            counterInitialState
+        );
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(expect.objectContaining({ tempFsState: counterInitialState }));
+
+        fs.destroy();
+        expect(spy).toHaveBeenCalledWith(expect.not.objectContaining({ tempCounter: counterInitialState }));
     });
 });

@@ -4,6 +4,7 @@ import StoreCore from './store-core';
 import { createActionTypePrefix, miniRxError, select } from './utils';
 import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
+import { takeUntil } from 'rxjs/operators';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
@@ -12,6 +13,7 @@ const nameUpdateAction = 'set-state';
 
 export class FeatureStore<StateType> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
+    private destroy$: Subject<void> = new Subject();
 
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
     /**
@@ -23,19 +25,24 @@ export class FeatureStore<StateType> {
         return this.stateSource.getValue();
     }
 
-    constructor(private featureName: string, initialState: StateType) {
-        const actionTypePrefix = createActionTypePrefix(featureName);
+    get featureName(): string {
+        return this._featureName;
+    }
+
+    // tslint:disable-next-line:variable-name
+    constructor(private _featureName: string, initialState: StateType) {
+        const actionTypePrefix = createActionTypePrefix(_featureName);
         const reducer: Reducer<StateType> = createDefaultReducer(actionTypePrefix, initialState);
-        StoreCore.addFeature<StateType>(featureName, reducer, {
-            isDefaultReducer: true,
-        });
+        StoreCore.addFeature<StateType>(_featureName, reducer);
 
         // Create Default Action Type (needed for setState())
         this.actionTypeSetState = `${actionTypePrefix}/${nameUpdateAction}`;
 
         // Select Feature State and delegate to local BehaviorSubject
-        const featureSelector = createFeatureSelector<AppState, StateType>(featureName);
-        StoreCore.select(featureSelector).subscribe(this.stateSource);
+        const featureSelector = createFeatureSelector<AppState, StateType>(_featureName);
+        StoreCore.select(featureSelector).pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
@@ -47,7 +54,7 @@ export class FeatureStore<StateType> {
                     : stateOrCallback,
         };
 
-        StoreCore.dispatch(action, { onlyForFeature: this.featureName });
+        StoreCore.dispatch(action);
 
         return action;
     }
@@ -66,7 +73,10 @@ export class FeatureStore<StateType> {
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();
 
-        subject.pipe(effectFn).subscribe();
+        subject.pipe(
+            effectFn,
+            takeUntil(this.destroy$)
+        ).subscribe();
 
         return (payload?: PayLoadType) => {
             subject.next(payload);
@@ -77,6 +87,17 @@ export class FeatureStore<StateType> {
         isUndoExtensionInitialized
             ? StoreCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized');
+    }
+
+    destroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        StoreCore.removeFeature(this._featureName);
+    }
+
+    // tslint:disable-next-line:use-lifecycle-interface
+    ngOnDestroy() {
+        this.destroy();
     }
 }
 

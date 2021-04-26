@@ -685,7 +685,7 @@ describe('Store', () => {
         expect(() => configureStore({})).toThrow();
     });
 
-    it('should not emit a new AppState when dispatching unknown Actions ', () => {
+    it('should not emit a new AppState when dispatching unknown Actions', () => {
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledTimes(1);
@@ -693,6 +693,18 @@ describe('Store', () => {
 
         store.dispatch({ type: 'unknownAction' });
         expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should add and remove reducers', () => {
+        const featureName = 'tempCounter';
+
+        const spy = jest.fn();
+        StoreCore.addFeature<CounterState>(featureName, counterReducer);
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(expect.objectContaining({ tempCounter: counterInitialState }));
+
+        StoreCore.removeFeature(featureName);
+        expect(spy).toHaveBeenCalledWith(expect.not.objectContaining({ tempCounter: counterInitialState }));
     });
 });
 
