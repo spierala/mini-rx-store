@@ -14,7 +14,7 @@ import { map, observeOn, tap, withLatestFrom } from 'rxjs/operators';
 import {
     combineMetaReducers,
     combineReducers,
-    createActionTypePrefix,
+    createMiniRxActionType,
     miniRxError, omit,
     select,
     storeInitActionType,
@@ -106,20 +106,14 @@ class StoreCore {
             reducer = createReducerWithInitialState(reducer, initialState);
         }
 
-        const actionTypePrefix = createActionTypePrefix(featureName);
-
         this.addReducer(featureName, reducer);
-
-        this.dispatch({type: `${actionTypePrefix}/init`});
+        this.dispatch({type: createMiniRxActionType(featureName, 'init')});
     }
 
     removeFeature(featureName: string) {
         this.removeReducer(featureName);
-
-        const actionTypePrefix = createActionTypePrefix(featureName);
-
         this.dispatch({
-            type: `${actionTypePrefix}/destroy`,
+            type: createMiniRxActionType(featureName, 'destroy')
         });
     }
 

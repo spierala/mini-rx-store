@@ -1,6 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, AppState, MetaReducer, Reducer, ReducerDictionary } from './models';
+import { Action, ActionName, AppState, MetaReducer, Reducer, ReducerDictionary } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -63,12 +63,19 @@ export function omit<T extends { [key: string]: any }>(
     );
 }
 
-export function createActionTypePrefix(featureName): string {
-    return '@mini-rx/' + featureName;
+const miniRxNameSpace = '@mini-rx';
+
+export function createMiniRxActionType(featureName, actionName: ActionName): string {
+    return miniRxNameSpace + '/' + featureName + '/' + actionName;
+}
+
+export function isMiniRxAction(actionType: string, actionName: ActionName, featureName?: string) {
+    return actionType.indexOf(miniRxNameSpace + (featureName ? `/${featureName}/` : '')) > -1 &&
+        actionType.indexOf(actionName) > -1;
 }
 
 export function miniRxError(message: string) {
-    throw new Error(`MiniRx: ` + message);
+    throw new Error(miniRxNameSpace + ' ' + message);
 }
 
-export const storeInitActionType = '@mini-rx/store/init';
+export const storeInitActionType = miniRxNameSpace + '/store/init';
