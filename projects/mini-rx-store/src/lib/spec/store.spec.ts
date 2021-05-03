@@ -2,9 +2,9 @@ import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
 import { Action, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap, take, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, mapTo, mergeMap, take, tap, withLatestFrom } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
@@ -661,15 +661,21 @@ describe('Store', () => {
         expect(spy).toHaveBeenCalledWith(customInitialState);
     });
 
-    it('should resubscribe on action stream when side effect error is not handled', () => {
+    it('should resubscribe the effect 10 times (if side effect error is not handled)', () => {
         const spy = jest.fn();
+        console.error = jest.fn();
+
+        function apiCallWithError() {
+            spy();
+            throw new Error();
+            return of('someValue');
+        }
 
         store.effect(
             actions$.pipe(
                 ofType('someAction3'),
                 mergeMap(() => {
-                    spy();
-                    throw new Error();
+                    return apiCallWithError().pipe(mapTo({ type: 'someActionSuccess' }));
                 })
             )
         );
@@ -677,8 +683,65 @@ describe('Store', () => {
         store.dispatch({ type: 'someAction3' });
         store.dispatch({ type: 'someAction3' });
         store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' }); // #12 will not trigger the Api call anymore
+        store.dispatch({ type: 'someAction3' }); // #13 will not trigger the Api call anymore
 
-        expect(spy).toHaveBeenCalledTimes(3);
+        expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
+
+        function getErrorMsg(times) {
+            return `MiniRx resubscribed the Effect. ONLY ${times} time(s) remaining!`;
+        }
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(9)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(8)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(7)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(6)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(5)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(4)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(3)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(2)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(1)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(0)),
+            expect.any(Error)
+        );
+
+        expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
     });
 
     it('should throw when creating store again with functional creation method', () => {
