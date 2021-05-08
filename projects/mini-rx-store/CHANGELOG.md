@@ -1,3 +1,8 @@
+# 2.0.1 (2021-05-08)
+
+### Bugfixes
+* default-effects-error-handler: console.error instead of silencing the error
+
 # 2.0.0-beta.4 (2021-03-15)
 
 ### Bugfixes
