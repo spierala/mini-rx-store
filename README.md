@@ -68,8 +68,14 @@ MiniRx supports the classic Redux API with registering reducers and dispatching 
 Observable state can be selected with memoized selectors.
 
 ```ts
-import { Action, Store, configureStore, createFeatureSelector, createSelector } from "mini-rx-store";
-import { Observable } from "rxjs";
+import {
+  Action,
+  Store,
+  configureStore,
+  createFeatureSelector,
+  createSelector
+} from 'mini-rx-store';
+import { Observable } from 'rxjs';
 
 // 1.) State interface
 interface CounterState {
@@ -87,7 +93,7 @@ function counterReducer(
   action: Action
 ): CounterState {
   switch (action.type) {
-    case "inc":
+    case 'inc':
       return {
         ...state,
         count: state.count + 1
@@ -105,7 +111,7 @@ const store: Store = configureStore({
 });
 
 // 5.) Create memoized selectors
-const getCounterFeatureState = createFeatureSelector<CounterState>("counter");
+const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
 const getCount = createSelector(
   getCounterFeatureState,
   state => state.count
@@ -113,10 +119,10 @@ const getCount = createSelector(
 
 // 6.) Select state as RxJS Observable
 const count$: Observable<number> = store.select(getCount);
-count$.subscribe(count => console.log("count:", count));
+count$.subscribe(count => console.log('count:', count));
 
 // 7.) Dispatch an action
-store.dispatch({ type: "inc" });
+store.dispatch({ type: 'inc' });
 
 // OUTPUT: count: 1
 // OUTPUT: count: 2
@@ -126,31 +132,30 @@ store.dispatch({ type: "inc" });
 The API of a FeatureStore is optimized to select and update a feature state directly with a minimum of boilerplate.
 
 ```ts title="counter-feature-store.ts"
-import { FeatureStore } from "mini-rx-store";
-import { Observable } from "rxjs";
+import { FeatureStore } from 'mini-rx-store';
+import { Observable } from 'rxjs';
 
 // 1.) State interface
 interface CounterState {
-  counter: number;
+  count: number;
 }
 
 // 2.) Initial state
 const counterInitialState: CounterState = {
-  counter: 11
+  count: 11
 };
 
 export class CounterFeatureStore extends FeatureStore<CounterState> {
-
   // Select state as RxJS Observable
-  counter$: Observable<number> = this.select(state => state.counter);
+  count$: Observable<number> = this.select(state => state.count);
 
   constructor() {
-    super('counterFs', counterInitialState)
+    super('counterFs', counterInitialState);
   }
 
   // Update state with `setState`
   inc() {
-    this.setState(state => ({...state, counter: state.counter + 1}))
+    this.setState(state => ({ ...state, count: state.count + 1 }));
   }
 }
 ```
@@ -160,7 +165,7 @@ Use the "counterFs" feature store like this:
 import { CounterFeatureStore } from "./counter-feature-store";
 
 const counterFs = new CounterFeatureStore();
-counterFs.counter$.subscribe(count => console.log('count:', count));
+counterFs.count$.subscribe(count => console.log('count:', count));
 counterFs.inc();
 
 // OUTPUT: count: 11
@@ -174,8 +179,15 @@ Every new Feature Store will show up in the global state with the corresponding 
 ```ts
 store.select(state => state).subscribe(console.log);
 
-//OUTPUT: {"counter":{"count":2},"counterFs":{"counter":12}}
+//OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
 ```
+Play with the basic tutorial on Stackblitz: [MiniRx Store - Basic Tutorial](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts)
+
+## More MiniRx Examples:
+These popular Angular demo applications show the power of MiniRx:
+- [Angular Tetris with MiniRx](https://github.com/spierala/angular-tetris-mini-rx)
+- [Angular Jira Clone using MiniRx](https://github.com/spierala/jira-clone-angular)
+- Coming soon: Angular Spotify using MiniRx
 
 ## MiniRx Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
