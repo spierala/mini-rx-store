@@ -2,9 +2,9 @@ import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
 import { Action, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
-import { catchError, map, mapTo, mergeMap, take, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
@@ -118,7 +118,7 @@ describe('Store Config', () => {
     it('should initialize the store with an empty object when root reducers have no initial state', () => {
         StoreCore.config({
             reducers: {
-                test: (state, action) => {
+                test: (state) => {
                     return state;
                 },
             },
@@ -417,13 +417,13 @@ describe('Store', () => {
 
     it('should update the Feature state #1', () => {
         const age$ = store.select(getAge);
-        hot('-a-b').subscribe((value) => store.dispatch({ type: 'incAge' }));
+        hot('-a-b').subscribe(() => store.dispatch({ type: 'incAge' }));
         expect(age$).toBeObservable(hot('ab-c', { a: 30, b: 31, c: 32 }));
     });
 
     it('should update the Feature state #2', () => {
         const age$ = store.select(getAge);
-        hot('(ab)').subscribe((value) => store.dispatch({ type: 'incAge' }));
+        hot('(ab)').subscribe(() => store.dispatch({ type: 'incAge' }));
         expect(age$).toBeObservable(hot('(abc)', { a: 32, b: 33, c: 34 }));
     });
 
@@ -487,10 +487,10 @@ describe('Store', () => {
                 ofType('someAction'),
                 mergeMap(() =>
                     fakeApiWithError().pipe(
-                        map((user) => ({
+                        map(() => ({
                             type: 'whatever',
                         })),
-                        catchError((err) => of({ type: 'error', payload: 'error' }))
+                        catchError(() => of({ type: 'error', payload: 'error' }))
                     )
                 )
             )
@@ -588,7 +588,7 @@ describe('Store', () => {
 
         store.feature<CounterState>('counter', counterReducer);
 
-        const spy = jest.fn().mockImplementation((value) => {
+        const spy = jest.fn().mockImplementation(() => {
             store.dispatch({ type: 'counter' });
         });
 
@@ -624,7 +624,7 @@ describe('Store', () => {
             )
         );
 
-        const spy2 = jest.fn().mockImplementation((value) => {
+        const spy2 = jest.fn().mockImplementation(() => {
             store.dispatch({ type: 'counterEffectStart' });
         });
 
