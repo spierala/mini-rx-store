@@ -117,36 +117,35 @@ import { Observable } from 'rxjs';
 
 // 1.) State interface
 interface CounterState {
-  counter: number;
+  count: number;
 }
 
 // 2.) Initial state
 const counterInitialState: CounterState = {
-  counter: 11
+  count: 11
 };
 
 export class CounterFeatureStore extends FeatureStore<CounterState> {
-
   // Select state as RxJS Observable
-  counter$: Observable<number> = this.select(state => state.counter);
+  count$: Observable<number> = this.select(state => state.count);
 
   constructor() {
-    super('counterFs', counterInitialState)
+    super('counterFs', counterInitialState);
   }
 
   // Update state with `setState`
   inc() {
-    this.setState(state => ({...state, counter: state.counter + 1}))
+    this.setState(state => ({ ...state, count: state.count + 1 }));
   }
 }
 ```
 
 Use the "counterFs" Feature Store like this:
 ```ts
-import { CounterFeatureStore } from './counter-feature-store';
+import { CounterFeatureStore } from "./counter-feature-store";
 
 const counterFs = new CounterFeatureStore();
-counterFs.counter$.subscribe(count => console.log('count:', count));
+counterFs.count$.subscribe(count => console.log('count:', count));
 counterFs.inc();
 
 // OUTPUT: count: 11
@@ -160,10 +159,10 @@ Every new Feature Store will show up in the global state with the corresponding 
 ```ts
 store.select(state => state).subscribe(console.log);
 
-//OUTPUT: {"counter":{"count":2},"counterFs":{"counter":12}}
+//OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
 ```
 :::
 
 ## Demos
-- [Todos App using FeatureStore](https://stackblitz.com/edit/mini-rx-angular-todos?file=src%2Fapp%2Fmodules%2Ftodo%2Fservices%2Ftodos-state.service.ts)
-- Coming soon: Redux Demo
+- [MiniRx Store - Basic Tutorial](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts): See the basic tutorial in action
+- [MiniRx Store Demo](https://stackblitz.com/edit/mini-rx-store-demo): See MiniRx Feature Stores, and the MiniRx Redux API in action
