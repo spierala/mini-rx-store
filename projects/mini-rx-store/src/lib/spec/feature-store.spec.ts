@@ -1,6 +1,6 @@
 import { FeatureStore } from '../feature-store';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import { actions$, createFeatureStore } from '../store';
@@ -210,6 +210,84 @@ describe('FeatureStore', () => {
         );
     });
 
+    it('should resubscribe the effect 10 times (if side effect error is not handled)', () => {
+        const spy = jest.fn();
+        console.error = jest.fn();
+
+        function apiCallWithError() {
+            spy();
+            throw new Error();
+            return of('someValue');
+        }
+
+        const fs: FeatureStore<any> = createFeatureStore('fsWithFailingApi', {});
+
+        const load = fs.effect(mergeMap(() => apiCallWithError().pipe(tap(() => fs.setState({})))));
+
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load(); // #12 will not trigger the Api call anymore
+        load(); // #13 will not trigger the Api call anymore
+
+        expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
+
+        function getErrorMsg(times) {
+            return `MiniRx resubscribed the Effect. ONLY ${times} time(s) remaining!`;
+        }
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(9)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(8)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(7)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(6)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(5)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(4)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(3)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(2)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(1)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(0)),
+            expect.any(Error)
+        );
+
+        expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
+    });
+
     it('should dispatch a set-state default action', () => {
         userFeature.resetState();
 
@@ -277,9 +355,13 @@ describe('FeatureStore', () => {
 
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
-        expect(spy).toHaveBeenCalledWith(expect.objectContaining({ tempFsState: counterInitialState }));
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining({ tempFsState: counterInitialState })
+        );
 
         fs.destroy();
-        expect(spy).toHaveBeenCalledWith(expect.not.objectContaining({ tempCounter: counterInitialState }));
+        expect(spy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ tempCounter: counterInitialState })
+        );
     });
 });
