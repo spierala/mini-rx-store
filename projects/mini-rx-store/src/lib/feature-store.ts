@@ -5,6 +5,7 @@ import { createMiniRxActionType, isMiniRxAction, miniRxError, select } from './u
 import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { takeUntil } from 'rxjs/operators';
+import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
@@ -37,9 +38,9 @@ export class FeatureStore<StateType> {
 
         // Select Feature State and delegate to local BehaviorSubject
         const featureSelector = createFeatureSelector<AppState, StateType>(_featureName);
-        StoreCore.select(featureSelector).pipe(
-            takeUntil(this.destroy$)
-        ).subscribe(this.stateSource);
+        StoreCore.select(featureSelector)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
@@ -69,11 +70,9 @@ export class FeatureStore<StateType> {
         effectFn: (payload: Observable<PayLoadType>) => Observable<any>
     ): (payload?: PayLoadType) => void {
         const subject: Subject<PayLoadType> = new Subject();
+        const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(subject.pipe(effectFn));
 
-        subject.pipe(
-            effectFn,
-            takeUntil(this.destroy$)
-        ).subscribe();
+        effectWithDefaultErrorHandler.pipe(takeUntil(this.destroy$)).subscribe();
 
         return (payload?: PayLoadType) => {
             subject.next(payload);
@@ -103,9 +102,7 @@ function createDefaultReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload) => {
-        if (
-            isMiniRxAction(action.type, 'set-state', featureName)
-        ) {
+        if (isMiniRxAction(action.type, 'set-state', featureName)) {
             return {
                 ...state,
                 ...action.payload,
