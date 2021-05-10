@@ -9,7 +9,7 @@
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e",
-        "minirx-version++": "cd projects/mini-rx-store && npm version patch",
+        "minirx-version++": "cd projects/mini-rx-store && npm version prerelease",
         "minirx-build": "npm run minirx-version++ && ng build mini-rx-store --prod && copy LICENSE dist/mini-rx-store && copy README.md dist/mini-rx-store",
         "test:minirx": "jest --config ./projects/mini-rx-store/jest.config.js",
         "test:minirx:watch": "jest --config ./projects/mini-rx-store/jest.config.js --watch",
