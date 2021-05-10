@@ -26,15 +26,19 @@ import { Action } from './models';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-const MAX_NUMBER_OF_RETRY_ATTEMPTS = 10;
-
 // Prevent effect to unsubscribe from the actions stream
 export function defaultEffectsErrorHandler<T extends Action>(
     observable$: Observable<T>,
-    retryAttemptLeft: number = MAX_NUMBER_OF_RETRY_ATTEMPTS
+    retryAttemptLeft: number = 10
 ): Observable<T> {
     return observable$.pipe(
         catchError((error) => {
+            console.error(
+                `MiniRx resubscribed the Effect. ONLY ${
+                    retryAttemptLeft - 1
+                } time(s) remaining!\nPlease provide error handling inside the Effect using \`catchError\`.\nDetails:`,
+                error
+            );
             if (retryAttemptLeft <= 1) {
                 return observable$; // last attempt
             }
