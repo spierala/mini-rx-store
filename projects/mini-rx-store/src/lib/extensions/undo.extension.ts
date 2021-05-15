@@ -19,11 +19,11 @@ export class UndoExtension extends StoreExtension {
         super();
 
         bufferSize = config.bufferSize;
-        isUndoExtensionInitialized = true;
     }
 
     init(): void {
         StoreCore.addMetaReducers(undoMetaReducer);
+        isUndoExtensionInitialized = true;
     }
 }
 
@@ -50,10 +50,14 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
                 (executedAction) => (newState = rootReducer(newState, executedAction))
             );
             return newState;
-        } else if (!(action.type === storeInitActionType
-            || isMiniRxAction(action.type, 'init')
-            || isMiniRxAction(action.type, 'destroy'))) {
-            // push every action that isn't an UNDO_ACTION or STORE_INIT_ACTION or STORE_UPDATE_ACTION to the executedActions property
+        } else if (
+            !(
+                action.type === storeInitActionType ||
+                isMiniRxAction(action.type, 'init') ||
+                isMiniRxAction(action.type, 'destroy')
+            )
+        ) {
+            // push every action that isn't UNDO_ACTION / storeInitAction / "MiniRx (feature) Init" / "MiniRx (feature) Destroy" to the executedActions property
             executedActions.push(action);
         }
         const updatedState = rootReducer(state, action);

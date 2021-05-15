@@ -522,7 +522,7 @@ describe('Store', () => {
             payload: user,
         };
 
-        store._addExtension(new LoggerExtension());
+        StoreCore.addExtension(new LoggerExtension());
 
         store.dispatch(action);
 
@@ -538,7 +538,7 @@ describe('Store', () => {
 
     it('should add extension', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
-        store._addExtension(new ReduxDevtoolsExtension({}));
+        StoreCore.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
         expect(StoreCore['extensions'].length).toBe(2);
     });

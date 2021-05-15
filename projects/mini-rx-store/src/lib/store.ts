@@ -1,12 +1,5 @@
 import { Observable } from 'rxjs';
-import {
-    Action,
-    AppState,
-    FeatureStoreConfig,
-    Reducer,
-    StoreConfig,
-    StoreExtension,
-} from './models';
+import { Action, AppState, FeatureStoreConfig, Reducer, StoreConfig } from './models';
 import StoreCore from './store-core';
 import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
@@ -15,14 +8,17 @@ export class Store {
     private static instance: Store = undefined;
 
     // Prevent direct construction calls with the `new` operator.
-    private constructor() {}
+    private constructor(config: Partial<StoreConfig>) {
+        StoreCore.config(config);
+    }
 
     /** @deprecated This is an internal implementation detail, do not use. */
-    static getInstance() {
+    static configureStore(config: Partial<StoreConfig>) {
         if (!Store.instance) {
-            Store.instance = new Store();
+            Store.instance = new Store(config);
+            return Store.instance;
         }
-        return Store.instance;
+        miniRxError('`configureStore` was called multiple times');
     }
 
     feature<StateType>(
@@ -31,13 +27,6 @@ export class Store {
         config?: FeatureStoreConfig<StateType>
     ) {
         StoreCore.addFeature<StateType>(featureName, reducer, config);
-    }
-
-    /**
-     * @deprecated Use effect instead.
-     */
-    createEffect(effect: Observable<Action>) {
-        StoreCore.effect(effect);
     }
 
     effect(effect: Observable<Action>) {
@@ -49,23 +38,10 @@ export class Store {
     select<K>(mapFn: (state: AppState) => K): Observable<K> {
         return StoreCore.select(mapFn);
     }
-
-    /** @deprecated This is an internal implementation detail, do not use. */
-    _addExtension(extension: StoreExtension) {
-        StoreCore.addExtension(extension);
-    }
 }
 
-let store: Store;
-
 export function configureStore(config: Partial<StoreConfig>): Store {
-    if (store) {
-        miniRxError('Store is already configured. Did you call `configureStore` multiple times?');
-        return store;
-    }
-    store = Store.getInstance();
-    StoreCore.config(config);
-    return store;
+    return Store.configureStore(config);
 }
 
 export function createFeatureStore<T>(featureName: string, initialState: T): FeatureStore<T> {
