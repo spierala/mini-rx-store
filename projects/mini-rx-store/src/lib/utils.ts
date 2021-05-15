@@ -78,4 +78,4 @@ export function miniRxError(message: string) {
     throw new Error(miniRxNameSpace + ' ' + message);
 }
 
-export const storeInitActionType = miniRxNameSpace + '/store/init';
+export const storeInitActionType = miniRxNameSpace + '/init';

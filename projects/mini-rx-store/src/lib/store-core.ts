@@ -4,7 +4,8 @@ import {
     Actions,
     AppState,
     MetaReducer,
-    Reducer, ReducerDictionary,
+    Reducer,
+    ReducerDictionary,
     StoreConfig,
     StoreExtension,
 } from './models';
@@ -13,7 +14,8 @@ import {
     combineMetaReducers,
     combineReducers,
     createMiniRxActionType,
-    miniRxError, omit,
+    miniRxError,
+    omit,
     select,
     storeInitActionType,
 } from './utils';
@@ -50,27 +52,20 @@ class StoreCore {
         this.actions$
             .pipe(
                 observeOn(queueScheduler),
-                withLatestFrom(
-                    this.state$,
-                    this.combinedReducer$,
-                    this.combinedMetaReducer$
-                )
+                withLatestFrom(this.state$, this.combinedReducer$, this.combinedMetaReducer$)
             )
-            .subscribe(([
-                            action,
-                            state,
-                            combinedReducer,
-                            combinedMetaReducer,
-                        ]: [
-                Action,
-                AppState,
-                Reducer<AppState>,
-                MetaReducer<AppState>
-            ]) => {
-                const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
-                const newState: AppState = reducer(state, action);
-                this.updateState(newState);
-            });
+            .subscribe(
+                ([action, state, combinedReducer, combinedMetaReducer]: [
+                    Action,
+                    AppState,
+                    Reducer<AppState>,
+                    MetaReducer<AppState>
+                ]) => {
+                    const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
+                    const newState: AppState = reducer(state, action);
+                    this.updateState(newState);
+                }
+            );
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {
@@ -97,13 +92,13 @@ class StoreCore {
         }
 
         this.addReducer(featureName, reducer);
-        this.dispatch({type: createMiniRxActionType(featureName, 'init')});
+        this.dispatch({ type: createMiniRxActionType(featureName, 'init') });
     }
 
     removeFeature(featureName: string) {
         this.removeReducer(featureName);
         this.dispatch({
-            type: createMiniRxActionType(featureName, 'destroy')
+            type: createMiniRxActionType(featureName, 'destroy'),
         });
     }
 
@@ -124,9 +119,11 @@ class StoreCore {
             });
         }
 
-        this.updateState(config.initialState); // Looks strange? It´s fine: This is just an internal emission (Store state can only selected after config)
+        if (config.initialState) {
+            this.updateState(config.initialState);
+        }
 
-        this.dispatch({type: storeInitActionType});
+        this.dispatch({ type: storeInitActionType });
     }
 
     effect(effect$: Observable<Action>) {
@@ -153,13 +150,12 @@ class StoreCore {
 
     private addReducer(featureName: string, reducer: Reducer<any>) {
         const reducers = this.reducersSource.getValue();
-        this.reducersSource.getValue()[featureName] = reducer;
+        reducers[featureName] = reducer;
         this.reducersSource.next(reducers);
     }
 
     private removeReducer(featureName: string) {
-        const reducers: ReducerDictionary = omit(this.reducersSource.getValue(), featureName);
-        this.reducersSource.next(reducers);
+        this.reducersSource.next(omit(this.reducersSource.getValue(), featureName));
     }
 }
 
@@ -174,7 +170,7 @@ function createReducerWithInitialState<StateType>(
 
 function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
     if (reducers.hasOwnProperty(featureName)) {
-        miniRxError(`Feature "${featureName}" already exists.`);
+        miniRxError(`Feature "${featureName}" already exists`);
     }
 }
 
@@ -186,4 +182,3 @@ function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
 
 // Created once to initialize singleton
 export default new StoreCore();
-

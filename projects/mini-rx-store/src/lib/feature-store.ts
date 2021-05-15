@@ -15,11 +15,7 @@ export class FeatureStore<StateType> {
     private destroy$: Subject<void> = new Subject();
 
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
-    /**
-     * @deprecated Use `this.select()` instead.
-     * state$ will become private in an upcoming major version
-     */
-    state$: Observable<StateType> = this.stateSource.asObservable();
+    private state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
         return this.stateSource.getValue();
     }
