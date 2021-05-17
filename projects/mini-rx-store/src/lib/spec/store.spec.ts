@@ -1,4 +1,4 @@
-import { actions$, configureStore } from '../store';
+import { actions$, configureStore, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
 import { Action, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
@@ -16,6 +16,7 @@ import {
     store,
 } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
+import { StoreConfig } from 'mini-rx-store';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -162,6 +163,13 @@ describe('Store Config', () => {
             user: { name: 'Nicolas' }, // userReducer initial state is overwritten by the root initial state
             user2: userInitialState, // Root initial state does not affect User2 initial state
         });
+    });
+
+    it('should throw when calling Store.config after a Feature Store was initialized', () => {
+        createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
+        expect(() => StoreCore.config({})).toThrowError(
+            '`configureStore` detected already registered reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+        );
     });
 
     describe('Root Meta Reducers', () => {
@@ -764,10 +772,14 @@ describe('Store', () => {
         const spy = jest.fn();
         StoreCore.addFeature<CounterState>(featureName, counterReducer);
         store.select((state) => state).subscribe(spy);
-        expect(spy).toHaveBeenCalledWith(expect.objectContaining({ tempCounter: counterInitialState }));
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining({ tempCounter: counterInitialState })
+        );
 
         StoreCore.removeFeature(featureName);
-        expect(spy).toHaveBeenCalledWith(expect.not.objectContaining({ tempCounter: counterInitialState }));
+        expect(spy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ tempCounter: counterInitialState })
+        );
     });
 });
 

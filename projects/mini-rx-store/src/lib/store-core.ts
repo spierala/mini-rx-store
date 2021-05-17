@@ -38,6 +38,9 @@ class StoreCore {
 
     // FEATURE REDUCERS DICTIONARY
     private reducersSource: BehaviorSubject<ReducerDictionary> = new BehaviorSubject({});
+    private get reducers(): ReducerDictionary {
+        return this.reducersSource.getValue();
+    }
 
     // FEATURE REDUCERS COMBINED
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
@@ -85,7 +88,7 @@ class StoreCore {
                 ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
                 : reducer;
 
-        checkFeatureExists(featureName, this.reducersSource.getValue());
+        checkFeatureExists(featureName, this.reducers);
 
         if (typeof config.initialState !== 'undefined') {
             reducer = createReducerWithInitialState(reducer, config.initialState);
@@ -103,6 +106,12 @@ class StoreCore {
     }
 
     config(config: Partial<StoreConfig> = {}) {
+        if (Object.keys(this.reducers).length > 0) {
+            miniRxError(
+                '`configureStore` detected already registered reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+            );
+        }
+
         if (config.metaReducers && config.metaReducers.length > 0) {
             this.addMetaReducers(...config.metaReducers);
         }
@@ -114,7 +123,7 @@ class StoreCore {
 
         if (config.reducers) {
             Object.keys(config.reducers).forEach((featureName) => {
-                checkFeatureExists(featureName, this.reducersSource.getValue());
+                checkFeatureExists(featureName, this.reducers);
                 this.addReducer(featureName, config.reducers[featureName]);
             });
         }
@@ -149,13 +158,13 @@ class StoreCore {
     }
 
     private addReducer(featureName: string, reducer: Reducer<any>) {
-        const reducers = this.reducersSource.getValue();
+        const reducers = this.reducers;
         reducers[featureName] = reducer;
         this.reducersSource.next(reducers);
     }
 
     private removeReducer(featureName: string) {
-        this.reducersSource.next(omit(this.reducersSource.getValue(), featureName));
+        this.reducersSource.next(omit(this.reducers, featureName));
     }
 }
 
@@ -170,7 +179,7 @@ function createReducerWithInitialState<StateType>(
 
 function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
     if (reducers.hasOwnProperty(featureName)) {
-        miniRxError(`Feature "${featureName}" already exists`);
+        miniRxError(`Feature "${featureName}" already exists.`);
     }
 }
 

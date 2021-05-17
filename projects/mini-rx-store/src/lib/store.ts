@@ -18,7 +18,7 @@ export class Store {
             Store.instance = new Store(config);
             return Store.instance;
         }
-        miniRxError('`configureStore` was called multiple times');
+        miniRxError('`configureStore` was called multiple times.');
     }
 
     feature<StateType>(
