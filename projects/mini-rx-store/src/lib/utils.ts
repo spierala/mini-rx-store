@@ -75,7 +75,7 @@ export function isMiniRxAction(actionType: string, actionName: ActionName, featu
 }
 
 export function miniRxError(message: string) {
-    throw new Error(miniRxNameSpace + ' ' + message);
+    throw new Error(miniRxNameSpace + ': ' + message);
 }
 
 export const storeInitActionType = miniRxNameSpace + '/init';
