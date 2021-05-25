@@ -1,6 +1,6 @@
 // Credits go to NgRx
 // Copied from NgRx with small modifications:
-// https://github.com/ngrx/platform/blob/9.2.0/modules/effects/src/effects_error_handler.ts
+// https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts
 
 // The MIT License (MIT)
 //
@@ -24,28 +24,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action } from './models';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Action, Reducer, ReducerDictionary } from 'mini-rx-store';
+import { AppState } from './models';
 
-// Prevent effect to unsubscribe from the actions stream
-export function defaultEffectsErrorHandler<T extends Action>(
-    observable$: Observable<T>,
-    retryAttemptLeft: number = 10
-): Observable<T> {
-    return observable$.pipe(
-        catchError((error) => {
-            console.error(
-                `MiniRx resubscribed the Effect. ONLY ${
-                    retryAttemptLeft - 1
-                } time(s) remaining!\nPlease provide error handling inside the Effect using \`catchError\`.\nDetails:`,
-                error
-            );
-            if (retryAttemptLeft <= 1) {
-                return observable$; // last attempt
-            }
-            // Return observable that produces this particular effect
-            return defaultEffectsErrorHandler(observable$, retryAttemptLeft - 1);
-        })
-    );
+export function combineReducers(reducers: ReducerDictionary): Reducer<AppState> {
+    const reducerKeys = Object.keys(reducers);
+    const reducerKeyLength = reducerKeys.length;
+
+    return (state: AppState = {}, action: Action): AppState => {
+        const stateKeysLength = Object.keys(state).length;
+
+        let hasChanged = stateKeysLength !== reducerKeyLength;
+        const nextState: AppState = {};
+
+        for (let i = 0; i < reducerKeyLength; i++) {
+            const key = reducerKeys[i];
+            const reducer: any = reducers[key];
+            const previousStateForKey = state[key];
+            const nextStateForKey = reducer(previousStateForKey, action);
+
+            nextState[key] = nextStateForKey;
+            hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
+        }
+        return hasChanged ? nextState : state;
+    };
 }

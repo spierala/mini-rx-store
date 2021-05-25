@@ -17,29 +17,6 @@ export function select<T, K>(mapFn: (state: T) => K) {
     );
 }
 
-export function combineReducers(reducers: ReducerDictionary): Reducer<AppState> {
-    const reducerKeys = Object.keys(reducers);
-    const reducerKeyLength = reducerKeys.length;
-
-    return (state: AppState = {}, action: Action): AppState => {
-        const stateKeysLength = Object.keys(state).length;
-
-        let hasChanged = stateKeysLength !== reducerKeyLength;
-        const nextState: AppState = {};
-
-        for (let i = 0; i < reducerKeyLength; i++) {
-            const key = reducerKeys[i];
-            const reducer: any = reducers[key];
-            const previousStateForKey = state[key];
-            const nextStateForKey = reducer(previousStateForKey, action);
-
-            nextState[key] = nextStateForKey;
-            hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
-        }
-        return hasChanged ? nextState : state;
-    };
-}
-
 export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
     return (reducer: Reducer<any>): Reducer<T> => {
         return metaReducers.reduceRight(

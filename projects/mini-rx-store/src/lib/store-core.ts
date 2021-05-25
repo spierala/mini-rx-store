@@ -12,7 +12,6 @@ import {
 import { map, observeOn, withLatestFrom } from 'rxjs/operators';
 import {
     combineMetaReducers,
-    combineReducers,
     createMiniRxActionType,
     miniRxError,
     omit,
@@ -20,6 +19,7 @@ import {
     storeInitActionType,
 } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
+import { combineReducers } from './combine-reducers';
 
 class StoreCore {
     // ACTIONS
