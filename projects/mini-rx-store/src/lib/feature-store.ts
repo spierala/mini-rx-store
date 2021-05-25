@@ -20,20 +20,20 @@ export class FeatureStore<StateType> {
         return this.stateSource.getValue();
     }
 
-    get featureName(): string {
-        return this._featureName;
+    get featureKey(): string {
+        return this._featureKey;
     }
 
     // tslint:disable-next-line:variable-name
-    constructor(private _featureName: string, initialState: StateType) {
-        const reducer: Reducer<StateType> = createDefaultReducer(_featureName, initialState);
-        StoreCore.addFeature<StateType>(_featureName, reducer);
+    constructor(private _featureKey: string, initialState: StateType) {
+        const reducer: Reducer<StateType> = createDefaultReducer(_featureKey, initialState);
+        StoreCore.addFeature<StateType>(_featureKey, reducer);
 
         // Create Default Action Type (needed for setState())
-        this.actionTypeSetState = createMiniRxActionType(_featureName, 'set-state');
+        this.actionTypeSetState = createMiniRxActionType(_featureKey, 'set-state');
 
         // Select Feature State and delegate to local BehaviorSubject
-        const featureSelector = createFeatureSelector<AppState, StateType>(_featureName);
+        const featureSelector = createFeatureSelector<AppState, StateType>(_featureKey);
         StoreCore.select(featureSelector)
             .pipe(takeUntil(this.destroy$))
             .subscribe(this.stateSource);
@@ -84,7 +84,7 @@ export class FeatureStore<StateType> {
     destroy() {
         this.destroy$.next();
         this.destroy$.complete();
-        StoreCore.removeFeature(this._featureName);
+        StoreCore.removeFeature(this._featureKey);
     }
 
     // tslint:disable-next-line:use-lifecycle-interface

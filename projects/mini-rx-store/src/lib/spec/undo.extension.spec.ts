@@ -37,7 +37,7 @@ describe('Undo Extension', () => {
     describe('FeatureStore', () => {
         const featureStore: MyFeatureStore = new MyFeatureStore();
 
-        it('should throw it Undo Extension is not added', () => {
+        it('should throw if Undo Extension is not added', () => {
             expect(featureStore.undoLastAction).toThrow();
         });
 

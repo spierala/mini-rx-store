@@ -49,7 +49,7 @@ const getCountry = createSelector(getUserFeatureState2, (state) => state.country
 store.feature<CounterState>('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector<CounterState>('someFeature');
 
-class FeatureState extends FeatureStore<UserState> {
+class UserFeatureStore extends FeatureStore<UserState> {
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
     country$ = this.select(getCountry);
@@ -121,7 +121,7 @@ class CounterFeature2 extends FeatureStore<any> {
     }
 }
 
-const userFeature: FeatureState = new FeatureState();
+const userFeature: UserFeatureStore = new UserFeatureStore();
 const counterFeature: CounterFeature = new CounterFeature();
 
 describe('FeatureStore', () => {
@@ -138,6 +138,10 @@ describe('FeatureStore', () => {
         userFeature.select().subscribe(spy);
         expect(spy).toHaveBeenCalledWith(initialState);
         expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should expose the feature key', () => {
+        expect(userFeature.featureKey).toBe('user2');
     });
 
     it('should update state', () => {
@@ -363,5 +367,16 @@ describe('FeatureStore', () => {
         expect(spy).toHaveBeenCalledWith(
             expect.not.objectContaining({ tempCounter: counterInitialState })
         );
+    });
+
+    it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
+            'tempFsState',
+            counterInitialState
+        );
+
+        const spy = jest.spyOn(fs, 'destroy');
+        fs.ngOnDestroy();
+        expect(spy).toHaveBeenCalled();
     });
 });
