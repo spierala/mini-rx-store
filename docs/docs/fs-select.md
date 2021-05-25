@@ -19,7 +19,7 @@ Within that function you can pick a specific piece of state.
 ## Memoized Selectors
 
 You can use memoized selectors also with the Feature Store...
-You only have to omit the feature name when using `createFeatureSelector`.
+You only have to omit the feature key when using `createFeatureSelector`.
 This is because the Feature Store is operating on a specific feature state already
 (the corresponding feature key has been provided in the constructor).
 
