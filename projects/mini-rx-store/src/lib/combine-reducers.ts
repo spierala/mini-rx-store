@@ -24,17 +24,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, AppState, Reducer, ReducerDictionary } from './models';
+import { Action, Reducer, ReducerDictionary } from './models';
 
-export function combineReducers(reducers: ReducerDictionary): Reducer<AppState> {
-    const reducerKeys = Object.keys(reducers);
-    const reducerKeyLength = reducerKeys.length;
+export function combineReducers<T>(reducers: ReducerDictionary<T>): Reducer<T>;
 
-    return (state: AppState = {}, action: Action): AppState => {
-        const stateKeysLength = Object.keys(state).length;
+export function combineReducers(reducers: ReducerDictionary<any>): Reducer<any> {
+    const reducerKeys: string[] = Object.keys(reducers);
+    const reducerKeyLength: number = reducerKeys.length;
 
-        let hasChanged = stateKeysLength !== reducerKeyLength;
-        const nextState: AppState = {};
+    return (state: any = {}, action: Action) => {
+        const stateKeysLength: number = Object.keys(state).length;
+
+        let hasChanged: boolean = stateKeysLength !== reducerKeyLength;
+        const nextState: any = {};
 
         for (let i = 0; i < reducerKeyLength; i++) {
             const key = reducerKeys[i];

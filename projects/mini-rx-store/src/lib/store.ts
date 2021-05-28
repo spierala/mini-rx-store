@@ -8,12 +8,12 @@ export class Store {
     private static instance: Store = undefined;
 
     // Prevent direct construction calls with the `new` operator.
-    private constructor(config: Partial<StoreConfig>) {
+    private constructor(config: Partial<StoreConfig<AppState>>) {
         StoreCore.config(config);
     }
 
     /** @deprecated This is an internal implementation detail, do not use. */
-    static configureStore(config: Partial<StoreConfig>) {
+    static configureStore(config: Partial<StoreConfig<AppState>>) {
         if (!Store.instance) {
             Store.instance = new Store(config);
             return Store.instance;
@@ -40,7 +40,7 @@ export class Store {
     }
 }
 
-export function configureStore(config: Partial<StoreConfig>): Store {
+export function configureStore<T>(config: Partial<StoreConfig<T>>): Store {
     return Store.configureStore(config);
 }
 

@@ -97,7 +97,7 @@ function createDefaultReducer<StateType>(
     featureKey: string,
     initialState: StateType
 ): Reducer<StateType> {
-    return (state: StateType = initialState, action: ActionWithPayload) => {
+    return (state: StateType = initialState, action: ActionWithPayload): StateType => {
         if (isMiniRxAction(action.type, 'set-state', featureKey)) {
             return {
                 ...state,
