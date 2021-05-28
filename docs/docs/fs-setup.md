@@ -1,6 +1,6 @@
 ---
 id: fs-setup
-title: Create a FeatureStore
+title: Create a Feature Store
 sidebar_label: Setup
 slud: /feature-store-setup
 ---
