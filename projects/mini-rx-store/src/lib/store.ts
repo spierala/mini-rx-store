@@ -22,11 +22,11 @@ export class Store {
     }
 
     feature<StateType>(
-        featureName: string,
+        featureKey: string,
         reducer: Reducer<StateType>,
         config?: FeatureStoreConfig<StateType>
     ) {
-        StoreCore.addFeature<StateType>(featureName, reducer, config);
+        StoreCore.addFeature<StateType>(featureKey, reducer, config);
     }
 
     effect(effect: Observable<Action>) {
@@ -44,8 +44,8 @@ export function configureStore(config: Partial<StoreConfig>): Store {
     return Store.configureStore(config);
 }
 
-export function createFeatureStore<T>(featureName: string, initialState: T): FeatureStore<T> {
-    return new FeatureStore<T>(featureName, initialState);
+export function createFeatureStore<T>(featureKey: string, initialState: T): FeatureStore<T> {
+    return new FeatureStore<T>(featureKey, initialState);
 }
 
 export const actions$ = StoreCore.actions$;

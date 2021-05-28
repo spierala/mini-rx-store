@@ -2,7 +2,8 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { Action } from '../models';
 import {
     counterInitialState,
-    counterReducer, CounterState,
+    counterReducer,
+    CounterState,
     counterStringInitialState,
     counterStringReducer,
     CounterStringState,
@@ -59,15 +60,15 @@ describe('Undo Extension', () => {
     });
 
     describe('CounterStringReducer', () => {
-        const featureName = 'counterStringWithUndo';
-        const getCounterFeatureState = createFeatureSelector<CounterStringState>(featureName);
+        const featureKey = 'counterStringWithUndo';
+        const getCounterFeatureState = createFeatureSelector<CounterStringState>(featureKey);
         const getCounter = createSelector(getCounterFeatureState, (state) => {
             return state.counter;
         });
 
         const counterSpy = jest.fn();
 
-        store.feature<CounterStringState>(featureName, counterStringReducer);
+        store.feature<CounterStringState>(featureKey, counterStringReducer);
         store.select(getCounter).subscribe(counterSpy);
 
         function createCounterAction(payload: string) {
@@ -112,30 +113,40 @@ describe('Undo Extension', () => {
 
             const spy = jest.fn();
 
-            store.select(state => {
-                return state;
-            }).subscribe(spy);
+            store
+                .select((state) => {
+                    return state;
+                })
+                .subscribe(spy);
 
-            expect(spy).toHaveBeenCalledWith(expect.objectContaining({
-                tempCounter1: counterInitialState,
-                tempCounter2: counterInitialState
-            }));
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tempCounter1: counterInitialState,
+                    tempCounter2: counterInitialState,
+                })
+            );
 
             spy.mockReset();
 
-            const counterAction: Action = {type: 'counter'};
+            const counterAction: Action = { type: 'counter' };
             store.dispatch(counterAction);
-            expect(spy).toHaveBeenCalledWith(expect.objectContaining({
-                tempCounter1: {counter: 2},
-                tempCounter2: {counter: 2}
-            }));
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tempCounter1: { counter: 2 },
+                    tempCounter2: { counter: 2 },
+                })
+            );
 
             spy.mockReset();
 
             StoreCore.removeFeature('tempCounter2');
             store.dispatch(undo(counterAction));
-            expect(spy).toHaveBeenCalledWith(expect.objectContaining({ tempCounter1: counterInitialState }));
-            expect(spy).toHaveBeenCalledWith(expect.not.objectContaining({ tempCounter2: counterInitialState }));
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({ tempCounter1: counterInitialState })
+            );
+            expect(spy).toHaveBeenCalledWith(
+                expect.not.objectContaining({ tempCounter2: counterInitialState })
+            );
         });
     });
 });

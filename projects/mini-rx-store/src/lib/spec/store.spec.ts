@@ -654,17 +654,17 @@ describe('Store', () => {
     });
 
     it('should overwrite reducers default state with a provided initialState', () => {
-        const featureName = 'counterWithCustomInitialState';
+        const featureKey = 'counterWithCustomInitialState';
         const customInitialState: CounterState = {
             counter: 2,
         };
 
-        store.feature<CounterState>(featureName, counterReducer, {
+        store.feature<CounterState>(featureKey, counterReducer, {
             initialState: customInitialState,
         });
 
         const spy = jest.fn();
-        store.select((state) => state[featureName]).subscribe(spy);
+        store.select((state) => state[featureKey]).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(customInitialState);
     });
 
@@ -766,16 +766,16 @@ describe('Store', () => {
     });
 
     it('should add and remove reducers', () => {
-        const featureName = 'tempCounter';
+        const featureKey = 'tempCounter';
 
         const spy = jest.fn();
-        StoreCore.addFeature<CounterState>(featureName, counterReducer);
+        StoreCore.addFeature<CounterState>(featureKey, counterReducer);
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(
             expect.objectContaining({ tempCounter: counterInitialState })
         );
 
-        StoreCore.removeFeature(featureName);
+        StoreCore.removeFeature(featureKey);
         expect(spy).toHaveBeenCalledWith(
             expect.not.objectContaining({ tempCounter: counterInitialState })
         );

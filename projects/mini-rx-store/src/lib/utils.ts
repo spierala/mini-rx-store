@@ -28,27 +28,26 @@ export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaRedu
     };
 }
 
-export function omit<T extends { [key: string]: any }>(
-    object: T,
-    keyToOmit: keyof T
-): Partial<T> {
-    return Object.keys(object).filter(key =>
-        key !== keyToOmit).reduce((prevValue, key) => {
+export function omit<T extends { [key: string]: any }>(object: T, keyToOmit: keyof T): Partial<T> {
+    return Object.keys(object)
+        .filter((key) => key !== keyToOmit)
+        .reduce((prevValue, key) => {
             prevValue[key] = object[key];
             return prevValue;
-        }, {}
-    );
+        }, {});
 }
 
 const miniRxNameSpace = '@mini-rx';
 
-export function createMiniRxActionType(featureName, actionName: ActionName): string {
-    return miniRxNameSpace + '/' + featureName + '/' + actionName;
+export function createMiniRxActionType(featureKey, actionName: ActionName): string {
+    return miniRxNameSpace + '/' + featureKey + '/' + actionName;
 }
 
-export function isMiniRxAction(actionType: string, actionName: ActionName, featureName?: string) {
-    return actionType.indexOf(miniRxNameSpace + (featureName ? `/${featureName}/` : '')) > -1 &&
-        actionType.indexOf(actionName) > -1;
+export function isMiniRxAction(actionType: string, actionName: ActionName, featureKey?: string) {
+    return (
+        actionType.indexOf(miniRxNameSpace + (featureKey ? `/${featureKey}/` : '')) > -1 &&
+        actionType.indexOf(actionName) > -1
+    );
 }
 
 export function miniRxError(message: string) {

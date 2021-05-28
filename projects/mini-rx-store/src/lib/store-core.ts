@@ -76,7 +76,7 @@ class StoreCore {
     }
 
     addFeature<StateType>(
-        featureName: string,
+        featureKey: string,
         reducer: Reducer<StateType>,
         config: {
             metaReducers?: MetaReducer<StateType>[];
@@ -88,20 +88,20 @@ class StoreCore {
                 ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
                 : reducer;
 
-        checkFeatureExists(featureName, this.reducers);
+        checkFeatureExists(featureKey, this.reducers);
 
         if (typeof config.initialState !== 'undefined') {
             reducer = createReducerWithInitialState(reducer, config.initialState);
         }
 
-        this.addReducer(featureName, reducer);
-        this.dispatch({ type: createMiniRxActionType(featureName, 'init') });
+        this.addReducer(featureKey, reducer);
+        this.dispatch({ type: createMiniRxActionType(featureKey, 'init') });
     }
 
-    removeFeature(featureName: string) {
-        this.removeReducer(featureName);
+    removeFeature(featureKey: string) {
+        this.removeReducer(featureKey);
         this.dispatch({
-            type: createMiniRxActionType(featureName, 'destroy'),
+            type: createMiniRxActionType(featureKey, 'destroy'),
         });
     }
 
@@ -122,9 +122,9 @@ class StoreCore {
         }
 
         if (config.reducers) {
-            Object.keys(config.reducers).forEach((featureName) => {
-                checkFeatureExists(featureName, this.reducers);
-                this.addReducer(featureName, config.reducers[featureName]);
+            Object.keys(config.reducers).forEach((featureKey) => {
+                checkFeatureExists(featureKey, this.reducers);
+                this.addReducer(featureKey, config.reducers[featureKey]);
             });
         }
 
@@ -157,14 +157,14 @@ class StoreCore {
         this.extensions.push(extension);
     }
 
-    private addReducer(featureName: string, reducer: Reducer<any>) {
+    private addReducer(featureKey: string, reducer: Reducer<any>) {
         const reducers = this.reducers;
-        reducers[featureName] = reducer;
+        reducers[featureKey] = reducer;
         this.reducersSource.next(reducers);
     }
 
-    private removeReducer(featureName: string) {
-        this.reducersSource.next(omit(this.reducers, featureName));
+    private removeReducer(featureKey: string) {
+        this.reducersSource.next(omit(this.reducers, featureKey));
     }
 }
 
@@ -177,9 +177,9 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function checkFeatureExists(featureName: string, reducers: ReducerDictionary) {
-    if (reducers.hasOwnProperty(featureName)) {
-        miniRxError(`Feature "${featureName}" already exists.`);
+function checkFeatureExists(featureKey: string, reducers: ReducerDictionary) {
+    if (reducers.hasOwnProperty(featureKey)) {
+        miniRxError(`Feature "${featureKey}" already exists.`);
     }
 }
 

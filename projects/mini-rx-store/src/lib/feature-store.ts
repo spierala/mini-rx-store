@@ -94,11 +94,11 @@ export class FeatureStore<StateType> {
 }
 
 function createDefaultReducer<StateType>(
-    featureName: string,
+    featureKey: string,
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload) => {
-        if (isMiniRxAction(action.type, 'set-state', featureName)) {
+        if (isMiniRxAction(action.type, 'set-state', featureKey)) {
             return {
                 ...state,
                 ...action.payload,
