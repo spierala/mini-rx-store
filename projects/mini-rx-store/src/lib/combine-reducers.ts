@@ -24,8 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, Reducer, ReducerDictionary } from 'mini-rx-store';
-import { AppState } from './models';
+import { Action, AppState, Reducer, ReducerDictionary } from './models';
 
 export function combineReducers(reducers: ReducerDictionary): Reducer<AppState> {
     const reducerKeys = Object.keys(reducers);

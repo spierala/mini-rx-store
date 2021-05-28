@@ -16,7 +16,6 @@ import {
     store,
 } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
-import { StoreConfig } from 'mini-rx-store';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
