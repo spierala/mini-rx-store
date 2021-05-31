@@ -1,4 +1,4 @@
-import { Action, AppState, Reducer } from '../models';
+import { Action, Reducer } from '../models';
 import { combineReducers } from '../combine-reducers';
 
 const action1: Action = {
@@ -50,7 +50,7 @@ function reducer3(state: any, action: Action): any {
 }
 
 describe('combine Reducers', () => {
-    let combinedReducer: Reducer<AppState>;
+    let combinedReducer: Reducer<any>;
 
     it('should combine reducers', () => {
         combinedReducer = combineReducers({
