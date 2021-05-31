@@ -37,8 +37,8 @@ class StoreCore {
     );
 
     // FEATURE REDUCERS DICTIONARY
-    private reducersSource: BehaviorSubject<ReducerDictionary> = new BehaviorSubject({});
-    private get reducers(): ReducerDictionary {
+    private reducersSource: BehaviorSubject<ReducerDictionary<AppState>> = new BehaviorSubject({});
+    private get reducers(): ReducerDictionary<AppState> {
         return this.reducersSource.getValue();
     }
 
@@ -105,7 +105,7 @@ class StoreCore {
         });
     }
 
-    config(config: Partial<StoreConfig> = {}) {
+    config(config: Partial<StoreConfig<AppState>> = {}) {
         if (Object.keys(this.reducers).length > 0) {
             miniRxError(
                 '`configureStore` detected already registered reducers. Did you instantiate FeatureStores before calling `configureStore`?'
@@ -177,7 +177,7 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function checkFeatureExists(featureKey: string, reducers: ReducerDictionary) {
+function checkFeatureExists(featureKey: string, reducers: ReducerDictionary<AppState>) {
     if (reducers.hasOwnProperty(featureKey)) {
         miniRxError(`Feature "${featureKey}" already exists.`);
     }
