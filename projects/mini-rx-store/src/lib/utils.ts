@@ -1,6 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, ActionName, AppState, MetaReducer, Reducer, ReducerDictionary } from './models';
+import { Action, ActionName, MetaReducer, Reducer } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>

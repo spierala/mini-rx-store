@@ -2,11 +2,11 @@ import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/
 import {
     Actions,
     actions$,
-    Store,
-    Reducer,
     configureStore,
-    StoreConfig,
     FeatureStoreConfig,
+    Reducer,
+    Store,
+    StoreConfig,
 } from 'mini-rx-store';
 
 export const STORE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/store-config');

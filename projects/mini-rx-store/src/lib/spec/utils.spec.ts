@@ -1,6 +1,6 @@
 import { actions$ } from '../store';
 import { ofType } from '../utils';
-import { Action, AppState, Reducer } from '../models';
+import { Action } from '../models';
 import { store } from './_spec-helpers';
 
 const action1: Action = {
