@@ -1,3 +1,41 @@
+# 3.0.0-beta.3 (2021-05-31)
+
+### Features
+Typings: configureStore initialState type has to match the provided reducers map keys.
+
+### Refactor
+* Store: improve miniRx error message
+* FeatureStore: rename: featureName -> featureKey
+
+# 3.0.0-beta.2 (2021-05-17)
+
+### BREAKING CHANGES
+* Throw error when instantiating FeatureStores before calling configureStore
+
+### DEPRECATIONS
+* FeatureStore.state$: use FeatureStore.select() instead
+* Store.createEffect: use Store.effect
+
+### Refactor
+* Store.getInstance -> Store.configureStore
+
+# 3.0.0-beta.0 (2021-05-10)
+
+### BREAKING CHANGES
+* Store config initial state must match the reducer keys (initial state properties which have no corresponding reducer key will be dropped)
+
+### Features
+* Feature Store: destroyable
+* Feature Store effect: resubscribe the effect 10 times (if side effect error is not handled)
+
+### Bugfixes
+* Undo Extension: exclude more miniRx Actions from buffered actions
+* default-effects-error-handler: console.error instead of silencing the error 
+
+### Refactor
+* Store Core: remove obsolete ActionWithMeta
+* Store Core: use action subscribe to update state, remove tap operator
+
 # 2.0.1 (2021-05-08)
 
 ### Bugfixes

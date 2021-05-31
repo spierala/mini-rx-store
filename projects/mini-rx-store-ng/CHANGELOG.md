@@ -1,3 +1,14 @@
+# 2.0.0-beta.1 (2021-05-31)
+
+### Features
+Typings: Store.forRoot initialState type has to match the provided reducers map keys.
+
+# 2.0.0-beta.0 (2021-05-17)
+
+### BREAKING CHANGES
+
+* Store config initial state must match the reducer keys
+
 # 1.0.0-beta.1 (2021-03-15)
 
 ### Features
