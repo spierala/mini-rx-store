@@ -1,3 +1,11 @@
+# 3.0.0-rc.0 (2021-06-14)
+
+### Features
+* FeatureStore: expose FeatureStore.state$
+
+### Refactor
+* Store: shorten error message: "`configureStore` detected reducers".
+
 # 3.0.0-beta.3 (2021-05-31)
 
 ### Features
