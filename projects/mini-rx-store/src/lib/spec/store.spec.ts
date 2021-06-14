@@ -167,7 +167,7 @@ describe('Store Config', () => {
     it('should throw when calling Store.config after a Feature Store was initialized', () => {
         createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
         expect(() => StoreCore.config({})).toThrowError(
-            '`configureStore` detected already registered reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+            '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
         );
     });
 

@@ -108,7 +108,7 @@ class StoreCore {
     config(config: Partial<StoreConfig<AppState>> = {}) {
         if (Object.keys(this.reducers).length > 0) {
             miniRxError(
-                '`configureStore` detected already registered reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+                '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
             );
         }
 
