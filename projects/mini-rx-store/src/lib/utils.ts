@@ -1,6 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, AppState, MetaReducer, Reducer } from './models';
+import { Action, ActionName, MetaReducer, Reducer } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -17,14 +17,6 @@ export function select<T, K>(mapFn: (state: T) => K) {
     );
 }
 
-export function combineReducers(reducers: Reducer<any>[]): Reducer<AppState> {
-    return (state: AppState = {}, action: Action): AppState => {
-        return reducers.reduce((currState, reducer) => {
-            return reducer(currState, action);
-        }, state);
-    };
-}
-
 export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
     return (reducer: Reducer<any>): Reducer<T> => {
         return metaReducers.reduceRight(
@@ -36,12 +28,30 @@ export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaRedu
     };
 }
 
-export function createActionTypePrefix(featureName): string {
-    return '@mini-rx/' + featureName;
+export function omit<T extends { [key: string]: any }>(object: T, keyToOmit: keyof T): Partial<T> {
+    return Object.keys(object)
+        .filter((key) => key !== keyToOmit)
+        .reduce((prevValue, key) => {
+            prevValue[key] = object[key];
+            return prevValue;
+        }, {});
+}
+
+const miniRxNameSpace = '@mini-rx';
+
+export function createMiniRxActionType(featureKey, actionName: ActionName): string {
+    return miniRxNameSpace + '/' + featureKey + '/' + actionName;
+}
+
+export function isMiniRxAction(actionType: string, actionName: ActionName, featureKey?: string) {
+    return (
+        actionType.indexOf(miniRxNameSpace + (featureKey ? `/${featureKey}/` : '')) > -1 &&
+        actionType.indexOf(actionName) > -1
+    );
 }
 
 export function miniRxError(message: string) {
-    throw new Error(`MiniRx: ` + message);
+    throw new Error(miniRxNameSpace + ': ' + message);
 }
 
-export const storeInitActionType = '@mini-rx/store/init';
+export const storeInitActionType = miniRxNameSpace + '/init';

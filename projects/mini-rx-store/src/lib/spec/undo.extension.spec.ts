@@ -1,6 +1,9 @@
 import { createFeatureSelector, createSelector } from '../selector';
 import { Action } from '../models';
 import {
+    counterInitialState,
+    counterReducer,
+    CounterState,
     counterStringInitialState,
     counterStringReducer,
     CounterStringState,
@@ -9,6 +12,7 @@ import {
 import { undo, UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
+import StoreCore from '../store-core';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
@@ -34,11 +38,11 @@ describe('Undo Extension', () => {
     describe('FeatureStore', () => {
         const featureStore: MyFeatureStore = new MyFeatureStore();
 
-        it('should throw it Undo Extension is not added', () => {
+        it('should throw if Undo Extension is not added', () => {
             expect(featureStore.undoLastAction).toThrow();
         });
 
-        store._addExtension(new UndoExtension());
+        StoreCore.addExtension(new UndoExtension());
 
         const counterSpy = jest.fn();
         featureStore.count$.subscribe(counterSpy);
@@ -56,15 +60,15 @@ describe('Undo Extension', () => {
     });
 
     describe('CounterStringReducer', () => {
-        const featureName = 'counterStringWithUndo';
-        const getCounterFeatureState = createFeatureSelector<CounterStringState>(featureName);
+        const featureKey = 'counterStringWithUndo';
+        const getCounterFeatureState = createFeatureSelector<CounterStringState>(featureKey);
         const getCounter = createSelector(getCounterFeatureState, (state) => {
             return state.counter;
         });
 
         const counterSpy = jest.fn();
 
-        store.feature<CounterStringState>(featureName, counterStringReducer);
+        store.feature<CounterStringState>(featureKey, counterStringReducer);
         store.select(getCounter).subscribe(counterSpy);
 
         function createCounterAction(payload: string) {
@@ -101,6 +105,48 @@ describe('Undo Extension', () => {
             store.dispatch(undo(createCounter9Action));
 
             expect(counterSpy).toHaveBeenLastCalledWith('12457810');
+        });
+
+        it('should not affect removed feature states / reducers', () => {
+            StoreCore.addFeature<CounterState>('tempCounter1', counterReducer);
+            StoreCore.addFeature<CounterState>('tempCounter2', counterReducer);
+
+            const spy = jest.fn();
+
+            store
+                .select((state) => {
+                    return state;
+                })
+                .subscribe(spy);
+
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tempCounter1: counterInitialState,
+                    tempCounter2: counterInitialState,
+                })
+            );
+
+            spy.mockReset();
+
+            const counterAction: Action = { type: 'counter' };
+            store.dispatch(counterAction);
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    tempCounter1: { counter: 2 },
+                    tempCounter2: { counter: 2 },
+                })
+            );
+
+            spy.mockReset();
+
+            StoreCore.removeFeature('tempCounter2');
+            store.dispatch(undo(counterAction));
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({ tempCounter1: counterInitialState })
+            );
+            expect(spy).toHaveBeenCalledWith(
+                expect.not.objectContaining({ tempCounter2: counterInitialState })
+            );
         });
     });
 });

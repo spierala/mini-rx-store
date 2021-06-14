@@ -10,7 +10,7 @@ import {
     NgModule,
 } from '@angular/core';
 import { NgReduxDevtoolsExtension } from './ng-redux-devtools.extension';
-import { ReduxDevtoolsOptions, Store } from 'mini-rx-store';
+import { _StoreCore, ReduxDevtoolsOptions } from 'mini-rx-store';
 
 export const DEVTOOLS_OPTIONS = new InjectionToken<ReduxDevtoolsOptions>(
     '@mini-rx/reduxDevtoolsOptions'
@@ -24,7 +24,7 @@ export class NgReduxDevtoolsService {
         private injector: Injector,
         @Inject(DEVTOOLS_OPTIONS) private options: ReduxDevtoolsOptions
     ) {
-        Store.getInstance()._addExtension(new NgReduxDevtoolsExtension(options, injector));
+        _StoreCore.addExtension(new NgReduxDevtoolsExtension(options, injector));
     }
 }
 

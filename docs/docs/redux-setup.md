@@ -10,19 +10,13 @@ At the same time we can pass a configuration to initialize our feature reducers,
 At first, we do not need any configuration to get started.
 
 Let`s just get hold of the store instance:
-
 ```ts
 import { configureStore, Store } from 'mini-rx-store';
 
 const store: Store = configureStore({});
 ```
 
-We can add feature reducers dynamically later like this:
-```ts
-import todoReducer from './todo-reducer';
-
-store.feature('todo', todoReducer);
-```
+With the `store` instance we can already add reducers (dynamically), select state, dispatch actions and create effects.
 
 ## Feature Reducers
 We can configure the feature reducers via the configuration object. The reducers will be ready at store initialization.
@@ -40,19 +34,32 @@ const store: Store = configureStore({
 });
 ```
 
+### Add Feature Reducers dynamically
+It is possible to add feature reducers dynamically later like this:
+```ts
+import todoReducer from './todo-reducer';
+
+store.feature('todo', todoReducer);
+```
+
 ## Initial State
-Set the initial state of the store via the configuration object:
+We can set the initial state of the store via the configuration object. The initial state keys must match the provided reducer keys:
 ```ts
 import { configureStore, Store } from 'mini-rx-store';
+import counterReducer from './counter-reducer';
 
 const store: Store = configureStore({
-  initialState: {counter: 123}
+  reducers: {
+    product: productReducer,
+    user: userReducer
+  },
+  initialState: {
+    product: {},
+    user: {}
+  }
 });
-
-store.select(state => state).subscribe(console.log);
-//OUTPUT: {counter: 123}
 ```
-See how the initial state is available in the feature reducers:
+See how the initial state is available in a feature reducer:
 ```ts
 import { Action, Store, configureStore } from 'mini-rx-store';
 

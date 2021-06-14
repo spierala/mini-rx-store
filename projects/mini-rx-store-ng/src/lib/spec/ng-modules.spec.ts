@@ -7,16 +7,16 @@ import { of } from 'rxjs';
 import { EffectsModule } from '../effects.module';
 
 export const loadAction: Action = {
-    type: 'LOAD'
-}
+    type: 'LOAD',
+};
 
 export const loadSuccessAction: Action = {
-    type: 'LOAD_SUCCESS'
-}
+    type: 'LOAD_SUCCESS',
+};
 
 export const loadFailAction: Action = {
-    type: 'LOAD_FAIL'
-}
+    type: 'LOAD_FAIL',
+};
 
 interface CounterState {
     counter: number;
@@ -53,31 +53,30 @@ function featureMetaReducer(reducer) {
 }
 
 @NgModule({
-    imports: [StoreModule.forFeature<CounterState>('counter5', counterReducer, {
-        initialState: {
-            counter: 555,
-        },
-        metaReducers: [featureMetaReducer]
-    })],
+    imports: [
+        StoreModule.forFeature<CounterState>('counter5', counterReducer, {
+            initialState: {
+                counter: 555,
+            },
+            metaReducers: [featureMetaReducer],
+        }),
+    ],
 })
 class Counter5Module {}
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TodoEffects {
     loadTodos$ = this.actions$.pipe(
         ofType(loadAction.type),
         mergeMap(() =>
             of('some result').pipe(
-                map(res => loadSuccessAction),
-                catchError(err => of(loadFailAction))
+                map((res) => loadSuccessAction),
+                catchError((err) => of(loadFailAction))
             )
         )
     );
 
-    constructor(
-        private actions$: Actions
-    ) {
-    }
+    constructor(private actions$: Actions) {}
 }
 
 class CounterFeatureStore extends FeatureStore<CounterState> {
@@ -121,18 +120,14 @@ describe(`Ng Modules`, () => {
                 StoreModule.forRoot({
                     reducers: {
                         counter1: counterReducer,
-                        counter2: counterReducer,
                     },
                     initialState: {
                         counter1: { counter: 111 },
-                        counter3: {
-                            counter: 333,
-                        },
                     },
                     metaReducers: [rootMetaReducer],
                     extensions: [new SomeExtension()],
                 }),
-                Counter5Module
+                Counter5Module,
             ],
         });
 
@@ -149,8 +144,6 @@ describe(`Ng Modules`, () => {
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({
             counter1: { counter: 111 }, // Reducer initial state is overwritten by initial state from forRoot config
-            counter2: { counter: 1 }, // Reducer initial state
-            counter3: { counter: 333 }, // forRoot config initial state
             counter4: { counter: 1 },
             counter5: { counter: 555 }, // forFeature config initial state
         });
@@ -172,8 +165,6 @@ describe(`Ng Modules`, () => {
 
         expect(spy).toHaveBeenCalledWith({
             counter1: { counter: 112 },
-            counter2: { counter: 2 },
-            counter3: { counter: 333 },
             counter4: { counter: 2 },
             counter5: { counter: 556 },
         });
@@ -203,8 +194,6 @@ describe(`Ng Modules`, () => {
 
             expect(spy).toHaveBeenCalledWith({
                 counter1: { counter: 112 },
-                counter2: { counter: 2 },
-                counter3: { counter: 333 },
                 counterFs: { counter: 1 },
                 counter4: { counter: 2 },
                 counter5: { counter: 556 },
@@ -218,8 +207,6 @@ describe(`Ng Modules`, () => {
 
             expect(spy).toHaveBeenCalledWith({
                 counter1: { counter: 112 },
-                counter2: { counter: 2 },
-                counter3: { counter: 333 },
                 counterFs: { counter: 2 },
                 counter4: { counter: 2 },
                 counter5: { counter: 556 },

@@ -1,6 +1,6 @@
 import { FeatureStore } from '../feature-store';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import { actions$, createFeatureStore } from '../store';
@@ -49,7 +49,7 @@ const getCountry = createSelector(getUserFeatureState2, (state) => state.country
 store.feature<CounterState>('someFeature', counterReducer);
 const getSomeFeatureSelector = createFeatureSelector<CounterState>('someFeature');
 
-class FeatureState extends FeatureStore<UserState> {
+class UserFeatureStore extends FeatureStore<UserState> {
     firstName$ = this.select((state) => state.firstName);
     lastName$ = this.select((state) => state.lastName);
     country$ = this.select(getCountry);
@@ -121,7 +121,7 @@ class CounterFeature2 extends FeatureStore<any> {
     }
 }
 
-const userFeature: FeatureState = new FeatureState();
+const userFeature: UserFeatureStore = new UserFeatureStore();
 const counterFeature: CounterFeature = new CounterFeature();
 
 describe('FeatureStore', () => {
@@ -138,6 +138,10 @@ describe('FeatureStore', () => {
         userFeature.select().subscribe(spy);
         expect(spy).toHaveBeenCalledWith(initialState);
         expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should expose the feature key', () => {
+        expect(userFeature.featureKey).toBe('user2');
     });
 
     it('should update state', () => {
@@ -210,6 +214,84 @@ describe('FeatureStore', () => {
         );
     });
 
+    it('should resubscribe the effect 10 times (if side effect error is not handled)', () => {
+        const spy = jest.fn();
+        console.error = jest.fn();
+
+        function apiCallWithError() {
+            spy();
+            throw new Error();
+            return of('someValue');
+        }
+
+        const fs: FeatureStore<any> = createFeatureStore('fsWithFailingApi', {});
+
+        const load = fs.effect(mergeMap(() => apiCallWithError().pipe(tap(() => fs.setState({})))));
+
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load();
+        load(); // #12 will not trigger the Api call anymore
+        load(); // #13 will not trigger the Api call anymore
+
+        expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
+
+        function getErrorMsg(times) {
+            return `MiniRx resubscribed the Effect. ONLY ${times} time(s) remaining!`;
+        }
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(9)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(8)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(7)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(6)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(5)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(4)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(3)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(2)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(1)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(0)),
+            expect.any(Error)
+        );
+
+        expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
+    });
+
     it('should dispatch a set-state default action', () => {
         userFeature.resetState();
 
@@ -220,34 +302,6 @@ describe('FeatureStore', () => {
             type: '@mini-rx/user2/set-state/updateCity',
             payload: { city: 'NY' },
         });
-    });
-
-    it('should dispatch a set-state default action with meta data', () => {
-        userFeature.resetState();
-
-        const spy = jest.fn();
-        StoreCore['actionsWithMetaSource'].subscribe(spy);
-        userFeature.updateCity('NY');
-        expect(spy).toHaveBeenCalledWith({
-            action: {
-                type: '@mini-rx/user2/set-state/updateCity',
-                payload: { city: 'NY' },
-            },
-            meta: {
-                onlyForFeature: 'user2',
-            },
-        });
-    });
-
-    it('should only run its own feature state reducer when Feature.setState is called', () => {
-        expect(reducerSpy).toHaveBeenCalledTimes(1); // 1 for initializing the feature state reducer with an initial action
-        reducerSpy.mockReset();
-    });
-
-    it('should NOT run the redux reducers when a new feature state is added', () => {
-        const counterFeature = new CounterFeature2();
-        expect(reducerSpy).toHaveBeenCalledTimes(0);
-        reducerSpy.mockReset();
     });
 
     it('should run the meta reducers when state changes', () => {
@@ -295,5 +349,34 @@ describe('FeatureStore', () => {
         inc();
 
         expect(spy).toHaveBeenCalledWith(2);
+    });
+
+    it('should remove the feature state when Feature Store is destroyed', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
+            'tempFsState',
+            counterInitialState
+        );
+
+        const spy = jest.fn();
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining({ tempFsState: counterInitialState })
+        );
+
+        fs.destroy();
+        expect(spy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ tempCounter: counterInitialState })
+        );
+    });
+
+    it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {
+        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
+            'tempFsState',
+            counterInitialState
+        );
+
+        const spy = jest.spyOn(fs, 'destroy');
+        fs.ngOnDestroy();
+        expect(spy).toHaveBeenCalled();
     });
 });

@@ -10,9 +10,9 @@ MiniRx Store uses the Redux pattern to make state management easy and predictabl
 ## Redux Pattern
 The Redux Pattern is based on this 3 key principles:
 
--   Single Source of Truth: The Store holds the global application state
--   State is read-only and is only changed by dispatching actions
--   Changes are made using pure functions called reducers
+-   Single source of truth: The **store** holds the global application state
+-   State is read-only and is only changed by dispatching **actions**
+-   Changes are made using pure functions called **reducers**
 
 ## What's Included
 The MiniRx Redux Store comes with these APIs:

@@ -3,6 +3,7 @@
  */
 
 export { actions$, Store, configureStore, createFeatureStore } from './lib/store';
+export { default as _StoreCore } from './lib/store-core';
 export { FeatureStore } from './lib/feature-store';
 export { createFeatureSelector, createSelector } from './lib/selector';
 export {

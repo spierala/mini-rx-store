@@ -1,4 +1,4 @@
-import { actions$, configureStore } from '../store';
+import { actions$, configureStore, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
 import { Action, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
@@ -162,6 +162,13 @@ describe('Store Config', () => {
             user: { name: 'Nicolas' }, // userReducer initial state is overwritten by the root initial state
             user2: userInitialState, // Root initial state does not affect User2 initial state
         });
+    });
+
+    it('should throw when calling Store.config after a Feature Store was initialized', () => {
+        createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
+        expect(() => StoreCore.config({})).toThrowError(
+            '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+        );
     });
 
     describe('Root Meta Reducers', () => {
@@ -522,7 +529,7 @@ describe('Store', () => {
             payload: user,
         };
 
-        store._addExtension(new LoggerExtension());
+        StoreCore.addExtension(new LoggerExtension());
 
         store.dispatch(action);
 
@@ -538,7 +545,7 @@ describe('Store', () => {
 
     it('should add extension', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
-        store._addExtension(new ReduxDevtoolsExtension({}));
+        StoreCore.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
         expect(StoreCore['extensions'].length).toBe(2);
     });
@@ -647,17 +654,17 @@ describe('Store', () => {
     });
 
     it('should overwrite reducers default state with a provided initialState', () => {
-        const featureName = 'counterWithCustomInitialState';
+        const featureKey = 'counterWithCustomInitialState';
         const customInitialState: CounterState = {
             counter: 2,
         };
 
-        store.feature<CounterState>(featureName, counterReducer, {
+        store.feature<CounterState>(featureKey, counterReducer, {
             initialState: customInitialState,
         });
 
         const spy = jest.fn();
-        store.select((state) => state[featureName]).subscribe(spy);
+        store.select((state) => state[featureKey]).subscribe(spy);
         expect(spy).toHaveBeenCalledWith(customInitialState);
     });
 
@@ -748,7 +755,7 @@ describe('Store', () => {
         expect(() => configureStore({})).toThrow();
     });
 
-    it('should not emit a new AppState when dispatching unknown Actions ', () => {
+    it('should not emit a new AppState when dispatching unknown Actions', () => {
         const spy = jest.fn();
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledTimes(1);
@@ -756,6 +763,22 @@ describe('Store', () => {
 
         store.dispatch({ type: 'unknownAction' });
         expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should add and remove reducers', () => {
+        const featureKey = 'tempCounter';
+
+        const spy = jest.fn();
+        StoreCore.addFeature<CounterState>(featureKey, counterReducer);
+        store.select((state) => state).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining({ tempCounter: counterInitialState })
+        );
+
+        StoreCore.removeFeature(featureKey);
+        expect(spy).toHaveBeenCalledWith(
+            expect.not.objectContaining({ tempCounter: counterInitialState })
+        );
     });
 });
 

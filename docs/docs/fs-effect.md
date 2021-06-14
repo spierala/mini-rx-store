@@ -51,7 +51,7 @@ With RxJS flattening operators (mergeMap, switchMap, concatMap, exhaustMap) we c
 Inside the RxJS `tap` and `catchError` operators we can call `this.setState()` to update state.
 
 :::warning
-It is important to handle possible API errors with `catchError` to make sure that the `payload$` stream does not die.
+It is important to handle possible API errors with `catchError` to make sure that the effect source does not complete. Otherwise, the effect will not work anymore. 
 :::warning
 
 :::info

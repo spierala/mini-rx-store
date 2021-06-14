@@ -2,21 +2,21 @@ import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/
 import {
     Actions,
     actions$,
-    Store,
-    Reducer,
     configureStore,
-    StoreConfig,
     FeatureStoreConfig,
+    Reducer,
+    Store,
+    StoreConfig,
 } from 'mini-rx-store';
 
-export const STORE_CONFIG = new InjectionToken<StoreConfig>('@mini-rx/store-config');
+export const STORE_CONFIG = new InjectionToken<StoreConfig<any>>('@mini-rx/store-config');
 export const FEATURE_NAMES = new InjectionToken<string[]>('@mini-rx/feature-name');
 export const FEATURE_REDUCERS = new InjectionToken<Reducer<any>[]>('@mini-rx/feature-reducer');
 export const FEATURE_CONFIGS = new InjectionToken<FeatureStoreConfig<any>[]>(
     '@mini-rx/feature-store-config'
 );
 
-export function storeFactory(config: StoreConfig) {
+export function storeFactory<T>(config: StoreConfig<T>) {
     return configureStore(config);
 }
 
@@ -44,7 +44,7 @@ export class StoreFeatureModule {
 
 @NgModule()
 export class StoreModule {
-    static forRoot(config: Partial<StoreConfig>): ModuleWithProviders<StoreRootModule> {
+    static forRoot<T>(config: Partial<StoreConfig<T>>): ModuleWithProviders<StoreRootModule> {
         return {
             ngModule: StoreRootModule,
             providers: [

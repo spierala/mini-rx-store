@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 todos$: Observable<Todo[]> = this.select(state => state.todos);
 ```
 
-`select` takes a callback function which gives you access to the current feature state (see the `state` parameter).
+`select` takes a callback function which gives you access to the current **feature state** (see the `state` parameter).
 Within that function you can pick a specific piece of state.
 `select` returns an Observable which will emit as soon as the selected state changes.
 
@@ -27,7 +27,7 @@ This is because the Feature Store is operating on a specific feature state alrea
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
 
 // Memoized Selectors
-const getTodoFeatureState = createFeatureSelector<TodoState>(); // Omit the feature name!
+const getTodoFeatureState = createFeatureSelector<TodoState>(); // Omit the feature key!
 
 const getTodos = createSelector(
   getTodoFeatureState,

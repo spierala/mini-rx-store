@@ -1,5 +1,10 @@
 {
     "extends": "./tsconfig.lib.json",
+    "compilerOptions": {
+        "paths": {
+            "mini-rx-store": ["dist/mini-rx-store"]
+        },
+    },
     "angularCompilerOptions": {
         "enableIvy": false
     }

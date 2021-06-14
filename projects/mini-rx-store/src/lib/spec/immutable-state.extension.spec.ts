@@ -4,6 +4,7 @@ import { Action, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
 import { FeatureStore } from '../feature-store';
 import { createFeatureStore } from '../store';
+import StoreCore from '../store-core';
 
 export function counterReducerWithMutation(
     state: CounterState = counterInitialState,
@@ -74,7 +75,7 @@ describe('Immutable State Extension', () => {
     const fs: FeatureStore<CounterState> = createFeatureStore('fsImmutable', counterInitialState);
 
     beforeAll(() => {
-        store._addExtension(new ImmutableStateExtension());
+        StoreCore.addExtension(new ImmutableStateExtension());
         store.feature<CounterState>('immutableCounter2', counterReducerWithMutation);
         store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
     });
