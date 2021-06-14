@@ -15,7 +15,7 @@ export class FeatureStore<StateType> {
     private destroy$: Subject<void> = new Subject();
 
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
-    private state$: Observable<StateType> = this.stateSource.asObservable();
+    state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
         return this.stateSource.getValue();
     }
