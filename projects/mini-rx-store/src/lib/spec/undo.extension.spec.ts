@@ -49,13 +49,14 @@ describe('Undo Extension', () => {
 
         it('should undo dispatched actions', () => {
             featureStore.count('2');
+            featureStore.undoLastAction();
             featureStore.count('3');
             featureStore.undoLastAction();
             featureStore.count('4');
             featureStore.count('5');
             featureStore.undoLastAction();
             featureStore.count('6');
-            expect(counterSpy).toHaveBeenLastCalledWith('1246');
+            expect(counterSpy).toHaveBeenLastCalledWith('146');
         });
     });
 

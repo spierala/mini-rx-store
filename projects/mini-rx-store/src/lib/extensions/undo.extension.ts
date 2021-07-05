@@ -51,13 +51,9 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
             );
             return newState;
         } else if (
-            !(
-                action.type === storeInitActionType ||
-                isMiniRxAction(action.type, 'init') ||
-                isMiniRxAction(action.type, 'destroy')
-            )
+            !(action.type === storeInitActionType || isMiniRxAction(action.type, 'destroy'))
         ) {
-            // push every action that isn't UNDO_ACTION / storeInitAction / "MiniRx (feature) Init" / "MiniRx (feature) Destroy" to the executedActions property
+            // push every action that isn't UNDO_ACTION / storeInitAction / "MiniRx (feature) destroy" to the executedActions property
             executedActions.push(action);
         }
         const updatedState = rootReducer(state, action);
