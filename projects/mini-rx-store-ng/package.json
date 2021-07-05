@@ -1,6 +1,6 @@
 {
     "name": "mini-rx-store-ng",
-    "version": "2.0.0-rc.1",
+    "version": "2.0.0-rc.2",
     "dependencies": {
         "tslib": "^1.10.0"
     },
