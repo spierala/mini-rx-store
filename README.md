@@ -187,7 +187,7 @@ Play with the basic tutorial on Stackblitz: [MiniRx Store - Basic Tutorial](http
 These popular Angular demo applications show the power of MiniRx:
 - [Angular Tetris with MiniRx](https://github.com/spierala/angular-tetris-mini-rx)
 - [Angular Jira Clone using MiniRx](https://github.com/spierala/jira-clone-angular)
-- Coming soon: Angular Spotify using MiniRx
+- [Angular Spotify using MiniRx](https://github.com/spierala/angular-spotify-mini-rx)
 
 ## MiniRx Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
