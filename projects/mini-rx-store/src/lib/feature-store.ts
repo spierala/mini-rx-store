@@ -20,20 +20,23 @@ export class FeatureStore<StateType> {
         return this.stateSource.getValue();
     }
 
+    // tslint:disable-next-line:variable-name
+    private readonly _featureKey: string;
     get featureKey(): string {
         return this._featureKey;
     }
 
-    // tslint:disable-next-line:variable-name
-    constructor(private _featureKey: string, initialState: StateType) {
-        const reducer: Reducer<StateType> = createDefaultReducer(_featureKey, initialState);
-        StoreCore.addFeature<StateType>(_featureKey, reducer);
+    constructor(featureKey: string, initialState: StateType) {
+        this._featureKey = featureKey;
+
+        const reducer: Reducer<StateType> = createDefaultReducer(featureKey, initialState);
+        StoreCore.addFeature<StateType>(featureKey, reducer);
 
         // Create Default Action Type (needed for setState())
-        this.actionTypeSetState = createMiniRxActionType(_featureKey, 'set-state');
+        this.actionTypeSetState = createMiniRxActionType(featureKey, 'set-state');
 
         // Select Feature State and delegate to local BehaviorSubject
-        const featureSelector = createFeatureSelector<AppState, StateType>(_featureKey);
+        const featureSelector = createFeatureSelector<AppState, StateType>(featureKey);
         StoreCore.select(featureSelector)
             .pipe(takeUntil(this.destroy$))
             .subscribe(this.stateSource);
