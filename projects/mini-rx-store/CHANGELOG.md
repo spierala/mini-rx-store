@@ -1,3 +1,13 @@
+# 3.0.0-rc.2 (2021-07-06)
+### Bugfixes
+* Undo Extension: Add feature init action to buffered actions
+
+### Refactor
+* Feature Store: featureKey parameter in constructor: _featureKey -> featureKey
+
+# 3.0.0-rc.1 (2021-06-15)
+Downgrade ng-packagr
+
 # 3.0.0-rc.0 (2021-06-14)
 
 ### Features
