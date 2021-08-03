@@ -1,3 +1,9 @@
+# 2.0.0-rc.2 (2021-07-5)
+Update peer deps
+
+# 2.0.0-rc.1 (2021-06-15)
+Downgrade ng-packagr
+
 # 2.0.0-rc.0 (2021-06-14)
 This release contains the same set the of changes as 2.0.0-beta.1.
 
