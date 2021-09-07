@@ -1,3 +1,6 @@
+# 2.0.0 (2021-09-07)
+Update peer deps
+
 # 2.0.0-rc.2 (2021-07-05)
 Update peer deps
 

@@ -27,6 +27,6 @@
     "peerDependencies": {
         "@angular/common": ">= 9.0.0",
         "@angular/core": ">= 9.0.0",
-        "mini-rx-store": ">= 3.0.0-rc.1"
+        "mini-rx-store": ">= 3.0.0"
     }
 }

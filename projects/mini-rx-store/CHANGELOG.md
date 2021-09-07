@@ -1,3 +1,6 @@
+# 3.0.0 (2021-09-07)
+Change RxJS peer dependency, fix dependency versions of deep-freeze-strict and memoize-one
+
 # 3.0.0-rc.2 (2021-07-06)
 ### Bugfixes
 * Undo Extension: Add feature init action to buffered actions
