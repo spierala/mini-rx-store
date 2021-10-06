@@ -183,11 +183,17 @@ store.select(state => state).subscribe(console.log);
 ```
 Play with the basic tutorial on Stackblitz: [MiniRx Store - Basic Tutorial](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts)
 
-## More MiniRx Examples:
+## Demos and examples:
+Demos with working example:
+- [Angular MiniRx Demo on Github](https://github.com/spierala/mini-rx-angular-demo)
+    - See it live [here](https://angular-demo.mini-rx.io/)   
+- [Svelte MiniRx Demo on Github](https://github.com/spierala/mini-rx-svelte-demo)
+    - See it live [here](https://svelte-demo.mini-rx.io/)   
+
 These popular Angular demo applications show the power of MiniRx:
-- [Angular Tetris with MiniRx](https://github.com/spierala/angular-tetris-mini-rx)
-- [Angular Jira Clone using MiniRx](https://github.com/spierala/jira-clone-angular)
-- [Angular Spotify using MiniRx](https://github.com/spierala/angular-spotify-mini-rx)
+- [Angular Tetris with MiniRx on Github](https://github.com/spierala/angular-tetris-mini-rx)
+- [Angular Jira Clone using MiniRx on Github](https://github.com/spierala/jira-clone-angular)
+- [Angular Spotify using MiniRx on Github](https://github.com/spierala/angular-spotify-mini-rx)
 
 ## MiniRx Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
