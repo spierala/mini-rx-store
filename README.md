@@ -14,32 +14,32 @@ It is a **global**, application-wide solution to manage state and is powered by 
 MiniRx will help you to manage state at large scale (with the **Redux** pattern), but it also offers a simple form of state management: **Feature Stores**.
 
 
-- 🤓 Learn about MiniRx on the [docs site](https://spierala.github.io/mini-rx-store)
+- 🤓 Learn about MiniRx on the [docs site](https://mini-rx.io)
 - 🚀 See MiniRx in action on [StackBlitz](https://stackblitz.com/edit/mini-rx-store-demo)
 
 ## What's Included
 -   RxJS powered global state management
 -   State and Actions are exposed as RxJS Observable
--   [Store (Redux API)](https://spierala.github.io/mini-rx-store/docs/redux):
+-   [Store (Redux API)](https://mini-rx.io/docs/redux):
     -   Actions
     -   Reducers
     -   Meta Reducers
     -   Memoized Selectors
     -   Effects
-    -   [Support for ts-action](https://spierala.github.io/mini-rx-store/docs/ts-action): Create and consume actions with as little boilerplate as possible
--   [FeatureStore](https://spierala.github.io/mini-rx-store/docs/fs-quick-start): Update state without actions and reducers:
+    -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create and consume actions with as little boilerplate as possible
+-   [FeatureStore](https://mini-rx.io/docs/fs-quick-start): Update state without actions and reducers:
     -   `setState()` update the feature state
     -   `select()` read feature state
     -   `effect()` run side effects like API calls and update feature state
     -   `undo()` easily undo setState actions
--   [Extensions](https://spierala.github.io/mini-rx-store/docs/ext-quick-start):
+-   [Extensions](https://mini-rx.io/docs/ext-quick-start):
     - Redux Dev Tools Extension: Inspect State with the Redux Dev Tools
     - Immutable Extension: Enforce immutability
     - Undo Extension: Undo dispatched Actions
     - Logger Extension: console.log the current action and updated state
 -   Framework agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
 -   TypeScript support: The MiniRx API comes with TypeScript type definitions
--   [Angular Integration](https://spierala.github.io/mini-rx-store/docs/angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
+-   [Angular Integration](https://mini-rx.io/docs/angular): Use MiniRx Store the Angular way: `StoreModule.forRoot()`, `StoreModule.forFeature()`, ...
 
 ## Key Concepts
 - The store is a single object which holds the global application state. It is the **"single source of truth"**
@@ -195,7 +195,7 @@ These popular Angular demo applications show the power of MiniRx:
 - [Angular Jira Clone using MiniRx on Github](https://github.com/spierala/jira-clone-angular)
 - [Angular Spotify using MiniRx on Github](https://github.com/spierala/angular-spotify-mini-rx)
 
-## MiniRx Blog Posts:
+## Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
 
 ## References
