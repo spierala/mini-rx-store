@@ -1,6 +1,6 @@
 {
     "name": "mini-rx-store",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
@@ -13,6 +13,7 @@
         "Angular",
         "React",
         "Vue",
+        "Svelte",
         "Observable",
         "Store",
         "JavaScript"

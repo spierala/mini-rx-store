@@ -28,10 +28,11 @@ MiniRx will help you to manage state at large scale (with the **Redux** pattern)
     -   Effects
     -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create and consume actions with as little boilerplate as possible
 -   [FeatureStore](https://mini-rx.io/docs/fs-quick-start): Update state without actions and reducers:
-    -   `setState()` update the feature state
-    -   `select()` read feature state
-    -   `effect()` run side effects like API calls and update feature state
-    -   `undo()` easily undo setState actions
+    - `setState()` update the feature state
+    - `select()` read feature state
+    - `effect()` run side effects like API calls and update feature state
+    - `undo()` easily undo setState actions
+    - `get state()` imperatively get the current feature state
 -   [Extensions](https://mini-rx.io/docs/ext-quick-start):
     - Redux Dev Tools Extension: Inspect State with the Redux Dev Tools
     - Immutable Extension: Enforce immutability

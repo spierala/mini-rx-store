@@ -1,3 +1,7 @@
+# 3.0.1 (2021-11-25)
+### Bugfixes
+Feature Store: improve state type: prevent using number, string etc as state type
+
 # 3.0.0 (2021-09-07)
 Change RxJS peer dependency, fix dependency versions of deep-freeze-strict and memoize-one
 
