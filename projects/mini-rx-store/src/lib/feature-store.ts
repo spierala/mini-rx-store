@@ -10,7 +10,7 @@ import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
-export class FeatureStore<StateType> {
+export class FeatureStore<StateType extends object> {
     private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
     private destroy$: Subject<void> = new Subject();
 
