@@ -44,7 +44,10 @@ export function configureStore<T>(config: Partial<StoreConfig<T>>): Store {
     return Store.configureStore(config);
 }
 
-export function createFeatureStore<T>(featureKey: string, initialState: T): FeatureStore<T> {
+export function createFeatureStore<T extends object>(
+    featureKey: string,
+    initialState: T
+): FeatureStore<T> {
     return new FeatureStore<T>(featureKey, initialState);
 }
 
