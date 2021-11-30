@@ -198,6 +198,7 @@ These popular Angular demo applications show the power of MiniRx:
 
 ## Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
+- [MiniRx Feature Store vs. NgRx Component Store vs. Akita](https://dev.to/this-is-angular/minirx-feature-store-vs-ngrx-component-store-vs-akita-4983)
 
 ## References
 
