@@ -1,5 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, StoreExtension } from '../models';
+import { AppState, ExtensionSortOrder, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
 const win = window as any;
@@ -14,13 +14,13 @@ export interface ReduxDevtoolsOptions {
     latency: number;
 }
 
-export class ReduxDevtoolsExtension extends StoreExtension {
+export class ReduxDevtoolsExtension implements StoreExtension {
+    sortOrder = ExtensionSortOrder.DEFAULT;
+
     private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
-        super();
-
         this.options = {
             ...defaultOptions,
             ...this.options,
@@ -57,7 +57,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
     }
 }
 
-enum DevToolActions {
+const enum DevToolActions {
     DISPATCH = 'DISPATCH',
     JUMP_TO_STATE = 'JUMP_TO_STATE',
     JUMP_TO_ACTION = 'JUMP_TO_ACTION',

@@ -12,13 +12,11 @@ let executedActions: Array<Action> = [];
 let initialState;
 let bufferSize;
 
-export class UndoExtension extends StoreExtension {
+export class UndoExtension implements StoreExtension {
     sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
 
     constructor(config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
-        super();
-
-        bufferSize = config.bufferSize;
+       bufferSize = config.bufferSize;
     }
 
     init(): void {

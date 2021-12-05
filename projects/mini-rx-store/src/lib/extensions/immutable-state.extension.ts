@@ -1,11 +1,13 @@
 // Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
 // See MIT licence below
 
-import { Action, Reducer, StoreExtension } from '../models';
+import { Action, ExtensionSortOrder, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import deepFreeze from 'deep-freeze-strict';
 
-export class ImmutableStateExtension extends StoreExtension {
+export class ImmutableStateExtension implements StoreExtension {
+    sortOrder = ExtensionSortOrder.DEFAULT;
+
     init(): void {
         StoreCore.addMetaReducers(storeFreeze);
     }

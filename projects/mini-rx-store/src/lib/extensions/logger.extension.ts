@@ -1,7 +1,9 @@
-import { StoreExtension } from '../models';
+import { ExtensionSortOrder, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
-export class LoggerExtension extends StoreExtension {
+export class LoggerExtension implements StoreExtension {
+    sortOrder = ExtensionSortOrder.DEFAULT;
+
     init(): void {
         StoreCore.addMetaReducers(loggerMetaReducer);
     }
