@@ -83,7 +83,7 @@ class StoreCore {
         } = {}
     ) {
         reducer =
-            config.metaReducers && config.metaReducers.length > 0
+            config.metaReducers && config.metaReducers.length
                 ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
                 : reducer;
 
@@ -103,17 +103,17 @@ class StoreCore {
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
-        if (Object.keys(this.reducers).length > 0) {
+        if (Object.keys(this.reducers).length) {
             miniRxError(
                 '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
             );
         }
 
-        if (config.metaReducers && config.metaReducers.length > 0) {
+        if (config.metaReducers && config.metaReducers.length) {
             this.addMetaReducers(...config.metaReducers);
         }
 
-        if (config.extensions && config.extensions.length > 0) {
+        if (config.extensions && config.extensions.length) {
             const sortedExtensions: StoreExtension[] = sortExtensions(config.extensions);
             sortedExtensions.forEach((extension) => this.addExtension(extension));
         }
