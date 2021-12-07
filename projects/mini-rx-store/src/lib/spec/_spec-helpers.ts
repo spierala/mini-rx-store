@@ -1,17 +1,13 @@
-import { Action, ActionWithPayload, AppState, MetaReducer } from '../models';
+import { Action, ActionWithPayload } from '../models';
 import { configureStore, Store } from '../store';
 import { default as StoreCore } from '../store-core';
-import { combineMetaReducers } from '../utils';
-import { combineReducers } from '../combine-reducers';
 
 export const store: Store = configureStore({});
 
 export function resetStoreConfig() {
     StoreCore['extensions'] = [];
-    StoreCore['metaReducers'] = [];
-    StoreCore['combinedMetaReducer'] = combineMetaReducers([]);
-    StoreCore['reducers'] = {};
-    StoreCore['combinedReducer'] = combineReducers({});
+    StoreCore['metaReducersSource'].next([]);
+    StoreCore['reducersSource'].next({});
 }
 
 export interface CounterState {

@@ -9,8 +9,14 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { observeOn } from 'rxjs/operators';
-import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select, } from './utils';
+import { map, observeOn, withLatestFrom } from 'rxjs/operators';
+import {
+    combineMetaReducers,
+    createMiniRxAction,
+    miniRxError,
+    omit,
+    select,
+} from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 
@@ -22,19 +28,23 @@ class StoreCore {
     // APP STATE
     private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
     state$: Observable<AppState> = this.stateSource.asObservable();
-    get state(): AppState {
-        return  this.stateSource.getValue();
-    }
 
     // META REDUCERS
-    private metaReducers: MetaReducer<AppState>[] = [];
-    private combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(this.metaReducers);
+    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject([]);
+    private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
+        map((metaReducers) => combineMetaReducers(metaReducers))
+    );
 
     // FEATURE REDUCERS DICTIONARY
-    private reducers: ReducerDictionary<AppState> = {};
+    private reducersSource: BehaviorSubject<ReducerDictionary<AppState>> = new BehaviorSubject({});
+    private get reducers(): ReducerDictionary<AppState> {
+        return this.reducersSource.getValue();
+    }
 
     // FEATURE REDUCERS COMBINED
-    private combinedReducer: Reducer<AppState> = combineReducers(this.reducers);
+    private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
+        map((reducers) => combineReducers(reducers))
+    );
 
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
@@ -44,19 +54,24 @@ class StoreCore {
         this.actions$
             .pipe(
                 observeOn(queueScheduler),
+                withLatestFrom(this.state$, this.combinedReducer$, this.combinedMetaReducer$)
             )
             .subscribe(
-                (action) => {
-                    const reducer: Reducer<AppState> = this.combinedMetaReducer(this.combinedReducer);
-                    const newState: AppState = reducer(this.state, action);
+                ([action, state, combinedReducer, combinedMetaReducer]: [
+                    Action,
+                    AppState,
+                    Reducer<AppState>,
+                    MetaReducer<AppState>
+                ]) => {
+                    const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
+                    const newState: AppState = reducer(state, action);
                     this.updateState(newState);
                 }
             );
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {
-        this.metaReducers = [...this.metaReducers, ...reducers];
-        this.combinedMetaReducer = combineMetaReducers(this.metaReducers);
+        this.metaReducersSource.next([...this.metaReducersSource.getValue(), ...reducers]);
     }
 
     addFeature<StateType>(
@@ -140,13 +155,13 @@ class StoreCore {
     }
 
     private addReducer(featureKey: string, reducer: Reducer<any>) {
-        this.reducers[featureKey] = reducer;
-        this.combinedReducer = combineReducers(this.reducers);
+        const reducers = this.reducers;
+        reducers[featureKey] = reducer;
+        this.reducersSource.next(reducers);
     }
 
     private removeReducer(featureKey: string) {
-        this.reducers = omit(this.reducers, featureKey);
-        this.combinedReducer = combineReducers(this.reducers);
+        this.reducersSource.next(omit(this.reducers, featureKey));
     }
 }
 
