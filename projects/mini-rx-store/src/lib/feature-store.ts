@@ -1,10 +1,9 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createMiniRxAction, miniRxError, select } from './utils';
 import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
-import { takeUntil } from 'rxjs/operators';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
 type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
@@ -12,7 +11,6 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
 export class FeatureStore<StateType extends object> {
     private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
-    private destroy$: Subject<void> = new Subject();
 
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
     state$: Observable<StateType> = this.stateSource.asObservable();
@@ -26,6 +24,8 @@ export class FeatureStore<StateType extends object> {
         return this._featureKey;
     }
 
+    private sub: Subscription;
+
     constructor(featureKey: string, initialState: StateType) {
         this._featureKey = featureKey;
 
@@ -34,8 +34,7 @@ export class FeatureStore<StateType extends object> {
         StoreCore.addFeature<StateType>(featureKey, createFeatureReducer(featureKey, initialState, this.setStateAction));
 
         // Select Feature State and delegate to local BehaviorSubject
-        StoreCore.select(createFeatureSelector<AppState, StateType>(featureKey))
-            .pipe(takeUntil(this.destroy$))
+        this.sub = StoreCore.select(createFeatureSelector<AppState, StateType>(featureKey))
             .subscribe(this.stateSource);
     }
 
@@ -68,7 +67,7 @@ export class FeatureStore<StateType extends object> {
         const subject: Subject<PayLoadType> = new Subject();
         const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(subject.pipe(effectFn));
 
-        effectWithDefaultErrorHandler.pipe(takeUntil(this.destroy$)).subscribe();
+        this.sub.add(effectWithDefaultErrorHandler.subscribe());
 
         return (payload?: PayLoadType) => {
             subject.next(payload);
@@ -82,8 +81,7 @@ export class FeatureStore<StateType extends object> {
     }
 
     destroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
+        this.sub.unsubscribe();
         StoreCore.removeFeature(this._featureKey);
     }
 
