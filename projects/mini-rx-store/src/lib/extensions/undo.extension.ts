@@ -3,7 +3,7 @@
 
 import { Action, ExtensionSortOrder, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import { isMiniRxAction } from '../utils';
+import { isMiniRxAction, miniRxNameSpace } from '../utils';
 
 const defaultBufferSize = 100;
 
@@ -25,7 +25,7 @@ export class UndoExtension implements StoreExtension {
     }
 }
 
-const UNDO_ACTION = '@mini-rx/undo';
+const UNDO_ACTION = miniRxNameSpace + '/undo';
 
 export function undo(action: Action) {
     return {
