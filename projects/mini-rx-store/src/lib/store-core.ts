@@ -155,9 +155,10 @@ class StoreCore {
     }
 
     private addReducer(featureKey: string, reducer: Reducer<any>) {
-        const reducers = this.reducers;
-        reducers[featureKey] = reducer;
-        this.reducersSource.next(reducers);
+        this.reducersSource.next({
+            ...this.reducers,
+            [featureKey]: reducer
+        });
     }
 
     private removeReducer(featureKey: string) {
