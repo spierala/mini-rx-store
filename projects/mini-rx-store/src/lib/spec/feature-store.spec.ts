@@ -299,7 +299,7 @@ describe('FeatureStore', () => {
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith({
-            type: '@mini-rx/user2/set-state/updateCity',
+            type: '@mini-rx/set-state/user2/updateCity',
             payload: { city: 'NY' },
         });
     });

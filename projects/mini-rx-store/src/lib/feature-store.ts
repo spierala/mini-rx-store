@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
-import { createMiniRxActionType, isMiniRxAction, miniRxError, select } from './utils';
+import { createMiniRxAction, miniRxError, select } from './utils';
 import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { takeUntil } from 'rxjs/operators';
@@ -11,7 +11,7 @@ type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
 type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 
 export class FeatureStore<StateType extends object> {
-    private readonly actionTypeSetState: string; // E.g. @mini-rx/products/set-state
+    private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
     private destroy$: Subject<void> = new Subject();
 
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
@@ -29,22 +29,19 @@ export class FeatureStore<StateType extends object> {
     constructor(featureKey: string, initialState: StateType) {
         this._featureKey = featureKey;
 
-        const reducer: Reducer<StateType> = createDefaultReducer(featureKey, initialState);
-        StoreCore.addFeature<StateType>(featureKey, reducer);
+        this.setStateAction = createMiniRxAction('set-state', featureKey);
 
-        // Create Default Action Type (needed for setState())
-        this.actionTypeSetState = createMiniRxActionType(featureKey, 'set-state');
+        StoreCore.addFeature<StateType>(featureKey, createFeatureReducer(featureKey, initialState, this.setStateAction));
 
         // Select Feature State and delegate to local BehaviorSubject
-        const featureSelector = createFeatureSelector<AppState, StateType>(featureKey);
-        StoreCore.select(featureSelector)
+        StoreCore.select(createFeatureSelector<AppState, StateType>(featureKey))
             .pipe(takeUntil(this.destroy$))
             .subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: ActionWithPayload = {
-            type: name ? this.actionTypeSetState + '/' + name : this.actionTypeSetState,
+            type: this.setStateAction.type + (name ?  '/' + name : ''),
             payload:
                 typeof stateOrCallback === 'function'
                     ? stateOrCallback(this.state)
@@ -96,12 +93,13 @@ export class FeatureStore<StateType extends object> {
     }
 }
 
-function createDefaultReducer<StateType>(
+function createFeatureReducer<StateType>(
     featureKey: string,
-    initialState: StateType
+    initialState: StateType,
+    setStateAction: Action,
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload): StateType => {
-        if (isMiniRxAction(action.type, 'set-state', featureKey)) {
+        if (action.type.startsWith(setStateAction.type)) {
             return {
                 ...state,
                 ...action.payload,

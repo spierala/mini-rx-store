@@ -12,11 +12,10 @@ import {
 import { map, observeOn, withLatestFrom } from 'rxjs/operators';
 import {
     combineMetaReducers,
-    createMiniRxActionType,
+    createMiniRxAction,
     miniRxError,
     omit,
     select,
-    storeInitActionType,
 } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
@@ -95,14 +94,12 @@ class StoreCore {
         }
 
         this.addReducer(featureKey, reducer);
-        this.dispatch({ type: createMiniRxActionType(featureKey, 'init') });
+        this.dispatch(createMiniRxAction( 'init-feature', featureKey));
     }
 
     removeFeature(featureKey: string) {
         this.removeReducer(featureKey);
-        this.dispatch({
-            type: createMiniRxActionType(featureKey, 'destroy'),
-        });
+        this.dispatch(createMiniRxAction('destroy-feature', featureKey));
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
@@ -132,7 +129,7 @@ class StoreCore {
             this.updateState(config.initialState);
         }
 
-        this.dispatch({ type: storeInitActionType });
+        this.dispatch(createMiniRxAction('init-store'));
     }
 
     effect(effect$: Observable<Action>) {

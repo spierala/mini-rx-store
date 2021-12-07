@@ -49,4 +49,4 @@ export type ReducerDictionary<T> = {
     [p in keyof T]: Reducer<T[p]>;
 };
 
-export type ActionName = 'destroy' | 'init' | 'set-state';
+export type MiniRxActionType = 'init-store' | 'init-feature' | 'destroy-feature' | 'set-state';

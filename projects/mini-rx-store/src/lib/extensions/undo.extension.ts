@@ -3,7 +3,7 @@
 
 import { Action, ExtensionSortOrder, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import { isMiniRxAction, storeInitActionType } from '../utils';
+import { isMiniRxAction } from '../utils';
 
 const defaultBufferSize = 100;
 
@@ -49,9 +49,9 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
             );
             return newState;
         } else if (
-            !(action.type === storeInitActionType || isMiniRxAction(action.type, 'destroy'))
+            !(isMiniRxAction(action, 'init-store') || isMiniRxAction(action, 'destroy-feature'))
         ) {
-            // push every action that isn't UNDO_ACTION / storeInitAction / "MiniRx (feature) destroy" to the executedActions property
+            // push every action that isn't UNDO_ACTION / 'init-store' / 'destroy-feature' to the executedActions property
             executedActions.push(action);
         }
         const updatedState = rootReducer(state, action);
