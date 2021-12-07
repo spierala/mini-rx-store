@@ -1,4 +1,4 @@
-import { tap, withLatestFrom } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { AppState, ExtensionSortOrder, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
@@ -33,8 +33,7 @@ export class ReduxDevtoolsExtension implements StoreExtension {
 
             StoreCore.actions$
                 .pipe(
-                    withLatestFrom(StoreCore.state$),
-                    tap(([action, state]) => this.devtoolsConnection.send(action, state))
+                    tap((action) => this.devtoolsConnection.send(action, StoreCore.state))
                 )
                 .subscribe();
 
