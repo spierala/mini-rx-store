@@ -97,7 +97,7 @@ function createFeatureReducer<StateType>(
     setStateAction: Action,
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload): StateType => {
-        if (action.type.startsWith(setStateAction.type)) {
+        if (action.type.indexOf(setStateAction.type) === 0) {
             return {
                 ...state,
                 ...action.payload,

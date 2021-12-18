@@ -44,7 +44,7 @@ export function createMiniRxAction(miniRxActionType: MiniRxActionType, featureKe
 }
 
 export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionType) {
-    return action.type.startsWith(miniRxNameSpace + '/' + miniRxActionType);
+    return action.type.indexOf(miniRxNameSpace + '/' + miniRxActionType) === 0;
 }
 
 export function miniRxError(message: string) {
