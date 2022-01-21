@@ -83,7 +83,7 @@ class StoreCore {
         } = {}
     ) {
         reducer =
-            config.metaReducers && config.metaReducers.length
+            config.metaReducers?.length
                 ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
                 : reducer;
 
@@ -109,11 +109,11 @@ class StoreCore {
             );
         }
 
-        if (config.metaReducers && config.metaReducers.length) {
+        if (config.metaReducers?.length) {
             this.addMetaReducers(...config.metaReducers);
         }
 
-        if (config.extensions && config.extensions.length) {
+        if (config.extensions?.length) {
             const sortedExtensions: StoreExtension[] = sortExtensions(config.extensions);
             sortedExtensions.forEach((extension) => this.addExtension(extension));
         }
