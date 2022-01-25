@@ -42,7 +42,6 @@ class StoreCore {
         new BehaviorSubject({});
     private groupedByFeatureReducers$: Observable<ReducerDictionary<AppState>> =
         this.groupedByFeatureReducersSource.pipe(
-            tap((v) => {}),
             map((groupedByFeatureReducers) => {
                 return Object.keys(groupedByFeatureReducers).reduce((previousValue, key) => {
                     return {
@@ -60,7 +59,6 @@ class StoreCore {
         this.reducersSource,
         this.groupedByFeatureReducers$,
     ]).pipe(
-        tap((v) => {}),
         map(([appReducers, groupedFeatureReducers]) =>
             combineReducers({ ...appReducers, ...groupedFeatureReducers })
         )
