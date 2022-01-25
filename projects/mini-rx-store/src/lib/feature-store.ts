@@ -34,16 +34,18 @@ export class FeatureStore<StateType extends object> {
         this.keys = StoreCore.addFeatureStore<StateType>(featureKey, initialState, config.multi);
         this.setStateAction = createMiniRxAction('set-state', this.keys);
 
-        const featureSelector = createFeatureSelector<AppState, StateType>(this.keys[0]);
-        const selector = createSelector(featureSelector, (state) => {
-            if (this.keys.length > 1) {
-                return state[this.keys[1]];
+        const featureStateSelector = createSelector(
+            createFeatureSelector<AppState, StateType>(this.keys[0]),
+            (state) => {
+                if (this.keys.length > 1) {
+                    return state[this.keys[1]];
+                }
+                return state;
             }
-            return state;
-        });
+        );
 
         // Select Feature State and delegate to local BehaviorSubject
-        this.sub = StoreCore.select(selector).subscribe(this.stateSource);
+        this.sub = StoreCore.select(featureStateSelector).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {

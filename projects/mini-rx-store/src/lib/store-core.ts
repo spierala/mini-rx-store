@@ -201,15 +201,6 @@ class StoreCore {
         return [featureKey];
     }
 
-    // private multiReducers: GroupedByFeatureReducers = {
-    //     // if emit
-    //     // go over all props of multiReducer
-    //     // run combineReducer for each prop -> every prop has a reducer (similar to reducerSource)
-    //     // combinedReducer$: merge reducerSource with multiReducersSource with combineLatest?
-    //
-    //     // Feature Store: adjust select feature state
-    // }
-
     private addMultiReducer(featureKey: string, initialState: any): string[] {
         const groupedByFeatureReducers = this.groupedByFeatureReducersSource.getValue();
 
@@ -226,9 +217,7 @@ class StoreCore {
             initialState
         );
 
-        console.log('addMultiReducer', groupedByFeatureReducers);
         this.groupedByFeatureReducersSource.next(groupedByFeatureReducers);
-
         return [featureKey, multiReducerKey];
     }
 
