@@ -1,7 +1,8 @@
-import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, queueScheduler, Subject } from 'rxjs';
 import {
     Action,
     Actions,
+    ActionWithPayload,
     AppState,
     MetaReducer,
     Reducer,
@@ -9,16 +10,12 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { map, observeOn, withLatestFrom } from 'rxjs/operators';
-import {
-    combineMetaReducers,
-    createMiniRxAction,
-    miniRxError,
-    omit,
-    select,
-} from './utils';
+import { map, observeOn, tap, withLatestFrom } from 'rxjs/operators';
+import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
+
+type GroupedByFeatureReducers = Record<string, Record<string, Reducer<any>>>;
 
 class StoreCore {
     // ACTIONS
@@ -41,9 +38,32 @@ class StoreCore {
         return this.reducersSource.getValue();
     }
 
+    private groupedByFeatureReducersSource: BehaviorSubject<GroupedByFeatureReducers> =
+        new BehaviorSubject({});
+    private groupedByFeatureReducers$: Observable<ReducerDictionary<AppState>> =
+        this.groupedByFeatureReducersSource.pipe(
+            tap((v) => {}),
+            map((groupedByFeatureReducers) => {
+                return Object.keys(groupedByFeatureReducers).reduce((previousValue, key) => {
+                    return {
+                        ...previousValue,
+                        [key]: combineReducers(groupedByFeatureReducers[key]),
+                    };
+                }, {});
+            })
+        );
+
+    private multiReducersCounters = {};
+
     // FEATURE REDUCERS COMBINED
-    private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        map((reducers) => combineReducers(reducers))
+    private combinedReducer$: Observable<Reducer<AppState>> = combineLatest([
+        this.reducersSource,
+        this.groupedByFeatureReducers$,
+    ]).pipe(
+        tap((v) => {}),
+        map(([appReducers, groupedFeatureReducers]) =>
+            combineReducers({ ...appReducers, ...groupedFeatureReducers })
+        )
     );
 
     // EXTENSIONS
@@ -94,12 +114,32 @@ class StoreCore {
         }
 
         this.addReducer(featureKey, reducer);
-        this.dispatch(createMiniRxAction( 'init-feature', featureKey));
+        this.dispatch(createMiniRxAction('init-feature', [featureKey]));
     }
 
-    removeFeature(featureKey: string) {
-        this.removeReducer(featureKey);
-        this.dispatch(createMiniRxAction('destroy-feature', featureKey));
+    addFeatureStore<StateType>(
+        featureKey: string,
+        initialState?: StateType,
+        multi?: boolean
+    ): string[] {
+        const featureExists = checkFeatureExists(featureKey, this.reducers);
+
+        if (!multi && featureExists) {
+            miniRxError(`Feature "${featureKey}" already exists.`);
+        }
+
+        const multiReducerKey: string[] = multi
+            ? this.addMultiReducer(featureKey, initialState)
+            : this.addReducer(featureKey, createFeatureReducer([featureKey], initialState));
+        this.dispatch(createMiniRxAction('init-feature', multiReducerKey));
+        return multiReducerKey;
+    }
+
+    removeFeature(featureKeys: string[]) {
+        featureKeys.length > 1
+            ? this.removeMultiReducer([featureKeys[0], featureKeys[1]])
+            : this.removeReducer(featureKeys[0]);
+        this.dispatch(createMiniRxAction('destroy-feature', featureKeys));
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
@@ -120,7 +160,6 @@ class StoreCore {
 
         if (config.reducers) {
             Object.keys(config.reducers).forEach((featureKey) => {
-                checkFeatureExists(featureKey, this.reducers);
                 this.addReducer(featureKey, config.reducers[featureKey]);
             });
         }
@@ -154,15 +193,56 @@ class StoreCore {
         this.extensions.push(extension);
     }
 
-    private addReducer(featureKey: string, reducer: Reducer<any>) {
+    private addReducer(featureKey: string, reducer: Reducer<any>): string[] {
         this.reducersSource.next({
             ...this.reducers,
-            [featureKey]: reducer
+            [featureKey]: reducer,
         });
+        return [featureKey];
+    }
+
+    // private multiReducers: GroupedByFeatureReducers = {
+    //     // if emit
+    //     // go over all props of multiReducer
+    //     // run combineReducer for each prop -> every prop has a reducer (similar to reducerSource)
+    //     // combinedReducer$: merge reducerSource with multiReducersSource with combineLatest?
+    //
+    //     // Feature Store: adjust select feature state
+    // }
+
+    private addMultiReducer(featureKey: string, initialState: any): string[] {
+        const groupedByFeatureReducers = this.groupedByFeatureReducersSource.getValue();
+
+        let multiReducerKey: string;
+        if (!groupedByFeatureReducers.hasOwnProperty(featureKey)) {
+            groupedByFeatureReducers[featureKey] = {};
+            multiReducerKey = featureKey + '-' + 1;
+            this.multiReducersCounters[featureKey] = 1;
+        } else {
+            multiReducerKey = featureKey + '-' + (this.multiReducersCounters[featureKey] += 1);
+        }
+        groupedByFeatureReducers[featureKey][multiReducerKey] = createFeatureReducer(
+            [featureKey, multiReducerKey],
+            initialState
+        );
+
+        console.log('addMultiReducer', groupedByFeatureReducers);
+        this.groupedByFeatureReducersSource.next(groupedByFeatureReducers);
+
+        return [featureKey, multiReducerKey];
     }
 
     private removeReducer(featureKey: string) {
         this.reducersSource.next(omit(this.reducers, featureKey));
+    }
+
+    private removeMultiReducer([feature, multiReducerKey]) {
+        const groupedByFeatureReducers = this.groupedByFeatureReducersSource.getValue();
+        groupedByFeatureReducers[feature] = omit(
+            groupedByFeatureReducers[feature],
+            multiReducerKey
+        );
+        this.groupedByFeatureReducersSource.next(groupedByFeatureReducers);
     }
 }
 
@@ -175,16 +255,30 @@ function createReducerWithInitialState<StateType>(
     };
 }
 
-function checkFeatureExists(featureKey: string, reducers: ReducerDictionary<AppState>) {
-    if (reducers.hasOwnProperty(featureKey)) {
-        miniRxError(`Feature "${featureKey}" already exists.`);
-    }
+function checkFeatureExists(featureKey: string, reducers: ReducerDictionary<AppState>): boolean {
+    return reducers.hasOwnProperty(featureKey);
 }
 
 function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
     return [...extensions].sort((a, b) => {
         return a.sortOrder - b.sortOrder;
     });
+}
+
+function createFeatureReducer<StateType>(
+    keys: string[],
+    initialState: StateType
+): Reducer<StateType> {
+    const setStateAction: Action = createMiniRxAction('set-state', keys);
+    return (state: StateType = initialState, action: ActionWithPayload): StateType => {
+        if (action.type.indexOf(setStateAction.type) === 0) {
+            return {
+                ...state,
+                ...action.payload,
+            };
+        }
+        return state;
+    };
 }
 
 // Created once to initialize singleton

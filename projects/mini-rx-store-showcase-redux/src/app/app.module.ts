@@ -15,6 +15,7 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
+import { CounterModule } from './counter/counter.module';
 
 @NgModule({
     imports: [
@@ -31,6 +32,7 @@ import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx
             maxAge: 25,
             latency: 250,
         }),
+        CounterModule,
     ],
     declarations: [
         AppComponent,

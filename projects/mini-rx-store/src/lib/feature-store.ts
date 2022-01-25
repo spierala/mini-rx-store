@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createMiniRxAction, miniRxError, select } from './utils';
-import { createFeatureSelector } from './selector';
+import { createFeatureSelector, createSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
@@ -26,21 +26,29 @@ export class FeatureStore<StateType extends object> {
 
     private sub: Subscription;
 
-    constructor(featureKey: string, initialState: StateType) {
+    private readonly keys: string[];
+
+    constructor(featureKey: string, initialState: StateType, private config?: { multi: boolean }) {
         this._featureKey = featureKey;
 
-        this.setStateAction = createMiniRxAction('set-state', featureKey);
+        this.keys = StoreCore.addFeatureStore<StateType>(featureKey, initialState, config.multi);
+        this.setStateAction = createMiniRxAction('set-state', this.keys);
 
-        StoreCore.addFeature<StateType>(featureKey, createFeatureReducer(featureKey, initialState, this.setStateAction));
+        const featureSelector = createFeatureSelector<AppState, StateType>(this.keys[0]);
+        const selector = createSelector(featureSelector, (state) => {
+            if (this.keys.length > 1) {
+                return state[this.keys[1]];
+            }
+            return state;
+        });
 
         // Select Feature State and delegate to local BehaviorSubject
-        this.sub = StoreCore.select(createFeatureSelector<AppState, StateType>(featureKey))
-            .subscribe(this.stateSource);
+        this.sub = StoreCore.select(selector).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: ActionWithPayload = {
-            type: this.setStateAction.type + (name ?  '/' + name : ''),
+            type: this.setStateAction.type + (name ? '/' + name : ''),
             payload:
                 typeof stateOrCallback === 'function'
                     ? stateOrCallback(this.state)
@@ -82,27 +90,11 @@ export class FeatureStore<StateType extends object> {
 
     destroy() {
         this.sub.unsubscribe();
-        StoreCore.removeFeature(this._featureKey);
+        StoreCore.removeFeature(this.keys);
     }
 
     // tslint:disable-next-line:use-lifecycle-interface
     ngOnDestroy() {
         this.destroy();
     }
-}
-
-function createFeatureReducer<StateType>(
-    featureKey: string,
-    initialState: StateType,
-    setStateAction: Action,
-): Reducer<StateType> {
-    return (state: StateType = initialState, action: ActionWithPayload): StateType => {
-        if (action.type.indexOf(setStateAction.type) === 0) {
-            return {
-                ...state,
-                ...action.payload,
-            };
-        }
-        return state;
-    };
 }

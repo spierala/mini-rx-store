@@ -35,6 +35,7 @@ export interface StoreConfig<T> {
     extensions: StoreExtension[];
 }
 
+// TODO should be part of mini-rx-store-ng (BREAKING CHANGE?)
 export interface FeatureStoreConfig<StateType> {
     initialState: StateType;
     metaReducers?: MetaReducer<StateType>[];

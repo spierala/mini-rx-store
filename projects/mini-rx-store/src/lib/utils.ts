@@ -39,8 +39,17 @@ export function omit<T extends { [key: string]: any }>(object: T, keyToOmit: key
 
 export const miniRxNameSpace = '@mini-rx';
 
-export function createMiniRxAction(miniRxActionType: MiniRxActionType, featureKey?: string): Action {
-    return {type: miniRxNameSpace + '/' + miniRxActionType + (featureKey ? '/' + featureKey : '')};
+export function createMiniRxAction(
+    miniRxActionType: MiniRxActionType,
+    featureKeys?: string[]
+): Action {
+    return {
+        type:
+            miniRxNameSpace +
+            '/' +
+            miniRxActionType +
+            (featureKeys ? '/' + featureKeys.join('/') : ''),
+    };
 }
 
 export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionType) {
