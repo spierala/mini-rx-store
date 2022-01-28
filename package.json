@@ -60,7 +60,7 @@
         "jest": "^26.6.3",
         "jest-marbles": "^2.5.1",
         "jest-preset-angular": "^8.4.0",
-        "ng-packagr": "^9.1.5",
+        "ng-packagr": "^10.1.1",
         "prettier": "^2.2.1",
         "pretty-quick": "^2.0.2",
         "protractor": "^5.4.4",
