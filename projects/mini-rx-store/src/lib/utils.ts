@@ -1,6 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, ActionName, MetaReducer, Reducer } from './models';
+import { Action, MiniRxActionType, MetaReducer, Reducer } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -37,21 +37,16 @@ export function omit<T extends { [key: string]: any }>(object: T, keyToOmit: key
         }, {});
 }
 
-const miniRxNameSpace = '@mini-rx';
+export const miniRxNameSpace = '@mini-rx';
 
-export function createMiniRxActionType(featureKey, actionName: ActionName): string {
-    return miniRxNameSpace + '/' + featureKey + '/' + actionName;
+export function createMiniRxAction(miniRxActionType: MiniRxActionType, featureKey?: string): Action {
+    return {type: miniRxNameSpace + '/' + miniRxActionType + (featureKey ? '/' + featureKey : '')};
 }
 
-export function isMiniRxAction(actionType: string, actionName: ActionName, featureKey?: string) {
-    return (
-        actionType.indexOf(miniRxNameSpace + (featureKey ? `/${featureKey}/` : '')) > -1 &&
-        actionType.indexOf(actionName) > -1
-    );
+export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionType) {
+    return action.type.indexOf(miniRxNameSpace + '/' + miniRxActionType) === 0;
 }
 
 export function miniRxError(message: string) {
     throw new Error(miniRxNameSpace + ': ' + message);
 }
-
-export const storeInitActionType = miniRxNameSpace + '/init';

@@ -12,11 +12,10 @@ import {
 import { map, observeOn, withLatestFrom } from 'rxjs/operators';
 import {
     combineMetaReducers,
-    createMiniRxActionType,
+    createMiniRxAction,
     miniRxError,
     omit,
     select,
-    storeInitActionType,
 } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
@@ -84,7 +83,7 @@ class StoreCore {
         } = {}
     ) {
         reducer =
-            config.metaReducers && config.metaReducers.length > 0
+            config.metaReducers?.length
                 ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
                 : reducer;
 
@@ -95,28 +94,26 @@ class StoreCore {
         }
 
         this.addReducer(featureKey, reducer);
-        this.dispatch({ type: createMiniRxActionType(featureKey, 'init') });
+        this.dispatch(createMiniRxAction( 'init-feature', featureKey));
     }
 
     removeFeature(featureKey: string) {
         this.removeReducer(featureKey);
-        this.dispatch({
-            type: createMiniRxActionType(featureKey, 'destroy'),
-        });
+        this.dispatch(createMiniRxAction('destroy-feature', featureKey));
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
-        if (Object.keys(this.reducers).length > 0) {
+        if (Object.keys(this.reducers).length) {
             miniRxError(
                 '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
             );
         }
 
-        if (config.metaReducers && config.metaReducers.length > 0) {
+        if (config.metaReducers?.length) {
             this.addMetaReducers(...config.metaReducers);
         }
 
-        if (config.extensions && config.extensions.length > 0) {
+        if (config.extensions?.length) {
             const sortedExtensions: StoreExtension[] = sortExtensions(config.extensions);
             sortedExtensions.forEach((extension) => this.addExtension(extension));
         }
@@ -132,7 +129,7 @@ class StoreCore {
             this.updateState(config.initialState);
         }
 
-        this.dispatch({ type: storeInitActionType });
+        this.dispatch(createMiniRxAction('init-store'));
     }
 
     effect(effect$: Observable<Action>) {
@@ -158,9 +155,10 @@ class StoreCore {
     }
 
     private addReducer(featureKey: string, reducer: Reducer<any>) {
-        const reducers = this.reducers;
-        reducers[featureKey] = reducer;
-        this.reducersSource.next(reducers);
+        this.reducersSource.next({
+            ...this.reducers,
+            [featureKey]: reducer
+        });
     }
 
     private removeReducer(featureKey: string) {

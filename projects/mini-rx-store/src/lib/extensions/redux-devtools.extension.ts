@@ -57,7 +57,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
     }
 }
 
-enum DevToolActions {
+const enum DevToolActions {
     DISPATCH = 'DISPATCH',
     JUMP_TO_STATE = 'JUMP_TO_STATE',
     JUMP_TO_ACTION = 'JUMP_TO_ACTION',
