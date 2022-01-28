@@ -41,10 +41,7 @@ export class FeatureStore<StateType extends object> {
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: ActionWithPayload = {
             type: this.setStateAction.type + (name ?  '/' + name : ''),
-            payload:
-                typeof stateOrCallback === 'function'
-                    ? stateOrCallback(this.state)
-                    : stateOrCallback,
+            payload: stateOrCallback
         };
 
         StoreCore.dispatch(action);
@@ -98,9 +95,13 @@ function createFeatureReducer<StateType>(
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload): StateType => {
         if (action.type.indexOf(setStateAction.type) === 0) {
+            const stateOrCallback = action.payload;
+            const newPartialState =                 typeof stateOrCallback === 'function'
+                    ? stateOrCallback(state)
+                    : stateOrCallback;
             return {
                 ...state,
-                ...action.payload,
+                ...newPartialState,
             };
         }
         return state;

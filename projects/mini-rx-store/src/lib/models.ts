@@ -25,7 +25,7 @@ export interface Action {
 }
 
 export interface ActionWithPayload extends Action {
-    payload: any;
+    payload?: any;
 }
 
 export interface StoreConfig<T> {

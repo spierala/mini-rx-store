@@ -6,7 +6,7 @@ import {
     CounterState,
     counterStringInitialState,
     counterStringReducer,
-    CounterStringState,
+    CounterStringState, createUniqueCounterReducerWithAction, resetStoreConfig,
     store,
 } from './_spec-helpers';
 import { undo, UndoExtension } from '../extensions/undo.extension';
@@ -23,31 +23,41 @@ class MyFeatureStore extends FeatureStore<CounterStringState> {
         super('featureWithUndo', counterStringInitialState);
     }
 
-    count(payload: string) {
-        this.lastAction = this.setState((state) => ({
+    count(payload: string): Action {
+        return this.lastAction = this.setState((state) => ({
             counter: state.counter + payload,
         }));
+    }
+
+    resetCount() {
+        this.setState(counterStringInitialState);
     }
 
     undoLastAction() {
         this.undo(this.lastAction);
     }
+
+    undoActions(actions: Action[]) {
+        actions.forEach(item => this.undo(item))
+    }
 }
 
 describe('Undo Extension', () => {
     describe('FeatureStore', () => {
-        const featureStore: MyFeatureStore = new MyFeatureStore();
+        beforeEach(() => {
+            resetStoreConfig();
+            StoreCore.addExtension(new UndoExtension());
+        });
 
         it('should throw if Undo Extension is not added', () => {
+            const featureStore: MyFeatureStore = new MyFeatureStore();
             expect(featureStore.undoLastAction).toThrow();
         });
 
-        StoreCore.addExtension(new UndoExtension());
-
-        const counterSpy = jest.fn();
-        featureStore.count$.subscribe(counterSpy);
-
         it('should undo dispatched actions', () => {
+            const featureStore: MyFeatureStore = new MyFeatureStore();
+            const counterSpy = jest.fn();
+            featureStore.count$.subscribe(counterSpy);
             featureStore.count('2');
             featureStore.undoLastAction();
             featureStore.count('3');
@@ -57,29 +67,96 @@ describe('Undo Extension', () => {
             featureStore.undoLastAction();
             featureStore.count('6');
             expect(counterSpy).toHaveBeenLastCalledWith('146');
+            counterSpy.mockReset();
+
+            featureStore.resetCount();
+            const undoNum2 = featureStore.count('2');
+            const actionsToUndo: Action[] = [featureStore.count('3'), featureStore.count('4'), featureStore.count('5')];
+            featureStore.count('6');
+
+            expect(counterSpy).toHaveBeenLastCalledWith('123456');
+            counterSpy.mockReset();
+
+            featureStore.undoActions(actionsToUndo);
+            expect(counterSpy).toHaveBeenLastCalledWith('126');
+            counterSpy.mockReset();
+
+            featureStore.count('7');
+            featureStore.undoActions([undoNum2]);
+            expect(counterSpy).toHaveBeenLastCalledWith('167');
+        });
+
+        it('should not affect removed feature which is added again (for destroyable feature stores)', () => {
+            const featureKey = 'destroyableCounter';
+            const [reducer, action] = createUniqueCounterReducerWithAction();
+            StoreCore.addFeature<CounterState>(featureKey, reducer);
+
+            const spy = jest.fn();
+
+            const getCount = createSelector(createFeatureSelector<CounterState>(featureKey), state => state?.counter);
+            let lastAction: Action;
+
+            store
+                .select(getCount)
+                .subscribe(spy);
+
+            expect(spy).toHaveBeenCalledWith(1);
+
+            store.dispatch(action);
+            store.dispatch(action);
+            store.dispatch(action);
+            store.dispatch(action);
+            lastAction = {...action};
+            store.dispatch(lastAction);
+
+            expect(spy).toHaveBeenCalledWith(6);
+            spy.mockReset();
+
+            store.dispatch(undo(lastAction));
+
+            expect(spy).toHaveBeenCalledWith(5);
+            spy.mockReset();
+
+            StoreCore.removeFeature(featureKey);
+            StoreCore.addFeature<CounterState>(featureKey, reducer);
+
+            store.dispatch(action);
+            lastAction = {...action};
+            store.dispatch(lastAction);
+            expect(spy).toHaveBeenCalledWith(3);
+            spy.mockReset();
+
+            store.dispatch(undo(lastAction));
+
+            expect(spy).toHaveBeenCalledWith(2);
         });
     });
 
-    describe('CounterStringReducer', () => {
-        const featureKey = 'counterStringWithUndo';
-        const getCounterFeatureState = createFeatureSelector<CounterStringState>(featureKey);
-        const getCounter = createSelector(getCounterFeatureState, (state) => {
-            return state.counter;
+    describe('Store Feature', () => {
+        beforeEach(() => {
+            resetStoreConfig();
+            StoreCore.addExtension(new UndoExtension());
         });
 
-        const counterSpy = jest.fn();
-
-        store.feature<CounterStringState>(featureKey, counterStringReducer);
-        store.select(getCounter).subscribe(counterSpy);
-
-        function createCounterAction(payload: string) {
-            return {
-                type: 'counterString',
-                payload,
-            };
-        }
-
         it('should undo dispatched actions', () => {
+            const featureKey = 'counterStringWithUndo';
+            const getCounterFeatureState = createFeatureSelector<CounterStringState>(featureKey);
+            const getCounter = createSelector(getCounterFeatureState, (state) => {
+                return state.counter;
+            });
+
+            const counterSpy = jest.fn();
+
+            store.feature<CounterStringState>(featureKey, counterStringReducer);
+            store.select(getCounter).subscribe(counterSpy);
+
+            function createCounterAction(payload: string) {
+                return {
+                    type: 'counterString',
+                    payload,
+                };
+            }
+
             store.dispatch(createCounterAction('2'));
 
             const createCounter3Action: Action = createCounterAction('3');
