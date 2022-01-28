@@ -47,11 +47,21 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
             // update the state for every action until we get the
             // exact same state as before, but without the action we want to rollback
             executedActions.forEach(
-                (executedAction) => (newState = rootReducer(newState, executedAction))
+                (executedAction) => {
+                    if (isMiniRxAction(executedAction, 'destroy-feature')) {
+                        // Fix issue related to reducers which are removed and added again with the same feature key:
+                        // The Undo extension replays also actions which where meant for an 'old' (removed) feature reducer
+                        // This can lead to unexpected state in the 'new' feature reducer
+                        // Solution: Clear the feature state from the newState manually if we encounter a 'destroy-feature' action
+                        // This will make sure that the feature reducer initializes again with its initial state
+                        newState[executedAction.payload] = undefined;
+                    }
+                    newState = rootReducer(newState, executedAction);
+                }
             );
             return newState;
         } else if (
-            !(isMiniRxAction(action, 'init-store') || isMiniRxAction(action, 'destroy-feature'))
+            !(isMiniRxAction(action, 'init-store'))
         ) {
             // push every action that isn't UNDO_ACTION / 'init-store' / 'destroy-feature' to the executedActions property
             executedActions.push(action);

@@ -99,7 +99,7 @@ class StoreCore {
 
     removeFeature(featureKey: string) {
         this.removeReducer(featureKey);
-        this.dispatch(createMiniRxAction('destroy-feature', featureKey));
+        this.dispatch(createMiniRxAction('destroy-feature', featureKey, featureKey));
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
