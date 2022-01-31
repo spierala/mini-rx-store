@@ -1,6 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, MiniRxActionType, MetaReducer, Reducer } from './models';
+import { Action, MiniRxActionType, MetaReducer, Reducer, ActionWithPayload } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -41,7 +41,8 @@ export const miniRxNameSpace = '@mini-rx';
 
 export function createMiniRxAction(
     miniRxActionType: MiniRxActionType,
-    featureKeys?: string[]
+    featureKeys?: string[],
+    payload?: any
 ): Action {
     return {
         type:
@@ -49,6 +50,7 @@ export function createMiniRxAction(
             '/' +
             miniRxActionType +
             (featureKeys ? '/' + featureKeys.join('/') : ''),
+        payload,
     };
 }
 

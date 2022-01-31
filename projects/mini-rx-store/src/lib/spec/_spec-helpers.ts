@@ -1,6 +1,7 @@
-import { Action, ActionWithPayload } from '../models';
+import { Action, ActionWithPayload, Reducer } from '../models';
 import { configureStore, Store } from '../store';
 import { default as StoreCore } from '../store-core';
+import { v4 as uuid } from 'uuid';
 
 export const store: Store = configureStore({});
 
@@ -18,9 +19,13 @@ export const counterInitialState: CounterState = {
     counter: 1,
 };
 
-export function counterReducer(state: CounterState = counterInitialState, action: Action) {
+export function counterReducer(
+    state: CounterState = counterInitialState,
+    action: Action,
+    incrementCase = 'counter'
+) {
     switch (action.type) {
-        case 'counter':
+        case incrementCase:
             return {
                 ...state,
                 counter: state.counter + 1,
@@ -28,6 +33,22 @@ export function counterReducer(state: CounterState = counterInitialState, action
         default:
             return state;
     }
+}
+
+export function createUniqueCounterReducerWithAction(): [Reducer<CounterState>, Action] {
+    const incrementCase = uuid();
+    const reducer = (state: CounterState = counterInitialState, action: Action) => {
+        switch (action.type) {
+            case incrementCase:
+                return {
+                    ...state,
+                    counter: state.counter + 1,
+                };
+            default:
+                return state;
+        }
+    };
+    return [reducer, { type: incrementCase }];
 }
 
 export interface CounterStringState {

@@ -113,10 +113,8 @@ describe('Immutable State Extension', () => {
 
     it('should throw when mutating state in a FeatureStore', () => {
         function updateCount() {
-            fs.setState(state => {
-                state.counter = 123;
-                return state;
-            });
+            const state = fs.state;
+            state.counter = 123;
         }
 
         expect(() => updateCount()).toThrow(TypeError);
@@ -126,7 +124,7 @@ describe('Immutable State Extension', () => {
     it('should throw when mutating selected state from a FeatureStore', () => {
         let selectedFeatureState: CounterState;
 
-        fs.select().subscribe(state => selectedFeatureState = state);
+        fs.select().subscribe((state) => (selectedFeatureState = state));
 
         expect(() => (selectedFeatureState.counter = 123)).toThrow();
     });

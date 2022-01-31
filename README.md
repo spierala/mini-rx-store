@@ -196,6 +196,9 @@ These popular Angular demo applications show the power of MiniRx:
 - [Angular Jira Clone using MiniRx on Github](https://github.com/spierala/jira-clone-angular)
 - [Angular Spotify using MiniRx on Github](https://github.com/spierala/angular-spotify-mini-rx)
 
+More about MiniRx:
+- [State Management Bundle Size Comparison Angular](https://github.com/spierala/angular-state-management-comparison)
+
 ## Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
 - [MiniRx Feature Store vs. NgRx Component Store vs. Akita](https://dev.to/this-is-angular/minirx-feature-store-vs-ngrx-component-store-vs-akita-4983)

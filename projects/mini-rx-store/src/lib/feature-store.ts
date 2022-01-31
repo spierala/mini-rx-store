@@ -51,10 +51,7 @@ export class FeatureStore<StateType extends object> {
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: ActionWithPayload = {
             type: this.setStateAction.type + (name ? '/' + name : ''),
-            payload:
-                typeof stateOrCallback === 'function'
-                    ? stateOrCallback(this.state)
-                    : stateOrCallback,
+            payload: stateOrCallback,
         };
 
         StoreCore.dispatch(action);

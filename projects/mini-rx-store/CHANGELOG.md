@@ -1,3 +1,14 @@
+# 3.1.0 (2022-01-28)
+### Bugfixes
+Undo Extension: unexpected feature state when reducer is added and removed under the same feature key
+
+### Refactor
+* Store, Feature Store: Refactored action names: @mini-rx/set-state/products/load success instead of @mini-rx/products/set-state/load success, @mini-rx/init-feature/products instead of @mini-rx/products/init
+* Feature Store: Feature reducer setState check more performant
+* Feature Store: more lightweight unsubscribe with Subscription.add
+* Feature Store: setState action payload can be a function or an object (necessary to fix Undo Extension issue)
+* General minor changes for less bundle size
+
 # 3.0.1 (2021-11-25)
 ### Bugfixes
 Feature Store: improve state type: prevent using number, string etc as state type
