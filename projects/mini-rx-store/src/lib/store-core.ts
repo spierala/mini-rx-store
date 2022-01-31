@@ -15,7 +15,7 @@ import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select } fr
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 
-type GroupedByFeatureReducers = Record<string, Record<string, Reducer<any>>>;
+type GroupedReducers = Record<string, Record<string, Reducer<any>>>;
 
 class StoreCore {
     // ACTIONS
@@ -38,26 +38,25 @@ class StoreCore {
         return this.reducersSource.getValue();
     }
 
-    private groupedByFeatureReducersSource: BehaviorSubject<GroupedByFeatureReducers> =
-        new BehaviorSubject({});
-    private groupedByFeatureReducers$: Observable<ReducerDictionary<AppState>> =
-        this.groupedByFeatureReducersSource.pipe(
-            map((groupedByFeatureReducers) => {
-                return Object.keys(groupedByFeatureReducers).reduce((previousValue, key) => {
+    private groupedReducersSource: BehaviorSubject<GroupedReducers> = new BehaviorSubject({});
+    private groupedReducers$: Observable<ReducerDictionary<AppState>> =
+        this.groupedReducersSource.pipe(
+            map((groupedReducers) => {
+                return Object.keys(groupedReducers).reduce((previousValue, key) => {
                     return {
                         ...previousValue,
-                        [key]: combineReducers(groupedByFeatureReducers[key]),
+                        [key]: combineReducers(groupedReducers[key]),
                     };
                 }, {});
             })
         );
 
-    private multiReducersCounters = {};
+    private groupedReducerCounts = {};
 
     // FEATURE REDUCERS COMBINED
     private combinedReducer$: Observable<Reducer<AppState>> = combineLatest([
         this.reducersSource,
-        this.groupedByFeatureReducers$,
+        this.groupedReducers$,
     ]).pipe(
         map(([appReducers, groupedFeatureReducers]) =>
             combineReducers({ ...appReducers, ...groupedFeatureReducers })
@@ -126,7 +125,7 @@ class StoreCore {
         }
 
         const multiReducerKey: string[] = multi
-            ? this.addMultiReducer(featureKey, initialState)
+            ? this.addGroupedReducer(featureKey, initialState)
             : this.addReducer(featureKey, createFeatureReducer([featureKey], initialState));
         this.dispatch(createMiniRxAction('init-feature', multiReducerKey));
         return multiReducerKey;
@@ -134,7 +133,7 @@ class StoreCore {
 
     removeFeature(featureKeys: string[]) {
         featureKeys.length > 1
-            ? this.removeMultiReducer([featureKeys[0], featureKeys[1]])
+            ? this.removeGroupedReducer([featureKeys[0], featureKeys[1]])
             : this.removeReducer(featureKeys[0]);
         this.dispatch(createMiniRxAction('destroy-feature', featureKeys));
     }
@@ -198,37 +197,38 @@ class StoreCore {
         return [featureKey];
     }
 
-    private addMultiReducer(featureKey: string, initialState: any): string[] {
-        const groupedByFeatureReducers = this.groupedByFeatureReducersSource.getValue();
+    private addGroupedReducer(featureKey: string, initialState: any): string[] {
+        const groupedReducers = this.groupedReducersSource.getValue();
 
-        let multiReducerKey: string;
-        if (!groupedByFeatureReducers.hasOwnProperty(featureKey)) {
-            groupedByFeatureReducers[featureKey] = {};
-            multiReducerKey = featureKey + '-' + 1;
-            this.multiReducersCounters[featureKey] = 1;
+        let childReducerKey: string;
+        if (!groupedReducers.hasOwnProperty(featureKey)) {
+            groupedReducers[featureKey] = {};
+            childReducerKey = featureKey + '-' + 1;
+            this.groupedReducerCounts[featureKey] = 1;
         } else {
-            multiReducerKey = featureKey + '-' + (this.multiReducersCounters[featureKey] += 1);
+            childReducerKey = featureKey + '-' + (this.groupedReducerCounts[featureKey] += 1);
         }
-        groupedByFeatureReducers[featureKey][multiReducerKey] = createFeatureReducer(
-            [featureKey, multiReducerKey],
+        groupedReducers[featureKey][childReducerKey] = createFeatureReducer(
+            [featureKey, childReducerKey],
             initialState
         );
 
-        this.groupedByFeatureReducersSource.next(groupedByFeatureReducers);
-        return [featureKey, multiReducerKey];
+        this.groupedReducersSource.next(groupedReducers);
+        return [featureKey, childReducerKey];
     }
 
     private removeReducer(featureKey: string) {
         this.reducersSource.next(omit(this.reducers, featureKey));
     }
 
-    private removeMultiReducer([feature, multiReducerKey]) {
-        const groupedByFeatureReducers = this.groupedByFeatureReducersSource.getValue();
-        groupedByFeatureReducers[feature] = omit(
-            groupedByFeatureReducers[feature],
-            multiReducerKey
-        );
-        this.groupedByFeatureReducersSource.next(groupedByFeatureReducers);
+    private removeGroupedReducer([feature, multiReducerKey]) {
+        const groupedReducers = this.groupedReducersSource.getValue();
+        groupedReducers[feature] = omit(groupedReducers[feature], multiReducerKey);
+        if (Object.keys(groupedReducers[feature]).length === 0) {
+            delete groupedReducers[feature];
+        }
+
+        this.groupedReducersSource.next(groupedReducers);
     }
 }
 

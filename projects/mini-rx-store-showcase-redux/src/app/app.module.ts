@@ -25,7 +25,7 @@ import { CounterModule } from './counter/counter.module';
         UserModule,
         AppRoutingModule,
         StoreModule.forRoot({
-            extensions: [new ImmutableStateExtension(), new LoggerExtension(), new UndoExtension()],
+            extensions: [new ImmutableStateExtension(), new UndoExtension()],
         }),
         StoreDevtoolsModule.instrument({
             name: 'MiniRx Redux Showcase',
