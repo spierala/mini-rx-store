@@ -28,7 +28,11 @@ export class FeatureStore<StateType extends object> {
 
     private readonly keys: string[];
 
-    constructor(featureKey: string, initialState: StateType, private config?: { multi: boolean }) {
+    constructor(
+        featureKey: string,
+        initialState: StateType,
+        private config: { multi?: boolean } = {}
+    ) {
         this._featureKey = featureKey;
 
         this.keys = StoreCore.addFeatureStore<StateType>(featureKey, initialState, config.multi);
