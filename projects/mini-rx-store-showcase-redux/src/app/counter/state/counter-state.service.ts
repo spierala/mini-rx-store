@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FeatureStore } from 'mini-rx-store';
 
-interface CounterState {
+export interface CounterState {
     count: number;
 }
 
