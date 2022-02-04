@@ -33,8 +33,8 @@ export class StoreFeatureModule {
         private store: Store,
         root: StoreRootModule, // Prevent feature states to be initialized before root state
         @Inject(FEATURE_NAMES) featureNames: string[],
-        @Inject(FEATURE_REDUCERS) reducers: Reducer<any[]>,
-        @Inject(FEATURE_CONFIGS) configs: FeatureStoreConfig<any[]>
+        @Inject(FEATURE_REDUCERS) reducers: Reducer<any>[],
+        @Inject(FEATURE_CONFIGS) configs: FeatureStoreConfig<any>[]
     ) {
         featureNames.forEach((featureName, index) => {
             this.store.feature(featureName, reducers[index], configs[index]);

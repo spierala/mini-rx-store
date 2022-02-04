@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
-import { Action, Actions, FeatureStore, ofType, Store, StoreExtension } from 'mini-rx-store';
+import { Action, Actions, FeatureStore, ofType, Reducer, Store, StoreExtension } from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -45,7 +45,7 @@ class Counter4Module {}
 
 const featureMetaReducerSpy = jest.fn();
 
-function featureMetaReducer(reducer) {
+function featureMetaReducer(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
         featureMetaReducerSpy(state);
         return reducer(state, action);
@@ -97,7 +97,7 @@ describe(`Ng Modules`, () => {
 
     const rootMetaReducerSpy = jest.fn();
 
-    function rootMetaReducer(reducer) {
+    function rootMetaReducer(reducer: Reducer<any>): Reducer<any> {
         return (state, action) => {
             rootMetaReducerSpy(state);
             return reducer(state, action);
