@@ -8,7 +8,7 @@ export class NgReduxDevtoolsExtension extends ReduxDevtoolsExtension {
         super(options);
     }
 
-    updateState(state) {
+    override updateState(state: Record<string, any>) {
         this.ngZone.run(() => {
             super.updateState(state);
         });

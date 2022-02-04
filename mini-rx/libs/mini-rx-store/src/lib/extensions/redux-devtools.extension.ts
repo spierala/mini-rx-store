@@ -1,5 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { Action, ActionWithPayload, AppState, StoreExtension } from '../models';
+import { AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
 const win = window as any;
