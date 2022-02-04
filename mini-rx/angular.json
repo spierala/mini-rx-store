@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "projects": {
+    "mini-rx-angular-demo": "apps/mini-rx-angular-demo",
+    "mini-rx-angular-demo-e2e": "apps/mini-rx-angular-demo-e2e"
+  }
+}
