@@ -30,7 +30,7 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // META REDUCERS
-    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject([]);
+    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject<MetaReducer<AppState>[]>([]);
     private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
         map((metaReducers) => combineMetaReducers(metaReducers))
     );
@@ -121,7 +121,7 @@ class StoreCore {
         if (config.reducers) {
             Object.keys(config.reducers).forEach((featureKey) => {
                 checkFeatureExists(featureKey, this.reducers);
-                this.addReducer(featureKey, config.reducers[featureKey]);
+                this.addReducer(featureKey, config.reducers![featureKey]);
             });
         }
 

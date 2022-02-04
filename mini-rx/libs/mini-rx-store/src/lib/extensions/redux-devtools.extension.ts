@@ -1,5 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, StoreExtension } from '../models';
+import { Action, ActionWithPayload, AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
 const win = window as any;
@@ -42,7 +42,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
         }
     }
 
-    private onDevToolsMessage(message) {
+    private onDevToolsMessage(message: {type: string, payload: any, state: any}) {
         if (message.type === DevToolActions.DISPATCH) {
             switch (message.payload.type) {
                 case DevToolActions.JUMP_TO_STATE:

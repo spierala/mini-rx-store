@@ -12,7 +12,7 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 export class FeatureStore<StateType extends object> {
     private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
 
-    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject(undefined);
+    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>({} as StateType);
     state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
         return this.stateSource.getValue();
@@ -59,9 +59,9 @@ export class FeatureStore<StateType extends object> {
     }
 
     effect<PayLoadType = any>(
-        effectFn: (payload: Observable<PayLoadType>) => Observable<any>
+        effectFn: (payload: Observable<PayLoadType | undefined>) => Observable<any>
     ): (payload?: PayLoadType) => void {
-        const subject: Subject<PayLoadType> = new Subject();
+        const subject: Subject<PayLoadType | undefined> = new Subject();
         const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(subject.pipe(effectFn));
 
         this.sub.add(effectWithDefaultErrorHandler.subscribe());

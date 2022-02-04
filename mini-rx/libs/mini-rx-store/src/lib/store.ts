@@ -5,7 +5,7 @@ import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
 
 export class Store {
-    private static instance: Store = undefined;
+    private static instance: Store | undefined = undefined;
 
     // Prevent direct construction calls with the `new` operator.
     private constructor(config: Partial<StoreConfig<AppState>>) {
@@ -13,7 +13,7 @@ export class Store {
     }
 
     /** @deprecated This is an internal implementation detail, do not use. */
-    static configureStore(config: Partial<StoreConfig<AppState>>) {
+    static configureStore(config: Partial<StoreConfig<AppState>>): Store | never {
         if (!Store.instance) {
             Store.instance = new Store(config);
             return Store.instance;

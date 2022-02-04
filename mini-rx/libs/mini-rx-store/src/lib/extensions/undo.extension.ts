@@ -9,11 +9,11 @@ const defaultBufferSize = 100;
 
 export let isUndoExtensionInitialized: boolean;
 let executedActions: Array<Action> = [];
-let initialState;
-let bufferSize;
+let initialState: any;
+let bufferSize: number;
 
 export class UndoExtension extends StoreExtension {
-    sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
+    override sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
 
     constructor(config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
         super();
@@ -54,7 +54,7 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
                         // This can lead to unexpected state in the 'new' feature reducer
                         // Solution: Clear the feature state from the newState manually if we encounter a 'destroy-feature' action
                         // This will make sure that the feature reducer initializes again with its initial state
-                        newState[executedAction.payload] = undefined;
+                        newState[executedAction['payload']] = undefined;
                     }
                     newState = rootReducer(newState, executedAction);
                 }

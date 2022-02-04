@@ -1,6 +1,12 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, MiniRxActionType, MetaReducer, Reducer, ActionWithPayload } from './models';
+import {
+  Action,
+  MiniRxActionType,
+  MetaReducer,
+  Reducer,
+  ActionWithPayload
+} from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -28,13 +34,13 @@ export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaRedu
     };
 }
 
-export function omit<T extends { [key: string]: any }>(object: T, keyToOmit: keyof T): Partial<T> {
+export function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Record<string, any> {
     return Object.keys(object)
         .filter((key) => key !== keyToOmit)
         .reduce((prevValue, key) => {
             prevValue[key] = object[key];
             return prevValue;
-        }, {});
+        }, {} as Record<string, any>);
 }
 
 export const miniRxNameSpace = '@mini-rx';
@@ -47,6 +53,6 @@ export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionTyp
     return action.type.indexOf(miniRxNameSpace + '/' + miniRxActionType) === 0;
 }
 
-export function miniRxError(message: string) {
+export function miniRxError(message: string): never {
     throw new Error(miniRxNameSpace + ': ' + message);
 }

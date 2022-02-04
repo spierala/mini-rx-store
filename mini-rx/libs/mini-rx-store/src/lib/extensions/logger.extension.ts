@@ -1,4 +1,4 @@
-import { StoreExtension } from '../models';
+import { Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 
 export class LoggerExtension extends StoreExtension {
@@ -7,7 +7,7 @@ export class LoggerExtension extends StoreExtension {
     }
 }
 
-function loggerMetaReducer(reducer) {
+function loggerMetaReducer(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
         const nextState = reducer(state, action);
 
