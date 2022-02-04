@@ -13,7 +13,7 @@ interface UserState {
     lastName: string;
     city: string;
     country: string;
-    err: string;
+    err: string | undefined;
 }
 
 const initialState: UserState = {
@@ -78,19 +78,19 @@ class UserFeatureStore extends FeatureStore<UserState> {
         super('user2', initialState);
     }
 
-    updateFirstName(firstName) {
+    updateFirstName(firstName: string) {
         this.setState({ firstName });
     }
 
-    updateLastName(lastName) {
+    updateLastName(lastName: string) {
         this.setState({ lastName });
     }
 
-    updateCity(city) {
+    updateCity(city: string) {
         this.setState({ city }, 'updateCity');
     }
 
-    updateCountry(country) {
+    updateCountry(country: string) {
         this.setState({
             ...this.state, // Test updating state using `this.state`
             country,
@@ -244,7 +244,7 @@ describe('FeatureStore', () => {
 
         expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
 
-        function getErrorMsg(times) {
+        function getErrorMsg(times: number) {
             return `MiniRx resubscribed the Effect. ONLY ${times} time(s) remaining!`;
         }
 
@@ -307,7 +307,7 @@ describe('FeatureStore', () => {
     it('should run the meta reducers when state changes', () => {
         const metaReducerSpy = jest.fn();
 
-        function metaReducer(reducer): Reducer<any> {
+        function metaReducer(reducer: Reducer<any>): Reducer<any> {
             return (state, action: Action) => {
                 metaReducerSpy();
 

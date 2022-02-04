@@ -50,7 +50,7 @@ describe('Redux Dev Tools', () => {
 
     it('should receive state and actions', () => {
         store.dispatch(action);
-        let currAppState;
+        let currAppState = {};
         store.select((state) => state).subscribe((state) => (currAppState = state));
 
         expect(sendFn).toHaveBeenCalledTimes(1);
@@ -78,6 +78,8 @@ describe('Redux Dev Tools', () => {
 
         extension['onDevToolsMessage']({
             type: 'NOT_SUPPORTED_TYPE',
+            payload: {},
+            state: {}
         });
 
         expect(spy).toHaveBeenCalledTimes(0);

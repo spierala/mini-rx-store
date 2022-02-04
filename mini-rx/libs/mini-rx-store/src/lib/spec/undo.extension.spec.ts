@@ -17,7 +17,7 @@ import StoreCore from '../store-core';
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
 
-    private lastAction: Action;
+    private lastAction: Action | undefined;
 
     constructor() {
         super('featureWithUndo', counterStringInitialState);
@@ -34,7 +34,9 @@ class MyFeatureStore extends FeatureStore<CounterStringState> {
     }
 
     undoLastAction() {
+      if (this.lastAction) {
         this.undo(this.lastAction);
+      }
     }
 
     undoActions(actions: Action[]) {

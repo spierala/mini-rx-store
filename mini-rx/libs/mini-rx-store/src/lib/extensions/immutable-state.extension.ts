@@ -3,7 +3,7 @@
 
 import { Action, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import deepFreeze from 'deep-freeze-strict';
+import deepFreezeStrict = require('deep-freeze-strict');
 
 export class ImmutableStateExtension extends StoreExtension {
     init(): void {
@@ -13,9 +13,9 @@ export class ImmutableStateExtension extends StoreExtension {
 
 export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
     return (state = {}, action: Action) => {
-        deepFreeze(state);
+        deepFreezeStrict(state);
         const nextState = reducer(state, action);
-        deepFreeze(nextState);
+        deepFreezeStrict(nextState);
         return nextState;
     };
 }

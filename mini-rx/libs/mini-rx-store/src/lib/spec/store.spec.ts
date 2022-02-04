@@ -1,6 +1,6 @@
 import { actions$, configureStore, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
-import { Action, Reducer, StoreExtension } from '../models';
+import { Action, ActionWithPayload, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
@@ -45,7 +45,7 @@ interface UserState {
     firstName: string;
     lastName: string;
     age: number;
-    err: string;
+    err: string | undefined;
 }
 
 const userInitialState: UserState = {
@@ -55,7 +55,7 @@ const userInitialState: UserState = {
     err: undefined,
 };
 
-function userReducer(state: UserState = userInitialState, action: Action): UserState {
+function userReducer(state: UserState = userInitialState, action: ActionWithPayload): UserState {
     switch (action.type) {
         case 'updateUser':
         case 'loadUserSuccess':
@@ -180,7 +180,7 @@ describe('Store Config', () => {
                 user: {},
             };
 
-            function rootMetaReducer1(reducer) {
+            function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
                 return (state, action) => {
                     rootMetaReducerSpy(state);
                     return reducer(state, action);
@@ -196,16 +196,16 @@ describe('Store Config', () => {
         });
 
         it('should call root meta reducers from left to right', () => {
-            const callOrder = [];
+            const callOrder: string[] = [];
 
-            function rootMetaReducer1(reducer) {
+            function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
                 return (state, action) => {
                     callOrder.push('meta1');
                     return reducer(state, action);
                 };
             }
 
-            function rootMetaReducer2(reducer) {
+            function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
                 return (state, action) => {
                     callOrder.push('meta2');
                     return reducer(state, action);
@@ -220,9 +220,9 @@ describe('Store Config', () => {
         });
 
         it('should call root meta reducers from extensions depending on sortOrder', () => {
-            const callOrder = [];
+            const callOrder: string[] = [];
 
-            function rootMetaReducerForExtension(reducer) {
+            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
                 return (state, action) => {
                     callOrder.push('meta1');
                     return reducer(state, action);
@@ -235,7 +235,7 @@ describe('Store Config', () => {
                 }
             }
 
-            function rootMetaReducerForExtension2(reducer) {
+            function rootMetaReducerForExtension2(reducer: Reducer<any>): Reducer<any> {
                 return (state, action) => {
                     callOrder.push('meta2');
                     return reducer(state, action);
@@ -243,14 +243,14 @@ describe('Store Config', () => {
             }
 
             class Extension2 extends StoreExtension {
-                sortOrder = 100;
+                override sortOrder = 100;
 
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension2);
                 }
             }
 
-            function rootMetaReducerForExtension3(reducer) {
+            function rootMetaReducerForExtension3(reducer: Reducer<any>): Reducer<any> {
                 return (state, action) => {
                     callOrder.push('meta3');
                     return reducer(state, action);
@@ -331,7 +331,7 @@ describe('Store Config', () => {
                     };
                 }
 
-                function inTheMiddleRootMetaReducer(reducer) {
+                function inTheMiddleRootMetaReducer(reducer: Reducer<any>): Reducer<any> {
                     return (state, action) => {
                         const nextState = reducer(state, action);
 
@@ -551,7 +551,7 @@ describe('Store', () => {
     });
 
     it('should call the reducer before running the effect', () => {
-        const callOrder = [];
+        const callOrder: string[] = [];
         const someReducer = (state = { value: 0 }, action: Action) => {
             switch (action.type) {
                 case 'someAction2':
@@ -576,7 +576,7 @@ describe('Store', () => {
         store.effect(
             actions$.pipe(
                 ofType('someAction2'),
-                withLatestFrom(store.select((state) => state.someFeature.value)),
+                withLatestFrom(store.select((state) => state['someFeature'].value)),
                 mergeMap(([, value]) => {
                     valueSpy(value);
                     return onEffectStarted();
@@ -703,7 +703,7 @@ describe('Store', () => {
 
         expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
 
-        function getErrorMsg(times) {
+        function getErrorMsg(times: number) {
             return `MiniRx resubscribed the Effect. ONLY ${times} time(s) remaining!`;
         }
 
@@ -805,7 +805,7 @@ describe('Store Feature MetaReducers', () => {
         }
     }
 
-    function featureMetaReducer1(reducer): Reducer<CounterStringState> {
+    function featureMetaReducer1(reducer: Reducer<any>): Reducer<CounterStringState> {
         return (state, action: Action) => {
             if (action.type === 'metaTest2') {
                 state = {
@@ -818,7 +818,7 @@ describe('Store Feature MetaReducers', () => {
         };
     }
 
-    function featureMetaReducer2(reducer): Reducer<CounterStringState> {
+    function featureMetaReducer2(reducer: Reducer<any>): Reducer<CounterStringState> {
         return (state, action: Action) => {
             if (action.type === 'metaTest2') {
                 state = {
@@ -833,7 +833,7 @@ describe('Store Feature MetaReducers', () => {
 
     const nextStateSpy = jest.fn();
 
-    function inTheMiddleMetaReducer(reducer) {
+    function inTheMiddleMetaReducer(reducer: Reducer<any>): Reducer<any> {
         return (state, action) => {
             const nextState = reducer(state, action);
 
