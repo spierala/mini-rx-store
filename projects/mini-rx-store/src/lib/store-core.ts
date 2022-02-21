@@ -103,7 +103,9 @@ class StoreCore {
             ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
             : reducer;
 
-        checkFeatureExists(featureKey, this.reducers);
+        if (checkFeatureExists(featureKey, this.reducers)) {
+            featureAlreadyExistsError(featureKey);
+        }
 
         if (typeof config.initialState !== 'undefined') {
             reducer = createReducerWithInitialState(reducer, config.initialState);
@@ -121,7 +123,7 @@ class StoreCore {
         const featureExists = checkFeatureExists(featureKey, this.reducers);
 
         if (!multi && featureExists) {
-            miniRxError(`Feature "${featureKey}" already exists.`);
+            featureAlreadyExistsError(featureKey);
         }
 
         const multiReducerKey: string[] = multi
@@ -135,7 +137,7 @@ class StoreCore {
         featureKeys.length > 1
             ? this.removeGroupedReducer([featureKeys[0], featureKeys[1]])
             : this.removeReducer(featureKeys[0]);
-        this.dispatch(createMiniRxAction('destroy-feature', featureKeys));
+        this.dispatch(createMiniRxAction('destroy-feature', featureKeys, featureKeys));
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
@@ -258,13 +260,21 @@ function createFeatureReducer<StateType>(
     const setStateAction: Action = createMiniRxAction('set-state', keys);
     return (state: StateType = initialState, action: ActionWithPayload): StateType => {
         if (action.type.indexOf(setStateAction.type) === 0) {
+            const stateOrCallback = action.payload;
+            const newPartialState = typeof stateOrCallback === 'function'
+                ? stateOrCallback(state)
+                : stateOrCallback;
             return {
                 ...state,
-                ...action.payload,
+                ...newPartialState,
             };
         }
         return state;
     };
+}
+
+function featureAlreadyExistsError(featureKey): void {
+    miniRxError(`Feature "${featureKey}" already exists.`);
 }
 
 // Created once to initialize singleton

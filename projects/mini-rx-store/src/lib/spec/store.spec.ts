@@ -775,7 +775,7 @@ describe('Store', () => {
             expect.objectContaining({ tempCounter: counterInitialState })
         );
 
-        StoreCore.removeFeature(featureKey);
+        StoreCore.removeFeature([featureKey]);
         expect(spy).toHaveBeenCalledWith(
             expect.not.objectContaining({ tempCounter: counterInitialState })
         );

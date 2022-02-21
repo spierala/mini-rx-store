@@ -124,7 +124,7 @@ describe('Undo Extension', () => {
             expect(spy).toHaveBeenCalledWith(5);
             spy.mockReset();
 
-            StoreCore.removeFeature(featureKey);
+            StoreCore.removeFeature([featureKey]);
             StoreCore.addFeature<CounterState>(featureKey, reducer);
 
             store.dispatch(action);
@@ -224,7 +224,7 @@ describe('Undo Extension', () => {
 
             spy.mockReset();
 
-            StoreCore.removeFeature('tempCounter2');
+            StoreCore.removeFeature(['tempCounter2']);
             store.dispatch(undo(counterAction));
             expect(spy).toHaveBeenCalledWith(
                 expect.objectContaining({ tempCounter1: counterInitialState })
