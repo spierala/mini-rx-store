@@ -58,16 +58,16 @@ export class FeatureStore<StateType extends object> {
         return this.state$.pipe(select(mapFn));
     }
 
-    effect<PayLoadType = any>(
-        effectFn: (payload: Observable<PayLoadType | undefined>) => Observable<any>
+    effect<PayLoadType = void>(
+        effectFn: (payload$: Observable<PayLoadType>) => Observable<any>
     ): (payload?: PayLoadType) => void {
-        const subject: Subject<PayLoadType | undefined> = new Subject();
+        const subject: Subject<PayLoadType> = new Subject();
         const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(subject.pipe(effectFn));
 
         this.sub.add(effectWithDefaultErrorHandler.subscribe());
 
         return (payload?: PayLoadType) => {
-            subject.next(payload);
+            subject.next(payload as PayLoadType);
         };
     }
 

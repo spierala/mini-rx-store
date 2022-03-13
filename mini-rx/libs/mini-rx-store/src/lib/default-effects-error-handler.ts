@@ -29,7 +29,7 @@ import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 // Prevent effect to unsubscribe from the actions stream
-export function defaultEffectsErrorHandler<T extends Action>(
+export function defaultEffectsErrorHandler<T>(
     observable$: Observable<T>,
     retryAttemptLeft: number = 10
 ): Observable<T> {
