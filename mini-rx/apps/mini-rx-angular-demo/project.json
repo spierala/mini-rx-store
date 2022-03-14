@@ -2,7 +2,7 @@
   "projectType": "application",
   "root": "apps/mini-rx-angular-demo",
   "sourceRoot": "apps/mini-rx-angular-demo/src",
-  "prefix": "mini-rx",
+  "prefix": "app",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
@@ -13,12 +13,14 @@
         "main": "apps/mini-rx-angular-demo/src/main.ts",
         "polyfills": "apps/mini-rx-angular-demo/src/polyfills.ts",
         "tsConfig": "apps/mini-rx-angular-demo/tsconfig.app.json",
-        "inlineStyleLanguage": "scss",
+        "inlineStyleLanguage": "css",
         "assets": [
           "apps/mini-rx-angular-demo/src/favicon.ico",
           "apps/mini-rx-angular-demo/src/assets"
         ],
-        "styles": ["apps/mini-rx-angular-demo/src/styles.scss"],
+        "styles": ["apps/mini-rx-angular-demo/src/styles.css",
+          "node_modules/bootstrap/dist/css/bootstrap.css",
+          "node_modules/ngx-toastr/toastr.css"],
         "scripts": []
       },
       "configurations": {

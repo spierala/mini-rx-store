@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ProductStateService } from './modules/products/state/product-state.service';
+import { UserStateService } from './modules/user/state/user-state.service';
 
 @Component({
-  selector: 'mini-rx-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  title = 'mini-rx-angular-demo';
+    constructor(public productState: ProductStateService, public userState: UserStateService) {}
 }
