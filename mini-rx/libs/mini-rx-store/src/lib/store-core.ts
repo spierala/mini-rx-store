@@ -121,7 +121,7 @@ class StoreCore {
         if (config.reducers) {
             Object.keys(config.reducers).forEach((featureKey) => {
                 checkFeatureExists(featureKey, this.reducers);
-                this.addReducer(featureKey, config.reducers![featureKey]);
+                this.addReducer(featureKey, config.reducers![featureKey]); // config.reducers! (prevent TS2532: Object is possibly 'undefined')
             });
         }
 

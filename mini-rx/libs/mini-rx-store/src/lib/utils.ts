@@ -34,13 +34,13 @@ export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaRedu
     };
 }
 
-export function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Record<string, any> {
+export function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {
     return Object.keys(object)
         .filter((key) => key !== keyToOmit)
-        .reduce((prevValue, key) => {
+        .reduce<Partial<T>>((prevValue, key: keyof T) => {
             prevValue[key] = object[key];
             return prevValue;
-        }, {} as Record<string, any>);
+        }, {});
 }
 
 export const miniRxNameSpace = '@mini-rx';
