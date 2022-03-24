@@ -1,9 +1,0 @@
-{
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../../out-tsc/spec",
-        "types": ["jest", "node"],
-        "emitDecoratorMetadata": true
-    },
-    "include": ["**/*.spec.ts", "**/*.d.ts"]
-}
