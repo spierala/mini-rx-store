@@ -8,9 +8,7 @@ export const enum ExtensionSortOrder {
     UNDO_EXTENSION = 1,
 }
 
-export interface AppState {
-    [key: string]: any;
-}
+export type AppState = Record<string, any>
 
 export abstract class StoreExtension {
     sortOrder: ExtensionSortOrder = ExtensionSortOrder.DEFAULT;

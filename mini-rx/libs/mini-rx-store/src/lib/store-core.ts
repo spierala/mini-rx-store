@@ -162,7 +162,8 @@ class StoreCore {
     }
 
     private removeReducer(featureKey: string) {
-        this.reducersSource.next(omit(this.reducers, featureKey));
+        const reducers = omit(this.reducers, featureKey)
+        this.reducersSource.next(reducers as ReducerDictionary<AppState>);
     }
 }
 
