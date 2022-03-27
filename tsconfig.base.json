@@ -15,8 +15,8 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "mini-rx-store": ["dist/libs/mini-rx-store"],
-            "mini-rx-store-ng": ["dist/libs/mini-rx-store-ng"]
+            "mini-rx-store": ["libs/mini-rx-store/src/index.ts"],
+            "mini-rx-store-ng": ["libs/mini-rx-store-ng/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

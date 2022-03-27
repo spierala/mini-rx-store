@@ -19,7 +19,11 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+      "paths": {
+          "mini-rx-store": ["dist/libs/mini-rx-store"],
+          "mini-rx-store-ng": ["dist/libs/mini-rx-store-ng"]
+      }
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,
