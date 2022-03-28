@@ -15,7 +15,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [10.x, 12.x]
+                node-version: [12.x, 14.x]
 
         steps:
             - uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
                   node-version: ${{ matrix.node-version }}
             - run: npm ci
             - run: npm run build:all
-            - run: npm run test:minirx
-            - run: npm run test:minirx-ng
+            - run: npm run test:mini-rx-store
+            - run: npm run test:mini-rx-store-ng
               env:
                   CI: true

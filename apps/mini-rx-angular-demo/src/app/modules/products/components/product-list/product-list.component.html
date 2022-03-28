@@ -1,0 +1,36 @@
+<div class="card h-100">
+    <div class="card-header d-flex">
+        <span class="flex-grow-1">Products</span>
+        <label>
+            <input
+                class="form-check-input"
+                type="checkbox"
+                [ngModel]="displayCode"
+                (ngModelChange)="displayCodeChange.emit($event)"
+            />
+            Display Product Code
+        </label>
+    </div>
+    <ul class="list-group">
+        <li
+            class="list-group-item d-flex align-items-center"
+            *ngFor="let product of products"
+            [ngClass]="{ active: selectedProduct?.id === product.id }"
+            (click)="productSelect.emit(product)"
+        >
+            <span class="flex-grow-1">
+                {{ product.productName }}
+                <ng-container *ngIf="displayCode">({{ product.productCode }})</ng-container>
+            </span>
+            <div class="mr-2">
+                {{ product.price | currency }}
+            </div>
+
+            <span
+                *ngIf="showCartBtn"
+                class="btn bi bi-cart-plus-fill text-primary"
+                (click)="$event.stopPropagation(); addToCart.emit(product)"
+            ></span>
+        </li>
+    </ul>
+</div>
