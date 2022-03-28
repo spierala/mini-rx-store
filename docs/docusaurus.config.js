@@ -1,7 +1,7 @@
 module.exports = {
     title: 'MiniRx - The RxJS Redux Store',
     tagline: 'Make hard things simple - Keep simple things simple',
-    url: 'https://github.com/spierala/mini-rx-store',
+    url: 'https://mini-rx.io',
     baseUrl: '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
