@@ -32,7 +32,7 @@ export class TodoFeatureStore extends FeatureStore<TodoState> {
 Extending the `FeatureStore` requires to pass the feature key (e.g. 'todo') and the initial state.
 We have to provide a TypeScript interface to `FeatureStore` to get type safety: `FeatureStore<TodoState>`.
 
-### Option2 : Functional creation method
+### Option 2: Functional creation method
 
 We can create a Feature Store with `createFeatureStore`
 
