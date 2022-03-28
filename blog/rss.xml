@@ -2,7 +2,7 @@
 <rss version="2.0">
     <channel>
         <title>MiniRx - The RxJS Redux Store Blog</title>
-        <link>https://github.com/spierala/mini-rx-store/blog</link>
+        <link>https://mini-rx.io/blog</link>
         <description>MiniRx - The RxJS Redux Store Blog</description>
         <lastBuildDate>Sun, 25 Oct 2015 23:29:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
