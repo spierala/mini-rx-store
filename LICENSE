@@ -43,11 +43,3 @@ See the file for details.
 This repository includes a file "combine-reducers.ts" originally copied from
 https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts, MIT licensed.
 See the file for details.
-
-This repository includes a project "mini-rx-store-showcase" originally copied from
-https://github.com/DeborahK/Angular-NgRx-GettingStarted
-See the project for details.
-
-This repository includes a project "mini-rx-store-showcase-redux" originally copied from
-https://github.com/DeborahK/Angular-NgRx-GettingStarted
-See the project for details.
