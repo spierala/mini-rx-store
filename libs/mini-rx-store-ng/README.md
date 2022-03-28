@@ -1,7 +1,18 @@
-# mini-rx-store-ng
+[![npm version](https://badge.fury.io/js/mini-rx-store-ng.svg)](https://www.npmjs.com/package/mini-rx-store-ng)
 
-This library was generated with [Nx](https://nx.dev).
+# Angular Integration for [MiniRx Store](https://github.com/spierala/mini-rx-store)
 
-## Running unit tests
+Use MiniRx Store the Angular way:
 
-Run `nx test mini-rx-store-ng` to execute the unit tests.
+- Configure the store using `StoreModule.forRoot()`
+- Register Feature States using `StoreModule.forFeature()`
+- Register Effects using `EffectsModule.register()`
+- Use Angular Dependency Injection for `Store` and `Actions`
+- Redux Devtools Extension
+
+## Installation:
+
+`npm i mini-rx-store-ng`
+
+## Docs
+- 🤓 Learn more about the MiniRx Angular Integration on the [docs site](https://spierala.github.io/mini-rx-store/docs/angular)

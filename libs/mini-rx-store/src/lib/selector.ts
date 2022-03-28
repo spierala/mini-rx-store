@@ -108,7 +108,7 @@ export function createSelector(...args: any[]): Selector<any, any> {
 }
 
 export function createFeatureSelector<T>(featureKey?: string): Selector<object, T>;
-export function createFeatureSelector<T, V>(featureKey?: keyof T): Selector<T, V>;
+export function createFeatureSelector<T, V>(featureKey: keyof T): Selector<T, V>;
 export function createFeatureSelector(featureKey?: any): Selector<any, any> {
     return createSelector(
         (state: any) => {
