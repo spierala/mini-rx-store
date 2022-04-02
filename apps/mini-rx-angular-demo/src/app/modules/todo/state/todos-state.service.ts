@@ -29,9 +29,7 @@ const initialState: TodoState = {
 // MEMOIZED SELECTORS
 const getTodosFeatureSelector = createFeatureSelector<TodoState>();
 const getTodos = createSelector(getTodosFeatureSelector, (state) => state.todos);
-const getSelectedTodo = createSelector(
-    getTodosFeatureSelector, state => state.selectedTodo
-);
+const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) => state.selectedTodo);
 const getFilter = createSelector(getTodosFeatureSelector, (state) => state.filter);
 const getTodosFiltered = createSelector(getTodos, getFilter, (todos, filter) => {
     return todos.filter((item) => {
@@ -112,8 +110,8 @@ export class TodosStateService extends FeatureStore<TodoState> {
     create = this.effect<Todo>(
         // FYI: we can skip the $payload pipe when using just one RxJS operator
         mergeMap((todo) => {
-            const optimisticUpdate: Action = this.setState(state =>
-                ({
+            const optimisticUpdate: Action = this.setState(
+                (state) => ({
                     todos: [...state.todos, todo],
                 }),
                 'createOptimistic'
@@ -187,5 +185,12 @@ export class TodosStateService extends FeatureStore<TodoState> {
 }
 
 function updateTodoInList(todos: Todo[], updatedTodo: Todo): Todo[] {
-    return todos.map((item) => (item.id === updatedTodo.id ? updatedTodo : item));
+    return todos.map((item) =>
+        item.id === updatedTodo.id
+            ? {
+                  ...item,
+                  ...updatedTodo,
+              }
+            : item
+    );
 }

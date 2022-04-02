@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Todo } from '../../models/todo';
 import { TodosStateService } from '../../state/todos-state.service';
-import { cloneDeep } from 'lodash-es';
 
 @Component({
     selector: 'app-todo-detail',
@@ -18,13 +17,10 @@ export class TodoDetailComponent implements OnInit {
     ngOnInit() {}
 
     submit() {
-        const clonedTodo = cloneDeep(this.todo);
-        // Clone again, otherwise the ImmutableExtension might freeze `this.todo`...
-        // ...and further [(ngModel)] changes would throw an exception
         if (this.todo.id) {
-            this.todosService.update(clonedTodo);
+            this.todosService.update(this.todo);
         } else {
-            this.todosService.create(clonedTodo);
+            this.todosService.create(this.todo);
         }
     }
 
