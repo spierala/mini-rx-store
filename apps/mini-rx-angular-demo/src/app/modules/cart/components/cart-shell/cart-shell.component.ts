@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ProductStateService } from '../../../products/state/product-state.service';
 
 @Component({
@@ -6,8 +6,6 @@ import { ProductStateService } from '../../../products/state/product-state.servi
     templateUrl: './cart-shell.component.html',
     styleUrls: ['./cart-shell.component.css'],
 })
-export class CartShellComponent implements OnInit {
-    constructor(public stateService: ProductStateService) {}
-
-    ngOnInit(): void {}
+export class CartShellComponent {
+    constructor(public productState: ProductStateService) {}
 }

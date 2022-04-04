@@ -6,10 +6,10 @@ import { CounterStateService } from '../state/counter-state.service';
     selector: 'app-counter',
     templateUrl: './counter.component.html',
     styleUrls: ['./counter.component.css'],
-    providers: [CounterStateService],
+    providers: [CounterStateService], // The CounterState is provided for each counter component instance
 })
 export class CounterComponent {
-    counter$: Observable<number> = this.counterState.$count;
+    counter$: Observable<number> = this.counterState.count$;
 
     constructor(private counterState: CounterStateService) {}
 
