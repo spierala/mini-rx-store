@@ -1,11 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    Input,
-    OnInit,
-    Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Todo } from '../../models/todo';
 
 @Component({
@@ -14,7 +7,7 @@ import { Todo } from '../../models/todo';
     styleUrls: ['./todo-list.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TodoListComponent implements OnInit {
+export class TodoListComponent {
     @Input()
     todos: Todo[] = [];
 
@@ -23,8 +16,4 @@ export class TodoListComponent implements OnInit {
 
     @Output()
     selectTodo: EventEmitter<Todo> = new EventEmitter();
-
-    constructor() {}
-
-    ngOnInit(): void {}
 }

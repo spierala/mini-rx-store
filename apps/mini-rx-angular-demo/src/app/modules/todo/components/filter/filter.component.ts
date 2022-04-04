@@ -25,7 +25,7 @@ export class FilterComponent implements OnInit, OnDestroy {
     }
 
     @Output()
-    filterUpdate: EventEmitter<Filter> = new EventEmitter();
+    filterUpdate = new EventEmitter<Filter>();
 
     formGroup: FormGroup = new FormGroup({
         search: new FormControl(),

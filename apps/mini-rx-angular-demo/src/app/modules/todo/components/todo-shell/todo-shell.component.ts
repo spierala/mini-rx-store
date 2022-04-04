@@ -20,17 +20,5 @@ export class TodoShellComponent {
     );
     filter$: Observable<Filter> = this.todosState.filter$;
 
-    constructor(private todosState: TodosStateService) {}
-
-    selectTodo(todo: Todo) {
-        this.todosState.selectTodo(todo);
-    }
-
-    addTodo() {
-        this.todosState.initNewTodo();
-    }
-
-    onFilterUpdate(filter: Filter) {
-        this.todosState.updateFilter(filter);
-    }
+    constructor(public todosState: TodosStateService) {}
 }

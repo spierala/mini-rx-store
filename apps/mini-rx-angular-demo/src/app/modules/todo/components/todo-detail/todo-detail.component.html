@@ -1,7 +1,7 @@
 <div class="card h-100">
     <div class="card-header">
         <span>{{ todo.id ? 'Edit Todo' : 'Create Todo' }}</span>
-        <button (click)="onClose()" type="button" class="close" aria-label="Close">
+        <button (click)="close.emit()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
@@ -62,7 +62,7 @@
             >
                 Save
             </button>
-            <button *ngIf="todo.id" class="btn btn-primary btn-danger" (click)="delete()">
+            <button *ngIf="todo.id" class="btn btn-primary btn-danger" (click)="delete.emit(todo)">
                 Delete
             </button>
         </form>

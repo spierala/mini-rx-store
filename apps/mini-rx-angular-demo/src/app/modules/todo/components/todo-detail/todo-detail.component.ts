@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Todo } from '../../models/todo';
-import { TodosStateService } from '../../state/todos-state.service';
 
 @Component({
     selector: 'app-todo-detail',
@@ -8,27 +7,27 @@ import { TodosStateService } from '../../state/todos-state.service';
     styleUrls: ['./todo-detail.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TodoDetailComponent implements OnInit {
+export class TodoDetailComponent {
     @Input()
     todo!: Todo;
 
-    constructor(private todosService: TodosStateService) {}
+    @Output()
+    create = new EventEmitter<Todo>();
 
-    ngOnInit() {}
+    @Output()
+    update = new EventEmitter<Todo>();
+
+    @Output()
+    delete = new EventEmitter<Todo>();
+
+    @Output()
+    close = new EventEmitter<void>();
 
     submit() {
         if (this.todo.id) {
-            this.todosService.update(this.todo);
+            this.update.emit(this.todo);
         } else {
-            this.todosService.create(this.todo);
+            this.create.emit(this.todo);
         }
-    }
-
-    delete() {
-        this.todosService.delete(this.todo);
-    }
-
-    onClose() {
-        this.todosService.clearSelectedTodo();
     }
 }

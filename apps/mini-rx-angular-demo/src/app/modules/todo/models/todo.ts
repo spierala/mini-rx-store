@@ -4,4 +4,5 @@ export class Todo {
     isDone: boolean = false;
     isBusiness?: boolean;
     isPrivate?: boolean;
+    tempId?: string;
 }
