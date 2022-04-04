@@ -3,17 +3,17 @@ import { Injectable } from '@angular/core';
 import * as fromProducts from './product.reducer';
 import { createFeatureSelector, createSelector, Store } from 'mini-rx-store';
 import {
+    addProductToCart,
     clearCurrentProduct,
     createProduct,
     deleteProduct,
     initializeCurrentProduct,
     load,
+    removeProductFromCart,
     setCurrentProduct,
     toggleProductCode,
     updateProduct,
     updateSearch,
-    addProductToCart,
-    removeProductFromCart,
 } from './product.actions';
 import { Product } from '../models/product';
 import { Observable } from 'rxjs';

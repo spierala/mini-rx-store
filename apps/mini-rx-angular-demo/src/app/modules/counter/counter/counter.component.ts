@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CounterStateService } from '../state/counter-state.service';
 

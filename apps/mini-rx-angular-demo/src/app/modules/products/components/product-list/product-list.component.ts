@@ -20,11 +20,11 @@ export class ProductListComponent {
     showCartBtn = false;
 
     @Output()
-    productSelect: EventEmitter<Product> = new EventEmitter<Product>();
+    productSelect = new EventEmitter<Product>();
 
     @Output()
-    displayCodeChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+    displayCodeChange = new EventEmitter<boolean>();
 
     @Output()
-    addToCart: EventEmitter<Product> = new EventEmitter<Product>();
+    addToCart = new EventEmitter<Product>();
 }

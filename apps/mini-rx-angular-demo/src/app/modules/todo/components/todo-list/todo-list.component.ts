@@ -15,5 +15,5 @@ export class TodoListComponent {
     selectedTodo: Todo | undefined;
 
     @Output()
-    selectTodo: EventEmitter<Todo> = new EventEmitter();
+    selectTodo = new EventEmitter<Todo>();
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Product } from '../models/product';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastrService } from 'ngx-toastr';

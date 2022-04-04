@@ -71,7 +71,7 @@ export class DbService implements InMemoryDbService {
         return { todos, products };
     }
 
-    genId(todos: Todo[]): number {
+    genId(todos: { id: number }[]): number {
         return todos.length > 0 ? Math.max(...todos.map((todo) => todo.id!)) + 1 : INITIAL_ID;
     }
 }
