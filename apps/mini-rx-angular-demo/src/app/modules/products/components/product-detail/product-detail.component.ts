@@ -1,43 +1,45 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../../models/product';
 import { NgForm } from '@angular/forms';
-import { ProductStateService } from '../../state/product-state.service';
-import { UserStateService } from '../../../user/state/user-state.service';
+import { Permissions } from '../../../user/state/user-state.service';
 
 @Component({
     selector: 'app-product-detail',
     templateUrl: './product-detail.component.html',
     styleUrls: ['./product-detail.component.css'],
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent {
     @Input()
     product!: Product;
 
     @Input()
     detailTitle!: string;
 
-    constructor(private productState: ProductStateService, public userState: UserStateService) {}
+    @Input()
+    permissions!: Permissions;
 
-    ngOnInit(): void {}
+    @Output()
+    create = new EventEmitter<Product>();
 
-    onClose() {
-        this.productState.clearProduct();
-    }
+    @Output()
+    update = new EventEmitter<Product>();
+
+    @Output()
+    delete = new EventEmitter<Product>();
+
+    @Output()
+    close = new EventEmitter<void>();
 
     submit(form: NgForm) {
-        const newTodo: Product = {
+        const newProduct: Product = {
             ...this.product,
             ...form.value,
         };
 
-        if (newTodo.id) {
-            this.productState.update(newTodo);
+        if (newProduct.id) {
+            this.update.emit(newProduct);
         } else {
-            this.productState.create(newTodo);
+            this.create.emit(newProduct);
         }
-    }
-
-    delete(product: Product) {
-        this.productState.delete(product);
     }
 }

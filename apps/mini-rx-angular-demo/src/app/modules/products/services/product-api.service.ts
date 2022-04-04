@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { Product } from '../models/product';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
@@ -13,14 +13,18 @@ import { ToastrService } from 'ngx-toastr';
 export class ProductApiService {
     private productsUrl = 'api/products';
 
-    constructor(private http: HttpClient, private errorHandler: ErrorHandlerService, private toastr: ToastrService) {}
+    constructor(
+        private http: HttpClient,
+        private errorHandler: ErrorHandlerService,
+        private toastr: ToastrService
+    ) {}
 
     getProducts(): Observable<Product[]> {
         return this.http.get<Product[]>(this.productsUrl).pipe(
             tap((data) => {
                 console.log(JSON.stringify(data));
             }),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 
@@ -31,9 +35,9 @@ export class ProductApiService {
         return this.http.post<Product>(this.productsUrl, newProduct, { headers }).pipe(
             tap((data) => {
                 console.log('createProduct: ' + JSON.stringify(data));
-                this.toastr.success('Product created')
+                this.toastr.success('Product created');
             }),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 
@@ -42,10 +46,10 @@ export class ProductApiService {
         const url = `${this.productsUrl}/${id}`;
         return this.http.delete<Product>(url, { headers }).pipe(
             tap((data) => {
-                console.log('deleteProduct: ' + id)
-                this.toastr.success('Product deleted')
+                console.log('deleteProduct: ' + id);
+                this.toastr.success('Product deleted');
             }),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 
@@ -54,12 +58,12 @@ export class ProductApiService {
         const url = `${this.productsUrl}/${product.id}`;
         return this.http.put<Product>(url, product, { headers }).pipe(
             tap(() => {
-                console.log('updateProduct: ' + product.id)
-                this.toastr.success('Product updated')
+                console.log('updateProduct: ' + product.id);
+                this.toastr.success('Product updated');
             }),
             // Return the product on an update
             map(() => product),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 }

@@ -7,7 +7,7 @@ interface UserState {
     permissions: Permissions;
 }
 
-interface Permissions {
+export interface Permissions {
     canUpdateProducts: boolean;
 }
 
