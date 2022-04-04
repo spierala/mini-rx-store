@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../../models/product';
 
 @Component({
@@ -6,7 +6,7 @@ import { Product } from '../../models/product';
     templateUrl: './product-list.component.html',
     styleUrls: ['./product-list.component.css'],
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent {
     @Input()
     products: Product[] = [];
 
@@ -20,15 +20,11 @@ export class ProductListComponent implements OnInit {
     showCartBtn = false;
 
     @Output()
-    productSelect: EventEmitter<Product> = new EventEmitter<Product>();
+    productSelect = new EventEmitter<Product>();
 
     @Output()
-    displayCodeChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+    displayCodeChange = new EventEmitter<boolean>();
 
     @Output()
-    addToCart: EventEmitter<Product> = new EventEmitter<Product>();
-
-    constructor() {}
-
-    ngOnInit(): void {}
+    addToCart = new EventEmitter<Product>();
 }

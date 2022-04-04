@@ -29,6 +29,7 @@ import { ToastrModule } from 'ngx-toastr';
         StoreModule.forRoot({
             extensions: [new ImmutableStateExtension(), new UndoExtension(), new LoggerExtension()],
         }),
+        // TODO exclude from production: https://ngrx.io/guide/store-devtools/recipes/exclude
         StoreDevtoolsModule.instrument({
             name: 'MiniRx Angular Demo',
             maxAge: 25,

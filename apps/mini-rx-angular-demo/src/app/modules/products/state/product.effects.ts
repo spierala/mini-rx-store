@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { from, of } from 'rxjs';
 import { catchError, map, mergeMap, startWith } from 'rxjs/operators';
 
-import { Actions, Action, undo } from 'mini-rx-store';
+import { Action, Actions, undo } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,

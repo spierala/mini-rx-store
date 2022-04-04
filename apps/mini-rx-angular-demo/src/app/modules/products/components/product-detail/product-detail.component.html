@@ -1,7 +1,7 @@
-<div class="card h-100" *ngIf="userState.permissions$ | async as permissions">
+<div class="card h-100">
     <div class="card-header">
         <span>{{ detailTitle }}</span>
-        <button (click)="onClose()" type="button" class="close" aria-label="Close">
+        <button (click)="close.emit()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
@@ -80,7 +80,7 @@
                 <button
                     *ngIf="product.id"
                     class="btn btn-primary btn-danger"
-                    (click)="delete(product)"
+                    (click)="delete.emit(product)"
                 >
                     Delete
                 </button>

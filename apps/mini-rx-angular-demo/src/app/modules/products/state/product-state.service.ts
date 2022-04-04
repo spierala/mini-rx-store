@@ -3,17 +3,17 @@ import { Injectable } from '@angular/core';
 import * as fromProducts from './product.reducer';
 import { createFeatureSelector, createSelector, Store } from 'mini-rx-store';
 import {
+    addProductToCart,
     clearCurrentProduct,
     createProduct,
     deleteProduct,
     initializeCurrentProduct,
     load,
+    removeProductFromCart,
     setCurrentProduct,
     toggleProductCode,
     updateProduct,
     updateSearch,
-    addProductToCart,
-    removeProductFromCart,
 } from './product.actions';
 import { Product } from '../models/product';
 import { Observable } from 'rxjs';
@@ -100,7 +100,6 @@ export class ProductStateService {
     displayCode$: Observable<boolean> = this.store.select(getShowProductCode);
     selectedProduct$: Observable<Product | undefined> = this.store.select(getCurrentProduct);
     products$: Observable<Product[]> = this.store.select(getFilteredProducts);
-    errorMessage$: Observable<string> = this.store.select(getError);
     search$: Observable<string> = this.store.select(getSearch);
     cartItems$: Observable<CartItem[]> = this.store.select(getCartItemsWithExtraData);
     cartItemsAmount$: Observable<number> = this.store.select(getCartItemsAmount);
@@ -127,7 +126,7 @@ export class ProductStateService {
         this.store.dispatch(setCurrentProduct(product.id!));
     }
 
-    clearProduct(): void {
+    clearCurrentProduct(): void {
         this.store.dispatch(clearCurrentProduct());
     }
 

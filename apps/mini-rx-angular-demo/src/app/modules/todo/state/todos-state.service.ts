@@ -4,6 +4,7 @@ import { Filter } from '../models/filter';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { TodosApiService } from '../services/todos-api.service';
+import { v4 as uuid } from 'uuid';
 import { Action, createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
 
 // STATE INTERFACE
@@ -29,9 +30,7 @@ const initialState: TodoState = {
 // MEMOIZED SELECTORS
 const getTodosFeatureSelector = createFeatureSelector<TodoState>();
 const getTodos = createSelector(getTodosFeatureSelector, (state) => state.todos);
-const getSelectedTodo = createSelector(
-    getTodosFeatureSelector, state => state.selectedTodo
-);
+const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) => state.selectedTodo);
 const getFilter = createSelector(getTodosFeatureSelector, (state) => state.filter);
 const getTodosFiltered = createSelector(getTodos, getFilter, (todos, filter) => {
     return todos.filter((item) => {
@@ -71,7 +70,9 @@ export class TodosStateService extends FeatureStore<TodoState> {
     }
 
     initNewTodo() {
-        this.setState({ selectedTodo: new Todo() }, 'initNewTodo');
+        const newTodo = new Todo();
+        newTodo.tempId = uuid();
+        this.setState({ selectedTodo: newTodo }, 'initNewTodo');
     }
 
     clearSelectedTodo() {
@@ -85,12 +86,12 @@ export class TodosStateService extends FeatureStore<TodoState> {
 
     updateFilter(filter: Filter) {
         this.setState(
-            {
+            (state) => ({
                 filter: {
-                    ...this.state.filter,
+                    ...state.filter,
                     ...filter,
                 },
-            },
+            }),
             'updateFilter'
         );
     }
@@ -102,33 +103,41 @@ export class TodosStateService extends FeatureStore<TodoState> {
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
                     tap((todos) => this.setState({ todos }, 'loadSuccess')),
-                    catchError(() => EMPTY)
+                    catchError((err) => {
+                        console.error(err);
+                        return EMPTY;
+                    })
                 )
             )
         );
     });
 
-    // ... with effect and optimistic update / undo
+    // ... with effect (and optimistic update / undo)
     create = this.effect<Todo>(
-        // FYI: we can skip the $payload pipe when using just one RxJS operator
+        // FYI: we can skip the payload$.pipe when using just one RxJS operator
         mergeMap((todo) => {
-            const optimisticUpdate: Action = this.setState(state =>
-                ({
+            const optimisticUpdate: Action = this.setState(
+                (state) => ({
                     todos: [...state.todos, todo],
+                    selectedTodo: todo,
                 }),
                 'createOptimistic'
             );
 
             return this.apiService.createTodo(todo).pipe(
-                tap((newTodo) => {
+                tap((createdTodo) => {
                     this.setState(
                         (state) => ({
-                            todos: state.todos.map((item) => (item === todo ? newTodo : item)),
+                            todos: state.todos.map((item) =>
+                                item.tempId === todo.tempId ? createdTodo : item
+                            ),
+                            selectedTodo: createdTodo,
                         }),
                         'createSuccess'
                     );
                 }),
-                catchError(() => {
+                catchError((err) => {
+                    console.error(err);
                     this.undo(optimisticUpdate);
                     return EMPTY;
                 })
@@ -136,7 +145,7 @@ export class TodosStateService extends FeatureStore<TodoState> {
         })
     );
 
-    // ...with subscribe
+    // ...with subscribe (and optimistic update / undo)
     update(todo: Todo) {
         const optimisticUpdate: Action = this.setState(
             (state) => ({
@@ -156,7 +165,8 @@ export class TodosStateService extends FeatureStore<TodoState> {
                         'updateSuccess'
                     );
                 }),
-                catchError(() => {
+                catchError((err) => {
+                    console.error(err);
                     this.undo(optimisticUpdate);
                     return EMPTY;
                 })
@@ -164,12 +174,12 @@ export class TodosStateService extends FeatureStore<TodoState> {
             .subscribe();
     }
 
-    // ...with subscribe
+    // ...with subscribe (and optimistic update / undo)
     delete(todo: Todo) {
         const optimisticUpdate: Action = this.setState(
             (state) => ({
                 selectedTodo: undefined,
-                todos: this.state.todos.filter((item) => item.id !== todo.id),
+                todos: state.todos.filter((item) => item.id !== todo.id),
             }),
             'deleteOptimistic'
         );
@@ -177,7 +187,8 @@ export class TodosStateService extends FeatureStore<TodoState> {
         this.apiService
             .deleteTodo(todo)
             .pipe(
-                catchError(() => {
+                catchError((err) => {
+                    console.error(err);
                     this.undo(optimisticUpdate);
                     return EMPTY;
                 })
@@ -187,5 +198,12 @@ export class TodosStateService extends FeatureStore<TodoState> {
 }
 
 function updateTodoInList(todos: Todo[], updatedTodo: Todo): Todo[] {
-    return todos.map((item) => (item.id === updatedTodo.id ? updatedTodo : item));
+    return todos.map((item) =>
+        item.id === updatedTodo.id
+            ? {
+                  ...item,
+                  ...updatedTodo,
+              }
+            : item
+    );
 }

@@ -35,6 +35,11 @@
                 <app-product-detail
                     [product]="selectedProduct"
                     [detailTitle]="(detailTitle$ | async)!"
+                    [permissions]="(userState.permissions$ | async)!"
+                    (create)="productState.create($event)"
+                    (update)="productState.update($event)"
+                    (delete)="productState.delete($event)"
+                    (close)="productState.clearCurrentProduct()"
                 ></app-product-detail>
             </div>
         </div>

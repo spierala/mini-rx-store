@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Todo } from '../models/todo';
 import { Observable, tap } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
-
 
 const todoApiUrl = 'api/todos/';
 const failingTodoApiUrl = 'api/todos-not-ok';
@@ -26,7 +25,11 @@ function updateApiUrl(altKeyPressed: boolean) {
     providedIn: 'root',
 })
 export class TodosApiService {
-    constructor(private http: HttpClient, private toastr: ToastrService, private errorHandler: ErrorHandlerService) {}
+    constructor(
+        private http: HttpClient,
+        private toastr: ToastrService,
+        private errorHandler: ErrorHandlerService
+    ) {}
 
     getTodos(): Observable<Todo[]> {
         return this.http.get<Todo[]>(todoApiUrl);
@@ -35,21 +38,21 @@ export class TodosApiService {
     createTodo(todo: Todo): Observable<Todo> {
         return this.http.post<Todo>(apiUrl, todo).pipe(
             tap(() => this.toastr.success('Todo created')),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 
     updateTodo(todo: Todo): Observable<Todo> {
         return this.http.put<Todo>(apiUrl + todo.id, todo).pipe(
             tap(() => this.toastr.success('Todo updated')),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 
     deleteTodo(todo: Todo): Observable<void> {
         return this.http.delete<void>(apiUrl + todo.id).pipe(
             tap(() => this.toastr.success('Todo deleted')),
-            catchError(err => this.errorHandler.handleError(err))
+            catchError((err) => this.errorHandler.handleError(err))
         );
     }
 }

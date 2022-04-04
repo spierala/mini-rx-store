@@ -4,7 +4,7 @@
     </nav>
 
     <div class="container">
-        <div class="row" [ngSwitch]="stateService.hasCartItems$ | async">
+        <div class="row" [ngSwitch]="productState.hasCartItems$ | async">
             <div class="col">
                 <h5 class="text-center text-muted" *ngSwitchCase="false">
                     There is nothing in your shopping cart.
@@ -16,7 +16,7 @@
                     </div>
                     <ul class="list-group">
                         <li
-                            *ngFor="let item of stateService.cartItems$ | async"
+                            *ngFor="let item of productState.cartItems$ | async"
                             class="list-group-item d-flex align-items-center"
                         >
                             <div class="flex-grow-1">
@@ -31,12 +31,12 @@
 
                             <span
                                 class="btn bi bi-trash-fill text-danger"
-                                (click)="stateService.removeProductFromCart(item)"
+                                (click)="productState.removeProductFromCart(item)"
                             ></span>
                         </li>
                     </ul>
                     <div class="card-footer">
-                        <h5>Total: {{ stateService.cartTotalPrice$ | async | currency }}</h5>
+                        <h5>Total: {{ productState.cartTotalPrice$ | async | currency }}</h5>
                     </div>
                 </ng-container>
             </div>

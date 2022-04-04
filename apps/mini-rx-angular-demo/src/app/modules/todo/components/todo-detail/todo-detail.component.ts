@@ -1,7 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Todo } from '../../models/todo';
-import { TodosStateService } from '../../state/todos-state.service';
-import { cloneDeep } from 'lodash-es';
 
 @Component({
     selector: 'app-todo-detail',
@@ -9,30 +7,27 @@ import { cloneDeep } from 'lodash-es';
     styleUrls: ['./todo-detail.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TodoDetailComponent implements OnInit {
+export class TodoDetailComponent {
     @Input()
     todo!: Todo;
 
-    constructor(private todosService: TodosStateService) {}
+    @Output()
+    create = new EventEmitter<Todo>();
 
-    ngOnInit() {}
+    @Output()
+    update = new EventEmitter<Todo>();
+
+    @Output()
+    delete = new EventEmitter<Todo>();
+
+    @Output()
+    close = new EventEmitter<void>();
 
     submit() {
-        const clonedTodo = cloneDeep(this.todo);
-        // Clone again, otherwise the ImmutableExtension might freeze `this.todo`...
-        // ...and further [(ngModel)] changes would throw an exception
         if (this.todo.id) {
-            this.todosService.update(clonedTodo);
+            this.update.emit(this.todo);
         } else {
-            this.todosService.create(clonedTodo);
+            this.create.emit(this.todo);
         }
-    }
-
-    delete() {
-        this.todosService.delete(this.todo);
-    }
-
-    onClose() {
-        this.todosService.clearSelectedTodo();
     }
 }
