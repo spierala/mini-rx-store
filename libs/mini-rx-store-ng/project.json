@@ -1,42 +1,49 @@
 {
-  "projectType": "library",
-  "root": "libs/mini-rx-store-ng",
-  "sourceRoot": "libs/mini-rx-store-ng/src",
-  "prefix": "mini-rx",
-  "targets": {
-    "build": {
-      "executor": "@nrwl/angular:package",
-      "outputs": ["dist/libs/mini-rx-store-ng"],
-      "options": {
-        "project": "libs/mini-rx-store-ng/ng-package.json"
-      },
-      "configurations": {
-        "production": {
-          "tsConfig": "libs/mini-rx-store-ng/tsconfig.lib.prod.json"
+    "projectType": "library",
+    "root": "libs/mini-rx-store-ng",
+    "sourceRoot": "libs/mini-rx-store-ng/src",
+    "prefix": "mini-rx",
+    "targets": {
+        "build": {
+            "executor": "@nrwl/angular:package",
+            "outputs": ["dist/libs/mini-rx-store-ng"],
+            "options": {
+                "project": "libs/mini-rx-store-ng/ng-package.json"
+            },
+            "configurations": {
+                "production": {
+                    "tsConfig": "libs/mini-rx-store-ng/tsconfig.lib.prod.json"
+                },
+                "development": {
+                    "tsConfig": "libs/mini-rx-store-ng/tsconfig.lib.json"
+                }
+            },
+            "defaultConfiguration": "production"
         },
-        "development": {
-          "tsConfig": "libs/mini-rx-store-ng/tsconfig.lib.json"
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": ["coverage/libs/mini-rx-store-ng"],
+            "options": {
+                "jestConfig": "libs/mini-rx-store-ng/jest.config.js",
+                "passWithNoTests": true
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "options": {
+                "lintFilePatterns": [
+                    "libs/mini-rx-store-ng/src/**/*.ts",
+                    "libs/mini-rx-store-ng/src/**/*.html"
+                ]
+            }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "commitMessageFormat": "chore(${projectName}): release version ${version}"
+            }
         }
-      },
-      "defaultConfiguration": "production"
     },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/mini-rx-store-ng"],
-      "options": {
-        "jestConfig": "libs/mini-rx-store-ng/jest.config.js",
-        "passWithNoTests": true
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/mini-rx-store-ng/src/**/*.ts",
-          "libs/mini-rx-store-ng/src/**/*.html"
-        ]
-      }
-    }
-  },
-  "tags": []
+    "tags": []
 }
