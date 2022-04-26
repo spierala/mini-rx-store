@@ -1,3 +1,7 @@
+# 4.0.0-alpha.0
+### BREAKING CHANGES
+* Refactor to NX workspace 
+
 # 3.1.0 (2022-01-28)
 ### Bugfixes
 Undo Extension: unexpected feature state when reducer is added and removed under the same feature key

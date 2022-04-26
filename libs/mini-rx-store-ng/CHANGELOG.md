@@ -1,3 +1,8 @@
+# 3.0.0-alpha.0
+### BREAKING CHANGES
+* Refactor to NX workspace
+* Requires Angular@12
+
 # 2.0.0 (2021-09-07)
 Update peer deps
 
