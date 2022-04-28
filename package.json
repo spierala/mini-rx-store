@@ -12,6 +12,7 @@
         "build:all": "nx build mini-rx-store && nx build mini-rx-store-ng && nx build mini-rx-angular-demo",
         "test": "nx test",
         "test:mini-rx-store": "nx test mini-rx-store",
+        "test:mini-rx-store:watch": "nx test mini-rx-store --watch",
         "test:mini-rx-store-ng": "nx test mini-rx-store-ng",
         "deploy:docs": "npm run deploy --prefix docs",
         "prepare": "husky install"

@@ -12,7 +12,9 @@ type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
 export class FeatureStore<StateType extends object> {
     private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
 
-    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>({} as StateType);
+    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
+        {} as StateType
+    );
     state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
         return this.stateSource.getValue();
@@ -31,17 +33,21 @@ export class FeatureStore<StateType extends object> {
 
         this.setStateAction = createMiniRxAction('set-state', featureKey);
 
-        StoreCore.addFeature<StateType>(featureKey, createFeatureReducer(featureKey, initialState, this.setStateAction));
+        StoreCore.addFeature<StateType>(
+            featureKey,
+            createFeatureReducer(featureKey, initialState, this.setStateAction)
+        );
 
         // Select Feature State and delegate to local BehaviorSubject
-        this.sub = StoreCore.select(createFeatureSelector<AppState, StateType>(featureKey))
-            .subscribe(this.stateSource);
+        this.sub = StoreCore.select(
+            createFeatureSelector<AppState, StateType>(featureKey)
+        ).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
         const action: ActionWithPayload = {
-            type: this.setStateAction.type + (name ?  '/' + name : ''),
-            payload: stateOrCallback
+            type: this.setStateAction.type + (name ? '/' + name : ''),
+            payload: stateOrCallback,
         };
 
         StoreCore.dispatch(action);
@@ -58,17 +64,27 @@ export class FeatureStore<StateType extends object> {
         return this.state$.pipe(select(mapFn));
     }
 
-    effect<PayLoadType = void>(
-        effectFn: (payload$: Observable<PayLoadType>) => Observable<any>
-    ): (payload?: PayLoadType) => void {
-        const subject: Subject<PayLoadType> = new Subject();
-        const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(subject.pipe(effectFn));
+    effect<
+        // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
+        ProvidedType = void,
+        // The actual origin$ type, which could be unknown, when not specified
+        OriginType extends Observable<ProvidedType> | unknown = Observable<ProvidedType>,
+        // Unwrapped actual type of the origin$ Observable, after default was applied
+        ObservableType = OriginType extends Observable<infer A> ? A : never,
+        // Return either an empty callback or a function requiring specific types as inputs
+        ReturnType = ProvidedType | ObservableType extends void
+            ? () => void
+            : (payload: ObservableType) => void
+    >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
+        const subject = new Subject<ObservableType>();
+        const effect$ = effectFn(subject as OriginType);
+        const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(effect$);
 
         this.sub.add(effectWithDefaultErrorHandler.subscribe());
 
-        return (payload?: PayLoadType) => {
-            subject.next(payload as PayLoadType);
-        };
+        return ((payload?: ObservableType) => {
+            subject.next(payload as ObservableType);
+        }) as unknown as ReturnType;
     }
 
     undo(action: Action) {
@@ -91,14 +107,13 @@ export class FeatureStore<StateType extends object> {
 function createFeatureReducer<StateType>(
     featureKey: string,
     initialState: StateType,
-    setStateAction: Action,
+    setStateAction: Action
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: ActionWithPayload): StateType => {
         if (action.type.indexOf(setStateAction.type) === 0) {
             const stateOrCallback = action.payload;
-            const newPartialState =                 typeof stateOrCallback === 'function'
-                    ? stateOrCallback(state)
-                    : stateOrCallback;
+            const newPartialState =
+                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
             return {
                 ...state,
                 ...newPartialState,

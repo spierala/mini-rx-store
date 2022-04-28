@@ -226,7 +226,9 @@ describe('FeatureStore', () => {
 
         const fs: FeatureStore<any> = createFeatureStore('fsWithFailingApi', {});
 
-        const load = fs.effect(mergeMap(() => apiCallWithError().pipe(tap(() => fs.setState({})))));
+        const load = fs.effect<void>(
+            mergeMap(() => apiCallWithError().pipe(tap(() => fs.setState({}))))
+        );
 
         load();
         load();
