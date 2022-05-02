@@ -1,3 +1,18 @@
+# Changelog
+
+This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
+
+## [4.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.0...mini-rx-store-4.0.0-alpha.1) (2022-05-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store:** effect requires now a generic type
+
+### Bug Fixes
+
+* **mini-rx-store:** better FeatureStore effect typings ([5fe61f1](https://github.com/spierala/mini-rx-store/commit/5fe61f1269463f790f1e12a50d0b2a6c585ededc))
+
 # 4.0.0-alpha.0
 ### BREAKING CHANGES
 * Refactor to NX workspace 

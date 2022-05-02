@@ -1,7 +1,7 @@
 ![MiniRx - RxJS Redux Store - Logo](.github/images/mini-rx-logo-white-bg.png)
 
 [![NPM](https://img.shields.io/npm/v/mini-rx-store)](https://www.npmjs.com/package/mini-rx-store)
-[![Downloads](https://img.shields.io/npm/dt/mini-rx-store)](https://npmcharts.com/compare/mini-rx-store?interval=30)
+[![Downloads](https://img.shields.io/npm/dm/mini-rx-store)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
