@@ -2,6 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [3.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-alpha.1...mini-rx-store-ng-3.0.0-alpha.2) (2022-05-03)
+
 ## [3.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-alpha.0...mini-rx-store-ng-3.0.0-alpha.1) (2022-05-02)
 
 Update peer deps (Remove angular/common, lower angular/core to v12)
