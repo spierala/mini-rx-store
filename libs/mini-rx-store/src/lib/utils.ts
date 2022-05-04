@@ -11,10 +11,7 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
 }
 
 export function select<T, R>(mapFn: (state: T) => R) {
-    return pipe(
-        map((state: T) => mapFn(state)),
-        distinctUntilChanged()
-    );
+    return pipe(map(mapFn), distinctUntilChanged());
 }
 
 export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {

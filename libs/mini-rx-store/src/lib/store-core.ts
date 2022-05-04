@@ -28,7 +28,7 @@ class StoreCore {
         MetaReducer<AppState>[]
     >([]);
     private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
-        map((metaReducers) => combineMetaReducers(metaReducers))
+        map(combineMetaReducers)
     );
 
     // FEATURE REDUCERS DICTIONARY
@@ -39,7 +39,7 @@ class StoreCore {
 
     // FEATURE REDUCERS COMBINED
     private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        map((reducers) => combineReducers(reducers))
+        map(combineReducers)
     );
 
     // EXTENSIONS
@@ -49,7 +49,7 @@ class StoreCore {
         // Listen to the Actions Stream and update state accordingly
         this.actions$
             .pipe(
-                observeOn(queueScheduler),
+                observeOn(queueScheduler), // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
                 withLatestFrom(this.state$, this.combinedReducer$, this.combinedMetaReducer$)
             )
             .subscribe(
