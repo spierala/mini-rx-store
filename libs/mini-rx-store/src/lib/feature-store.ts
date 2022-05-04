@@ -6,8 +6,7 @@ import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
-type SetStateFn<StateType> = (state: StateType) => Partial<StateType>;
-type StateOrCallback<StateType> = Partial<StateType> | SetStateFn<StateType>;
+type StateOrCallback<StateType> = Partial<StateType> | ((state: StateType) => Partial<StateType>);
 
 export class FeatureStore<StateType extends object> {
     private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
@@ -56,8 +55,10 @@ export class FeatureStore<StateType extends object> {
     }
 
     select(): Observable<StateType>;
-    select<K>(mapFn: (state: StateType) => K): Observable<K>;
-    select<K, T extends (state: StateType) => K>(mapFn?: T): Observable<K | StateType> {
+    select<MapFnReturnType>(
+        mapFn: (state: StateType) => MapFnReturnType
+    ): Observable<MapFnReturnType>;
+    select(mapFn?: any): Observable<any> {
         if (!mapFn) {
             return this.state$;
         }
