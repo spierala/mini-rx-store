@@ -27,7 +27,6 @@
 import { Action, Reducer, ReducerDictionary } from './models';
 
 export function combineReducers<T>(reducers: ReducerDictionary<T>): Reducer<T>;
-
 export function combineReducers(reducers: ReducerDictionary<any>): Reducer<any> {
     const reducerKeys: string[] = Object.keys(reducers);
     const reducerKeyLength: number = reducerKeys.length;

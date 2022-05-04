@@ -1,12 +1,6 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import {
-  Action,
-  MiniRxActionType,
-  MetaReducer,
-  Reducer,
-  ActionWithPayload
-} from './models';
+import { Action, MiniRxActionType, MetaReducer, Reducer, ActionWithPayload } from './models';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -16,7 +10,7 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
     );
 }
 
-export function select<T, K>(mapFn: (state: T) => K) {
+export function select<T, R>(mapFn: (state: T) => R) {
     return pipe(
         map((state: T) => mapFn(state)),
         distinctUntilChanged()
@@ -45,8 +39,15 @@ export function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof 
 
 export const miniRxNameSpace = '@mini-rx';
 
-export function createMiniRxAction(miniRxActionType: MiniRxActionType, featureKey?: string, payload?: any): ActionWithPayload {
-    return {type: miniRxNameSpace + '/' + miniRxActionType + (featureKey ? '/' + featureKey : ''), payload};
+export function createMiniRxAction(
+    miniRxActionType: MiniRxActionType,
+    featureKey?: string,
+    payload?: any
+): ActionWithPayload {
+    return {
+        type: miniRxNameSpace + '/' + miniRxActionType + (featureKey ? '/' + featureKey : ''),
+        payload,
+    };
 }
 
 export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionType) {

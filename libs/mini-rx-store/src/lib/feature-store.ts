@@ -55,9 +55,7 @@ export class FeatureStore<StateType extends object> {
     }
 
     select(): Observable<StateType>;
-    select<MapFnReturnType>(
-        mapFn: (state: StateType) => MapFnReturnType
-    ): Observable<MapFnReturnType>;
+    select<R>(mapFn: (state: StateType) => R): Observable<R>;
     select(mapFn?: any): Observable<any> {
         if (!mapFn) {
             return this.state$;

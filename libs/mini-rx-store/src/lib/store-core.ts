@@ -10,13 +10,7 @@ import {
     StoreExtension,
 } from './models';
 import { map, observeOn, withLatestFrom } from 'rxjs/operators';
-import {
-    combineMetaReducers,
-    createMiniRxAction,
-    miniRxError,
-    omit,
-    select,
-} from './utils';
+import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 
@@ -30,7 +24,9 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // META REDUCERS
-    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject<MetaReducer<AppState>[]>([]);
+    private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject<
+        MetaReducer<AppState>[]
+    >([]);
     private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
         map((metaReducers) => combineMetaReducers(metaReducers))
     );
@@ -82,10 +78,9 @@ class StoreCore {
             initialState?: StateType;
         } = {}
     ) {
-        reducer =
-            config.metaReducers?.length
-                ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
-                : reducer;
+        reducer = config.metaReducers?.length
+            ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
+            : reducer;
 
         checkFeatureExists(featureKey, this.reducers);
 
@@ -94,7 +89,7 @@ class StoreCore {
         }
 
         this.addReducer(featureKey, reducer);
-        this.dispatch(createMiniRxAction( 'init-feature', featureKey));
+        this.dispatch(createMiniRxAction('init-feature', featureKey));
     }
 
     removeFeature(featureKey: string) {
@@ -145,7 +140,7 @@ class StoreCore {
         this.stateSource.next(state);
     }
 
-    select<K>(mapFn: (state: AppState) => K): Observable<K> {
+    select<R>(mapFn: (state: AppState) => R): Observable<R> {
         return this.state$.pipe(select(mapFn));
     }
 
@@ -157,12 +152,12 @@ class StoreCore {
     private addReducer(featureKey: string, reducer: Reducer<any>) {
         this.reducersSource.next({
             ...this.reducers,
-            [featureKey]: reducer
+            [featureKey]: reducer,
         });
     }
 
     private removeReducer(featureKey: string) {
-        const reducers = omit(this.reducers, featureKey)
+        const reducers = omit(this.reducers, featureKey);
         this.reducersSource.next(reducers as ReducerDictionary<AppState>);
     }
 }
