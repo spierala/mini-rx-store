@@ -7,11 +7,11 @@
             "executor": "@nrwl/web:rollup",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "updateBuildableProjectDepsInPackageJson": false,
                 "outputPath": "dist/libs/mini-rx-store",
                 "tsConfig": "libs/mini-rx-store/tsconfig.lib.json",
                 "project": "libs/mini-rx-store/package.json",
                 "entryFile": "libs/mini-rx-store/src/index.ts",
+                "format": ["esm", "umd", "cjs"],
                 "globals": [
                     {
                         "global": "Rx",
@@ -22,7 +22,6 @@
                         "moduleId": "rxjs/operators"
                     }
                 ],
-                "rollupConfig": "@nrwl/react/plugins/bundle-rollup",
                 "assets": [
                     {
                         "glob": "README.md",
