@@ -6,6 +6,7 @@ import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { TodosApiService } from '../services/todos-api.service';
 import { v4 as uuid } from 'uuid';
 import { Action, createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
+import { tapResponse } from 'mini-rx-store';
 
 // STATE INTERFACE
 interface TodoState {
@@ -102,11 +103,12 @@ export class TodosStateService extends FeatureStore<TodoState> {
         return payload$.pipe(
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
-                    tap((todos) => this.setState({ todos }, 'loadSuccess')),
-                    catchError((err) => {
-                        console.error(err);
-                        return EMPTY;
-                    })
+                    tapResponse(
+                        (todos) => this.setState({ todos }, 'loadSuccess'),
+                        (err) => {
+                            console.error(err);
+                        }
+                    )
                 )
             )
         );
@@ -125,22 +127,24 @@ export class TodosStateService extends FeatureStore<TodoState> {
             );
 
             return this.apiService.createTodo(todo).pipe(
-                tap((createdTodo) => {
-                    this.setState(
-                        (state) => ({
-                            todos: state.todos.map((item) =>
-                                item.tempId === todo.tempId ? createdTodo : item
-                            ),
-                            selectedTodo: createdTodo,
-                        }),
-                        'createSuccess'
-                    );
-                }),
-                catchError((err) => {
-                    console.error(err);
-                    this.undo(optimisticUpdate);
-                    return EMPTY;
-                })
+                tapResponse(
+                    (createdTodo) => {
+                        this.setState(
+                            (state) => ({
+                                todos: state.todos.map((item) =>
+                                    item.tempId === todo.tempId ? createdTodo : item
+                                ),
+                                selectedTodo: createdTodo,
+                            }),
+                            'createSuccess'
+                        );
+                    },
+                    (err) => {
+                        console.error(err);
+                        this.undo(optimisticUpdate);
+                        return EMPTY;
+                    }
+                )
             );
         })
     );

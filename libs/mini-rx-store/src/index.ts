@@ -23,3 +23,4 @@ export {
 export { LoggerExtension } from './lib/extensions/logger.extension';
 export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
 export { UndoExtension, undo } from './lib/extensions/undo.extension';
+export { tapResponse } from './lib/tap-response'
