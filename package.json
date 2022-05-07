@@ -14,6 +14,8 @@
         "test:mini-rx-store:watch": "nx test mini-rx-store --watch",
         "test:mini-rx-store-ng": "nx test mini-rx-store-ng",
         "deploy:docs": "npm run deploy --prefix docs",
+        "build:mini-rx-angular-demo:sourcemap": "nx build mini-rx-angular-demo --source-map",
+        "build:mini-rx-angular-demo:sourcemap:stats": "npm run build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
         "prepare": "husky install"
     },
     "private": true,
@@ -83,6 +85,7 @@
         "postcss-preset-env": "^6.7.0",
         "postcss-url": "^10.1.1",
         "prettier": "^2.5.1",
+        "source-map-explorer": "^2.5.2",
         "ts-jest": "27.0.5",
         "typescript": "~4.5.2"
     },
