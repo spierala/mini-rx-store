@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.5](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.4...mini-rx-store-4.0.0-alpha.5) (2022-05-10)
+
+
+### Bug Fixes
+
+* **mini-rx-store:** tapResponse: use finalize from 'rxjs/operators' ([b705e67](https://github.com/spierala/mini-rx-store/commit/b705e67f3e1f3dec693a6abe687f81a660610da0))
+
 ## [4.0.0-alpha.4](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.3...mini-rx-store-4.0.0-alpha.4) (2022-05-10)
 
 
