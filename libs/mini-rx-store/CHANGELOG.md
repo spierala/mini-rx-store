@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.4](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.3...mini-rx-store-4.0.0-alpha.4) (2022-05-10)
+
+
+### Features
+
+* **mini-rx-store:** tapResponse operator for error handling in effects: finalize callback ([6579396](https://github.com/spierala/mini-rx-store/commit/6579396113dd89c343516ad2030e828e4470d4d4))
+
 ## [4.0.0-alpha.3](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.2...mini-rx-store-4.0.0-alpha.3) (2022-05-07)
 
 
