@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.6](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.5...mini-rx-store-4.0.0-alpha.6) (2022-05-12)
+
+
+### Features
+
+* **mini-rx-store:** FeatureStore.effect: parameter for the returned function can be an Observable ([3440606](https://github.com/spierala/mini-rx-store/commit/3440606771ec89a50363df781d3b0eb4558e3416))
+
 ## [4.0.0-alpha.5](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.4...mini-rx-store-4.0.0-alpha.5) (2022-05-10)
 
 
