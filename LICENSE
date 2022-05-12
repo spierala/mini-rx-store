@@ -43,3 +43,11 @@ See the file for details.
 This repository includes a file "combine-reducers.ts" originally copied from
 https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts, MIT licensed.
 See the file for details.
+
+This repository includes a file "tap-response.ts" originally copied from
+https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/src/tap-response.ts
+See the file for details.
+
+This repository includes a file "tap-response.spec.ts" originally copied from
+https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/spec/tap-response.spec.ts
+See the file for details.

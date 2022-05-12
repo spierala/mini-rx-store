@@ -1,24 +1,4 @@
 // Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
-// See MIT licence below
-
-import { Action, Reducer, StoreExtension } from '../models';
-import StoreCore from '../store-core';
-import deepFreezeStrict from 'deep-freeze-strict';
-
-export class ImmutableStateExtension extends StoreExtension {
-    init(): void {
-        StoreCore.addMetaReducers(storeFreeze);
-    }
-}
-
-export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return (state = {}, action: Action) => {
-        deepFreezeStrict(state);
-        const nextState = reducer(state, action);
-        deepFreezeStrict(nextState);
-        return nextState;
-    };
-}
 
 // The MIT License (MIT)
 //
@@ -41,3 +21,22 @@ export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+import { Action, Reducer, StoreExtension } from '../models';
+import StoreCore from '../store-core';
+import deepFreezeStrict from 'deep-freeze-strict';
+
+export class ImmutableStateExtension extends StoreExtension {
+    init(): void {
+        StoreCore.addMetaReducers(storeFreeze);
+    }
+}
+
+export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
+    return (state = {}, action: Action) => {
+        deepFreezeStrict(state);
+        const nextState = reducer(state, action);
+        deepFreezeStrict(nextState);
+        return nextState;
+    };
+}
