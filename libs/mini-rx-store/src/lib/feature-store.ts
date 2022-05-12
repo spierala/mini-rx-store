@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, ActionWithPayload, AppState, Reducer } from './models';
 import StoreCore from './store-core';
 import { createMiniRxAction, miniRxError, select } from './utils';
@@ -73,7 +73,7 @@ export class FeatureStore<StateType extends object> {
         // Return either an empty callback or a function requiring specific types as inputs
         ReturnType = ProvidedType | ObservableType extends void
             ? () => void
-            : (payload: ObservableType) => void
+            : (observableOrValue: ObservableType | Observable<ObservableType>) => void
     >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
         const subject = new Subject<ObservableType>();
         const effect$ = effectFn(subject as OriginType);
@@ -81,8 +81,10 @@ export class FeatureStore<StateType extends object> {
 
         this.sub.add(effectWithDefaultErrorHandler.subscribe());
 
-        return ((payload?: ObservableType) => {
-            subject.next(payload as ObservableType);
+        return ((observableOrValue?: ObservableType | Observable<ObservableType>) => {
+            isObservable(observableOrValue)
+                ? this.sub.add(observableOrValue.subscribe(subject))
+                : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
 
