@@ -142,7 +142,6 @@ export class TodosStateService extends FeatureStore<TodoState> {
                     (err) => {
                         console.error(err);
                         this.undo(optimisticUpdate);
-                        return EMPTY;
                     }
                 )
             );
