@@ -25,12 +25,12 @@
 // SOFTWARE.
 
 import { EMPTY, identity, Observable } from 'rxjs';
-import { finalize, catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 type TapResponseObj<T> = {
-    nextFn?: (next: T) => void;
-    errorFn: (error: any) => void;
-    finalizeFn?: () => void;
+    next?: (next: T) => void;
+    error: (error: any) => void;
+    finalize?: () => void;
 };
 
 export function tapResponse<T>(obj?: TapResponseObj<T>): (source: Observable<T>) => Observable<T>;
@@ -44,19 +44,19 @@ export function tapResponse<T>(fn1OrObject: any, fn2?: any, fn3?: any): any {
         const tapResponseObj: TapResponseObj<T> =
             typeof fn1OrObject === 'function'
                 ? {
-                      nextFn: fn1OrObject,
-                      errorFn: fn2,
-                      finalizeFn: fn3,
+                      next: fn1OrObject,
+                      error: fn2,
+                      finalize: fn3,
                   }
                 : fn1OrObject;
 
         return source.pipe(
             tap({
-                next: tapResponseObj.nextFn,
-                error: tapResponseObj.errorFn,
+                next: tapResponseObj.next,
+                error: tapResponseObj.error,
             }),
             catchError(() => EMPTY),
-            tapResponseObj.finalizeFn ? finalize(tapResponseObj.finalizeFn) : identity // Conditionally apply operator: https://rxjs.dev/api/index/function/identity
+            tapResponseObj.finalize ? finalize(tapResponseObj.finalize) : identity // Conditionally apply operator: https://rxjs.dev/api/index/function/identity
         );
     };
 }
