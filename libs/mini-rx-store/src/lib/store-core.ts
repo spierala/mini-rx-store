@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
+import { observeOn } from 'rxjs/operators';
 import {
     Action,
     Actions,
@@ -9,7 +10,6 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { map, observeOn, withLatestFrom } from 'rxjs/operators';
 import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
@@ -27,9 +27,6 @@ class StoreCore {
     private metaReducersSource: BehaviorSubject<MetaReducer<AppState>[]> = new BehaviorSubject<
         MetaReducer<AppState>[]
     >([]);
-    private combinedMetaReducer$: Observable<MetaReducer<AppState>> = this.metaReducersSource.pipe(
-        map(combineMetaReducers)
-    );
 
     // FEATURE REDUCERS DICTIONARY
     private reducersSource: BehaviorSubject<ReducerDictionary<AppState>> = new BehaviorSubject({});
@@ -37,33 +34,26 @@ class StoreCore {
         return this.reducersSource.getValue();
     }
 
-    // FEATURE REDUCERS COMBINED
-    private combinedReducer$: Observable<Reducer<AppState>> = this.reducersSource.pipe(
-        map(combineReducers)
-    );
-
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
     constructor() {
+        let combinedMetaReducer: MetaReducer<AppState>;
+        let combinedReducer: Reducer<AppState>;
+        // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscriptions (fewer operators = less bundle-size :))
+        this.metaReducersSource.subscribe((v) => (combinedMetaReducer = combineMetaReducers(v)));
+        this.reducersSource.subscribe((v) => (combinedReducer = combineReducers(v)));
+
         // Listen to the Actions Stream and update state accordingly
         this.actions$
             .pipe(
-                observeOn(queueScheduler), // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
-                withLatestFrom(this.state$, this.combinedReducer$, this.combinedMetaReducer$)
+                observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
             )
-            .subscribe(
-                ([action, state, combinedReducer, combinedMetaReducer]: [
-                    Action,
-                    AppState,
-                    Reducer<AppState>,
-                    MetaReducer<AppState>
-                ]) => {
-                    const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
-                    const newState: AppState = reducer(state, action);
-                    this.updateState(newState);
-                }
-            );
+            .subscribe((action) => {
+                const reducer: Reducer<AppState> = combinedMetaReducer(combinedReducer);
+                const newState: AppState = reducer(this.stateSource.getValue(), action);
+                this.updateState(newState);
+            });
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {
