@@ -1,21 +1,10 @@
-// Number.isNaN as it is not supported in IE11 so conditionally using ponyfill
-// Using Number.isNaN where possible as it is ~10% faster
-
-const safeIsNaN =
-    Number.isNaN ||
-    function ponyfill(value: unknown): boolean {
-        // // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN#polyfill
-        // NaN is the only value in JavaScript which is not equal to itself.
-        return typeof value === 'number' && value !== value;
-    };
-
 function isEqual(first: unknown, second: unknown): boolean {
     if (first === second) {
         return true;
     }
 
     // Special case for NaN (NaN !== NaN)
-    if (safeIsNaN(first) && safeIsNaN(second)) {
+    if (Number.isNaN(first) && Number.isNaN(second)) {
         return true;
     }
 
@@ -43,7 +32,6 @@ export type EqualityFn<TFunc extends (...args: any[]) => any> = (
 ) => boolean;
 
 export type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
-    clear: () => void;
     (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
 };
 
@@ -55,8 +43,7 @@ type Cache<TFunc extends (this: any, ...args: any[]) => any> = {
 };
 
 export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
-    resultFn: TFunc,
-    isEqual: EqualityFn<TFunc> = areInputsEqual
+    resultFn: TFunc
 ): MemoizedFn<TFunc> {
     let cache: Cache<TFunc> | null = null;
 
@@ -65,7 +52,7 @@ export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
         this: ThisParameterType<TFunc>,
         ...newArgs: Parameters<TFunc>
     ): ReturnType<TFunc> {
-        if (cache && cache.lastThis === this && isEqual(newArgs, cache.lastArgs)) {
+        if (cache && cache.lastThis === this && areInputsEqual(newArgs, cache.lastArgs)) {
             return cache.lastResult;
         }
 
@@ -81,11 +68,6 @@ export function memoizeOne<TFunc extends (this: any, ...newArgs: any[]) => any>(
 
         return lastResult;
     }
-
-    // Adding the ability to clear the cache of a memoized function
-    memoized.clear = function clear() {
-        cache = null;
-    };
 
     return memoized;
 }
