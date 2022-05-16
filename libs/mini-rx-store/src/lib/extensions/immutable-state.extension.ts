@@ -24,7 +24,6 @@
 
 import { Action, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import deepFreezeStrict from 'deep-freeze-strict';
 
 export class ImmutableStateExtension extends StoreExtension {
     init(): void {
@@ -34,9 +33,31 @@ export class ImmutableStateExtension extends StoreExtension {
 
 export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
     return (state = {}, action: Action) => {
-        deepFreezeStrict(state);
+        deepFreeze(state);
         const nextState = reducer(state, action);
-        deepFreezeStrict(nextState);
+        deepFreeze(nextState);
         return nextState;
     };
+}
+
+// Copied from https://github.com/jsdf/deep-freeze/blob/master/index.js
+function deepFreeze(o: any) {
+    Object.freeze(o);
+
+    const oIsFunction = typeof o === 'function';
+    const hasOwnProp = Object.prototype.hasOwnProperty;
+
+    Object.getOwnPropertyNames(o).forEach(function (prop) {
+        if (
+            hasOwnProp.call(o, prop) &&
+            (oIsFunction ? prop !== 'caller' && prop !== 'callee' && prop !== 'arguments' : true) &&
+            o[prop] !== null &&
+            (typeof o[prop] === 'object' || typeof o[prop] === 'function') &&
+            !Object.isFrozen(o[prop])
+        ) {
+            deepFreeze(o[prop]);
+        }
+    });
+
+    return o;
 }
