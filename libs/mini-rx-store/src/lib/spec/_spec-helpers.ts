@@ -7,8 +7,10 @@ export const store: Store = configureStore({});
 
 export function resetStoreConfig() {
     StoreCore['extensions'] = [];
-    StoreCore['metaReducersSource'].next([]);
-    StoreCore['reducersSource'].next({});
+    StoreCore['reducerStateSource'].next({
+        metaReducers: [],
+        featureReducers: {},
+    });
 }
 
 export interface CounterState {
@@ -19,7 +21,11 @@ export const counterInitialState: CounterState = {
     counter: 1,
 };
 
-export function counterReducer(state: CounterState = counterInitialState, action: Action, incrementCase = 'counter') {
+export function counterReducer(
+    state: CounterState = counterInitialState,
+    action: Action,
+    incrementCase = 'counter'
+) {
     switch (action.type) {
         case incrementCase:
             return {
@@ -43,8 +49,8 @@ export function createUniqueCounterReducerWithAction(): [Reducer<CounterState>, 
             default:
                 return state;
         }
-    }
-    return [reducer, {type: incrementCase}];
+    };
+    return [reducer, { type: incrementCase }];
 }
 
 export interface CounterStringState {
