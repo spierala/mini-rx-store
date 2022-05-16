@@ -45,9 +45,13 @@ https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts, MIT lic
 See the file for details.
 
 This repository includes a file "tap-response.ts" originally copied from
-https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/src/tap-response.ts
+https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/src/tap-response.ts, MIT licensed.
 See the file for details.
 
 This repository includes a file "tap-response.spec.ts" originally copied from
-https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/spec/tap-response.spec.ts
+https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/spec/tap-response.spec.ts, MIT licensed.
+See the file for details.
+
+This repository includes a file "memoize-one.ts" originally copied from
+https://github.com/alexreardon/memoize-one/tree/v6.0.0/src, MIT licensed.
 See the file for details.
