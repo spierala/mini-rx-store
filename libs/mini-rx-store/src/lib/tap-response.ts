@@ -34,9 +34,9 @@ type TapResponseObj<T> = {
 
 export function tapResponse<T>(obj?: TapResponseObj<T>): (source: Observable<T>) => Observable<T>;
 export function tapResponse<T>(
-    nextFn: (next: T) => void,
-    errorFn: (error: any) => void,
-    finalizeFn?: () => void
+    next: (next: T) => void,
+    error: (error: any) => void,
+    finalize?: () => void
 ): (source: Observable<T>) => Observable<T>;
 export function tapResponse<T>(fn1OrObject: any, fn2?: any, fn3?: any): any {
     return (source: Observable<T>) => {
