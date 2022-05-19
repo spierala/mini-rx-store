@@ -1,5 +1,5 @@
-// Copied from memoize-one with small modifications:
-// https://github.com/alexreardon/memoize-one/tree/v6.0.0/src
+// Credits go to Alexander Reardon
+// Copied from with small modifications: https://github.com/alexreardon/memoize-one/tree/v6.0.0/src
 
 // MIT License
 //

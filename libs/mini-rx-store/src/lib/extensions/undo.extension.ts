@@ -1,5 +1,6 @@
-// Credits go to https://github.com/brechtbilliet/ngrx-undo
-// See MIT licence below
+// Credits go to Brecht Billiet
+// Copied from: https://github.com/brechtbilliet/ngrx-undo/blob/master/src/handleUndo.ts
+// Code has been modified to work with MiniRx
 
 // MIT License
 //

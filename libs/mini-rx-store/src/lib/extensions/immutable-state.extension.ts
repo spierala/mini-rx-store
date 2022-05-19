@@ -1,4 +1,5 @@
-// Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
+// Credits go to Brandon Roberts
+// Copied from with small modifications: https://github.com/brandonroberts/ngrx-store-freeze/blob/v0.2.4/src/index.ts
 
 // The MIT License (MIT)
 //
@@ -24,6 +25,7 @@
 
 import { Action, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
+import { deepFreeze } from '../deep-freeze';
 
 export class ImmutableStateExtension extends StoreExtension {
     init(): void {
@@ -38,26 +40,4 @@ export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
         deepFreeze(nextState);
         return nextState;
     };
-}
-
-// Copied from https://github.com/jsdf/deep-freeze/blob/master/index.js
-function deepFreeze(o: any) {
-    Object.freeze(o);
-
-    const oIsFunction = typeof o === 'function';
-    const hasOwnProp = Object.prototype.hasOwnProperty;
-
-    Object.getOwnPropertyNames(o).forEach(function (prop) {
-        if (
-            hasOwnProp.call(o, prop) &&
-            (oIsFunction ? prop !== 'caller' && prop !== 'callee' && prop !== 'arguments' : true) &&
-            o[prop] !== null &&
-            (typeof o[prop] === 'object' || typeof o[prop] === 'function') &&
-            !Object.isFrozen(o[prop])
-        ) {
-            deepFreeze(o[prop]);
-        }
-    });
-
-    return o;
 }
