@@ -1,8 +1,7 @@
-import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { Action, ActionWithPayload, AppState, Reducer } from './models';
+import { isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { Action, ActionWithPayload, Reducer } from './models';
 import StoreCore from './store-core';
 import { createMiniRxAction, miniRxError, select } from './utils';
-import { createFeatureSelector } from './selector';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
@@ -11,12 +10,15 @@ type StateOrCallback<StateType> = Partial<StateType> | ((state: StateType) => Pa
 export class FeatureStore<StateType extends object> {
     private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
 
-    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
-        {} as StateType
-    );
-    state$: Observable<StateType> = this.stateSource.asObservable();
+    state$: Observable<StateType> = StoreCore.select((state) => state[this.featureKey]);
     get state(): StateType {
-        return this.stateSource.getValue();
+        let value: StateType;
+        this.state$
+            .subscribe((state) => {
+                value = state;
+            })
+            .unsubscribe();
+        return value!;
     }
 
     // tslint:disable-next-line:variable-name
@@ -25,7 +27,7 @@ export class FeatureStore<StateType extends object> {
         return this._featureKey;
     }
 
-    private sub: Subscription;
+    private sub: Subscription = new Subscription();
 
     constructor(featureKey: string, initialState: StateType) {
         this._featureKey = featureKey;
@@ -36,11 +38,6 @@ export class FeatureStore<StateType extends object> {
             featureKey,
             createFeatureReducer(featureKey, initialState, this.setStateAction)
         );
-
-        // Select Feature State and delegate to local BehaviorSubject
-        this.sub = StoreCore.select(
-            createFeatureSelector<AppState, StateType>(featureKey)
-        ).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
