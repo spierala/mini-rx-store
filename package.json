@@ -13,6 +13,7 @@
         "build:all": "nx build mini-rx-store && nx build mini-rx-store-ng && nx build mini-rx-angular-demo",
         "test:mini-rx-store": "nx test mini-rx-store",
         "test:mini-rx-store:watch": "nx test mini-rx-store --watch",
+        "test:mini-rx-store:coverge": "nx test mini-rx-store --codeCoverage",
         "test:mini-rx-store-ng": "nx test mini-rx-store-ng",
         "deploy:docs": "npm run deploy --prefix docs",
         "build:mini-rx-angular-demo:sourcemap": "nx build mini-rx-angular-demo --source-map",
