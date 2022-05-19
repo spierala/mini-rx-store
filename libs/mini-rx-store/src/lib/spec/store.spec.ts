@@ -14,7 +14,7 @@ import {
     CounterState,
     resetStoreConfig,
     store,
-} from './_spec-helpers.spec';
+} from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 
 const asyncUser: Partial<UserState> = {

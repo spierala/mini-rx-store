@@ -6,11 +6,9 @@ import {
     CounterState,
     counterStringInitialState,
     counterStringReducer,
-    CounterStringState,
-    createUniqueCounterReducerWithAction,
-    resetStoreConfig,
+    CounterStringState, createUniqueCounterReducerWithAction, resetStoreConfig,
     store,
-} from './_spec-helpers.spec';
+} from './_spec-helpers';
 import { undo, UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
@@ -26,9 +24,9 @@ class MyFeatureStore extends FeatureStore<CounterStringState> {
     }
 
     count(payload: string): Action {
-        return (this.lastAction = this.setState((state) => ({
+        return this.lastAction = this.setState((state) => ({
             counter: state.counter + payload,
-        })));
+        }));
     }
 
     resetCount() {
@@ -36,13 +34,13 @@ class MyFeatureStore extends FeatureStore<CounterStringState> {
     }
 
     undoLastAction() {
-        if (this.lastAction) {
-            this.undo(this.lastAction);
-        }
+      if (this.lastAction) {
+        this.undo(this.lastAction);
+      }
     }
 
     undoActions(actions: Action[]) {
-        actions.forEach((item) => this.undo(item));
+        actions.forEach(item => this.undo(item))
     }
 }
 
@@ -75,11 +73,7 @@ describe('Undo Extension', () => {
 
             featureStore.resetCount();
             const undoNum2 = featureStore.count('2');
-            const actionsToUndo: Action[] = [
-                featureStore.count('3'),
-                featureStore.count('4'),
-                featureStore.count('5'),
-            ];
+            const actionsToUndo: Action[] = [featureStore.count('3'), featureStore.count('4'), featureStore.count('5')];
             featureStore.count('6');
 
             expect(counterSpy).toHaveBeenLastCalledWith('123456');
@@ -101,13 +95,12 @@ describe('Undo Extension', () => {
 
             const spy = jest.fn();
 
-            const getCount = createSelector(
-                createFeatureSelector<CounterState>(featureKey),
-                (state) => state?.counter
-            );
+            const getCount = createSelector(createFeatureSelector<CounterState>(featureKey), state => state?.counter);
             let lastAction: Action;
 
-            store.select(getCount).subscribe(spy);
+            store
+                .select(getCount)
+                .subscribe(spy);
 
             expect(spy).toHaveBeenCalledWith(1);
 
@@ -115,7 +108,7 @@ describe('Undo Extension', () => {
             store.dispatch(action);
             store.dispatch(action);
             store.dispatch(action);
-            lastAction = { ...action };
+            lastAction = {...action};
             store.dispatch(lastAction);
 
             expect(spy).toHaveBeenCalledWith(6);
@@ -130,7 +123,7 @@ describe('Undo Extension', () => {
             StoreCore.addFeature<CounterState>(featureKey, reducer);
 
             store.dispatch(action);
-            lastAction = { ...action };
+            lastAction = {...action};
             store.dispatch(lastAction);
             expect(spy).toHaveBeenCalledWith(3);
             spy.mockReset();

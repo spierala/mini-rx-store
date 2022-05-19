@@ -4,7 +4,7 @@ import {
     ReduxDevtoolsOptions,
 } from '../extensions/redux-devtools.extension';
 import { Action } from '../models';
-import { counterReducer, CounterState, store } from './_spec-helpers.spec';
+import { counterReducer, CounterState, store } from './_spec-helpers';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
@@ -79,7 +79,7 @@ describe('Redux Dev Tools', () => {
         extension['onDevToolsMessage']({
             type: 'NOT_SUPPORTED_TYPE',
             payload: {},
-            state: {},
+            state: {}
         });
 
         expect(spy).toHaveBeenCalledTimes(0);

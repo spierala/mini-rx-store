@@ -1,4 +1,4 @@
-import { counterInitialState, CounterState, store } from './_spec-helpers.spec';
+import { counterInitialState, CounterState, store } from './_spec-helpers';
 import { ImmutableStateExtension, storeFreeze } from '../extensions/immutable-state.extension';
 import { Action, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
@@ -124,7 +124,7 @@ describe('Immutable State Extension', () => {
     it('should throw when mutating selected state from a FeatureStore', () => {
         let selectedFeatureState: CounterState;
 
-        fs.select().subscribe((state) => (selectedFeatureState = state));
+        fs.select().subscribe(state => selectedFeatureState = state);
 
         expect(() => (selectedFeatureState.counter = 123)).toThrow();
     });
