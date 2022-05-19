@@ -5,7 +5,7 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import { actions$, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
-import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
+import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers.spec';
 import { Action, Reducer } from '../models';
 import { tapResponse } from 'mini-rx-store';
 
