@@ -127,8 +127,8 @@ export class TodosStateService extends FeatureStore<TodoState> {
             );
 
             return this.apiService.createTodo(todo).pipe(
-                tapResponse(
-                    (createdTodo) => {
+                tapResponse({
+                    next: (createdTodo) => {
                         this.setState(
                             (state) => ({
                                 todos: state.todos.map((item) =>
@@ -139,11 +139,11 @@ export class TodosStateService extends FeatureStore<TodoState> {
                             'createSuccess'
                         );
                     },
-                    (err) => {
+                    error: (err) => {
                         console.error(err);
                         this.undo(optimisticUpdate);
-                    }
-                )
+                    },
+                })
             );
         })
     );

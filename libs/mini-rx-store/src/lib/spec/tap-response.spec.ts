@@ -34,6 +34,15 @@ describe('tapResponse', () => {
         of(1, 2, 3).pipe(tapResponse(nextCallback, noop)).subscribe();
 
         expect(nextCallback.mock.calls).toEqual([[1], [2], [3]]);
+
+        nextCallback.mockReset();
+
+        // with object parameter
+        of(1, 2, 3)
+            .pipe(tapResponse({ next: nextCallback, error: noop }))
+            .subscribe();
+
+        expect(nextCallback.mock.calls).toEqual([[1], [2], [3]]);
     });
 
     it('should invoke error callback on error', () => {
@@ -45,14 +54,63 @@ describe('tapResponse', () => {
             .subscribe();
 
         expect(errorCallback).toHaveBeenCalledWith(error);
+
+        errorCallback.mockReset();
+
+        // with object parameter
+        throwError(() => error)
+            .pipe(tapResponse({ error: errorCallback }))
+            .subscribe();
+
+        expect(errorCallback).toHaveBeenCalledWith(error);
     });
 
-    it('should invoke complete callback on complete', () => {
-        const completeCallback = jest.fn<void, []>();
+    it('should invoke finalize callback on complete', () => {
+        const finalizeCallback = jest.fn<void, []>();
 
-        EMPTY.pipe(tapResponse(noop, noop, completeCallback)).subscribe();
+        EMPTY.pipe(tapResponse(noop, noop, finalizeCallback)).subscribe();
 
-        expect(completeCallback).toHaveBeenCalledWith();
+        expect(finalizeCallback).toHaveBeenCalledWith();
+
+        finalizeCallback.mockReset();
+
+        // with object parameter
+        EMPTY.pipe(
+            tapResponse({ next: noop, error: noop, finalize: finalizeCallback })
+        ).subscribe();
+
+        expect(finalizeCallback).toHaveBeenCalledWith();
+    });
+
+    it('should invoke finalize callback on error', () => {
+        const finalizeCallback = jest.fn();
+        const error = { message: 'error' };
+
+        throwError(() => error)
+            .pipe(tapResponse(noop, noop, finalizeCallback))
+            .subscribe();
+
+        expect(finalizeCallback).toHaveBeenCalledWith();
+
+        finalizeCallback.mockReset();
+
+        // with object parameter
+        throwError(() => error)
+            .pipe(tapResponse({ next: noop, error: noop, finalize: finalizeCallback }))
+            .subscribe();
+
+        expect(finalizeCallback).toHaveBeenCalledWith();
+    });
+
+    it('should first invoke next callback on next then finalize callback on complete', () => {
+        const nextCallback = jest.fn<void, [number]>();
+        const finalizeCallback = jest.fn();
+
+        of(1).pipe(tapResponse(nextCallback, noop, finalizeCallback)).subscribe();
+
+        expect(nextCallback.mock.invocationCallOrder[0]).toBeLessThan(
+            finalizeCallback.mock.invocationCallOrder[0]
+        );
     });
 
     it('should not unsubscribe from outer observable on inner observable error', () => {
