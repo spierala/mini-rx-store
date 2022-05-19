@@ -25,10 +25,6 @@
   "bugs": {
     "url": "https://github.com/spierala/mini-rx-store/issues"
   },
-  "dependencies": {
-    "deep-freeze-strict": "1.1.1",
-    "memoize-one": "6.0.0"
-  },
   "peerDependencies": {
     "rxjs": "^6.4.0 || ^7.0.0"
   }

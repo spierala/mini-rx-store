@@ -1,6 +1,5 @@
 // Credits go to NgRx
-// Copied from NgRx with small modifications:
-// https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts
+// Copied from with small modifications: https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts
 
 // The MIT License (MIT)
 //

@@ -1,4 +1,5 @@
-// Credits go to: https://github.com/brandonroberts/ngrx-store-freeze
+// Credits go to Brandon Roberts
+// Copied from with small modifications: https://github.com/brandonroberts/ngrx-store-freeze/blob/v0.2.4/src/index.ts
 
 // The MIT License (MIT)
 //
@@ -24,7 +25,7 @@
 
 import { Action, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import deepFreezeStrict from 'deep-freeze-strict';
+import { deepFreeze } from '../deep-freeze';
 
 export class ImmutableStateExtension extends StoreExtension {
     init(): void {
@@ -34,9 +35,9 @@ export class ImmutableStateExtension extends StoreExtension {
 
 export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
     return (state = {}, action: Action) => {
-        deepFreezeStrict(state);
+        deepFreeze(state);
         const nextState = reducer(state, action);
-        deepFreezeStrict(nextState);
+        deepFreeze(nextState);
         return nextState;
     };
 }

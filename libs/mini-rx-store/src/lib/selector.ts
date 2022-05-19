@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import memoizeOne from 'memoize-one';
+import { memoizeOne } from './memoize-one';
 
 export type Selector<T, V> = (state: T) => V;
 
