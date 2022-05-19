@@ -1,6 +1,5 @@
 // Credits go to NgRx
-// Copied from NgRx with small modifications:
-// https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/spec/tap-response.spec.ts
+// Copied from with small modifications: https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/spec/tap-response.spec.ts
 
 // The MIT License (MIT)
 //
