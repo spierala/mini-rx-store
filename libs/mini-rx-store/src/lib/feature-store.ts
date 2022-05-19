@@ -80,7 +80,7 @@ export class FeatureStore<StateType extends object> {
 
         return ((observableOrValue?: ObservableType | Observable<ObservableType>) => {
             isObservable(observableOrValue)
-                ? this.sub.add(observableOrValue.subscribe(subject))
+                ? this.sub.add(observableOrValue.subscribe((v) => subject.next(v)))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
