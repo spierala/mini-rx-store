@@ -1,12 +1,13 @@
 import { FeatureStore } from '../feature-store';
-import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { EMPTY, Observable, of } from 'rxjs';
+import { mergeMap, tap } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import { actions$, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
 import { Action, Reducer } from '../models';
+import { tapResponse } from 'mini-rx-store';
 
 interface UserState {
     firstName: string;
@@ -64,11 +65,12 @@ class UserFeatureStore extends FeatureStore<UserState> {
         payload$.pipe(
             mergeMap(() =>
                 fakeApiWithError().pipe(
-                    tap((user) => this.setState(user)),
-                    catchError((err) => {
-                        this.setState({ err: 'error' });
-                        return EMPTY;
-                    })
+                    tapResponse(
+                        (user) => this.setState(user),
+                        (err) => {
+                            this.setState({ err: 'error' });
+                        }
+                    )
                 )
             )
         )
@@ -204,6 +206,37 @@ describe('FeatureStore', () => {
     it('should create and execute an effect', () => {
         userFeature.loadFn();
         expect(userFeature.firstName$).toBeObservable(hot('a--b', { a: 'Bruce', b: 'Steven' }));
+    });
+
+    it('should invoke effect via Observable or imperatively', () => {
+        const spy = jest.fn();
+
+        function apiCall(param: number) {
+            spy(param);
+            return of('someValue');
+        }
+
+        const effect = userFeature.effect<number>(mergeMap((v) => apiCall(v)));
+        effect(1);
+
+        const source = new Subject<number>();
+        const source2 = new Subject<number>();
+
+        effect(source);
+
+        source.next(2);
+        source.next(3);
+        effect(4);
+
+        effect(source2);
+
+        source2.next(11);
+        source.complete();
+        source2.next(12);
+
+        effect(5);
+
+        expect(spy.mock.calls).toEqual([[1], [2], [3], [4], [11], [12], [5]]);
     });
 
     it('should create and execute an effect and handle error', () => {
