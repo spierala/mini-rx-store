@@ -51,12 +51,7 @@ function areInputsEqual(newInputs: readonly unknown[], lastInputs: readonly unkn
     return true;
 }
 
-export type EqualityFn<TFunc extends (...args: any[]) => any> = (
-    newArgs: Parameters<TFunc>,
-    lastArgs: Parameters<TFunc>
-) => boolean;
-
-export type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
+type MemoizedFn<TFunc extends (this: any, ...args: any[]) => any> = {
     (this: ThisParameterType<TFunc>, ...args: Parameters<TFunc>): ReturnType<TFunc>;
 };
 
