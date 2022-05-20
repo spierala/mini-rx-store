@@ -10,7 +10,7 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select } from './utils';
+import { createMiniRxAction, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 
@@ -186,6 +186,26 @@ function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
     return [...extensions].sort((a, b) => {
         return a.sortOrder - b.sortOrder;
     });
+}
+
+function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {
+    return Object.keys(object)
+        .filter((key) => key !== keyToOmit)
+        .reduce<Partial<T>>((prevValue, key: keyof T) => {
+            prevValue[key] = object[key];
+            return prevValue;
+        }, {});
+}
+
+function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+    return (reducer: Reducer<any>): Reducer<T> => {
+        return metaReducers.reduceRight(
+            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
+                return currentValue(previousValue);
+            },
+            reducer
+        );
+    };
 }
 
 // Created once to initialize singleton
