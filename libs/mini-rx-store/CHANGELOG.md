@@ -13,12 +13,6 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 * **mini-rx-store:** FeatureStore.effect with Observable argument: Observable completion should not stop the effect ([9a5c222](https://github.com/spierala/mini-rx-store/commit/9a5c2229620c7073edc35f58f08e9260fabd77ba))
 
-
-### Reverts
-
-* Revert "chore(mini-rx-store): add coverage npm task, refactor name of spec helper file" ([0515266](https://github.com/spierala/mini-rx-store/commit/05152662781307f651a9998e7448b78583c2beda))
-
-
 ### Code Refactoring
 
 * **mini-rx-store:** align tapResponse object parameter type with RxJS TapObserver ([5aed940](https://github.com/spierala/mini-rx-store/commit/5aed9404f8498f9c1934f4348c971dea0095c9cf))
