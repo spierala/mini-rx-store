@@ -76,7 +76,8 @@ function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
                     // This can lead to unexpected state in the 'new' feature reducer
                     // Solution: Clear the feature state from the newState manually if we encounter a 'destroy-feature' action
                     // This will make sure that the feature reducer initializes again with its initial state
-                    newState[executedAction['payload']] = undefined;
+                    const featureKey: string = executedAction.payload;
+                    newState[featureKey] = undefined;
                 }
                 newState = rootReducer(newState, executedAction);
             });

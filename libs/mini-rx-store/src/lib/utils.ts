@@ -47,7 +47,11 @@ export function createMiniRxAction(
     };
 }
 
-export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionType) {
+export function isMiniRxAction(
+    action: Action,
+    miniRxActionType: MiniRxActionType
+): action is ActionWithPayload {
+    // Return type is a type predicate! (https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
     return action.type.indexOf(miniRxNameSpace + '/' + miniRxActionType) === 0;
 }
 
