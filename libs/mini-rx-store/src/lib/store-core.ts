@@ -21,11 +21,11 @@ type ReducerState = {
 
 class StoreCore {
     // ACTIONS
-    private actionsSource: Subject<Action> = new Subject();
+    private actionsSource = new Subject<Action>();
     actions$: Actions = this.actionsSource.asObservable();
 
     // APP STATE
-    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
+    private stateSource = new BehaviorSubject<AppState>({}); // Init App State with empty object
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // REDUCERS (Feature state reducers and meta reducers)
