@@ -69,40 +69,6 @@ class StoreCore {
             });
     }
 
-    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
-        this.reducerStateSource.next({
-            ...this.reducerState,
-            metaReducers: [...this.reducerState.metaReducers, ...reducers],
-        });
-    }
-
-    addFeature<StateType>(
-        featureKey: string,
-        reducer: Reducer<StateType>,
-        config: {
-            metaReducers?: MetaReducer<StateType>[];
-            initialState?: StateType;
-        } = {}
-    ) {
-        reducer = config.metaReducers?.length
-            ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
-            : reducer;
-
-        checkFeatureExists(featureKey, this.featureReducers);
-
-        if (typeof config.initialState !== 'undefined') {
-            reducer = createReducerWithInitialState(reducer, config.initialState);
-        }
-
-        this.addReducer(featureKey, reducer);
-        this.dispatch(createMiniRxAction('init-feature', featureKey));
-    }
-
-    removeFeature(featureKey: string) {
-        this.removeReducer(featureKey);
-        this.dispatch(createMiniRxAction('destroy-feature', featureKey, featureKey));
-    }
-
     config(config: Partial<StoreConfig<AppState>> = {}) {
         if (Object.keys(this.featureReducers).length) {
             miniRxError(
@@ -133,9 +99,31 @@ class StoreCore {
         this.dispatch(createMiniRxAction('init-store'));
     }
 
-    effect(effect$: Observable<Action>) {
-        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
+    addFeature<StateType>(
+        featureKey: string,
+        reducer: Reducer<StateType>,
+        config: {
+            metaReducers?: MetaReducer<StateType>[];
+            initialState?: StateType;
+        } = {}
+    ) {
+        reducer = config.metaReducers?.length
+            ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
+            : reducer;
+
+        checkFeatureExists(featureKey, this.featureReducers);
+
+        if (typeof config.initialState !== 'undefined') {
+            reducer = createReducerWithInitialState(reducer, config.initialState);
+        }
+
+        this.addReducer(featureKey, reducer);
+        this.dispatch(createMiniRxAction('init-feature', featureKey));
+    }
+
+    removeFeature(featureKey: string) {
+        this.removeReducer(featureKey);
+        this.dispatch(createMiniRxAction('destroy-feature', featureKey, featureKey));
     }
 
     dispatch(action: Action) {
@@ -148,6 +136,18 @@ class StoreCore {
 
     select<R>(mapFn: (state: AppState) => R): Observable<R> {
         return this.state$.pipe(select(mapFn));
+    }
+
+    effect(effect$: Observable<Action>) {
+        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
+        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
+    }
+
+    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
+        this.reducerStateSource.next({
+            ...this.reducerState,
+            metaReducers: [...this.reducerState.metaReducers, ...reducers],
+        });
     }
 
     addExtension(extension: StoreExtension) {
