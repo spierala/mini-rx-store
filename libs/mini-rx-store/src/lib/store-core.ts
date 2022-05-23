@@ -53,8 +53,8 @@ class StoreCore {
         let reducer: Reducer<AppState>;
         // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscription (fewer operators = less bundle-size :))
         this.reducerStateSource.subscribe((v) => {
-            let combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
-            let combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
+            const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
+            const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
             reducer = combinedMetaReducer(combinedReducer);
         });
 
