@@ -1,6 +1,8 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, MiniRxActionType, MetaReducer, Reducer, ActionWithPayload } from './models';
+import { Action, ActionWithPayload } from './models';
+
+export const miniRxNameSpace = '@mini-rx';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>
@@ -9,32 +11,11 @@ export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Acti
         })
     );
 }
-
 export function select<T, R>(mapFn: (state: T) => R) {
     return pipe(map(mapFn), distinctUntilChanged());
 }
 
-export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
-    return (reducer: Reducer<any>): Reducer<T> => {
-        return metaReducers.reduceRight(
-            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
-                return currentValue(previousValue);
-            },
-            reducer
-        );
-    };
-}
-
-export function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {
-    return Object.keys(object)
-        .filter((key) => key !== keyToOmit)
-        .reduce<Partial<T>>((prevValue, key: keyof T) => {
-            prevValue[key] = object[key];
-            return prevValue;
-        }, {});
-}
-
-export const miniRxNameSpace = '@mini-rx';
+type MiniRxActionType = 'init-store' | 'init-feature' | 'destroy-feature' | 'set-state';
 
 export function createMiniRxAction(
     miniRxActionType: MiniRxActionType,
@@ -47,7 +28,11 @@ export function createMiniRxAction(
     };
 }
 
-export function isMiniRxAction(action: Action, miniRxActionType: MiniRxActionType) {
+export function isMiniRxAction(
+    action: Action,
+    miniRxActionType: MiniRxActionType
+): action is ActionWithPayload {
+    // Return type is a type predicate! (https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
     return action.type.indexOf(miniRxNameSpace + '/' + miniRxActionType) === 0;
 }
 

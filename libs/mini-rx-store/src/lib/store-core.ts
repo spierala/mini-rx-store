@@ -10,7 +10,7 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { combineMetaReducers, createMiniRxAction, miniRxError, omit, select } from './utils';
+import { createMiniRxAction, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 
@@ -21,11 +21,11 @@ type ReducerState = {
 
 class StoreCore {
     // ACTIONS
-    private actionsSource: Subject<Action> = new Subject();
+    private actionsSource = new Subject<Action>();
     actions$: Actions = this.actionsSource.asObservable();
 
     // APP STATE
-    private stateSource: BehaviorSubject<AppState> = new BehaviorSubject({}); // Init App State with empty object
+    private stateSource = new BehaviorSubject<AppState>({}); // Init App State with empty object
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // REDUCERS (Feature state reducers and meta reducers)
@@ -53,8 +53,8 @@ class StoreCore {
         let reducer: Reducer<AppState>;
         // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscription (fewer operators = less bundle-size :))
         this.reducerStateSource.subscribe((v) => {
-            let combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
-            let combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
+            const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
+            const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
             reducer = combinedMetaReducer(combinedReducer);
         });
 
@@ -67,40 +67,6 @@ class StoreCore {
                 const newState: AppState = reducer(this.stateSource.getValue(), action);
                 this.updateState(newState);
             });
-    }
-
-    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
-        this.reducerStateSource.next({
-            ...this.reducerState,
-            metaReducers: [...this.reducerState.metaReducers, ...reducers],
-        });
-    }
-
-    addFeature<StateType>(
-        featureKey: string,
-        reducer: Reducer<StateType>,
-        config: {
-            metaReducers?: MetaReducer<StateType>[];
-            initialState?: StateType;
-        } = {}
-    ) {
-        reducer = config.metaReducers?.length
-            ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
-            : reducer;
-
-        checkFeatureExists(featureKey, this.featureReducers);
-
-        if (typeof config.initialState !== 'undefined') {
-            reducer = createReducerWithInitialState(reducer, config.initialState);
-        }
-
-        this.addReducer(featureKey, reducer);
-        this.dispatch(createMiniRxAction('init-feature', featureKey));
-    }
-
-    removeFeature(featureKey: string) {
-        this.removeReducer(featureKey);
-        this.dispatch(createMiniRxAction('destroy-feature', featureKey, featureKey));
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
@@ -133,9 +99,31 @@ class StoreCore {
         this.dispatch(createMiniRxAction('init-store'));
     }
 
-    effect(effect$: Observable<Action>) {
-        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
+    addFeature<StateType>(
+        featureKey: string,
+        reducer: Reducer<StateType>,
+        config: {
+            metaReducers?: MetaReducer<StateType>[];
+            initialState?: StateType;
+        } = {}
+    ) {
+        reducer = config.metaReducers?.length
+            ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
+            : reducer;
+
+        checkFeatureExists(featureKey, this.featureReducers);
+
+        if (typeof config.initialState !== 'undefined') {
+            reducer = createReducerWithInitialState(reducer, config.initialState);
+        }
+
+        this.addReducer(featureKey, reducer);
+        this.dispatch(createMiniRxAction('init-feature', featureKey));
+    }
+
+    removeFeature(featureKey: string) {
+        this.removeReducer(featureKey);
+        this.dispatch(createMiniRxAction('destroy-feature', featureKey, featureKey));
     }
 
     dispatch(action: Action) {
@@ -148,6 +136,18 @@ class StoreCore {
 
     select<R>(mapFn: (state: AppState) => R): Observable<R> {
         return this.state$.pipe(select(mapFn));
+    }
+
+    effect(effect$: Observable<Action>) {
+        const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
+        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
+    }
+
+    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
+        this.reducerStateSource.next({
+            ...this.reducerState,
+            metaReducers: [...this.reducerState.metaReducers, ...reducers],
+        });
     }
 
     addExtension(extension: StoreExtension) {
@@ -186,6 +186,26 @@ function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
     return [...extensions].sort((a, b) => {
         return a.sortOrder - b.sortOrder;
     });
+}
+
+function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {
+    return Object.keys(object)
+        .filter((key) => key !== keyToOmit)
+        .reduce<Partial<T>>((prevValue, key: keyof T) => {
+            prevValue[key] = object[key];
+            return prevValue;
+        }, {});
+}
+
+function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+    return (reducer: Reducer<any>): Reducer<T> => {
+        return metaReducers.reduceRight(
+            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
+                return currentValue(previousValue);
+            },
+            reducer
+        );
+    };
 }
 
 // Created once to initialize singleton

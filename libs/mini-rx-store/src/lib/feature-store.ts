@@ -27,7 +27,7 @@ export class FeatureStore<StateType extends object> {
         return this._featureKey;
     }
 
-    private sub: Subscription = new Subscription();
+    private sub = new Subscription();
 
     constructor(featureKey: string, initialState: StateType) {
         this._featureKey = featureKey;

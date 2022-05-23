@@ -8,7 +8,7 @@ export const enum ExtensionSortOrder {
     UNDO_EXTENSION = 1,
 }
 
-export type AppState = Record<string, any>
+export type AppState = Record<string, any>;
 
 export abstract class StoreExtension {
     sortOrder: ExtensionSortOrder = ExtensionSortOrder.DEFAULT;
@@ -42,10 +42,8 @@ export class Actions extends Observable<Action> {}
 
 export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
 
-export type MetaReducer<StateType> = (reducer: Reducer<any>) => Reducer<StateType>;
+export type MetaReducer<StateType> = (reducer: Reducer<StateType>) => Reducer<StateType>;
 
 export type ReducerDictionary<T> = {
     [p in keyof T]: Reducer<T[p]>;
 };
-
-export type MiniRxActionType = 'init-store' | 'init-feature' | 'destroy-feature' | 'set-state';
