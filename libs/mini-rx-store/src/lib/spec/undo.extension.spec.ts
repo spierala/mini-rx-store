@@ -6,13 +6,16 @@ import {
     CounterState,
     counterStringInitialState,
     counterStringReducer,
-    CounterStringState, createUniqueCounterReducerWithAction, resetStoreConfig,
+    CounterStringState,
+    createUniqueCounterReducerWithAction,
+    resetStoreConfig,
     store,
 } from './_spec-helpers';
 import { undo, UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 import StoreCore from '../store-core';
+import { createFeatureStore } from 'mini-rx-store';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
@@ -24,9 +27,9 @@ class MyFeatureStore extends FeatureStore<CounterStringState> {
     }
 
     count(payload: string): Action {
-        return this.lastAction = this.setState((state) => ({
+        return (this.lastAction = this.setState((state) => ({
             counter: state.counter + payload,
-        }));
+        })));
     }
 
     resetCount() {
@@ -34,13 +37,13 @@ class MyFeatureStore extends FeatureStore<CounterStringState> {
     }
 
     undoLastAction() {
-      if (this.lastAction) {
-        this.undo(this.lastAction);
-      }
+        if (this.lastAction) {
+            this.undo(this.lastAction);
+        }
     }
 
     undoActions(actions: Action[]) {
-        actions.forEach(item => this.undo(item))
+        actions.forEach((item) => this.undo(item));
     }
 }
 
@@ -73,7 +76,11 @@ describe('Undo Extension', () => {
 
             featureStore.resetCount();
             const undoNum2 = featureStore.count('2');
-            const actionsToUndo: Action[] = [featureStore.count('3'), featureStore.count('4'), featureStore.count('5')];
+            const actionsToUndo: Action[] = [
+                featureStore.count('3'),
+                featureStore.count('4'),
+                featureStore.count('5'),
+            ];
             featureStore.count('6');
 
             expect(counterSpy).toHaveBeenLastCalledWith('123456');
@@ -90,45 +97,56 @@ describe('Undo Extension', () => {
 
         it('should not affect removed feature which is added again (for destroyable feature stores)', () => {
             const featureKey = 'destroyableCounter';
-            const [reducer, action] = createUniqueCounterReducerWithAction();
-            StoreCore.addFeature<CounterState>(featureKey, reducer);
 
+            class Fs extends FeatureStore<CounterState> {
+                constructor() {
+                    super(featureKey, counterInitialState);
+                }
+
+                increment(): Action {
+                    return this.setState({
+                        counter: this.state.counter + 1,
+                    });
+                }
+            }
+
+            const fs = new Fs();
             const spy = jest.fn();
+            const getCount = createSelector(
+                createFeatureSelector<CounterState>(featureKey),
+                (state) => state?.counter
+            );
 
-            const getCount = createSelector(createFeatureSelector<CounterState>(featureKey), state => state?.counter);
             let lastAction: Action;
 
-            store
-                .select(getCount)
-                .subscribe(spy);
+            store.select(getCount).subscribe(spy);
 
             expect(spy).toHaveBeenCalledWith(1);
 
-            store.dispatch(action);
-            store.dispatch(action);
-            store.dispatch(action);
-            store.dispatch(action);
-            lastAction = {...action};
-            store.dispatch(lastAction);
+            fs.increment();
+            fs.increment();
+            fs.increment();
+            fs.increment();
+            lastAction = fs.increment();
 
             expect(spy).toHaveBeenCalledWith(6);
             spy.mockReset();
 
-            store.dispatch(undo(lastAction));
+            fs.undo(lastAction);
 
             expect(spy).toHaveBeenCalledWith(5);
+
+            fs.destroy();
+
             spy.mockReset();
 
-            StoreCore.removeFeature(featureKey);
-            StoreCore.addFeature<CounterState>(featureKey, reducer);
-
-            store.dispatch(action);
-            lastAction = {...action};
-            store.dispatch(lastAction);
+            const fs2 = new Fs();
+            fs2.increment();
+            lastAction = fs2.increment();
             expect(spy).toHaveBeenCalledWith(3);
             spy.mockReset();
 
-            store.dispatch(undo(lastAction));
+            fs2.undo(lastAction);
 
             expect(spy).toHaveBeenCalledWith(2);
         });

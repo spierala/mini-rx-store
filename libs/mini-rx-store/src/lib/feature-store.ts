@@ -1,16 +1,14 @@
 import { isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { Action, ActionWithPayload, Reducer } from './models';
+import { Action, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
-import { createMiniRxAction, miniRxError, select } from './utils';
+import { miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-
-type StateOrCallback<StateType> = Partial<StateType> | ((state: StateType) => Partial<StateType>);
+import { MiniRxActionType, SetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
-    private readonly setStateAction: Action; // E.g. {type: '@mini-rx/set-state/products'}
-
     state$: Observable<StateType> = StoreCore.select((state) => state[this.featureKey]);
+
     get state(): StateType {
         let value: StateType;
         this.state$
@@ -28,23 +26,25 @@ export class FeatureStore<StateType extends object> {
     }
 
     private sub = new Subscription();
+    private readonly internalFeatureId: number;
 
     constructor(featureKey: string, initialState: StateType) {
         this._featureKey = featureKey;
-
-        this.setStateAction = createMiniRxAction('set-state', featureKey);
+        this.internalFeatureId = getInternalFeatureId();
 
         StoreCore.addFeature<StateType>(
             featureKey,
-            createFeatureReducer(featureKey, initialState, this.setStateAction)
+            createFeatureReducer(this.internalFeatureId, initialState) as Reducer<StateType>
         );
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        const action: ActionWithPayload = {
-            type: this.setStateAction.type + (name ? '/' + name : ''),
-            payload: stateOrCallback,
-        };
+        const action = new SetStateAction(
+            stateOrCallback,
+            this.internalFeatureId,
+            this.featureKey,
+            name
+        );
 
         StoreCore.dispatch(action);
 
@@ -102,14 +102,21 @@ export class FeatureStore<StateType extends object> {
     }
 }
 
+let internalFeatureId = 1;
+export function getInternalFeatureId() {
+    return internalFeatureId++;
+}
+
 function createFeatureReducer<StateType>(
-    featureKey: string,
-    initialState: StateType,
-    setStateAction: Action
+    internalFeatureId: number,
+    initialState: StateType
 ): Reducer<StateType> {
-    return (state: StateType = initialState, action: ActionWithPayload): StateType => {
-        if (action.type.indexOf(setStateAction.type) === 0) {
-            const stateOrCallback = action.payload;
+    return (state: StateType = initialState, action: Action): StateType => {
+        if (
+            isSetStateAction<StateType>(action) &&
+            action.__internalFeatureId === internalFeatureId
+        ) {
+            const stateOrCallback = action.stateOrCallback;
             const newPartialState =
                 typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
             return {
@@ -119,4 +126,11 @@ function createFeatureReducer<StateType>(
         }
         return state;
     };
+}
+
+const key: keyof SetStateAction<any> = '__internalType';
+const type: MiniRxActionType = 'set-state';
+// Type predicate
+export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
+    return action[key] === type;
 }

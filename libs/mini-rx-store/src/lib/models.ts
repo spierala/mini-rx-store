@@ -47,3 +47,7 @@ export type MetaReducer<StateType> = (reducer: Reducer<StateType>) => Reducer<St
 export type ReducerDictionary<T> = {
     [p in keyof T]: Reducer<T[p]>;
 };
+
+export type StateOrCallback<StateType> =
+    | Partial<StateType>
+    | ((state: StateType) => Partial<StateType>);
