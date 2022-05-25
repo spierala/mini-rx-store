@@ -10,9 +10,10 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { createMiniRxAction, miniRxError, select } from './utils';
+import { miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
+import { MiniRxAction } from './actions';
 
 type ReducerState = {
     featureReducers: ReducerDictionary<AppState>;
@@ -96,7 +97,7 @@ class StoreCore {
             this.updateState(config.initialState);
         }
 
-        this.dispatch(createMiniRxAction('init-store'));
+        this.dispatch(new MiniRxAction('init-store'));
     }
 
     addFeature<StateType>(
@@ -118,12 +119,12 @@ class StoreCore {
         }
 
         this.addReducer(featureKey, reducer);
-        this.dispatch(createMiniRxAction('init-feature', featureKey));
+        this.dispatch(new MiniRxAction('init-feature', featureKey));
     }
 
     removeFeature(featureKey: string) {
         this.removeReducer(featureKey);
-        this.dispatch(createMiniRxAction('destroy-feature', featureKey, featureKey));
+        this.dispatch(new MiniRxAction('destroy-feature', featureKey));
     }
 
     dispatch(action: Action) {

@@ -333,10 +333,14 @@ describe('FeatureStore', () => {
         const spy = jest.fn();
         actions$.subscribe(spy);
         userFeature.updateCity('NY');
-        expect(spy).toHaveBeenCalledWith({
-            type: '@mini-rx/set-state/user2/updateCity',
-            payload: { city: 'NY' },
-        });
+        expect(spy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: '@mini-rx/set-state/user2/updateCity',
+                stateOrCallback: { city: 'NY' },
+                __internalType: 'set-state',
+                __internalFeatureId: expect.any(Number),
+            })
+        );
     });
 
     it('should run the meta reducers when state changes', () => {
