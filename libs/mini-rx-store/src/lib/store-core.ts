@@ -106,13 +106,18 @@ class StoreCore {
         config: {
             metaReducers?: MetaReducer<StateType>[];
             initialState?: StateType;
+            multi?: boolean;
         } = {}
-    ) {
+    ): string {
         reducer = config.metaReducers?.length
             ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
             : reducer;
 
-        checkFeatureExists(featureKey, this.featureReducers);
+        if (!config.multi) {
+            checkFeatureExists(featureKey, this.featureReducers);
+        } else {
+            featureKey = featureKey + '-' + generateId();
+        }
 
         if (typeof config.initialState !== 'undefined') {
             reducer = createReducerWithInitialState(reducer, config.initialState);
@@ -120,6 +125,7 @@ class StoreCore {
 
         this.addReducer(featureKey, reducer);
         this.dispatch(new MiniRxAction('init-feature', featureKey));
+        return featureKey;
     }
 
     removeFeature(featureKey: string) {
@@ -207,6 +213,12 @@ function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> 
             reducer
         );
     };
+}
+
+// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
+// This isn't a real GUID!
+function generateId() {
+    return Math.random().toString(36).slice(2);
 }
 
 // Created once to initialize singleton

@@ -8,7 +8,6 @@ import { MiniRxActionType, SetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
     state$: Observable<StateType> = StoreCore.select((state) => state[this.featureKey]);
-
     get state(): StateType {
         let value: StateType;
         this.state$
@@ -28,13 +27,13 @@ export class FeatureStore<StateType extends object> {
     private sub = new Subscription();
     private readonly internalFeatureId: number;
 
-    constructor(featureKey: string, initialState: StateType) {
-        this._featureKey = featureKey;
+    constructor(featureKey: string, initialState: StateType, config: { multi?: boolean } = {}) {
         this.internalFeatureId = getInternalFeatureId();
 
-        StoreCore.addFeature<StateType>(
+        this._featureKey = StoreCore.addFeature<StateType>(
             featureKey,
-            createFeatureReducer(this.internalFeatureId, initialState) as Reducer<StateType>
+            createFeatureReducer(this.internalFeatureId, initialState),
+            config
         );
     }
 

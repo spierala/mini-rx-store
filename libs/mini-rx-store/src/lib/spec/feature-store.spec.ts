@@ -418,4 +418,51 @@ describe('FeatureStore', () => {
         fs.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
     });
+
+    it('should allow many instances of the same feature store with config.multi', () => {
+        const featureKey = 'multi-counter';
+
+        class Fs extends FeatureStore<CounterState> {
+            constructor() {
+                super(featureKey, counterInitialState, { multi: true });
+            }
+
+            increment(): Action {
+                return this.setState({
+                    counter: this.state.counter + 1,
+                });
+            }
+        }
+
+        const fs1 = new Fs();
+        const fs2 = new Fs();
+        const fs3 = new Fs();
+
+        const spy = jest.fn();
+        const spy2 = jest.fn();
+
+        const fs2FeatureKey = fs2.featureKey;
+        const getFs2Feature = createFeatureSelector<CounterState>(fs2FeatureKey);
+        const getFs2Counter = createSelector(getFs2Feature, (state) => state?.counter);
+
+        const fs3FeatureKey = fs3.featureKey;
+        const getFs3Feature = createFeatureSelector<CounterState>(fs3FeatureKey);
+        const getFs3Counter = createSelector(getFs3Feature, (state) => state?.counter);
+
+        store.select(getFs2Counter).subscribe(spy);
+        store.select(getFs3Counter).subscribe(spy2);
+
+        fs2.increment();
+
+        fs3.increment();
+        fs3.increment();
+
+        fs3.destroy();
+
+        expect(spy.mock.calls).toEqual([[1], [2]]);
+        expect(spy2.mock.calls).toEqual([[1], [2], [3], [undefined]]);
+
+        expect(fs2FeatureKey).toContain('multi-counter-');
+        expect(fs3FeatureKey).toContain('multi-counter-');
+    });
 });
