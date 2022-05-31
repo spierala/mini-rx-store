@@ -1,4 +1,4 @@
-import { isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { miniRxError, select } from './utils';
@@ -7,15 +7,12 @@ import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { MiniRxActionType, SetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
-    state$: Observable<StateType> = StoreCore.select((state) => state[this.featureKey]);
+    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
+        this.initialState
+    );
+    state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
-        let value: StateType;
-        this.state$
-            .subscribe((state) => {
-                value = state;
-            })
-            .unsubscribe();
-        return value!;
+        return this.stateSource.getValue();
     }
 
     // tslint:disable-next-line:variable-name
@@ -27,27 +24,49 @@ export class FeatureStore<StateType extends object> {
     private sub = new Subscription();
     private readonly internalFeatureId: number;
 
-    constructor(featureKey: string, initialState: StateType, config: { multi?: boolean } = {}) {
+    constructor(
+        featureKey: string,
+        private initialState: StateType,
+        private config: { multi?: boolean; detached?: boolean } = {}
+    ) {
         this.internalFeatureId = getInternalFeatureId();
 
-        this._featureKey = StoreCore.addFeature<StateType>(
-            featureKey,
-            createFeatureReducer(this.internalFeatureId, initialState),
-            config
-        );
+        if (!config.detached) {
+            this._featureKey = StoreCore.addFeature<StateType>(
+                featureKey,
+                createFeatureReducer(this.internalFeatureId, initialState),
+                config
+            );
+
+            this.sub.add(
+                StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
+            );
+        } else {
+            this._featureKey = featureKey;
+        }
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        const action = new SetStateAction(
-            stateOrCallback,
-            this.internalFeatureId,
-            this.featureKey,
-            name
-        );
+        // TODO create setState fn once instead of always checking config.detached
 
-        StoreCore.dispatch(action);
+        if (this.config.detached) {
+            this.stateSource.next(calcNewState(this.state, stateOrCallback));
+            return {
+                // TODO do not return an Action, conditional typing: return void if config.detached = true
+                type: 'bla',
+            };
+        } else {
+            const action = new SetStateAction(
+                stateOrCallback,
+                this.internalFeatureId,
+                this.featureKey,
+                name
+            );
 
-        return action;
+            StoreCore.dispatch(action);
+
+            return action;
+        }
     }
 
     select(): Observable<StateType>;
@@ -115,21 +134,24 @@ function createFeatureReducer<StateType>(
             isSetStateAction<StateType>(action) &&
             action.__internalFeatureId === internalFeatureId
         ) {
-            const stateOrCallback = action.stateOrCallback;
-            const newPartialState =
-                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
-            return {
-                ...state,
-                ...newPartialState,
-            };
+            return calcNewState(state, action.stateOrCallback);
         }
         return state;
+    };
+}
+
+function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
+    const newPartialState =
+        typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+    return {
+        ...state,
+        ...newPartialState,
     };
 }
 
 const key: keyof SetStateAction<any> = '__internalType';
 const type: MiniRxActionType = 'set-state';
 // Type predicate
-export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
+function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
     return action[key] === type;
 }
