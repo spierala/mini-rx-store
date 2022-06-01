@@ -14,6 +14,7 @@ import { ProductStateModule } from './modules/products/state/product-state.modul
 import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
+import { ArtModule } from './modules/art/art.module';
 
 @NgModule({
     imports: [
@@ -36,6 +37,7 @@ import { ToastrModule } from 'ngx-toastr';
             latency: 250,
         }),
         ProductStateModule,
+        ArtModule,
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
