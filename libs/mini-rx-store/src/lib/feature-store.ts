@@ -1,10 +1,32 @@
 import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { Action, Reducer, StateOrCallback } from './models';
+import { Action, InstantiationMode, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { MiniRxActionType, SetStateAction } from './actions';
+import { MiniRxAction, MiniRxActionType, SetStateAction } from './actions';
+
+type SetStateFn<StateType> = (stateOrCallback: StateOrCallback<StateType>, name?: string) => Action;
+
+function createSetStateFn<StateType>(stateSource: BehaviorSubject<StateType>) {
+    return (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
+        stateSource.next(calcNewState(stateSource.getValue(), stateOrCallback));
+        return new MiniRxAction('noop');
+    };
+}
+
+function createSetStateFnWithDispatch<StateType>(
+    internalFeatureId: number,
+    featureKey: string
+): SetStateFn<StateType> {
+    return (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
+        const action = new SetStateAction(stateOrCallback, internalFeatureId, featureKey, name);
+
+        StoreCore.dispatch(action);
+
+        return action;
+    };
+}
 
 export class FeatureStore<StateType extends object> {
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
@@ -24,48 +46,38 @@ export class FeatureStore<StateType extends object> {
     private sub = new Subscription();
     private readonly internalFeatureId: number;
 
+    setState: SetStateFn<StateType>;
+
+    get mode(): InstantiationMode {
+        return this.config.instantiation;
+    }
+
     constructor(
         featureKey: string,
         private initialState: StateType,
-        private config: { multi?: boolean; detached?: boolean } = {}
+        private config: {
+            instantiation: InstantiationMode;
+        } = { instantiation: InstantiationMode.SINGLE }
     ) {
         this.internalFeatureId = getInternalFeatureId();
 
-        if (!config.detached) {
+        if (this.mode !== InstantiationMode.MULTIPLE_DETACHED) {
             this._featureKey = StoreCore.addFeature<StateType>(
                 featureKey,
                 createFeatureReducer(this.internalFeatureId, initialState),
-                config
+                {
+                    multi: config.instantiation === InstantiationMode.MULTIPLE,
+                }
             );
+
+            this.setState = createSetStateFnWithDispatch(this.internalFeatureId, this.featureKey);
 
             this.sub.add(
                 StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
             );
         } else {
             this._featureKey = featureKey;
-        }
-    }
-
-    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        // TODO create setState fn once instead of always checking config.detached
-
-        if (this.config.detached) {
-            this.stateSource.next(calcNewState(this.state, stateOrCallback));
-            return {
-                // TODO do not return an Action, conditional typing: return void if config.detached = true
-                type: 'bla',
-            };
-        } else {
-            const action = new SetStateAction(
-                stateOrCallback,
-                this.internalFeatureId,
-                this.featureKey,
-                name
-            );
-
-            StoreCore.dispatch(action);
-
-            return action;
+            this.setState = createSetStateFn(this.stateSource);
         }
     }
 
@@ -104,6 +116,10 @@ export class FeatureStore<StateType extends object> {
     }
 
     undo(action: Action) {
+        if (this.mode === InstantiationMode.MULTIPLE_DETACHED) {
+            miniRxError('Undo is not supported when using `InstantiationMode.MULTIPLE_DETACHED`.');
+        }
+
         isUndoExtensionInitialized
             ? StoreCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
@@ -111,7 +127,9 @@ export class FeatureStore<StateType extends object> {
 
     destroy() {
         this.sub.unsubscribe();
-        StoreCore.removeFeature(this._featureKey);
+        if (this.mode !== InstantiationMode.MULTIPLE_DETACHED) {
+            StoreCore.removeFeature(this._featureKey);
+        }
     }
 
     // tslint:disable-next-line:use-lifecycle-interface

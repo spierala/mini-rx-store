@@ -8,6 +8,12 @@ export const enum ExtensionSortOrder {
     UNDO_EXTENSION = 1,
 }
 
+export const enum InstantiationMode {
+    SINGLE = 'SINGLE',
+    MULTIPLE = 'MULTIPLE',
+    MULTIPLE_DETACHED = 'MULTIPLE_DETACHED',
+}
+
 export type AppState = Record<string, any>;
 
 export abstract class StoreExtension {

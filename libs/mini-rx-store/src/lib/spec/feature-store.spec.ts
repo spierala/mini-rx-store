@@ -6,7 +6,7 @@ import { cold, hot } from 'jest-marbles';
 import { actions$, createFeatureStore } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
-import { Action, Reducer } from '../models';
+import { Action, InstantiationMode, Reducer } from '../models';
 import { tapResponse } from 'mini-rx-store';
 
 interface UserState {
@@ -424,7 +424,9 @@ describe('FeatureStore', () => {
 
         class Fs extends FeatureStore<CounterState> {
             constructor() {
-                super(featureKey, counterInitialState, { multi: true });
+                super(featureKey, counterInitialState, {
+                    instantiation: InstantiationMode.MULTIPLE,
+                });
             }
 
             increment(): Action {

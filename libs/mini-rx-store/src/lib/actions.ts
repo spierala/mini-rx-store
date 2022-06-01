@@ -2,7 +2,12 @@ import { Action } from 'mini-rx-store';
 import { StateOrCallback } from './models';
 import { miniRxNameSpace } from './utils';
 
-export type MiniRxActionType = 'init-store' | 'init-feature' | 'destroy-feature' | 'set-state';
+export type MiniRxActionType =
+    | 'init-store'
+    | 'init-feature'
+    | 'destroy-feature'
+    | 'set-state'
+    | 'noop';
 
 export class SetStateAction<T> implements Action {
     __internalType: MiniRxActionType;
