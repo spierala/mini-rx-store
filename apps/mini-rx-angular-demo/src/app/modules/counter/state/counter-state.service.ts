@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FeatureStore, InstantiationMode } from 'mini-rx-store';
 
+export class ComponentStore<T extends object> extends FeatureStore<T> {
+    constructor(initialState: T) {
+        super('', initialState, { instantiation: InstantiationMode.MULTIPLE_DETACHED });
+    }
+}
+
 interface CounterState {
     count: number;
 }
@@ -11,13 +17,11 @@ const initialState: CounterState = {
 };
 
 @Injectable()
-export class CounterStateService extends FeatureStore<CounterState> {
+export class CounterStateService extends ComponentStore<CounterState> {
     count$: Observable<number> = this.select((state) => state.count);
 
     constructor() {
-        super('counter', initialState, {
-            instantiation: InstantiationMode.MULTIPLE_DETACHED,
-        });
+        super(initialState);
     }
 
     increment() {
