@@ -2,6 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.8](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.7...mini-rx-store-4.0.0-alpha.8) (2022-06-01)
+
 ## [4.0.0-alpha.7](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.6...mini-rx-store-4.0.0-alpha.7) (2022-05-20)
 
 
