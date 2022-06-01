@@ -13,7 +13,7 @@ function getInitialState(): CounterState {
 }
 
 @Injectable()
-export class CounterStoreService extends FeatureStore<any> {
+export class ArtStateService extends FeatureStore<any> {
     opacity$: Observable<number> = this.select((state) => state.count / 10);
 
     constructor() {
