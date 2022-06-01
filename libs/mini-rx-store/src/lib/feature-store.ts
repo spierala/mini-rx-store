@@ -130,7 +130,8 @@ function createFeatureReducer<StateType>(
 
 const key: keyof SetStateAction<any> = '__internalType';
 const type: MiniRxActionType = 'set-state';
+
 // Type predicate
-export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
+function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
     return action[key] === type;
 }
