@@ -21,9 +21,7 @@ function createSetStateFnWithDispatch<StateType>(
 ): SetStateFn<StateType> {
     return (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
         const action = new SetStateAction(stateOrCallback, internalFeatureId, featureKey, name);
-
         StoreCore.dispatch(action);
-
         return action;
     };
 }

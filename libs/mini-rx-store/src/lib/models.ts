@@ -9,9 +9,9 @@ export const enum ExtensionSortOrder {
 }
 
 export const enum InstantiationMode {
-    SINGLE = 'SINGLE',
-    MULTIPLE = 'MULTIPLE',
-    MULTIPLE_DETACHED = 'MULTIPLE_DETACHED',
+    SINGLE,
+    MULTIPLE,
+    MULTIPLE_DETACHED,
 }
 
 export type AppState = Record<string, any>;
