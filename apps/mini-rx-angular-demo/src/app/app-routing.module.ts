@@ -4,6 +4,7 @@ import { TodoShellComponent } from './modules/todo/components/todo-shell/todo-sh
 import { APP_BASE_HREF } from '@angular/common';
 import { CounterShellComponent } from './modules/counter/counter-shell/counter-shell.component';
 import { UserShellComponent } from './modules/user/components/user-shell/user-shell.component';
+import { ArtShellComponent } from './modules/art/components/counter-shell/art-shell.component';
 
 const appRoutes: Routes = [
     {
@@ -14,6 +15,10 @@ const appRoutes: Routes = [
         path: 'products',
         loadChildren: () =>
             import('./modules/products/products.module').then((m) => m.ProductsModule),
+    },
+    {
+        path: 'art',
+        component: ArtShellComponent,
     },
     {
         path: 'counter',

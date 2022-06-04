@@ -1,20 +1,13 @@
-import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
-import { miniRxError, select } from './utils';
+import { miniRxError } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { MiniRxActionType, SetStateAction } from './actions';
+import { SimpleStore } from './simple-store';
 
-export class FeatureStore<StateType extends object> {
-    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
-        this.initialState
-    );
-    state$: Observable<StateType> = this.stateSource.asObservable();
-    get state(): StateType {
-        return this.stateSource.getValue();
-    }
-
+export class FeatureStore<StateType extends object> extends SimpleStore<StateType> {
     // tslint:disable-next-line:variable-name
     private readonly _featureKey: string;
     get featureKey(): string {
@@ -26,56 +19,35 @@ export class FeatureStore<StateType extends object> {
 
     constructor(
         featureKey: string,
-        private initialState: StateType,
-        private config: { multi?: boolean; detached?: boolean } = {}
+        initialState: StateType,
+        private config: { multi?: boolean } = {}
     ) {
+        super(initialState);
+
         this.internalFeatureId = getInternalFeatureId();
 
-        if (!config.detached) {
-            this._featureKey = StoreCore.addFeature<StateType>(
-                featureKey,
-                createFeatureReducer(this.internalFeatureId, initialState),
-                config
-            );
+        this._featureKey = StoreCore.addFeature<StateType>(
+            featureKey,
+            createFeatureReducer(this.internalFeatureId, initialState),
+            config
+        );
 
-            this.sub.add(
-                StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
-            );
-        } else {
-            this._featureKey = featureKey;
-        }
+        this.sub.add(
+            StoreCore.select((state) => state[this.featureKey]).subscribe(this['stateSource'])
+        );
     }
 
-    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        // TODO create setState fn once instead of always checking config.detached
+    override setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+        const action = new SetStateAction(
+            stateOrCallback,
+            this.internalFeatureId,
+            this.featureKey,
+            name
+        );
 
-        if (this.config.detached) {
-            this.stateSource.next(calcNewState(this.state, stateOrCallback));
-            return {
-                // TODO do not return an Action, conditional typing: return void if config.detached = true
-                type: 'bla',
-            };
-        } else {
-            const action = new SetStateAction(
-                stateOrCallback,
-                this.internalFeatureId,
-                this.featureKey,
-                name
-            );
+        StoreCore.dispatch(action);
 
-            StoreCore.dispatch(action);
-
-            return action;
-        }
-    }
-
-    select(): Observable<StateType>;
-    select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    select(mapFn?: any): Observable<any> {
-        if (!mapFn) {
-            return this.state$;
-        }
-        return this.state$.pipe(select(mapFn));
+        return action;
     }
 
     effect<
@@ -140,7 +112,7 @@ function createFeatureReducer<StateType>(
     };
 }
 
-function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
+export function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
     const newPartialState =
         typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
     return {

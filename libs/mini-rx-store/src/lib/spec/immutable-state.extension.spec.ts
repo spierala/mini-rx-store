@@ -124,7 +124,7 @@ describe('Immutable State Extension', () => {
     it('should throw when mutating selected state from a FeatureStore', () => {
         let selectedFeatureState: CounterState;
 
-        fs.select().subscribe(state => selectedFeatureState = state);
+        fs.select().subscribe((state) => (selectedFeatureState = state));
 
         expect(() => (selectedFeatureState.counter = 123)).toThrow();
     });
