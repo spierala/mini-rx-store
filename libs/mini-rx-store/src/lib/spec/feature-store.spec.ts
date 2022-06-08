@@ -327,7 +327,7 @@ describe('FeatureStore', () => {
         expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
     });
 
-    it('should dispatch a set-state default action', () => {
+    it('should dispatch a set-state action', () => {
         userFeature.resetState();
 
         const spy = jest.fn();
@@ -338,7 +338,7 @@ describe('FeatureStore', () => {
                 type: '@mini-rx/set-state/user2/updateCity',
                 stateOrCallback: { city: 'NY' },
                 __internalType: 'set-state',
-                __internalFeatureId: expect.any(Number),
+                __internalFeatureId: expect.any(String),
             })
         );
     });

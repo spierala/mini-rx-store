@@ -10,7 +10,7 @@ export class SetStateAction<T> implements Action {
 
     constructor(
         public stateOrCallback: StateOrCallback<T>,
-        public __internalFeatureId: number,
+        public __internalFeatureId: string,
         featureKey: string,
         name?: string
     ) {

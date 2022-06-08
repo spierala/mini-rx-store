@@ -1,7 +1,7 @@
 import { isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
-import { miniRxError, select } from './utils';
+import { generateId, miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { MiniRxActionType, SetStateAction } from './actions';
@@ -25,10 +25,10 @@ export class FeatureStore<StateType extends object> {
     }
 
     private sub = new Subscription();
-    private readonly internalFeatureId: number;
+    private readonly internalFeatureId: string;
 
     constructor(featureKey: string, initialState: StateType, config: { multi?: boolean } = {}) {
-        this.internalFeatureId = getInternalFeatureId();
+        this.internalFeatureId = generateId();
 
         this._featureKey = StoreCore.addFeature<StateType>(
             featureKey,
@@ -101,13 +101,8 @@ export class FeatureStore<StateType extends object> {
     }
 }
 
-let internalFeatureId = 1;
-export function getInternalFeatureId() {
-    return internalFeatureId++;
-}
-
 function createFeatureReducer<StateType>(
-    internalFeatureId: number,
+    internalFeatureId: string,
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action): StateType => {

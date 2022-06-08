@@ -10,7 +10,7 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { miniRxError, select } from './utils';
+import { generateId, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { MiniRxAction } from './actions';
@@ -213,12 +213,6 @@ function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> 
             reducer
         );
     };
-}
-
-// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
-// This isn't a real GUID!
-function generateId() {
-    return Math.random().toString(36).slice(2);
 }
 
 // Created once to initialize singleton
