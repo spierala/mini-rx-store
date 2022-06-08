@@ -1,5 +1,5 @@
 import { isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { Action, Reducer, StateOrCallback } from './models';
+import { Action, FeatureStoreInstanceConfig, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { generateId, miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
@@ -27,7 +27,11 @@ export class FeatureStore<StateType extends object> {
     private sub = new Subscription();
     private readonly internalFeatureId: string;
 
-    constructor(featureKey: string, initialState: StateType, config: { multi?: boolean } = {}) {
+    constructor(
+        featureKey: string,
+        initialState: StateType,
+        config: FeatureStoreInstanceConfig = {}
+    ) {
         this.internalFeatureId = generateId();
 
         this._featureKey = StoreCore.addFeature<StateType>(
@@ -127,4 +131,12 @@ const type: MiniRxActionType = 'set-state';
 // Type predicate
 export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
     return action[key] === type;
+}
+
+export function createFeatureStore<T extends object>(
+    featureKey: string,
+    initialState: T,
+    config: FeatureStoreInstanceConfig = {}
+): FeatureStore<T> {
+    return new FeatureStore<T>(featureKey, initialState, config);
 }

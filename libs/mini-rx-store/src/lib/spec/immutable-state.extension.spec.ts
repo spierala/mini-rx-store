@@ -2,8 +2,7 @@ import { counterInitialState, CounterState, store } from './_spec-helpers';
 import { ImmutableStateExtension, storeFreeze } from '../extensions/immutable-state.extension';
 import { Action, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
-import { FeatureStore } from '../feature-store';
-import { createFeatureStore } from '../store';
+import { FeatureStore, createFeatureStore } from '../feature-store';
 import StoreCore from '../store-core';
 
 export function counterReducerWithMutation(
@@ -124,7 +123,7 @@ describe('Immutable State Extension', () => {
     it('should throw when mutating selected state from a FeatureStore', () => {
         let selectedFeatureState: CounterState;
 
-        fs.select().subscribe(state => selectedFeatureState = state);
+        fs.select().subscribe((state) => (selectedFeatureState = state));
 
         expect(() => (selectedFeatureState.counter = 123)).toThrow();
     });

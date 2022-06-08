@@ -1,6 +1,5 @@
 import { AppState, FeatureStoreConfig, Reducer, StoreConfig } from './models';
 import StoreCore from './store-core';
-import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
 
 export class Store {
@@ -36,13 +35,6 @@ export class Store {
 
 export function configureStore<T>(config: Partial<StoreConfig<T>>): Store {
     return Store.configureStore(config);
-}
-
-export function createFeatureStore<T extends object>(
-    featureKey: string,
-    initialState: T
-): FeatureStore<T> {
-    return new FeatureStore<T>(featureKey, initialState);
 }
 
 export const actions$ = StoreCore.actions$;
