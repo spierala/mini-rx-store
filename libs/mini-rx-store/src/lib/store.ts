@@ -1,13 +1,19 @@
-import { AppState, StoreConfig } from './models';
+import { AppState, FeatureStoreConfig, Reducer, StoreConfig } from './models';
 import StoreCore from './store-core';
-import { FeatureStore } from './feature-store';
 import { miniRxError } from './utils';
 
 export class Store {
     private static instance: Store | undefined = undefined;
 
     // Public Store API
-    feature = StoreCore.addFeature.bind(StoreCore);
+    feature<StateType>(
+        featureKey: string,
+        reducer: Reducer<StateType>,
+        config?: FeatureStoreConfig<StateType>
+    ) {
+        StoreCore.addFeature<StateType>(featureKey, reducer, config);
+    }
+
     dispatch = StoreCore.dispatch.bind(StoreCore);
     select = StoreCore.select.bind(StoreCore);
     effect = StoreCore.effect.bind(StoreCore);
@@ -29,13 +35,6 @@ export class Store {
 
 export function configureStore<T>(config: Partial<StoreConfig<T>>): Store {
     return Store.configureStore(config);
-}
-
-export function createFeatureStore<T extends object>(
-    featureKey: string,
-    initialState: T
-): FeatureStore<T> {
-    return new FeatureStore<T>(featureKey, initialState);
 }
 
 export const actions$ = StoreCore.actions$;

@@ -10,7 +10,7 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { miniRxError, select } from './utils';
+import { generateId, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { MiniRxAction } from './actions';
@@ -106,13 +106,18 @@ class StoreCore {
         config: {
             metaReducers?: MetaReducer<StateType>[];
             initialState?: StateType;
+            multi?: boolean;
         } = {}
-    ) {
+    ): string {
         reducer = config.metaReducers?.length
             ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
             : reducer;
 
-        checkFeatureExists(featureKey, this.featureReducers);
+        if (!config.multi) {
+            checkFeatureExists(featureKey, this.featureReducers);
+        } else {
+            featureKey = featureKey + '-' + generateId();
+        }
 
         if (typeof config.initialState !== 'undefined') {
             reducer = createReducerWithInitialState(reducer, config.initialState);
@@ -120,6 +125,7 @@ class StoreCore {
 
         this.addReducer(featureKey, reducer);
         this.dispatch(new MiniRxAction('init-feature', featureKey));
+        return featureKey;
     }
 
     removeFeature(featureKey: string) {

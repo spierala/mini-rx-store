@@ -1,4 +1,4 @@
-import { actions$, configureStore, createFeatureStore } from '../store';
+import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
 import { Action, ActionWithPayload, Reducer, StoreExtension } from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
@@ -7,7 +7,7 @@ import { ofType } from '../utils';
 import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
-import { FeatureStore } from '../feature-store';
+import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
     counterInitialState,
     counterReducer,

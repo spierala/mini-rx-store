@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FeatureStore } from 'mini-rx-store';
 
-let id = 1;
-
 interface CounterState {
     count: number;
 }
@@ -17,7 +15,7 @@ export class CounterStateService extends FeatureStore<CounterState> {
     count$: Observable<number> = this.select((state) => state.count);
 
     constructor() {
-        super('counter-' + id++, initialState); // The counter Feature Stores need a unique feature key
+        super('counter', initialState, { multi: true });
     }
 
     increment() {
