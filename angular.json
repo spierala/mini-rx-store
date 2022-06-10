@@ -1,9 +1,9 @@
 {
-    "version": 2,
-    "projects": {
-        "mini-rx-angular-demo": "apps/mini-rx-angular-demo",
-        "mini-rx-angular-demo-e2e": "apps/mini-rx-angular-demo-e2e",
-        "mini-rx-store": "libs/mini-rx-store",
-        "mini-rx-store-ng": "libs/mini-rx-store-ng"
-    }
+  "version": 2,
+  "projects": {
+    "mini-rx-angular-demo": "apps/mini-rx-angular-demo",
+    "mini-rx-angular-demo-e2e": "apps/mini-rx-angular-demo-e2e",
+    "mini-rx-store": "libs/mini-rx-store",
+    "mini-rx-store-ng": "libs/mini-rx-store-ng"
+  }
 }

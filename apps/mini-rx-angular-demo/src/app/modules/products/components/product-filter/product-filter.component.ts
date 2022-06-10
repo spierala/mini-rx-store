@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 
@@ -19,8 +19,8 @@ export class ProductFilterComponent implements OnInit, OnDestroy {
     @Output()
     searchChanged = new EventEmitter<string>();
 
-    searchInput: FormControl = new FormControl();
-    formGroup: FormGroup = new FormGroup({
+    searchInput: UntypedFormControl = new UntypedFormControl();
+    formGroup: UntypedFormGroup = new UntypedFormGroup({
         search: this.searchInput,
     });
 

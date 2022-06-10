@@ -1,6 +1,6 @@
 {
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
-    "root": "apps/mini-rx-angular-demo",
     "sourceRoot": "apps/mini-rx-angular-demo/src",
     "prefix": "app",
     "targets": {
@@ -89,7 +89,7 @@
             "executor": "@nrwl/jest:jest",
             "outputs": ["coverage/apps/mini-rx-angular-demo"],
             "options": {
-                "jestConfig": "apps/mini-rx-angular-demo/jest.config.js",
+                "jestConfig": "apps/mini-rx-angular-demo/jest.config.ts",
                 "passWithNoTests": true
             }
         },

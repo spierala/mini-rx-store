@@ -7,7 +7,7 @@ import {
     OnInit,
     Output,
 } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Filter } from '../../models/filter';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -27,11 +27,11 @@ export class FilterComponent implements OnInit, OnDestroy {
     @Output()
     filterUpdate = new EventEmitter<Filter>();
 
-    formGroup: FormGroup = new FormGroup({
-        search: new FormControl(),
-        category: new FormGroup({
-            isBusiness: new FormControl(),
-            isPrivate: new FormControl(),
+    formGroup: UntypedFormGroup = new UntypedFormGroup({
+        search: new UntypedFormControl(),
+        category: new UntypedFormGroup({
+            isBusiness: new UntypedFormControl(),
+            isPrivate: new UntypedFormControl(),
         }),
     });
 

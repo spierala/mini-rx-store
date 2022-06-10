@@ -1,5 +1,5 @@
 {
-    "root": "libs/mini-rx-store",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "libs/mini-rx-store/src",
     "projectType": "library",
     "targets": {
@@ -42,7 +42,7 @@
             "executor": "@nrwl/jest:jest",
             "outputs": ["coverage/libs/mini-rx-store"],
             "options": {
-                "jestConfig": "libs/mini-rx-store/jest.config.js",
+                "jestConfig": "libs/mini-rx-store/jest.config.ts",
                 "passWithNoTests": true
             }
         },
