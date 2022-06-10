@@ -11,7 +11,7 @@
                 "tsConfig": "libs/mini-rx-store/tsconfig.lib.json",
                 "project": "libs/mini-rx-store/package.json",
                 "entryFile": "libs/mini-rx-store/src/index.ts",
-                "format": ["esm", "umd", "cjs"],
+                "format": ["esm", "umd"],
                 "globals": [
                     {
                         "global": "Rx",
