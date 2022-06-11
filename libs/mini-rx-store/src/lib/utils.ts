@@ -34,7 +34,7 @@ export function isSetStateAction<T>(action: Action): action is SetStateAction<T>
     return action[key] === type;
 }
 
-export function beautifyActionsForLogging(action: Action, state: AppState): Action {
+export function beautifyActionForLogging(action: Action, state: AppState): Action {
     if (isSetStateAction(action)) {
         return mapSetStateActionToActionWithPayload(action, state);
     }

@@ -5,25 +5,18 @@ import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import { actions$ } from '../store';
 import StoreCore from '../store-core';
-import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
+import {
+    counterInitialState,
+    counterReducer,
+    CounterState,
+    store,
+    userState,
+    UserState,
+} from './_spec-helpers';
 import { Action, Reducer } from '../models';
 import { tapResponse } from 'mini-rx-store';
 
-interface UserState {
-    firstName: string;
-    lastName: string;
-    city: string;
-    country: string;
-    err: string | undefined;
-}
-
-const initialState: UserState = {
-    firstName: 'Bruce',
-    lastName: 'Willis',
-    city: 'LA',
-    country: 'United States',
-    err: undefined,
-};
+const initialState: UserState = userState;
 
 const asyncUser: UserState = {
     firstName: 'Steven',

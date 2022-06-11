@@ -4,7 +4,8 @@ import {
     ReduxDevtoolsOptions,
 } from '../extensions/redux-devtools.extension';
 import { Action } from '../models';
-import { counterReducer, CounterState, store } from './_spec-helpers';
+import { counterReducer, CounterState, store, userState, UserState } from './_spec-helpers';
+import { createFeatureStore, FeatureStore } from 'mini-rx-store';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
@@ -25,10 +26,18 @@ const connectFn = jest.fn().mockImplementation(() => {
     };
 });
 
+let fs: FeatureStore<UserState>;
+
 describe('Redux Dev Tools', () => {
     beforeAll(() => {
         store.feature<CounterState>('devToolsCounter', counterReducer);
+        fs = createFeatureStore('user', userState);
     });
+
+    beforeEach(() => {
+        sendFn.mockReset();
+    });
+
     it('should connect to Store', () => {
         const options: Partial<ReduxDevtoolsOptions> = {
             name: 'test',
@@ -60,6 +69,33 @@ describe('Redux Dev Tools', () => {
         });
     });
 
+    it('should receive state and a SetStateAction with only type and payload', () => {
+        fs.setState((state) => ({
+            firstName: 'Cage',
+        }));
+
+        let currAppState = {};
+        store.select((state) => state).subscribe((state) => (currAppState = state));
+
+        expect(sendFn).toHaveBeenCalledTimes(1);
+        expect(sendFn).toHaveBeenCalledWith(
+            {
+                type: '@mini-rx/set-state/user',
+                payload: {
+                    firstName: 'Cage',
+                },
+            },
+            {
+                ...currAppState,
+                devToolsCounter: { counter: 2 },
+                user: {
+                    ...userState,
+                    firstName: 'Cage',
+                },
+            }
+        );
+    });
+
     it('should update the Store state', () => {
         const spy = jest.spyOn(StoreCore, 'updateState');
 
@@ -79,7 +115,7 @@ describe('Redux Dev Tools', () => {
         extension['onDevToolsMessage']({
             type: 'NOT_SUPPORTED_TYPE',
             payload: {},
-            state: {}
+            state: {},
         });
 
         expect(spy).toHaveBeenCalledTimes(0);

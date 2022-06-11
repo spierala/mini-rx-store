@@ -1,22 +1,6 @@
-import { counterReducer, resetStoreConfig } from './_spec-helpers';
+import { counterReducer, resetStoreConfig, userState } from './_spec-helpers';
 import { createFeatureStore, LoggerExtension } from 'mini-rx-store';
 import StoreCore from '../store-core';
-
-interface UserState {
-    firstName: string;
-    lastName: string;
-    city: string;
-    country: string;
-    err: string | undefined;
-}
-
-const initialState: UserState = {
-    firstName: 'Bruce',
-    lastName: 'Willis',
-    city: 'LA',
-    country: 'United States',
-    err: undefined,
-};
 
 describe('LoggerExtension', () => {
     beforeEach(() => {
@@ -47,7 +31,7 @@ describe('LoggerExtension', () => {
     });
 
     it('should log a SetStateAction with only type and payload', () => {
-        const fs = createFeatureStore('user', initialState);
+        const fs = createFeatureStore('user', userState);
 
         console.log = jest.fn();
 
@@ -68,7 +52,7 @@ describe('LoggerExtension', () => {
             expect.stringContaining('State: '),
             {
                 user: {
-                    ...initialState,
+                    ...userState,
                     firstName: 'Cage',
                 },
             }

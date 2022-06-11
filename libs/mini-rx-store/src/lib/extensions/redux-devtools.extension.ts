@@ -1,7 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { Action, AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import { beautifyActionsForLogging } from '../utils';
+import { beautifyActionForLogging } from '../utils';
 
 const win = window as any;
 
@@ -36,7 +36,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
                 .pipe(
                     withLatestFrom(StoreCore.state$),
                     tap(([action, state]) => {
-                        let actionForDevTools: Action = beautifyActionsForLogging(action, state);
+                        let actionForDevTools: Action = beautifyActionForLogging(action, state);
                         this.devtoolsConnection.send(actionForDevTools, state);
                     })
                 )
