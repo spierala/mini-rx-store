@@ -1,9 +1,9 @@
-import { FeatureStore } from '../feature-store';
+import { createFeatureStore, FeatureStore } from '../feature-store';
 import { mergeMap, tap } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
-import { actions$, createFeatureStore } from '../store';
+import { actions$ } from '../store';
 import StoreCore from '../store-core';
 import { counterInitialState, counterReducer, CounterState, store } from './_spec-helpers';
 import { Action, Reducer } from '../models';
@@ -327,7 +327,7 @@ describe('FeatureStore', () => {
         expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
     });
 
-    it('should dispatch a set-state default action', () => {
+    it('should dispatch a set-state action', () => {
         userFeature.resetState();
 
         const spy = jest.fn();
@@ -338,7 +338,7 @@ describe('FeatureStore', () => {
                 type: '@mini-rx/set-state/user2/updateCity',
                 stateOrCallback: { city: 'NY' },
                 __internalType: 'set-state',
-                __internalFeatureId: expect.any(Number),
+                __internalFeatureId: expect.any(String),
             })
         );
     });
@@ -417,5 +417,68 @@ describe('FeatureStore', () => {
         const spy = jest.spyOn(fs, 'destroy');
         fs.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should allow many instances of the same feature store with config.multi', () => {
+        const featureKey = 'multi-counter';
+
+        class Fs extends FeatureStore<CounterState> {
+            constructor() {
+                super(featureKey, counterInitialState, { multi: true });
+            }
+
+            increment(): Action {
+                return this.setState({
+                    counter: this.state.counter + 1,
+                });
+            }
+        }
+
+        const fs1 = new Fs();
+        const fs2 = new Fs();
+        const fs3 = new Fs();
+        const fs4 = createFeatureStore(featureKey, counterInitialState, { multi: true }); // Functional creation method should also support multi: true
+
+        function incrementFs4(): void {
+            fs4.setState((state) => ({ counter: state.counter + 1 }));
+        }
+
+        const spy = jest.fn();
+        const spy2 = jest.fn();
+        const spy3 = jest.fn();
+
+        const fs2FeatureKey = fs2.featureKey;
+        const getFs2Feature = createFeatureSelector<CounterState>(fs2FeatureKey);
+        const getFs2Counter = createSelector(getFs2Feature, (state) => state?.counter);
+
+        const fs3FeatureKey = fs3.featureKey;
+        const getFs3Feature = createFeatureSelector<CounterState>(fs3FeatureKey);
+        const getFs3Counter = createSelector(getFs3Feature, (state) => state?.counter);
+
+        const fs4FeatureKey = fs4.featureKey;
+        const getFs4Feature = createFeatureSelector<CounterState>(fs4FeatureKey);
+        const getFs4Counter = createSelector(getFs4Feature, (state) => state?.counter);
+
+        store.select(getFs2Counter).subscribe(spy);
+        store.select(getFs3Counter).subscribe(spy2);
+        store.select(getFs4Counter).subscribe(spy3);
+
+        fs2.increment();
+
+        fs3.increment();
+        fs3.increment();
+
+        incrementFs4();
+        incrementFs4();
+        incrementFs4();
+
+        fs3.destroy();
+
+        expect(spy.mock.calls).toEqual([[1], [2]]);
+        expect(spy2.mock.calls).toEqual([[1], [2], [3], [undefined]]);
+        expect(spy3.mock.calls).toEqual([[1], [2], [3], [4]]);
+
+        expect(fs2FeatureKey).toContain('multi-counter-');
+        expect(fs3FeatureKey).toContain('multi-counter-');
     });
 });

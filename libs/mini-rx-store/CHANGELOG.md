@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.9](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.8...mini-rx-store-4.0.0-alpha.9) (2022-06-08)
+
+
+### Features
+
+* **mini-rx-store:** createFeatureStore with config.multi ([5bdb2b4](https://github.com/spierala/mini-rx-store/commit/5bdb2b465a0ffd5c6b102d47e543891b2dde7b38))
+* **mini-rx-store:** FeatureStore config.multi: Allow to have multiple instances of the same Store ([b5893c8](https://github.com/spierala/mini-rx-store/commit/b5893c8833c368e0b9c561883c02b712fc0c3d1b))
+
 ## [4.0.0-alpha.8](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.7...mini-rx-store-4.0.0-alpha.8) (2022-06-01)
 
 ## [4.0.0-alpha.7](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.6...mini-rx-store-4.0.0-alpha.7) (2022-05-20)

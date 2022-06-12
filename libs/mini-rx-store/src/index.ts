@@ -2,9 +2,9 @@
  * Public API Surface of mini-rx-store
  */
 
-export { actions$, Store, configureStore, createFeatureStore } from './lib/store';
+export { actions$, Store, configureStore } from './lib/store';
 export { default as _StoreCore } from './lib/store-core';
-export { FeatureStore } from './lib/feature-store';
+export { FeatureStore, createFeatureStore } from './lib/feature-store';
 export { createFeatureSelector, createSelector } from './lib/selector';
 export {
     Action,
