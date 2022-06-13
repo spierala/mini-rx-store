@@ -9,15 +9,6 @@ describe('mapResponse', () => {
         of(1, 2, 3).pipe(mapResponse(nextCallback, noop)).subscribe();
 
         expect(nextCallback.mock.calls).toEqual([[1], [2], [3]]);
-
-        // nextCallback.mockReset();
-
-        // with object parameter
-        // of(1, 2, 3)
-        //     .pipe(tapResponse({ next: nextCallback, error: noop }))
-        //     .subscribe();
-        //
-        // expect(nextCallback.mock.calls).toEqual([[1], [2], [3]]);
     });
 
     it('should invoke error callback on error', () => {
@@ -30,15 +21,6 @@ describe('mapResponse', () => {
             .subscribe();
 
         expect(errorCallback).toHaveBeenCalledWith(error);
-
-        // errorCallback.mockReset();
-
-        // with object parameter
-        // throwError(() => error)
-        //     .pipe(tapResponse({ error: errorCallback }))
-        //     .subscribe();
-        //
-        // expect(errorCallback).toHaveBeenCalledWith(error);
     });
 
     it('should not unsubscribe from outer observable on inner observable error', () => {
@@ -61,20 +43,62 @@ describe('mapResponse', () => {
         expect(outerCompleteCallback).not.toHaveBeenCalled();
     });
 
-    it('should return one or many actions on next', () => {
-        const nextCallback = jest.fn<Action, [number]>();
+    it('should return one action on next', () => {
+        const spy = jest.fn<void, [Action | Action[]]>();
 
-        of(1, 2, 3).pipe(mapResponse(nextCallback, noop)).subscribe();
+        const action: Action = { type: 'action1' };
 
-        expect(nextCallback.mock.calls).toEqual([[1], [2], [3]]);
+        of(1)
+            .pipe(mapResponse(() => action, noop))
+            .subscribe((v) => spy(v));
 
-        // nextCallback.mockReset();
+        expect(spy.mock.calls).toEqual([[action]]);
+    });
 
-        // with object parameter
-        // of(1, 2, 3)
-        //     .pipe(tapResponse({ next: nextCallback, error: noop }))
-        //     .subscribe();
-        //
-        // expect(nextCallback.mock.calls).toEqual([[1], [2], [3]]);
+    it('should return many actions on next', () => {
+        const spy = jest.fn<void, [Action | Action[]]>();
+
+        const action1: Action = { type: 'action1' };
+        const action2: Action = { type: 'action2' };
+
+        of(1)
+            .pipe(mapResponse(() => [action1, action2], noop))
+            .subscribe((v) => spy(v));
+
+        expect(spy.mock.calls).toEqual([[action1], [action2]]);
+    });
+
+    it('should (optionally) return one or many action on error', () => {
+        const nextCallback = jest.fn<Action | Action, [number]>();
+        const error = { message: 'error' };
+        const action1: Action = { type: 'action1' };
+        const action2: Action = { type: 'action1' };
+
+        const spy = jest.fn<void, [Action | Action[]]>();
+
+        // One Action
+        throwError(() => error)
+            .pipe(mapResponse(nextCallback, () => action1))
+            .subscribe(spy);
+
+        expect(spy.mock.calls).toEqual([[action1]]);
+
+        spy.mockReset();
+
+        // Many Actions
+        throwError(() => error)
+            .pipe(mapResponse(nextCallback, () => [action1, action2]))
+            .subscribe(spy);
+
+        expect(spy.mock.calls).toEqual([[action1], [action2]]);
+
+        spy.mockReset();
+
+        // No Action
+        throwError(() => error)
+            .pipe(mapResponse(nextCallback, noop))
+            .subscribe(spy);
+
+        expect(spy).not.toHaveBeenCalled();
     });
 });
