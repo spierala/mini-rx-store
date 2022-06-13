@@ -8,9 +8,9 @@ export function mapResponse<T>(
 ): (source: Observable<T>) => Observable<Action | Action[]> {
     return (source) =>
         source.pipe(
-            map(mapFn),
+            map((v) => mapFn(v)),
             catchError((err) => {
-                const errorFnResult: Action | Action[] | void = errorFn(err);
+                const errorFnResult = errorFn(err);
                 return errorFnResult
                     ? Array.isArray(errorFnResult)
                         ? from(errorFnResult)
