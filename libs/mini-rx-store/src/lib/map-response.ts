@@ -1,5 +1,5 @@
-import { EMPTY, from, mergeMap, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { EMPTY, from, Observable, of } from 'rxjs';
+import { catchError, mergeMap, map } from 'rxjs/operators';
 import { Action } from 'mini-rx-store';
 
 export function mapResponse<T>(
