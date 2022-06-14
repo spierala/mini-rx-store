@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.10](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.9...mini-rx-store-4.0.0-alpha.10) (2022-06-14)
+
+
+### Features
+
+* **mini-rx-store:** mapResponse ([93a6dc9](https://github.com/spierala/mini-rx-store/commit/93a6dc97f99e8c01e14ee985b18184738c67f0dc))
+* **mini-rx-store:** mapResponse ([98a2b05](https://github.com/spierala/mini-rx-store/commit/98a2b057c3a118c39e1f4fe3fedb720e04c2d8d4))
+* **mini-rx-store:** mapResponse ([44c51f8](https://github.com/spierala/mini-rx-store/commit/44c51f885f1a4d5d4bc2ba95ae5b8127d7509882))
+
+
+### Bug Fixes
+
+* **mini-rx-store:** log setState callback result in devtools and logger extension ([dafbf6c](https://github.com/spierala/mini-rx-store/commit/dafbf6cb8bf3335e86a294435b696f9a510158f6))
+* **mini-rx-store:** log setState callback result in devtools and logger extension: UTs ([c60b17b](https://github.com/spierala/mini-rx-store/commit/c60b17b13e372e0df3204ed452f057139ebb5664))
+* **mini-rx-store:** log setState callback result in devtools and logger extension: UTs ([a3d326f](https://github.com/spierala/mini-rx-store/commit/a3d326f545d61e4d693c4f7293d3f2ca3f9d8f10))
+
 ## [4.0.0-alpha.9](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.8...mini-rx-store-4.0.0-alpha.9) (2022-06-08)
 
 
