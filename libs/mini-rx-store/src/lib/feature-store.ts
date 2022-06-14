@@ -1,10 +1,10 @@
 import { isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, FeatureStoreInstanceConfig, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
-import { generateId, miniRxError, select } from './utils';
+import { generateId, isSetStateAction, miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { MiniRxActionType, SetStateAction } from './actions';
+import { SetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
     state$: Observable<StateType> = StoreCore.select((state) => state[this.featureKey]);
@@ -124,14 +124,6 @@ function createFeatureReducer<StateType>(
         }
         return state;
     };
-}
-
-const key: keyof SetStateAction<any> = '__internalType';
-const type: MiniRxActionType = 'set-state';
-
-// Type predicate
-function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
-    return action[key] === type;
 }
 
 export function createFeatureStore<T extends object>(

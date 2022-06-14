@@ -11,7 +11,7 @@ export class SetStateAction<T> implements Action {
     constructor(
         public stateOrCallback: StateOrCallback<T>,
         public __internalFeatureId: string,
-        featureKey: string,
+        public featureKey: string,
         name?: string
     ) {
         this.__internalType = 'set-state';
@@ -20,12 +20,13 @@ export class SetStateAction<T> implements Action {
     }
 }
 
-export class MiniRxAction implements Action {
-    type: string;
-
-    constructor(miniRxActionType: MiniRxActionType, featureKey?: string) {
-        this.type = createMiniRxActionType(miniRxActionType, featureKey);
-    }
+export function createMiniRxAction(
+    miniRxActionType: MiniRxActionType,
+    featureKey?: string
+): Action {
+    return {
+        type: createMiniRxActionType(miniRxActionType, featureKey),
+    };
 }
 
 function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {

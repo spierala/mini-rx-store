@@ -3,6 +3,22 @@ import { configureStore, Store } from '../store';
 import { default as StoreCore } from '../store-core';
 import { v4 as uuid } from 'uuid';
 
+export interface UserState {
+    firstName: string;
+    lastName: string;
+    city: string;
+    country: string;
+    err: string | undefined;
+}
+
+export const userState: UserState = {
+    firstName: 'Bruce',
+    lastName: 'Willis',
+    city: 'LA',
+    country: 'United States',
+    err: undefined,
+};
+
 export const store: Store = configureStore({});
 
 export function resetStoreConfig() {
