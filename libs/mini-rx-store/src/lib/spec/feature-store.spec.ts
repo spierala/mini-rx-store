@@ -330,8 +330,8 @@ describe('FeatureStore', () => {
             expect.objectContaining({
                 type: '@mini-rx/set-state/user2/updateCity',
                 stateOrCallback: { city: 'NY' },
-                __internalType: 'set-state',
-                __internalFeatureId: expect.any(String),
+                miniRxActionType: 'set-state',
+                featureId: expect.any(String),
             })
         );
     });

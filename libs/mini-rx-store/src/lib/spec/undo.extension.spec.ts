@@ -7,7 +7,6 @@ import {
     counterStringInitialState,
     counterStringReducer,
     CounterStringState,
-    createUniqueCounterReducerWithAction,
     resetStoreConfig,
     store,
 } from './_spec-helpers';
@@ -15,7 +14,6 @@ import { undo, UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 import StoreCore from '../store-core';
-import { createFeatureStore } from 'mini-rx-store';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
