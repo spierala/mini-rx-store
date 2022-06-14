@@ -1,7 +1,7 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { Action, ActionWithPayload, AppState } from './models';
-import { MiniRxActionType, SetStateAction } from './actions';
+import { isSetStateAction, SetStateAction } from './actions';
 
 export const miniRxNameSpace = '@mini-rx';
 
@@ -24,14 +24,6 @@ export function miniRxError(message: string): never {
 // This isn't a real GUID!
 export function generateId() {
     return Math.random().toString(36).slice(2);
-}
-
-const key: keyof SetStateAction<any> = '__internalType';
-const type: MiniRxActionType = 'set-state';
-
-// Type predicate
-export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
-    return action[key] === type;
 }
 
 export function beautifyActionForLogging(action: Action, state: AppState): Action {
