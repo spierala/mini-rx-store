@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.11](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.10...mini-rx-store-4.0.0-alpha.11) (2022-06-14)
+
+
+### Bug Fixes
+
+* **mini-rx-store:** mapResponse: import mergeMap from rxjs/operators ([7d2ab3d](https://github.com/spierala/mini-rx-store/commit/7d2ab3dd6b6d5674f4fffd3e7d1c6ec30ae43b54))
+
 ## [4.0.0-alpha.10](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.9...mini-rx-store-4.0.0-alpha.10) (2022-06-14)
 
 
