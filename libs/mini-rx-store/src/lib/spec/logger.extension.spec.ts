@@ -3,6 +3,8 @@ import { createFeatureStore, LoggerExtension } from 'mini-rx-store';
 import StoreCore from '../store-core';
 
 describe('LoggerExtension', () => {
+    console.log = jest.fn();
+
     beforeEach(() => {
         resetStoreConfig();
 
@@ -12,8 +14,6 @@ describe('LoggerExtension', () => {
     });
 
     it('should log a dispatched Action', () => {
-        console.log = jest.fn();
-
         StoreCore.addFeature('counter', counterReducer);
 
         const action = { type: 'counter' };
@@ -32,8 +32,6 @@ describe('LoggerExtension', () => {
 
     it('should log a SetStateAction with only type and payload', () => {
         const fs = createFeatureStore('user', userState);
-
-        console.log = jest.fn();
 
         fs.setState((state) => ({
             firstName: 'Cage',
