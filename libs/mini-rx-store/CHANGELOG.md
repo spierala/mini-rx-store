@@ -2,6 +2,24 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.11](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.10...mini-rx-store-4.0.0-alpha.11) (2022-06-14)
+
+
+### Bug Fixes
+
+* **mini-rx-store:** mapResponse: import mergeMap from rxjs/operators ([7d2ab3d](https://github.com/spierala/mini-rx-store/commit/7d2ab3dd6b6d5674f4fffd3e7d1c6ec30ae43b54))
+
+## [4.0.0-alpha.10](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.9...mini-rx-store-4.0.0-alpha.10) (2022-06-14)
+
+
+### Features
+
+* **mini-rx-store:** mapResponse ([93a6dc9](https://github.com/spierala/mini-rx-store/commit/93a6dc97f99e8c01e14ee985b18184738c67f0dc))
+
+### Bug Fixes
+
+* **mini-rx-store:** log setState callback result in devtools and logger extension ([dafbf6c](https://github.com/spierala/mini-rx-store/commit/dafbf6cb8bf3335e86a294435b696f9a510158f6))
+
 ## [4.0.0-alpha.9](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.8...mini-rx-store-4.0.0-alpha.9) (2022-06-08)
 
 

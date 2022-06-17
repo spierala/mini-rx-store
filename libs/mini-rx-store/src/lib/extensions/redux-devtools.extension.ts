@@ -1,6 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { AppState, StoreExtension } from '../models';
+import { Action, AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
+import { beautifyActionForLogging } from '../utils';
 
 const win = window as any;
 
@@ -34,7 +35,10 @@ export class ReduxDevtoolsExtension extends StoreExtension {
             StoreCore.actions$
                 .pipe(
                     withLatestFrom(StoreCore.state$),
-                    tap(([action, state]) => this.devtoolsConnection.send(action, state))
+                    tap(([action, state]) => {
+                        let actionForDevTools: Action = beautifyActionForLogging(action, state);
+                        this.devtoolsConnection.send(actionForDevTools, state);
+                    })
                 )
                 .subscribe();
 
@@ -42,7 +46,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
         }
     }
 
-    private onDevToolsMessage(message: {type: string, payload: any, state: any}) {
+    private onDevToolsMessage(message: { type: string; payload: any; state: any }) {
         if (message.type === DevToolActions.DISPATCH) {
             switch (message.payload.type) {
                 case DevToolActions.JUMP_TO_STATE:

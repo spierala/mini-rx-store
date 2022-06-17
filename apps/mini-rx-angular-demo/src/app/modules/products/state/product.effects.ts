@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
+import { mergeMap, startWith } from 'rxjs/operators';
 
-import { from, of } from 'rxjs';
-import { catchError, map, mergeMap, startWith } from 'rxjs/operators';
-
-import { Action, Actions, undo } from 'mini-rx-store';
+import { Action, Actions, mapResponse, undo } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,
@@ -31,8 +29,10 @@ export class ProductEffects {
         ofType(load),
         mergeMap((action) =>
             this.productService.getProducts().pipe(
-                map((products) => loadSuccess(products)),
-                catchError((err) => of(loadFail(err)))
+                mapResponse(
+                    (products) => loadSuccess(products),
+                    (error) => loadFail(error)
+                )
             )
         )
     );
@@ -45,8 +45,10 @@ export class ProductEffects {
             const optimisticUpdateAction: Action = updateProductOptimistic(product);
 
             return this.productService.updateProduct(product).pipe(
-                map((updatedProduct) => updateProductSuccess(updatedProduct)),
-                catchError((err) => from([updateProductFail(err), undo(optimisticUpdateAction)])),
+                mapResponse(
+                    (updatedProduct) => updateProductSuccess(updatedProduct),
+                    (err) => [updateProductFail(err), undo(optimisticUpdateAction)]
+                ),
                 startWith(optimisticUpdateAction)
             );
         })
@@ -57,8 +59,10 @@ export class ProductEffects {
         toPayload(),
         mergeMap((product: Product) =>
             this.productService.createProduct(product).pipe(
-                map((newProduct) => createProductSuccess(newProduct)),
-                catchError((err) => of(createProductFail(err)))
+                mapResponse(
+                    (newProduct) => createProductSuccess(newProduct),
+                    (err) => createProductFail(err)
+                )
             )
         )
     );
@@ -68,8 +72,10 @@ export class ProductEffects {
         toPayload(),
         mergeMap((productId: number) =>
             this.productService.deleteProduct(productId).pipe(
-                map(() => deleteProductSuccess(productId)),
-                catchError((err) => of(deleteProductFail(err)))
+                mapResponse(
+                    () => deleteProductSuccess(productId),
+                    (err) => deleteProductFail(err)
+                )
             )
         )
     );

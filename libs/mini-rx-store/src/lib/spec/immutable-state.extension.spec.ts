@@ -2,7 +2,7 @@ import { counterInitialState, CounterState, store } from './_spec-helpers';
 import { ImmutableStateExtension, storeFreeze } from '../extensions/immutable-state.extension';
 import { Action, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
-import { FeatureStore, createFeatureStore } from '../feature-store';
+import { createFeatureStore, FeatureStore } from '../feature-store';
 import StoreCore from '../store-core';
 
 export function counterReducerWithMutation(

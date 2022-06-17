@@ -1,6 +1,7 @@
 import { OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action } from './models';
+import { Action, ActionWithPayload, AppState } from './models';
+import { isSetStateAction, SetStateAction } from './actions';
 
 export const miniRxNameSpace = '@mini-rx';
 
@@ -23,4 +24,24 @@ export function miniRxError(message: string): never {
 // This isn't a real GUID!
 export function generateId() {
     return Math.random().toString(36).slice(2);
+}
+
+export function beautifyActionForLogging(action: Action, state: AppState): Action {
+    if (isSetStateAction(action)) {
+        return mapSetStateActionToActionWithPayload(action, state);
+    }
+    return action;
+}
+
+function mapSetStateActionToActionWithPayload(
+    action: SetStateAction<any>,
+    state: AppState
+): ActionWithPayload {
+    const stateOrCallback = action.stateOrCallback;
+    const featureState = state[action.featureKey];
+    return {
+        type: action.type,
+        payload:
+            typeof stateOrCallback === 'function' ? stateOrCallback(featureState) : stateOrCallback,
+    };
 }
