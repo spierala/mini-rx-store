@@ -26,7 +26,7 @@
 
 import { Action, ExtensionSortOrder, Reducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import { miniRxNameSpace } from '../utils';
+import { miniRxNameSpace } from '../constants';
 
 const defaultBufferSize = 100;
 
