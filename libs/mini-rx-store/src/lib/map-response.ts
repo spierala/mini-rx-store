@@ -1,6 +1,6 @@
 import { EMPTY, from, Observable, of } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
-import { Action } from 'mini-rx-store';
+import { Action } from './models';
 
 export function mapResponse<T>(
     mapFn: (next: T) => Action | Action[],

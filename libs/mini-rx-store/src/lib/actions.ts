@@ -1,5 +1,4 @@
-import { Action } from 'mini-rx-store';
-import { StateOrCallback } from './models';
+import { StateOrCallback, Action } from './models';
 import { miniRxNameSpace } from './utils';
 
 export const enum MiniRxActionType {
