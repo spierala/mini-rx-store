@@ -14,7 +14,7 @@ import {
     UserState,
 } from './_spec-helpers';
 import { Action, Reducer } from '../models';
-import { tapResponse } from 'mini-rx-store';
+import { tapResponse } from '../tap-response';
 
 const initialState: UserState = userState;
 

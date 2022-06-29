@@ -1,6 +1,5 @@
-import { Action } from 'mini-rx-store';
-import { StateOrCallback } from './models';
-import { miniRxNameSpace } from './utils';
+import { StateOrCallback, Action } from './models';
+import { miniRxNameSpace } from './constants';
 
 export const enum MiniRxActionType {
     INIT_STORE = 'init-store',

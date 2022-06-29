@@ -1,6 +1,7 @@
 import { counterReducer, resetStoreConfig, userState } from './_spec-helpers';
-import { createFeatureStore, LoggerExtension } from 'mini-rx-store';
 import StoreCore from '../store-core';
+import { LoggerExtension } from '../extensions/logger.extension';
+import { createFeatureStore } from '../feature-store';
 
 describe('LoggerExtension', () => {
     console.log = jest.fn();

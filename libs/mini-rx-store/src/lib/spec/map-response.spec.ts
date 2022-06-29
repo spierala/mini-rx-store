@@ -1,6 +1,7 @@
 import { noop, Observable, of, throwError } from 'rxjs';
 import { concatMap, finalize } from 'rxjs/operators';
-import { Action, mapResponse } from 'mini-rx-store';
+import { Action } from '../models';
+import { mapResponse } from '../map-response';
 
 describe('mapResponse', () => {
     it('should invoke next callback on next', () => {
