@@ -1,6 +1,7 @@
-import { AppState, FeatureStoreConfig, Reducer, StoreConfig } from './models';
+import { Action, AppState, FeatureStoreConfig, Reducer, StoreConfig } from './models';
 import StoreCore from './store-core';
 import { miniRxError } from './utils';
+import { Observable } from 'rxjs';
 
 export class Store {
     private static instance: Store | undefined = undefined;
@@ -14,9 +15,9 @@ export class Store {
         StoreCore.addFeature<StateType>(featureKey, reducer, config);
     }
 
-    dispatch = StoreCore.dispatch.bind(StoreCore);
-    select = StoreCore.select.bind(StoreCore);
-    effect = StoreCore.effect.bind(StoreCore);
+    dispatch: (action: Action) => void = StoreCore.dispatch.bind(StoreCore);
+    select: <R>(mapFn: (state: AppState) => R) => Observable<R> = StoreCore.select.bind(StoreCore);
+    effect: (effect: Observable<Action>) => void = StoreCore.effect.bind(StoreCore);
 
     // Prevent direct construction calls with the `new` operator.
     private constructor(config: Partial<StoreConfig<AppState>>) {
