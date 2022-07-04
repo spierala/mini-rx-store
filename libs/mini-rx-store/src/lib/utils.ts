@@ -19,6 +19,10 @@ export function miniRxError(message: string): never {
     throw new Error(miniRxNameSpace + ': ' + message);
 }
 
+export function miniRxConsoleError(message: string, err: any): void {
+    console.error(miniRxNameSpace + ': ' + message, err);
+}
+
 // Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
 // This isn't a real GUID!
 export function generateId() {

@@ -132,4 +132,63 @@ describe('tapResponse', () => {
         expect(innerCompleteCallback).toHaveBeenCalled();
         expect(outerCompleteCallback).not.toHaveBeenCalled();
     });
+
+    it('should log an error which occurs in the next callback', () => {
+        console.error = jest.fn();
+
+        of(1)
+            .pipe(
+                tapResponse({
+                    next: () => {
+                        throw new Error('next_error');
+                    },
+                    error: noop,
+                })
+            )
+            .subscribe();
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('An error occurred in the `tapResponse` next callback'),
+            expect.any(Error)
+        );
+    });
+
+    it('should log an error which occurs in the error callback', () => {
+        console.error = jest.fn();
+
+        throwError(() => 'An error')
+            .pipe(
+                tapResponse({
+                    error: () => {
+                        throw new Error('error_error');
+                    },
+                })
+            )
+            .subscribe();
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('An error occurred in the `tapResponse` error callback'),
+            expect.any(Error)
+        );
+    });
+
+    it('should log an error which occurs in the finalize callback', () => {
+        console.error = jest.fn();
+
+        of(1)
+            .pipe(
+                tapResponse({
+                    error: noop,
+                    finalize: () => {
+                        throw new Error('finalize_error');
+                    },
+                })
+            )
+            .subscribe();
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('An error occurred in the `tapResponse` finalize callback'),
+            expect.any(Error)
+        );
+    });
 });
