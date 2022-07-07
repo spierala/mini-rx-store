@@ -20,7 +20,7 @@ export function miniRxError(message: string): never {
 }
 
 export function miniRxConsoleError(message: string, err: any): void {
-    console.error(miniRxNameSpace + ': ' + message, err);
+    console.error(miniRxNameSpace + ': ' + message + '\nDetails:', err);
 }
 
 // Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959

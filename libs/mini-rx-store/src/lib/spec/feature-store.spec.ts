@@ -273,7 +273,7 @@ describe('FeatureStore', () => {
         expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
 
         function getErrorMsg(times: number) {
-            return `MiniRx resubscribed the Effect. ONLY ${times} time(s) remaining!`;
+            return `@mini-rx: An error occurred in the Effect. MiniRx resubscribed the Effect automatically and will do so ${times} more times.`;
         }
 
         expect(console.error).toHaveBeenCalledWith(
