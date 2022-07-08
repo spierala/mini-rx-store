@@ -25,6 +25,7 @@
 
 import { EMPTY, identity, Observable } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
+import { miniRxConsoleError } from './utils';
 
 type TapResponseObj<T> = {
     next?: (next: T) => void;
@@ -51,11 +52,30 @@ export function tapResponse<T>(fn1OrObject: any, fn2?: any, fn3?: any): any {
 
         return source.pipe(
             tap({
-                next: tapResponseObj.next,
-                error: tapResponseObj.error,
+                next: (v) => {
+                    if (tapResponseObj.next) {
+                        tryCatch(() => tapResponseObj.next!(v), 'next');
+                    }
+                },
+                error: (err) => tryCatch(() => tapResponseObj.error!(err), 'error'),
             }),
             catchError(() => EMPTY),
-            tapResponseObj.finalize ? finalize(tapResponseObj.finalize) : identity // Conditionally apply operator: https://rxjs.dev/api/index/function/identity
+            tapResponseObj.finalize
+                ? finalize(() => {
+                      tryCatch(() => tapResponseObj.finalize!(), 'finalize');
+                  })
+                : identity // Conditionally apply operator: https://rxjs.dev/api/index/function/identity
         );
     };
+}
+
+function tryCatch(fn: () => void, whichCallback: 'next' | 'error' | 'finalize') {
+    try {
+        fn();
+    } catch (error) {
+        miniRxConsoleError(
+            `An error occurred in the \`tapResponse\` ${whichCallback} callback.`,
+            error
+        );
+    }
 }

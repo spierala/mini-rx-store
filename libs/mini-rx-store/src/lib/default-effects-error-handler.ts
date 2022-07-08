@@ -26,6 +26,7 @@
 
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { miniRxConsoleError } from './utils';
 
 // Prevent effect to unsubscribe from the actions stream
 export function defaultEffectsErrorHandler<T>(
@@ -34,10 +35,10 @@ export function defaultEffectsErrorHandler<T>(
 ): Observable<T> {
     return observable$.pipe(
         catchError((error) => {
-            console.error(
-                `MiniRx resubscribed the Effect. ONLY ${
+            miniRxConsoleError(
+                `An error occurred in the Effect. MiniRx resubscribed the Effect automatically and will do so ${
                     retryAttemptLeft - 1
-                } time(s) remaining!\nPlease provide error handling inside the Effect using \`catchError\`.\nDetails:`,
+                } more times.\nPlease provide error handling inside the Effect using \`catchError\` or \`tapResponse\`.`,
                 error
             );
             if (retryAttemptLeft <= 1) {
