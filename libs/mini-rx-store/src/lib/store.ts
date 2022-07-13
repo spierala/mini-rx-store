@@ -1,4 +1,4 @@
-import { Action, AppState, FeatureStoreConfig, Reducer, StoreConfig } from './models';
+import { Action, AppState, FeatureConfig, Reducer, StoreConfig } from './models';
 import StoreCore from './store-core';
 import { miniRxError } from './utils';
 import { Observable } from 'rxjs';
@@ -10,7 +10,7 @@ export class Store {
     feature<StateType>(
         featureKey: string,
         reducer: Reducer<StateType>,
-        config?: FeatureStoreConfig<StateType>
+        config?: FeatureConfig<StateType>
     ) {
         StoreCore.addFeature<StateType>(featureKey, reducer, config);
     }
