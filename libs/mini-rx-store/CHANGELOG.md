@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.14](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.13...mini-rx-store-4.0.0-alpha.14) (2022-07-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store:** use FeatureConfig instead of FeatureStoreConfig
+
+### Code Refactoring
+
+* **mini-rx-store:** rename FeatureStoreConfig -> FeatureConfig ([720f440](https://github.com/spierala/mini-rx-store/commit/720f440cf1daee2be25de64ca82b7f7b65e55416))
+
 ## [4.0.0-alpha.13](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.12...mini-rx-store-4.0.0-alpha.13) (2022-07-08)
 
 
