@@ -3,7 +3,7 @@ import {
     Actions,
     actions$,
     configureStore,
-    FeatureStoreConfig,
+    FeatureConfig,
     Reducer,
     Store,
     StoreConfig,
@@ -12,7 +12,7 @@ import {
 export const STORE_CONFIG = new InjectionToken<StoreConfig<any>>('@mini-rx/store-config');
 export const FEATURE_NAMES = new InjectionToken<string[]>('@mini-rx/feature-name');
 export const FEATURE_REDUCERS = new InjectionToken<Reducer<any>[]>('@mini-rx/feature-reducer');
-export const FEATURE_CONFIGS = new InjectionToken<FeatureStoreConfig<any>[]>(
+export const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>(
     '@mini-rx/feature-store-config'
 );
 
@@ -34,7 +34,7 @@ export class StoreFeatureModule {
         root: StoreRootModule, // Prevent feature states to be initialized before root state
         @Inject(FEATURE_NAMES) featureNames: string[],
         @Inject(FEATURE_REDUCERS) reducers: Reducer<any>[],
-        @Inject(FEATURE_CONFIGS) configs: FeatureStoreConfig<any>[]
+        @Inject(FEATURE_CONFIGS) configs: FeatureConfig<any>[]
     ) {
         featureNames.forEach((featureName, index) => {
             this.store.feature(featureName, reducers[index], configs[index]);
@@ -65,7 +65,7 @@ export class StoreModule {
     static forFeature<T>(
         featureName: string,
         reducer: Reducer<T>,
-        config?: Partial<FeatureStoreConfig<T>>
+        config?: Partial<FeatureConfig<T>>
     ): ModuleWithProviders<StoreFeatureModule> {
         return {
             ngModule: StoreFeatureModule,

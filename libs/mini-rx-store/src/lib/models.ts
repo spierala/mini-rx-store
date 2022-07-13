@@ -33,14 +33,14 @@ export interface StoreConfig<T> {
     extensions: StoreExtension[];
 }
 
-// Used for the Redux API: Store.feature
-export interface FeatureStoreConfig<StateType> {
+// Used for the Redux API: Store.feature / StoreModule.forFeature
+export interface FeatureConfig<StateType> {
     initialState: StateType;
     metaReducers?: MetaReducer<StateType>[];
 }
 
 // Used for createFeatureStore, new FeatureStore
-export interface FeatureStoreInstanceConfig {
+export interface FeatureStoreConfig {
     multi?: boolean;
 }
 
