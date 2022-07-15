@@ -7,6 +7,32 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
+# MiniRx Store 4 (beta)
+
+MiniRx Store 4 beta has been released.
+
+What's new?
+
+- Refactor to [Nx](https://nx.dev/)
+- Even more lightweight
+- `tapResponse` operator (handle API response in `FeatureStore.effect`)
+- `mapResponse` operator (handle API response in Redux Effects)
+- Many Feature Store instances with the `multi: true` config
+- `FeatureStore.effect`: the returned function accepts also an Observable as argument
+- Full Ivy support in Angular
+- Many more internal improvements
+
+Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
+
+## Installation
+`npm i mini-rx-store@beta`
+
+Install the Angular Integration if you are using Angular:
+
+`npm i mini-rx-store-ng@beta`
+
+The Angular Integration requires now Angular@12.
+
 # MiniRx Store
 
 MiniRx Store provides **Reactive State Management** for JavaScript and TypeScript applications.
