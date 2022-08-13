@@ -50,9 +50,7 @@ export class EffectsModule {
         @Optional() storeRootModule: StoreRootModule,
         @Optional() storeFeatureModule: StoreFeatureModule
     ) {
-        const effects = fromObjectsWithEffectsToEffects(
-            objectsWithEffects.splice(0, objectsWithEffects.length)
-        );
+        const effects = fromObjectsWithEffectsToEffects(objectsWithEffects);
         effects.forEach((effect: Observable<Action>) => {
             this.store.effect(effect);
         });
