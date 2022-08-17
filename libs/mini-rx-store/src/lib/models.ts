@@ -57,3 +57,23 @@ export type ReducerDictionary<T> = {
 export type StateOrCallback<StateType> =
     | Partial<StateType>
     | ((state: StateType) => Partial<StateType>);
+
+export const EFFECT_METADATA_KEY = '@mini-rx/effectMetaData';
+
+export interface EffectConfig {
+    /**
+     * Determines if the action emitted by the effect is dispatched to the store.
+     * If false, effect does not need to return type `Observable<Action>`.
+     */
+    dispatch?: boolean;
+}
+
+export interface SimpleHasEffectMetadata {
+    [EFFECT_METADATA_KEY]: EffectConfig;
+}
+
+export interface HasEffectMetadata<C extends EffectConfig = EffectConfig> {
+    [EFFECT_METADATA_KEY]: C;
+}
+
+export type EffectWithMetaData<C> = Observable<Action> & HasEffectMetadata<C>;

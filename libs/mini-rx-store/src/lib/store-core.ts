@@ -4,13 +4,16 @@ import {
     Action,
     Actions,
     AppState,
+    EFFECT_METADATA_KEY,
+    EffectConfig,
+    HasEffectMetadata,
     MetaReducer,
     Reducer,
     ReducerDictionary,
     StoreConfig,
     StoreExtension,
 } from './models';
-import { generateId, miniRxError, select } from './utils';
+import { generateId, hasEffectMetaData, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
@@ -145,9 +148,21 @@ class StoreCore {
         return this.state$.pipe(select(mapFn));
     }
 
-    effect(effect$: Observable<Action>) {
+    effect(effect$: Observable<any> & HasEffectMetadata<{ dispatch: false }>): void;
+    effect(effect$: Observable<Action>): void;
+    effect(effect$: any): void {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-        effectWithErrorHandler$.subscribe((action) => this.dispatch(action));
+        effectWithErrorHandler$.subscribe((action) => {
+            let dispatch = true;
+            if (hasEffectMetaData(effect$)) {
+                const metaData: EffectConfig = effect$[EFFECT_METADATA_KEY];
+                dispatch = !!metaData.dispatch;
+            }
+
+            if (dispatch) {
+                this.dispatch(action);
+            }
+        });
     }
 
     addMetaReducers(...reducers: MetaReducer<AppState>[]) {

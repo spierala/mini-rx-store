@@ -25,7 +25,7 @@
 
 import { ClassProvider, InjectionToken, Type } from '@angular/core';
 import { Observable } from 'rxjs';
-import { actions$ } from 'mini-rx-store';
+import { actions$, hasEffectMetaData } from 'mini-rx-store';
 
 export const fromClassesWithEffectsToClassProviders = (
     injectionToken: InjectionToken<any>,
@@ -40,11 +40,12 @@ export const fromClassesWithEffectsToClassProviders = (
 export const fromObjectsWithEffectsToEffects = (objectsWithEffects: any[]): Observable<any>[] =>
     objectsWithEffects.reduce((acc, objectWithEffects) => {
         const effectsFromCurrentObject = Object.getOwnPropertyNames(objectWithEffects)
-            .filter(
-                (prop) =>
-                    objectWithEffects[prop] instanceof Observable &&
-                    objectWithEffects[prop] !== actions$
-            )
+            .filter((prop) => {
+                const effect = objectWithEffects[prop];
+                return (
+                    effect instanceof Observable && effect !== actions$ && hasEffectMetaData(effect)
+                );
+            })
             .map((prop) => objectWithEffects[prop]);
         return [...acc, ...effectsFromCurrentObject];
     }, []);

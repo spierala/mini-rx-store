@@ -1,6 +1,14 @@
-import { OperatorFunction, pipe } from 'rxjs';
+import { Observable, OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { Action, ActionWithPayload, AppState } from './models';
+import {
+    Action,
+    ActionWithPayload,
+    AppState,
+    EFFECT_METADATA_KEY,
+    HasEffectMetadata,
+    EffectWithMetaData,
+    SimpleHasEffectMetadata,
+} from './models';
 import { isSetStateAction, SetStateAction } from './actions';
 import { miniRxNameSpace } from './constants';
 
@@ -21,6 +29,10 @@ export function miniRxError(message: string): never {
 
 export function miniRxConsoleError(message: string, err: any): void {
     console.error(miniRxNameSpace + ': ' + message + '\nDetails:', err);
+}
+
+export function hasEffectMetaData(param: object): param is SimpleHasEffectMetadata {
+    return param.hasOwnProperty(EFFECT_METADATA_KEY);
 }
 
 // Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959

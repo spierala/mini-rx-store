@@ -15,6 +15,7 @@
         "test:mini-rx-store:watch": "nx test mini-rx-store --watch",
         "test:mini-rx-store:coverge": "nx test mini-rx-store --codeCoverage",
         "test:mini-rx-store-ng": "nx test mini-rx-store-ng",
+        "test:mini-rx-store-ng:watch": "nx test mini-rx-store-ng --watch",
         "deploy:docs": "npm run deploy --prefix docs",
         "build:mini-rx-angular-demo:sourcemap": "nx build mini-rx-angular-demo --source-map",
         "build:mini-rx-angular-demo:sourcemap:stats": "npm run build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
