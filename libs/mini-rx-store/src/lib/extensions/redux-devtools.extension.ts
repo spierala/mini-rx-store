@@ -3,7 +3,7 @@ import { Action, AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import { beautifyActionForLogging } from '../utils';
 
-const win = window as any;
+const win = globalThis as any;
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux Dev Tools',
