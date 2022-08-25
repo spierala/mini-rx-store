@@ -19,6 +19,10 @@ export class ReduxDevtoolsExtension extends StoreExtension {
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
         super();
+        
+        if (!window) {
+            miniRxError('The Redux DevTools are only supported in Browser environments')
+        }
 
         this.options = {
             ...defaultOptions,
