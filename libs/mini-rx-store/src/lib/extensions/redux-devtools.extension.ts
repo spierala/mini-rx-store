@@ -1,7 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { Action, AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import { beautifyActionForLogging } from '../utils';
+import { beautifyActionForLogging, miniRxError } from '../utils';
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux Dev Tools',
