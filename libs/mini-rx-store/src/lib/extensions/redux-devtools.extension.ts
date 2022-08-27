@@ -1,9 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { Action, AppState, StoreExtension } from '../models';
 import StoreCore from '../store-core';
-import { beautifyActionForLogging } from '../utils';
-
-const win = window as any;
+import { beautifyActionForLogging, miniRxError } from '../utils';
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux Dev Tools',
@@ -16,11 +14,15 @@ export interface ReduxDevtoolsOptions {
 }
 
 export class ReduxDevtoolsExtension extends StoreExtension {
-    private devtoolsExtension = win.__REDUX_DEVTOOLS_EXTENSION__;
+    private devtoolsExtension = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
     private devtoolsConnection: any;
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
         super();
+        
+        if (!window) {
+            miniRxError('The Redux DevTools are only supported in Browser environments')
+        }
 
         this.options = {
             ...defaultOptions,
