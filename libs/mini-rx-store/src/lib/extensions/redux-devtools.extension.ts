@@ -14,15 +14,17 @@ export interface ReduxDevtoolsOptions {
 }
 
 export class ReduxDevtoolsExtension extends StoreExtension {
-    private devtoolsExtension = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+    private devtoolsExtension: any;
     private devtoolsConnection: any;
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
         super();
-        
+
         if (!window) {
-            miniRxError('The Redux DevTools are only supported in Browser environments')
+            miniRxError('The Redux DevTools are only supported in browser environments.');
         }
+
+        this.devtoolsExtension = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
 
         this.options = {
             ...defaultOptions,
