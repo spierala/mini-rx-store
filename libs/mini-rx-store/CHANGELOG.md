@@ -4,10 +4,10 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## [4.0.0-beta.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-beta.0...mini-rx-store-4.0.0-beta.1) (2022-08-30)
 
+### Code Refactoring
 
-### Bug Fixes
-
-* **mini-rx-store:** Add missing import ([ec9528b](https://github.com/spierala/mini-rx-store/commit/ec9528b83d38deec6ea6246dd0f5957ac4ee32df))
+* **mini-rx-store:** Redux DevTools Extension: Move reference to window inside the constructor to avoid runtime errors in non browser environments
+* **mini-rx-store:** Redux DevTools Extension: Throw error if window not available when constructing redux devtools extension
 
 ## [4.0.0-beta.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-alpha.14...mini-rx-store-4.0.0-beta.0) (2022-07-15)
 
