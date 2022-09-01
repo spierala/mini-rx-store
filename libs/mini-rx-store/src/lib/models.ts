@@ -68,12 +68,6 @@ export interface EffectConfig {
     dispatch?: boolean;
 }
 
-export interface SimpleHasEffectMetadata {
+export interface HasEffectMetadata {
     [EFFECT_METADATA_KEY]: EffectConfig;
 }
-
-export interface HasEffectMetadata<C extends EffectConfig = EffectConfig> {
-    [EFFECT_METADATA_KEY]: C;
-}
-
-export type EffectWithMetaData<C> = Observable<Action> & HasEffectMetadata<C>;

@@ -148,7 +148,7 @@ class StoreCore {
         return this.state$.pipe(select(mapFn));
     }
 
-    effect(effect$: Observable<any> & HasEffectMetadata<{ dispatch: false }>): void;
+    effect(effect$: Observable<any> & HasEffectMetadata): void;
     effect(effect$: Observable<Action>): void;
     effect(effect$: any): void {
         const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);

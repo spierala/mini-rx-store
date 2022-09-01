@@ -6,8 +6,6 @@ import {
     AppState,
     EFFECT_METADATA_KEY,
     HasEffectMetadata,
-    EffectWithMetaData,
-    SimpleHasEffectMetadata,
 } from './models';
 import { isSetStateAction, SetStateAction } from './actions';
 import { miniRxNameSpace } from './constants';
@@ -31,7 +29,9 @@ export function miniRxConsoleError(message: string, err: any): void {
     console.error(miniRxNameSpace + ': ' + message + '\nDetails:', err);
 }
 
-export function hasEffectMetaData(param: object): param is SimpleHasEffectMetadata {
+export function hasEffectMetaData(
+    param: Observable<Action>
+): param is Observable<Action> & HasEffectMetadata {
     return param.hasOwnProperty(EFFECT_METADATA_KEY);
 }
 

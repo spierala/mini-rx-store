@@ -1,11 +1,4 @@
-import {
-    Action,
-    AppState,
-    EffectWithMetaData,
-    FeatureConfig,
-    Reducer,
-    StoreConfig,
-} from './models';
+import { Action, AppState, FeatureConfig, Reducer, StoreConfig } from './models';
 import StoreCore from './store-core';
 import { miniRxError } from './utils';
 import { Observable } from 'rxjs';

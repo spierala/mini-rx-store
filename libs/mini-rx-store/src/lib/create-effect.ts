@@ -1,8 +1,7 @@
 // TODO add NgRx credits
 
 import { Observable } from 'rxjs';
-import { Action } from 'mini-rx-store';
-import { EFFECT_METADATA_KEY, HasEffectMetadata, EffectConfig } from './models';
+import { EFFECT_METADATA_KEY, HasEffectMetadata, EffectConfig, Action } from './models';
 
 const DEFAULT_EFFECT_CONFIG: Readonly<Required<EffectConfig>> = {
     dispatch: true,
@@ -19,7 +18,7 @@ export function createEffect<
     DT extends DispatchType<C>,
     OT extends ObservableType<DT, OT>,
     R extends EffectType<OT>
->(v: R, config?: C): R & HasEffectMetadata<C> {
+>(v: R, config?: C): R & HasEffectMetadata {
     const value: EffectConfig = {
         ...DEFAULT_EFFECT_CONFIG,
         ...config,
@@ -27,5 +26,5 @@ export function createEffect<
     Object.defineProperty(v, EFFECT_METADATA_KEY, {
         value,
     });
-    return v as typeof v & HasEffectMetadata<C>;
+    return v as typeof v & HasEffectMetadata;
 }
