@@ -5,11 +5,11 @@ import {
     createProductSuccess,
     deleteProductFail,
     deleteProductSuccess,
-    initializeCurrentProduct,
+    initializeNewProduct,
     loadFail,
     loadSuccess,
     removeProductFromCart,
-    setCurrentProduct,
+    selectProduct,
     toggleProductCode,
     updateProductFail,
     updateProductOptimistic,
@@ -23,18 +23,16 @@ import { CartItem } from '../models/cart-item';
 // State for this feature (Product)
 export interface ProductState {
     showProductCode: boolean;
-    currentProductId: number | undefined;
+    selectedProduct: Product | undefined;
     products: Product[];
-    error: string;
     search: string;
     cart: CartItem[];
 }
 
 const initialState: ProductState = {
     showProductCode: true,
-    currentProductId: undefined,
+    selectedProduct: undefined,
     products: [],
-    error: '',
     search: '',
     cart: [
         {
@@ -47,18 +45,16 @@ const initialState: ProductState = {
 export const productReducer = reducer<ProductState>(
     initialState,
     on(toggleProductCode, (state, { payload }) => ({ ...state, showProductCode: payload })),
-    on(setCurrentProduct, (state, { payload }) => ({ ...state, currentProductId: payload })),
-    on(clearCurrentProduct, (state) => ({ ...state, currentProductId: undefined })),
-    on(initializeCurrentProduct, (state) => ({ ...state, currentProductId: 0 })),
+    on(selectProduct, (state, { payload }) => ({ ...state, selectedProduct: payload })),
+    on(clearCurrentProduct, (state) => ({ ...state, selectedProduct: undefined })),
+    on(initializeNewProduct, (state) => ({ ...state, selectedProduct: new Product() })),
     on(loadSuccess, (state, { payload }) => ({
         ...state,
         products: payload,
-        error: '',
     })),
     on(loadFail, (state, { payload }) => ({
         ...state,
         products: [],
-        error: payload,
     })),
     on(updateProductSuccess, (state, { payload }) => {
         const updatedProducts = state.products.map((item) =>
@@ -67,8 +63,6 @@ export const productReducer = reducer<ProductState>(
         return {
             ...state,
             products: updatedProducts,
-            currentProductId: payload.id,
-            error: '',
         };
     }),
     on(updateProductOptimistic, (state, { payload }) => {
@@ -78,31 +72,18 @@ export const productReducer = reducer<ProductState>(
         return {
             ...state,
             products: updatedProducts,
+            selectedProduct: payload,
         };
     }),
-    on(updateProductFail, (state, { payload }) => ({
-        ...state,
-        error: payload,
-    })),
     on(createProductSuccess, (state, { payload }) => ({
         ...state,
         products: [...state.products, payload],
-        currentProductId: payload.id,
-        error: '',
-    })),
-    on(createProductFail, (state, { payload }) => ({
-        ...state,
-        error: payload,
+        selectedProduct: payload,
     })),
     on(deleteProductSuccess, (state, { payload }) => ({
         ...state,
         products: state.products.filter((product) => product.id !== payload),
         currentProductId: undefined,
-        error: '',
-    })),
-    on(deleteProductFail, (state, { payload }) => ({
-        ...state,
-        error: payload,
     })),
     on(updateSearch, (state, { payload }) => ({
         ...state,

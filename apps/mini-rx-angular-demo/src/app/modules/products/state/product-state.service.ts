@@ -7,10 +7,10 @@ import {
     clearCurrentProduct,
     createProduct,
     deleteProduct,
-    initializeCurrentProduct,
+    initializeNewProduct,
     load,
     removeProductFromCart,
-    setCurrentProduct,
+    selectProduct,
     toggleProductCode,
     updateProduct,
     updateSearch,
@@ -22,32 +22,8 @@ import { CartItem } from '../models/cart-item';
 // Selector functions
 const getProductFeatureState = createFeatureSelector<fromProducts.ProductState>('products');
 const getShowProductCode = createSelector(getProductFeatureState, (state) => state.showProductCode);
-const getCurrentProductId = createSelector(
-    getProductFeatureState,
-    (state) => state.currentProductId
-);
-const getCurrentProduct = createSelector(
-    getProductFeatureState,
-    getCurrentProductId,
-    (state, currentProductId) => {
-        if (currentProductId === 0) {
-            return {
-                id: 0,
-                productName: '',
-                productCode: 'New',
-                description: '',
-                starRating: 0,
-                price: undefined,
-            };
-        } else {
-            return currentProductId
-                ? state.products.find((p) => p.id === currentProductId)
-                : undefined;
-        }
-    }
-);
+const getSelectedProduct = createSelector(getProductFeatureState, (state) => state.selectedProduct);
 const getProducts = createSelector(getProductFeatureState, (state) => state.products);
-const getError = createSelector(getProductFeatureState, (state) => state.error);
 const getSearch = createSelector(getProductFeatureState, (state) => state.search);
 const getFilteredProducts = createSelector(getProducts, getSearch, (products, search) => {
     return products.filter(
@@ -98,7 +74,7 @@ const getCartTotalPrice = createSelector(getCartItemsWithExtraData, (cartItemsWi
 })
 export class ProductStateService {
     displayCode$: Observable<boolean> = this.store.select(getShowProductCode);
-    selectedProduct$: Observable<Product | undefined> = this.store.select(getCurrentProduct);
+    selectedProduct$: Observable<Product | undefined> = this.store.select(getSelectedProduct);
     products$: Observable<Product[]> = this.store.select(getFilteredProducts);
     search$: Observable<string> = this.store.select(getSearch);
     cartItems$: Observable<CartItem[]> = this.store.select(getCartItemsWithExtraData);
@@ -119,11 +95,11 @@ export class ProductStateService {
     }
 
     newProduct(): void {
-        this.store.dispatch(initializeCurrentProduct());
+        this.store.dispatch(initializeNewProduct());
     }
 
     productSelected(product: Product): void {
-        this.store.dispatch(setCurrentProduct(product.id!));
+        this.store.dispatch(selectProduct(product));
     }
 
     clearCurrentProduct(): void {
