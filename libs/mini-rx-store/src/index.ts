@@ -14,7 +14,6 @@ export {
     StoreConfig,
     FeatureConfig,
     StoreExtension,
-    EFFECT_METADATA_KEY,
 } from './lib/models';
 export { ofType, hasEffectMetaData } from './lib/utils';
 export {

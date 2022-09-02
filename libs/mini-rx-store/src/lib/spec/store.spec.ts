@@ -476,8 +476,7 @@ describe('Store', () => {
                             }))
                         )
                     )
-                ),
-                { dispatch: true }
+                )
             );
 
             store.effect(effect);
