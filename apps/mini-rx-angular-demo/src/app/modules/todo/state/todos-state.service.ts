@@ -118,13 +118,14 @@ export class TodosStateService extends FeatureStore<TodoState> {
     create = this.effect<Todo>(
         // FYI: we can skip the payload$.pipe when using just one RxJS operator
         mergeMap((todo) => {
-            const optimisticUpdate: Action = this.setState(
-                (state) => ({
-                    todos: [...state.todos, todo],
-                    selectedTodo: todo,
-                }),
-                'createOptimistic'
-            );
+            const optimisticUpdate: Action = this.setState((state) => {
+                // Create a new Todo object to prevent the Immutable Extension from making the current form model immutable
+                // This is only a concern if the create call fails (which would return a new Todo object)
+                const newTodo: Todo = { ...todo };
+                return {
+                    todos: [...state.todos, newTodo],
+                };
+            }, 'createOptimistic');
 
             return this.apiService.createTodo(todo).pipe(
                 tapResponse({

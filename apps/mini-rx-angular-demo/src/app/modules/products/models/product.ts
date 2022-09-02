@@ -1,9 +1,9 @@
 /* Defines the product entity */
-export interface Product {
+export class Product {
     id: number | undefined;
-    productName: string;
-    productCode: string;
-    description: string;
-    starRating: number;
+    productName: string = '';
+    productCode: string = 'New';
+    description: string = '';
+    starRating: number = 0;
     price: number | undefined;
 }
