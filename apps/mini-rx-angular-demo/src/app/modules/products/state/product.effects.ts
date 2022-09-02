@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { map, mergeMap, startWith, tap } from 'rxjs/operators';
-
-import { Action, Actions, mapResponse, undo, createEffect } from 'mini-rx-store';
+import { mergeMap, startWith } from 'rxjs/operators';
+import { Action, Actions, createEffect, mapResponse, undo } from 'mini-rx-store';
 import { ofType, toPayload } from 'ts-action-operators';
 import {
     createProduct,
@@ -20,22 +19,10 @@ import {
 } from './product.actions';
 import { Product } from '../models/product';
 import { ProductApiService } from '../services/product-api.service';
-import { Observable, timer } from 'rxjs';
 
 @Injectable()
 export class ProductEffects {
-    timer$ = timer(0, 1000);
-
     constructor(private productService: ProductApiService, private actions$: Actions) {}
-
-    // TODO remove: try non-dispatching effect
-    test$ = createEffect(
-        this.timer$.pipe(
-            tap((v) => console.log(v)),
-            map((v) => true)
-        ),
-        { dispatch: false }
-    );
 
     loadProducts$ = createEffect(
         this.actions$.pipe(
@@ -48,12 +35,11 @@ export class ProductEffects {
                     )
                 )
             )
-        ),
-        { dispatch: true }
+        )
     );
 
-    // Effect with optimistic update
-    updateProduct$: Observable<Action> = createEffect(
+    // Effect with optimistic update and undo
+    updateProduct$ = createEffect(
         this.actions$.pipe(
             ofType(updateProduct),
             toPayload(),
