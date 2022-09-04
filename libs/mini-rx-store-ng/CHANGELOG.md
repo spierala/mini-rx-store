@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [3.0.0-beta.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-beta.0...mini-rx-store-ng-3.0.0-beta.1) (2022-09-04)
+
+
+### Features
+
+* **mini-rx-store, mini-rx-store-ng:** create effect ([ed5ac04](https://github.com/spierala/mini-rx-store/commit/ed5ac04f5763ca6cefe833e68d1fe17f639322f8))
+* **mini-rx-store, mini-rx-store-ng:** create effect ([3adaf87](https://github.com/spierala/mini-rx-store/commit/3adaf87275ff077ffe9b3398a2b9e225f1a1d374))
+
 ## [3.0.0-beta.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-alpha.4...mini-rx-store-ng-3.0.0-beta.0) (2022-07-15)
 
 ## [3.0.0-beta.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-alpha.4...mini-rx-store-ng-3.0.0-beta.0) (2022-07-15)
