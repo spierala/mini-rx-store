@@ -1,6 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
-import { Action, Actions, FeatureStore, ofType, Reducer, Store, StoreExtension } from 'mini-rx-store';
+import {
+    Action,
+    Actions,
+    createEffect,
+    FeatureStore,
+    ofType,
+    Reducer,
+    Store,
+    StoreExtension,
+} from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -10,8 +19,24 @@ export const loadAction: Action = {
     type: 'LOAD',
 };
 
+export const loadAction2: Action = {
+    type: 'LOAD_2',
+};
+
+export const loadAction3: Action = {
+    type: 'LOAD_3',
+};
+
 export const loadSuccessAction: Action = {
     type: 'LOAD_SUCCESS',
+};
+
+export const loadSuccessAction2: Action = {
+    type: 'LOAD_SUCCESS_2',
+};
+
+export const loadSuccessAction3: Action = {
+    type: 'LOAD_SUCCESS_3',
 };
 
 export const loadFailAction: Action = {
@@ -64,16 +89,37 @@ function featureMetaReducer(reducer: Reducer<any>): Reducer<any> {
 })
 class Counter5Module {}
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class TodoEffects {
-    loadTodos$ = this.actions$.pipe(
-        ofType(loadAction.type),
-        mergeMap(() =>
-            of('some result').pipe(
-                map((res) => loadSuccessAction),
-                catchError((err) => of(loadFailAction))
+    loadTodos$ = createEffect(
+        this.actions$.pipe(
+            ofType(loadAction.type),
+            mergeMap(() =>
+                of('some result').pipe(
+                    map((res) => loadSuccessAction),
+                    catchError((err) => of(loadFailAction))
+                )
             )
         )
+    );
+
+    nonDispatchingEffect$ = createEffect(
+        this.actions$.pipe(
+            ofType(loadAction2.type),
+            mergeMap(() => of('some result').pipe(map((res) => loadSuccessAction2)))
+        ),
+        { dispatch: false }
+    );
+
+    constructor(private actions$: Actions) {}
+}
+
+@Injectable()
+export class TodoEffectsNOK {
+    // Effect is not registered because it is not using createEffect!
+    loadTodos$ = this.actions$.pipe(
+        ofType(loadAction3.type),
+        mergeMap(() => of('some result').pipe(map((res) => loadSuccessAction3)))
     );
 
     constructor(private actions$: Actions) {}
@@ -116,7 +162,7 @@ describe(`Ng Modules`, () => {
         TestBed.configureTestingModule({
             imports: [
                 Counter4Module,
-                EffectsModule.register([TodoEffects]),
+                EffectsModule.register([TodoEffects, TodoEffectsNOK]),
                 StoreModule.forRoot({
                     reducers: {
                         counter1: counterReducer,
@@ -179,8 +225,29 @@ describe(`Ng Modules`, () => {
 
         store.dispatch(loadAction);
 
+        expect(spy).toHaveBeenCalledTimes(2);
         expect(spy).toHaveBeenCalledWith(loadAction);
         expect(spy).toHaveBeenCalledWith(loadSuccessAction);
+    });
+
+    it(`should run non-dispatching effect`, () => {
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+
+        store.dispatch(loadAction2);
+
+        expect(spy).toHaveBeenCalledWith(loadAction2);
+        expect(spy).not.toHaveBeenCalledWith(loadSuccessAction);
+    });
+
+    it(`should NOT run effects from TodoEffectsNOK`, () => {
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+
+        store.dispatch(loadAction3);
+
+        expect(spy).toHaveBeenCalledWith(loadAction3);
+        expect(spy).not.toHaveBeenCalledWith(loadSuccessAction3);
     });
 
     describe(`FeatureStore`, () => {

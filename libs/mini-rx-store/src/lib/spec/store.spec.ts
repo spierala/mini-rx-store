@@ -16,6 +16,7 @@ import {
     store,
 } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
+import { createEffect } from 'mini-rx-store';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -462,9 +463,9 @@ describe('Store', () => {
 
         store.dispatch({ type: 'loadUser' });
 
-        // Lets be crazy and add another effect while the other effect is busy
+        // Let's be crazy and add another effect while the other effect is busy
         cold('-a').subscribe(() => {
-            store.effect(
+            const effect = createEffect(
                 actions$.pipe(
                     ofType('saveUser'),
                     mergeMap(() =>
@@ -478,12 +479,38 @@ describe('Store', () => {
                 )
             );
 
+            store.effect(effect);
+
             store.dispatch({ type: 'saveUser' });
         });
 
         expect(store.select(getUserFeatureState)).toBeObservable(
             hot('a-xb', { a: userInitialState, b: asyncUser, x: updatedAsyncUser })
         );
+    });
+
+    it('should create and execute a non-dispatching effect', () => {
+        const action1 = { type: 'someAction' };
+        const action2 = { type: 'someAction2' };
+
+        const effect = createEffect(
+            actions$.pipe(
+                ofType(action1.type),
+                mergeMap(() => of(action2))
+            ),
+            { dispatch: false }
+        );
+
+        store.effect(effect);
+
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+
+        store.dispatch(action1);
+
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith(action1);
+        expect(spy).not.toHaveBeenCalledWith(action2);
     });
 
     it('should create and execute an effect and handle side effect error', () => {

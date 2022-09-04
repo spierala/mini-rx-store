@@ -15,7 +15,7 @@ export {
     FeatureConfig,
     StoreExtension,
 } from './lib/models';
-export { ofType } from './lib/utils';
+export { ofType, hasEffectMetaData } from './lib/utils';
 export {
     ReduxDevtoolsExtension,
     ReduxDevtoolsOptions,
@@ -25,3 +25,4 @@ export { ImmutableStateExtension } from './lib/extensions/immutable-state.extens
 export { UndoExtension, undo } from './lib/extensions/undo.extension';
 export { tapResponse } from './lib/tap-response';
 export { mapResponse } from './lib/map-response';
+export { createEffect } from './lib/create-effect';

@@ -17,13 +17,14 @@ export class Store {
 
     dispatch: (action: Action) => void = StoreCore.dispatch.bind(StoreCore);
     select: <R>(mapFn: (state: AppState) => R) => Observable<R> = StoreCore.select.bind(StoreCore);
-    effect: (effect: Observable<Action>) => void = StoreCore.effect.bind(StoreCore);
+    effect = StoreCore.effect.bind(StoreCore);
 
     // Prevent direct construction calls with the `new` operator.
     private constructor(config: Partial<StoreConfig<AppState>>) {
         StoreCore.config(config);
     }
 
+    /** @internal */
     /** @deprecated This is an internal implementation detail, do not use. */
     static configureStore(config: Partial<StoreConfig<AppState>>): Store | never {
         if (!Store.instance) {
