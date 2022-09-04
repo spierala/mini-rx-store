@@ -1,9 +1,7 @@
 import {
     addProductToCart,
     clearCurrentProduct,
-    createProductFail,
     createProductSuccess,
-    deleteProductFail,
     deleteProductSuccess,
     initializeNewProduct,
     loadFail,
@@ -11,7 +9,6 @@ import {
     removeProductFromCart,
     selectProduct,
     toggleProductCode,
-    updateProductFail,
     updateProductOptimistic,
     updateProductSuccess,
     updateSearch,

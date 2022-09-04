@@ -3,12 +3,10 @@ import { Observable, throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ErrorHandlerService {
-
-    constructor(private toastr: ToastrService) {
-    }
+    constructor(private toastr: ToastrService) {}
 
     handleError(err: any): Observable<never> {
         let errorMessage: string;

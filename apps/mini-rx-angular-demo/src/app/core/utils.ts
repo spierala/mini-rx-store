@@ -1,4 +1,4 @@
-import { fromEvent, merge, Observable, shareReplay } from 'rxjs';
+import { fromEvent, merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 const keyDowns$ = fromEvent<KeyboardEvent>(document, 'keydown');

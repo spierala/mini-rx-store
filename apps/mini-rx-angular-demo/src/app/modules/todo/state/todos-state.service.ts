@@ -5,8 +5,13 @@ import { EMPTY, Observable } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { TodosApiService } from '../services/todos-api.service';
 import { v4 as uuid } from 'uuid';
-import { Action, createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
-import { tapResponse } from 'mini-rx-store';
+import {
+    Action,
+    createFeatureSelector,
+    createSelector,
+    FeatureStore,
+    tapResponse,
+} from 'mini-rx-store';
 
 // STATE INTERFACE
 interface TodoState {
