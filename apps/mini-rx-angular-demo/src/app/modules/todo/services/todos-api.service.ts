@@ -5,17 +5,13 @@ import { Observable, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { altKeyPressed$ } from '../../../core/utils';
 
 const todoApiUrl = 'api/todos/';
 const failingTodoApiUrl = 'api/todos-not-ok';
 let apiUrl = todoApiUrl;
 
-window.onkeyup = function (e) {
-    updateApiUrl(e.altKey);
-};
-window.onkeydown = function (e) {
-    updateApiUrl(e.altKey);
-};
+altKeyPressed$.subscribe(updateApiUrl);
 
 function updateApiUrl(altKeyPressed: boolean) {
     apiUrl = altKeyPressed ? failingTodoApiUrl : todoApiUrl;
