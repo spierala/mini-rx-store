@@ -4,11 +4,9 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## [3.0.0-beta.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-beta.0...mini-rx-store-ng-3.0.0-beta.1) (2022-09-04)
 
+### ⚠ BREAKING CHANGES
 
-### Features
-
-* **mini-rx-store, mini-rx-store-ng:** create effect ([ed5ac04](https://github.com/spierala/mini-rx-store/commit/ed5ac04f5763ca6cefe833e68d1fe17f639322f8))
-* **mini-rx-store, mini-rx-store-ng:** create effect ([3adaf87](https://github.com/spierala/mini-rx-store/commit/3adaf87275ff077ffe9b3398a2b9e225f1a1d374))
+* **mini-rx-store-ng:** `createEffect` **must** be used for creating effects which are registered via the EffectsModule. The change was necessary to prevent registering other Observables which are not an Effect and which do not emit an Action.
 
 ## [3.0.0-beta.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-alpha.4...mini-rx-store-ng-3.0.0-beta.0) (2022-07-15)
 

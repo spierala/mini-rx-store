@@ -7,9 +7,7 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ### Features
 
-* **mini-rx-store, mini-rx-store-ng:** create effect ([ed5ac04](https://github.com/spierala/mini-rx-store/commit/ed5ac04f5763ca6cefe833e68d1fe17f639322f8))
-* **mini-rx-store, mini-rx-store-ng:** create effect ([ef7b6d8](https://github.com/spierala/mini-rx-store/commit/ef7b6d8b46ae4877cad4e8ba175759c87cfc93de))
-* **mini-rx-store, mini-rx-store-ng:** create effect ([3adaf87](https://github.com/spierala/mini-rx-store/commit/3adaf87275ff077ffe9b3398a2b9e225f1a1d374))
+* **mini-rx-store:** `createEffect` to create an effect with additional settings (`dispatch` prop)
 
 ## [4.0.0-beta.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-beta.0...mini-rx-store-4.0.0-beta.1) (2022-08-30)
 
