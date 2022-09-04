@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
 import { Observable } from 'rxjs';
 
-interface UserState {
+export const featureKeyUser = 'user';
+
+export interface UserState {
     user: User;
     permissions: Permissions;
 }

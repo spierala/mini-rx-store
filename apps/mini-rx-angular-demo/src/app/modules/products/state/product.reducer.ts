@@ -17,7 +17,7 @@ import { on, reducer } from 'ts-action';
 import { Product } from '../models/product';
 import { CartItem } from '../models/cart-item';
 
-// State for this feature (Product)
+// STATE INTERFACE
 export interface ProductState {
     showProductCode: boolean;
     selectedProduct: Product | undefined;
@@ -26,6 +26,7 @@ export interface ProductState {
     cart: CartItem[];
 }
 
+// INITIAL STATE
 const initialState: ProductState = {
     showProductCode: true,
     selectedProduct: undefined,
@@ -53,7 +54,7 @@ export const productReducer = reducer<ProductState>(
         ...state,
         products: [],
     })),
-    on(updateProductSuccess, (state, { payload }) => {
+    on(updateProductOptimistic, (state, { payload }) => {
         const updatedProducts = state.products.map((item) =>
             payload.id === item.id ? payload : item
         );
@@ -62,14 +63,13 @@ export const productReducer = reducer<ProductState>(
             products: updatedProducts,
         };
     }),
-    on(updateProductOptimistic, (state, { payload }) => {
+    on(updateProductSuccess, (state, { payload }) => {
         const updatedProducts = state.products.map((item) =>
             payload.id === item.id ? payload : item
         );
         return {
             ...state,
             products: updatedProducts,
-            selectedProduct: payload,
         };
     }),
     on(createProductSuccess, (state, { payload }) => ({
