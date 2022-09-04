@@ -24,6 +24,7 @@ export class Store {
         StoreCore.config(config);
     }
 
+    /** @internal */
     /** @deprecated This is an internal implementation detail, do not use. */
     static configureStore(config: Partial<StoreConfig<AppState>>): Store | never {
         if (!Store.instance) {
