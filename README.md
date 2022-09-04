@@ -17,12 +17,18 @@ What's new?
 - Even more lightweight
 - `tapResponse` operator (handle API response in `FeatureStore.effect`)
 - `mapResponse` operator (handle API response in Redux Effects)
-- Many Feature Store instances with the `multi: true` config
+- Allow many Feature Store instances with the same featureKey using the `multi: true` config
 - `FeatureStore.effect`: the returned function accepts also an Observable as argument
-- Full Ivy support in Angular
+- `createEffect` can be used to create non-dispatching effects (using the `dispatch: false` config)
 - Many more internal improvements
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
+
+#### Angular Integration (mini-rx-store-ng)
+- Full Ivy support in Angular
+- BREAKING CHANGE: `createEffect` **must** be used for creating effects which are registered via the EffectsModule
+
+Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/CHANGELOG.md) of the Angular Integration.
 
 ## Installation
 `npm i mini-rx-store@beta`
