@@ -29,6 +29,7 @@ export function miniRxConsoleError(message: string, err: any): void {
     console.error(miniRxNameSpace + ': ' + message + '\nDetails:', err);
 }
 
+/** @internal */
 export function hasEffectMetaData(
     param: Observable<Action>
 ): param is Observable<Action> & HasEffectMetadata {

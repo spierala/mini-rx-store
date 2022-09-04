@@ -231,4 +231,5 @@ function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> 
 }
 
 // Created once to initialize singleton
+/** @internal */
 export default new StoreCore();
