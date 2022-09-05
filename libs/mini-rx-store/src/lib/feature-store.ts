@@ -1,4 +1,4 @@
-import { isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { generateId, miniRxError, select } from './utils';
@@ -7,15 +7,12 @@ import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { createSetStateAction, isSetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
-    state$: Observable<StateType> = StoreCore.select((state) => state[this.featureKey]);
+    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
+        {} as StateType
+    );
+    state$: Observable<StateType> = this.stateSource.asObservable();
     get state(): StateType {
-        let value: StateType;
-        this.state$
-            .subscribe((state) => {
-                value = state;
-            })
-            .unsubscribe();
-        return value!;
+        return this.stateSource.getValue();
     }
 
     // tslint:disable-next-line:variable-name
@@ -24,7 +21,7 @@ export class FeatureStore<StateType extends object> {
         return this._featureKey;
     }
 
-    private sub = new Subscription();
+    private sub: Subscription;
     private readonly featureId: string;
 
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
@@ -35,6 +32,8 @@ export class FeatureStore<StateType extends object> {
             createFeatureReducer(this.featureId, initialState),
             config
         );
+
+        this.sub = StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource);
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
