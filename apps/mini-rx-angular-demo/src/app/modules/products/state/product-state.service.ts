@@ -18,8 +18,9 @@ import {
 import { Product } from '../models/product';
 import { Observable } from 'rxjs';
 import { CartItem } from '../models/cart-item';
+import { featureKeyUser, UserState } from '../../user/state/user-state.service';
 
-// Selector functions
+// MEMOIZED SELECTORS
 const getProductFeatureState = createFeatureSelector<fromProducts.ProductState>('products');
 const getShowProductCode = createSelector(getProductFeatureState, (state) => state.showProductCode);
 const getSelectedProduct = createSelector(getProductFeatureState, (state) => state.selectedProduct);
@@ -69,10 +70,24 @@ const getCartTotalPrice = createSelector(getCartItemsWithExtraData, (cartItemsWi
     }, 0)
 );
 
+const getUserFeatureState = createFeatureSelector<UserState>(featureKeyUser);
+const getPermissions = createSelector(getUserFeatureState, (state) => state.permissions);
+const getDetailTitle = createSelector(
+    getPermissions,
+    getSelectedProduct,
+    (permissions, product) => {
+        if (permissions.canUpdateProducts) {
+            return product && product.id ? 'Edit Product' : 'Create Product';
+        }
+        return 'View Product';
+    }
+);
+
 @Injectable({
     providedIn: 'root',
 })
 export class ProductStateService {
+    // STATE OBSERVABLES
     displayCode$: Observable<boolean> = this.store.select(getShowProductCode);
     selectedProduct$: Observable<Product | undefined> = this.store.select(getSelectedProduct);
     products$: Observable<Product[]> = this.store.select(getFilteredProducts);
@@ -81,6 +96,7 @@ export class ProductStateService {
     cartItemsAmount$: Observable<number> = this.store.select(getCartItemsAmount);
     cartTotalPrice$: Observable<number> = this.store.select(getCartTotalPrice);
     hasCartItems$: Observable<boolean> = this.store.select(getHasCartItems);
+    detailTitle$: Observable<string> = this.store.select(getDetailTitle);
 
     constructor(private store: Store) {
         this.load();
@@ -98,7 +114,7 @@ export class ProductStateService {
         this.store.dispatch(initializeNewProduct());
     }
 
-    productSelected(product: Product): void {
+    selectProduct(product: Product): void {
         this.store.dispatch(selectProduct(product));
     }
 

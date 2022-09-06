@@ -20,7 +20,7 @@ function updateApiUrl(altKeyPressed: boolean) {
 @Injectable({
     providedIn: 'root',
 })
-export class TodosApiService {
+export class TodoApiService {
     constructor(
         private http: HttpClient,
         private toastr: ToastrService,
