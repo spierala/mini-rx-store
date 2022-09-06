@@ -1,5 +1,5 @@
 import { InMemoryDbService } from 'angular-in-memory-web-api';
-import { Todo } from '../modules/todo/models/todo';
+import { Todo } from '../modules/todo-shared/models/todo';
 import { Product } from '../modules/products/models/product';
 
 const INITIAL_ID = 1;

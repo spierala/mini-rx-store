@@ -11,6 +11,11 @@ const appRoutes: Routes = [
         component: TodoShellComponent,
     },
     {
+        path: 'todos-simple',
+        loadChildren: () =>
+            import('./modules/todos-simple/todos-simple.module').then((m) => m.TodosSimpleModule),
+    },
+    {
         path: 'products',
         loadChildren: () =>
             import('./modules/products/products.module').then((m) => m.ProductsModule),

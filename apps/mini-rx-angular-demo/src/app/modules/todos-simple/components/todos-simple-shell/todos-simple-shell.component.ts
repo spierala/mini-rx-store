@@ -1,18 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Todo } from '../../../todo-shared/models/todo';
-import { TodoFilter } from '../../../todo-shared/models/todo-filter';
-import { TodosStateService } from '../../state/todos-state.service';
 import { map } from 'rxjs/operators';
 import { cloneDeep } from 'lodash-es';
+import { TodoFilter } from '../../../todo-shared/models/todo-filter';
+import { TodosSimpleStateService } from '../../state/todos-simple-state.service';
 
 @Component({
-    selector: 'app-todo-shell',
-    templateUrl: './todo-shell.component.html',
-    styleUrls: ['./todo-shell.component.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-todos-simple',
+    templateUrl: './todos-simple-shell.component.html',
+    styleUrls: ['./todos-simple-shell.component.css'],
 })
-export class TodoShellComponent {
+export class TodosSimpleShellComponent {
     todosDone$: Observable<Todo[]> = this.todosState.todosDone$;
     todosNotDone$: Observable<Todo[]> = this.todosState.todosNotDone$;
     selectedTodo$: Observable<Todo | undefined> = this.todosState.selectedTodo$.pipe(
@@ -20,5 +19,5 @@ export class TodoShellComponent {
     );
     filter$: Observable<TodoFilter> = this.todosState.filter$;
 
-    constructor(public todosState: TodosStateService) {}
+    constructor(public todosState: TodosSimpleStateService) {}
 }

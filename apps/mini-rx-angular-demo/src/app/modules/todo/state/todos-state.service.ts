@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Todo } from '../models/todo';
-import { Filter } from '../models/filter';
+import { Todo } from '../../todo-shared/models/todo';
+import { TodoFilter } from '../../todo-shared/models/todo-filter';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { TodosApiService } from '../services/todos-api.service';
+import { TodosApiService } from '../../todo-shared/services/todos-api.service';
 import { v4 as uuid } from 'uuid';
 import {
     Action,
@@ -16,7 +16,7 @@ import {
 // STATE INTERFACE
 interface TodoState {
     todos: Todo[];
-    filter: Filter;
+    filter: TodoFilter;
     selectedTodo: Todo | undefined;
 }
 
@@ -61,7 +61,7 @@ export class TodosStateService extends FeatureStore<TodoState> {
     // STATE OBSERVABLES
     todosDone$: Observable<Todo[]> = this.select(getTodosDone);
     todosNotDone$: Observable<Todo[]> = this.select(getTodosNotDone);
-    filter$: Observable<Filter> = this.select(getFilter);
+    filter$: Observable<TodoFilter> = this.select(getFilter);
     selectedTodo$: Observable<Todo | undefined> = this.select(getSelectedTodo);
 
     constructor(private apiService: TodosApiService) {
@@ -90,7 +90,7 @@ export class TodosStateService extends FeatureStore<TodoState> {
         );
     }
 
-    updateFilter(filter: Filter) {
+    updateFilter(filter: TodoFilter) {
         this.setState(
             (state) => ({
                 filter: {
