@@ -52,7 +52,7 @@ export class AppModule {
 
 ### Register Feature Reducers in Angular Feature Modules
 
-```ts title="todos.module.ts"
+```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
 import { StoreModule } from 'mini-rx-store-ng';
 import todoReducer from './todo-reducer';
@@ -62,7 +62,7 @@ import todoReducer from './todo-reducer';
     StoreModule.forFeature('todo', todoReducer),
   ]
 })
-export class TodosModule {
+export class TodoModule {
   constructor() {
   }
 }
@@ -102,7 +102,7 @@ export class TodoEffects {
 ```
 
 Register the effects
-```ts title="todos.module.ts"
+```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
 
 import { EffectsModule, StoreModule } from 'mini-rx-store-ng';
@@ -116,7 +116,7 @@ import { todoReducer } from './todo-reducer';
     EffectsModule.register([TodoEffects]),
   ]
 })
-export class TodosModule {
+export class TodoModule {
 }
 ```
 The `register` method from the EffectsModule accepts an array of classes with effects and can be used in both, root and feature modules.
