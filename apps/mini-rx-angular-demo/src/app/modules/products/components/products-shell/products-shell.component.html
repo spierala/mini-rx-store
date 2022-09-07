@@ -35,7 +35,7 @@
                     [selectedProduct]="(productState.selectedProduct$ | async)!"
                     [displayCode]="(productState.displayCode$ | async)!"
                     [showCartBtn]="!permissions.canUpdateProducts"
-                    (productSelect)="productState.productSelected($event)"
+                    (productSelect)="productState.selectProduct($event)"
                     (displayCodeChange)="productState.toggleProductCode($event)"
                     (addToCart)="productState.addProductToCart($event)"
                 ></app-product-list>
@@ -43,7 +43,7 @@
             <div class="col" *ngIf="productState.selectedProduct$ | async as selectedProduct">
                 <app-product-detail
                     [product]="selectedProduct"
-                    [detailTitle]="(detailTitle$ | async)!"
+                    [detailTitle]="(productState.detailTitle$ | async)!"
                     [permissions]="(userState.permissions$ | async)!"
                     (create)="productState.create($event)"
                     (update)="productState.update($event)"

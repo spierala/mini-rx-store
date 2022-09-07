@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Todo } from '../../todo-shared/models/todo';
 import { TodoFilter } from '../../todo-shared/models/todo-filter';
-import { EMPTY, Observable } from 'rxjs';
-import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { TodosApiService } from '../../todo-shared/services/todos-api.service';
+import { Observable } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 import {
     Action,
@@ -12,6 +11,7 @@ import {
     FeatureStore,
     tapResponse,
 } from 'mini-rx-store';
+import { TodosApiService } from '../../todo-shared/services/todos-api.service';
 
 // STATE INTERFACE
 interface TodoState {
@@ -163,24 +163,20 @@ export class TodosStateService extends FeatureStore<TodoState> {
             'updateOptimistic'
         );
 
-        this.apiService
-            .updateTodo(todo)
-            .pipe(
-                tap((updatedTodo) => {
-                    this.setState(
-                        (state) => ({
-                            todos: updateTodoInList(state.todos, updatedTodo),
-                        }),
-                        'updateSuccess'
-                    );
-                }),
-                catchError((err) => {
-                    console.error(err);
-                    this.undo(optimisticUpdate);
-                    return EMPTY;
-                })
-            )
-            .subscribe();
+        this.apiService.updateTodo(todo).subscribe({
+            next: (updatedTodo) => {
+                this.setState(
+                    (state) => ({
+                        todos: updateTodoInList(state.todos, updatedTodo),
+                    }),
+                    'updateSuccess'
+                );
+            },
+            error: (err) => {
+                console.error(err);
+                this.undo(optimisticUpdate);
+            },
+        });
     }
 
     // ...with subscribe (and optimistic update / undo)
@@ -193,16 +189,12 @@ export class TodosStateService extends FeatureStore<TodoState> {
             'deleteOptimistic'
         );
 
-        this.apiService
-            .deleteTodo(todo)
-            .pipe(
-                catchError((err) => {
-                    console.error(err);
-                    this.undo(optimisticUpdate);
-                    return EMPTY;
-                })
-            )
-            .subscribe();
+        this.apiService.deleteTodo(todo).subscribe({
+            error: (err) => {
+                console.error(err);
+                this.undo(optimisticUpdate);
+            },
+        });
     }
 }
 
