@@ -104,8 +104,8 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     // API CALLS...
     // ...with effect
-    load = this.effect((payload$) => {
-        return payload$.pipe(
+    load = this.effect((trigger$) => {
+        return trigger$.pipe(
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
                     tapResponse(
