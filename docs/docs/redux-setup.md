@@ -23,12 +23,12 @@ We can configure the feature reducers via the configuration object. The reducers
 
 ```ts
 import { configureStore, Store } from 'mini-rx-store';
-import productReducer from './product-reducer';
+import productsReducer from './product-reducer';
 import userReducer from './user-reducer';
 
 const store: Store = configureStore({
   reducers: {
-    product: productReducer,
+    product: productsReducer,
     user: userReducer
   }
 });
@@ -50,7 +50,7 @@ import counterReducer from './counter-reducer';
 
 const store: Store = configureStore({
   reducers: {
-    product: productReducer,
+    product: productsReducer,
     user: userReducer
   },
   initialState: {

@@ -21,7 +21,7 @@ function updateApiUrl(altKeyPressed: boolean) {
 @Injectable({
     providedIn: 'root',
 })
-export class ProductApiService {
+export class ProductsApiService {
     constructor(
         private http: HttpClient,
         private errorHandler: ErrorHandlerService,

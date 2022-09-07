@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ProductStore } from '../../../products/state/product-store.service';
+import { ProductsStore } from '../../../products/state/products-store.service';
 
 @Component({
     selector: 'app-cart',
@@ -7,5 +7,5 @@ import { ProductStore } from '../../../products/state/product-store.service';
     styleUrls: ['./cart-shell.component.css'],
 })
 export class CartShellComponent {
-    constructor(public productStore: ProductStore) {}
+    constructor(public productStore: ProductsStore) {}
 }

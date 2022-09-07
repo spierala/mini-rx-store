@@ -12,7 +12,7 @@ import {
     updateProductOptimistic,
     updateProductSuccess,
     updateSearch,
-} from './product.actions';
+} from './products.actions';
 import { on, reducer } from 'ts-action';
 import { Product } from '../models/product';
 import { CartItem } from '../models/cart-item';
@@ -40,7 +40,7 @@ const initialState: ProductState = {
     ],
 };
 
-export const productReducer = reducer<ProductState>(
+export const productsReducer = reducer<ProductState>(
     initialState,
     on(toggleProductCode, (state, { payload }) => ({ ...state, showProductCode: payload })),
     on(selectProduct, (state, { payload }) => ({ ...state, selectedProduct: payload })),

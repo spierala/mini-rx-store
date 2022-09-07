@@ -10,7 +10,7 @@ import { TodoModule } from './modules/todos/todo.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
-import { ProductStateModule } from './modules/products/state/product-state.module';
+import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
@@ -35,7 +35,7 @@ import { ToastrModule } from 'ngx-toastr';
             maxAge: 25,
             latency: 250,
         }),
-        ProductStateModule,
+        ProductsStateModule,
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
