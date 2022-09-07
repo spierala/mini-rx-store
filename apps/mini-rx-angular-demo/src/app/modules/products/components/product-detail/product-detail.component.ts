@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../../models/product';
 import { NgForm } from '@angular/forms';
-import { Permissions } from '../../../user/state/user-state.service';
+import { Permissions } from '../../../user/state/user-store.service';
 
 @Component({
     selector: 'app-product-detail',

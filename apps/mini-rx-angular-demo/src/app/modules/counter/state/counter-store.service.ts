@@ -11,7 +11,7 @@ const initialState: CounterState = {
 };
 
 @Injectable()
-export class CounterStateService extends FeatureStore<CounterState> {
+export class CounterStore extends FeatureStore<CounterState> {
     count$: Observable<number> = this.select((state) => state.count);
 
     constructor() {

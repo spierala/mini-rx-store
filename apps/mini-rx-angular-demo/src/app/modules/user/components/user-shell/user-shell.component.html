@@ -4,14 +4,14 @@
     </nav>
 
     <div class="container">
-        <ng-container *ngIf="userState.user$ | async as user">
+        <ng-container *ngIf="userStore.user$ | async as user">
             <div class="form-group">
                 <label for="firstName">First name</label>
                 <input
                     class="form-control"
                     type="text"
                     [ngModel]="user.firstName"
-                    (ngModelChange)="userState.updateUser({ firstName: $event })"
+                    (ngModelChange)="userStore.updateUser({ firstName: $event })"
                     id="firstName"
                     name="firstName"
                     placeholder="First name"
@@ -23,7 +23,7 @@
                     class="form-control"
                     type="text"
                     [ngModel]="user.lastName"
-                    (ngModelChange)="userState.updateUser({ lastName: $event })"
+                    (ngModelChange)="userStore.updateUser({ lastName: $event })"
                     id="lastName"
                     name="lastName"
                     placeholder="Last name"
@@ -36,7 +36,7 @@
                 <span class="flex-grow-1">Permissions</span>
             </div>
             <div class="card-body">
-                <div class="form-group" *ngIf="userState.permissions$ | async as permissions">
+                <div class="form-group" *ngIf="userStore.permissions$ | async as permissions">
                     <div class="custom-control custom-switch">
                         <input
                             type="checkbox"
@@ -44,7 +44,7 @@
                             id="canUpdateProducts"
                             name="canUpdateProducts"
                             [ngModel]="permissions.canUpdateProducts"
-                            (ngModelChange)="userState.toggleCanUpdateProducts()"
+                            (ngModelChange)="userStore.toggleCanUpdateProducts()"
                         />
                         <label class="custom-control-label" for="canUpdateProducts">
                             CanUpdateProducts

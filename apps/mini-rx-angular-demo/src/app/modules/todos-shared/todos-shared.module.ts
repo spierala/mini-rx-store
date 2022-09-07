@@ -10,4 +10,4 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     exports: [TodoListComponent, TodoDetailComponent, TodoFilterComponent],
     imports: [CommonModule, ReactiveFormsModule, FormsModule],
 })
-export class TodoSharedModule {}
+export class TodosSharedModule {}

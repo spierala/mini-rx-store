@@ -11,10 +11,10 @@
         </a>
         <ul class="d-flex flex-grow-1 navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item" [routerLinkActive]="'active'">
-                <a class="nav-link" [routerLink]="'/todos'">Todos</a>
+                <a class="nav-link" [routerLink]="'/todos-simple'">Todos Simple</a>
             </li>
             <li class="nav-item" [routerLinkActive]="'active'">
-                <a class="nav-link" [routerLink]="'/todos-simple'">Todos Simple</a>
+                <a class="nav-link" [routerLink]="'/todos'">Todos</a>
             </li>
             <li class="nav-item" [routerLinkActive]="'active'">
                 <a class="nav-link" [routerLink]="'/products'">Products</a>
@@ -25,7 +25,7 @@
             <li class="nav-item" [routerLinkActive]="'active'">
                 <a class="nav-link d-flex align-items-center" [routerLink]="'/user'">
                     <i class="bi bi-person-circle mr-1"></i>
-                    {{ userState.userFullName$ | async }}
+                    {{ userStore.userFullName$ | async }}
                 </a>
             </li>
             <li class="nav-item" [routerLinkActive]="'active'">
@@ -33,7 +33,7 @@
                     <i class="bi bi-cart-fill mr-1"></i>
                     <span class="mr-2">Cart</span>
                     <span class="badge badge-light">
-                        {{ productState.cartItemsAmount$ | async }}
+                        {{ productStore.cartItemsAmount$ | async }}
                     </span>
                 </a>
             </li>

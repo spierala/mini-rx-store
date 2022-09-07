@@ -1,10 +1,10 @@
 <div class="d-flex flex-column h-100">
     <nav class="navbar navbar-light bg-light mb-4">
-        <a class="navbar-brand">Todos</a>
+        <a class="navbar-brand">Todos Simple</a>
         <div class="d-flex flex-grow-1 mb-2 justify-content-between mt-2">
-            <button class="btn btn-primary btn-sm" (click)="todosState.initNewTodo()">New</button>
+            <button class="btn btn-primary btn-sm" (click)="todosSimpleStore.initNewTodo()">New</button>
             <app-filter
-                (filterUpdate)="todosState.updateFilter($event)"
+                (filterUpdate)="todosSimpleStore.updateFilter($event)"
                 [filter]="(filter$ | async)!"
             ></app-filter>
         </div>
@@ -20,7 +20,7 @@
                     <app-todo-list
                         [todos]="(todosNotDone$ | async)!"
                         [selectedTodo]="(selectedTodo$ | async)!"
-                        (selectTodo)="todosState.selectTodo($event)"
+                        (selectTodo)="todosSimpleStore.selectTodo($event)"
                     ></app-todo-list>
                 </div>
             </div>
@@ -32,17 +32,17 @@
                     <app-todo-list
                         [todos]="(todosDone$ | async)!"
                         [selectedTodo]="(selectedTodo$ | async)!"
-                        (selectTodo)="todosState.selectTodo($event)"
+                        (selectTodo)="todosSimpleStore.selectTodo($event)"
                     ></app-todo-list>
                 </div>
             </div>
             <div class="col" *ngIf="selectedTodo$ | async as selectedTodo">
                 <app-todo-detail
                     [todo]="selectedTodo"
-                    (create)="todosState.create($event)"
-                    (update)="todosState.update($event)"
-                    (delete)="todosState.delete($event)"
-                    (close)="todosState.clearSelectedTodo()"
+                    (create)="todosSimpleStore.create($event)"
+                    (update)="todosSimpleStore.update($event)"
+                    (delete)="todosSimpleStore.delete($event)"
+                    (close)="todosSimpleStore.clearSelectedTodo()"
                 ></app-todo-detail>
             </div>
         </div>

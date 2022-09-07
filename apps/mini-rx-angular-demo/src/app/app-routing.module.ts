@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { TodoShellComponent } from './modules/todo/components/todo-shell/todo-shell.component';
+import { TodosShellComponent } from './modules/todos/components/todos-shell/todos-shell.component';
 import { APP_BASE_HREF } from '@angular/common';
 import { CounterShellComponent } from './modules/counter/counter-shell/counter-shell.component';
 import { UserShellComponent } from './modules/user/components/user-shell/user-shell.component';
@@ -8,7 +8,7 @@ import { UserShellComponent } from './modules/user/components/user-shell/user-sh
 const appRoutes: Routes = [
     {
         path: 'todos',
-        component: TodoShellComponent,
+        component: TodosShellComponent,
     },
     {
         path: 'todos-simple',

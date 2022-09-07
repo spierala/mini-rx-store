@@ -41,7 +41,7 @@ const getPermissions = createSelector(getUserFeatureState, (state) => state.perm
 @Injectable({
     providedIn: 'root',
 })
-export class UserStateService extends FeatureStore<UserState> {
+export class UserStore extends FeatureStore<UserState> {
     permissions$: Observable<Permissions> = this.select(getPermissions);
     userFullName$: Observable<string> = this.select(getUserFullName);
     user$: Observable<User> = this.select(getUser);

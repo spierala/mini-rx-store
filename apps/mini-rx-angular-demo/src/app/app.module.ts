@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
-import { TodoModule } from './modules/todo/todo.module';
+import { TodoModule } from './modules/todos/todo.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';

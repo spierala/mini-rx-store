@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Todo } from '../../todo-shared/models/todo';
-import { TodoFilter } from '../../todo-shared/models/todo-filter';
+import { Todo } from '../../todos-shared/models/todo';
+import { TodoFilter } from '../../todos-shared/models/todo-filter';
 import { Observable } from 'rxjs';
-import { TodosApiService } from '../../todo-shared/services/todos-api.service';
+import { TodosApiService } from '../../todos-shared/services/todos-api.service';
 import { FeatureStore } from 'mini-rx-store';
 
 // STATE INTERFACE
-interface TodoState {
+interface TodosState {
     todos: Todo[];
     filter: TodoFilter;
     selectedTodo: Todo | undefined;
 }
 
 // INITIAL STATE
-const initialState: TodoState = {
+const initialState: TodosState = {
     todos: [],
     selectedTodo: undefined,
     filter: {
@@ -28,7 +28,7 @@ const initialState: TodoState = {
 @Injectable({
     providedIn: 'root',
 })
-export class TodosSimpleStateService extends FeatureStore<TodoState> {
+export class TodosSimpleStore extends FeatureStore<TodosState> {
     // STATE OBSERVABLES
     todosDone$: Observable<Todo[]> = this.select((state) => {
         const filteredTodos = filterTodos(state.todos, state.filter);
