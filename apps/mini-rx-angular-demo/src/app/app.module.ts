@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
-import { TodoModule } from './modules/todos/todo.module';
+import { TodosModule } from './modules/todos/todos.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
@@ -23,7 +23,7 @@ import { ToastrModule } from 'ngx-toastr';
         HttpClientInMemoryWebApiModule.forRoot(DbService, { delay: 500, put204: false }),
         AppRoutingModule,
         ToastrModule.forRoot(),
-        TodoModule,
+        TodosModule,
         CounterModule,
         UserModule,
         StoreModule.forRoot({
