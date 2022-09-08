@@ -6,14 +6,14 @@
                 <button
                     *ngIf="permissions.canUpdateProducts"
                     class="btn btn-primary btn-sm"
-                    (click)="productStore.newProduct()"
+                    (click)="productsStore.newProduct()"
                 >
                     New
                 </button>
             </div>
             <app-product-filter
-                [search]="(productStore.search$ | async)!"
-                (searchChanged)="productStore.updateSearch($event)"
+                [search]="(productsStore.search$ | async)!"
+                (searchChanged)="productsStore.updateSearch($event)"
             ></app-product-filter>
         </div>
     </nav>
@@ -31,24 +31,24 @@
         <div class="row">
             <div class="col">
                 <app-product-list
-                    [products]="(productStore.products$ | async)!"
-                    [selectedProduct]="(productStore.selectedProduct$ | async)!"
-                    [displayCode]="(productStore.displayCode$ | async)!"
+                    [products]="(productsStore.products$ | async)!"
+                    [selectedProduct]="(productsStore.selectedProduct$ | async)!"
+                    [displayCode]="(productsStore.displayCode$ | async)!"
                     [showCartBtn]="!permissions.canUpdateProducts"
-                    (productSelect)="productStore.selectProduct($event)"
-                    (displayCodeChange)="productStore.toggleProductCode($event)"
-                    (addToCart)="productStore.addProductToCart($event)"
+                    (productSelect)="productsStore.selectProduct($event)"
+                    (displayCodeChange)="productsStore.toggleProductCode($event)"
+                    (addToCart)="productsStore.addProductToCart($event)"
                 ></app-product-list>
             </div>
-            <div class="col" *ngIf="productStore.selectedProduct$ | async as selectedProduct">
+            <div class="col" *ngIf="productsStore.selectedProduct$ | async as selectedProduct">
                 <app-product-detail
                     [product]="selectedProduct"
-                    [detailTitle]="(productStore.detailTitle$ | async)!"
+                    [detailTitle]="(productsStore.detailTitle$ | async)!"
                     [permissions]="(userStore.permissions$ | async)!"
-                    (create)="productStore.create($event)"
-                    (update)="productStore.update($event)"
-                    (delete)="productStore.delete($event)"
-                    (close)="productStore.clearCurrentProduct()"
+                    (create)="productsStore.create($event)"
+                    (update)="productsStore.update($event)"
+                    (delete)="productsStore.delete($event)"
+                    (close)="productsStore.clearCurrentProduct()"
                 ></app-product-detail>
             </div>
         </div>

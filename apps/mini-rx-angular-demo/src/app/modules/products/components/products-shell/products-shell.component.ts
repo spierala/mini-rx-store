@@ -8,5 +8,5 @@ import { UserStore } from '../../../user/state/user-store.service';
     styleUrls: ['./products-shell.component.css'],
 })
 export class ProductsShellComponent {
-    constructor(public productStore: ProductsStore, public userStore: UserStore) {}
+    constructor(public productsStore: ProductsStore, public userStore: UserStore) {}
 }

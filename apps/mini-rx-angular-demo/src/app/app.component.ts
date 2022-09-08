@@ -9,5 +9,5 @@ import { UserStore } from './modules/user/state/user-store.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-    constructor(public productStore: ProductsStore, public userStore: UserStore) {}
+    constructor(public productsStore: ProductsStore, public userStore: UserStore) {}
 }

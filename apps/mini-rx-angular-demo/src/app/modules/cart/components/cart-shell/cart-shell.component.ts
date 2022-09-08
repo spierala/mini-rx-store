@@ -6,5 +6,5 @@ import { ProductsStore } from '../../../products/state/products-store.service';
     styleUrls: ['./cart-shell.component.css'],
 })
 export class CartShellComponent {
-    constructor(public productStore: ProductsStore) {}
+    constructor(public productsStore: ProductsStore) {}
 }
