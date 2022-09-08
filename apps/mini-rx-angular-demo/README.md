@@ -11,11 +11,15 @@ MiniRx is a RxJS Redux Store.
 MiniRx provides simple yet powerful state management with **[Feature Stores](https://spierala.github.io/mini-rx-store/docs/fs-quick-start)**.
 To manage state at large scale you can use the classic **[Redux API](https://spierala.github.io/mini-rx-store/docs/redux)**.
 
-The Demo uses both the Redux API and the Feature Store API:
+This demo uses both the Redux API and the Feature Store API:
 
+- Todos Simple: Feature Store API
 - Todos: Feature Store API
 - Products and Cart: Redux API
 - User: Feature Store API
+
+### Install dependencies
+`npm install`
 
 ### Run the demo
 `npm run start:angular-demo`
