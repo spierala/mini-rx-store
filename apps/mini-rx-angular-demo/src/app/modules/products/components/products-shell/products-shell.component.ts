@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ProductStateService } from '../../state/product-state.service';
-import { UserStateService } from '../../../user/state/user-state.service';
+import { ProductsStore } from '../../state/products-store.service';
+import { UserStore } from '../../../user/state/user-store.service';
 
 @Component({
     selector: 'app-products',
@@ -8,5 +8,5 @@ import { UserStateService } from '../../../user/state/user-state.service';
     styleUrls: ['./products-shell.component.css'],
 })
 export class ProductsShellComponent {
-    constructor(public productState: ProductStateService, public userState: UserStateService) {}
+    constructor(public productsStore: ProductsStore, public userStore: UserStore) {}
 }

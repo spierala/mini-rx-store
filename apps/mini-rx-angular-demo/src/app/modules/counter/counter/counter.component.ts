@@ -1,23 +1,23 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CounterStateService } from '../state/counter-state.service';
+import { CounterStore } from '../state/counter-store.service';
 
 @Component({
     selector: 'app-counter',
     templateUrl: './counter.component.html',
     styleUrls: ['./counter.component.css'],
-    providers: [CounterStateService], // The CounterState is provided for each counter component instance
+    providers: [CounterStore], // The CounterStore is provided for each counter component instance
 })
 export class CounterComponent {
-    counter$: Observable<number> = this.counterState.count$;
+    counter$: Observable<number> = this.counterStore.count$;
 
-    constructor(private counterState: CounterStateService) {}
+    constructor(private counterStore: CounterStore) {}
 
     increment() {
-        this.counterState.increment();
+        this.counterStore.increment();
     }
 
     decrement() {
-        this.counterState.decrement();
+        this.counterStore.decrement();
     }
 }

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Todo } from '../models/todo';
-import { Filter } from '../models/filter';
+import { Todo } from '../../todos-shared/models/todo';
+import { TodoFilter } from '../../todos-shared/models/todo-filter';
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { TodoApiService } from '../services/todo-api.service';
 import { v4 as uuid } from 'uuid';
 import {
     Action,
@@ -12,16 +11,17 @@ import {
     FeatureStore,
     tapResponse,
 } from 'mini-rx-store';
+import { TodosApiService } from '../../todos-shared/services/todos-api.service';
 
 // STATE INTERFACE
-interface TodoState {
+interface TodosState {
     todos: Todo[];
-    filter: Filter;
+    filter: TodoFilter;
     selectedTodo: Todo | undefined;
 }
 
 // INITIAL STATE
-const initialState: TodoState = {
+const initialState: TodosState = {
     todos: [],
     selectedTodo: undefined,
     filter: {
@@ -34,7 +34,7 @@ const initialState: TodoState = {
 };
 
 // MEMOIZED SELECTORS
-const getTodosFeatureSelector = createFeatureSelector<TodoState>();
+const getTodosFeatureSelector = createFeatureSelector<TodosState>();
 const getTodos = createSelector(getTodosFeatureSelector, (state) => state.todos);
 const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) => state.selectedTodo);
 const getFilter = createSelector(getTodosFeatureSelector, (state) => state.filter);
@@ -57,14 +57,14 @@ const getTodosNotDone = createSelector(getTodosFiltered, (todos) =>
 @Injectable({
     providedIn: 'root',
 })
-export class TodosStateService extends FeatureStore<TodoState> {
+export class TodosStore extends FeatureStore<TodosState> {
     // STATE OBSERVABLES
     todosDone$: Observable<Todo[]> = this.select(getTodosDone);
     todosNotDone$: Observable<Todo[]> = this.select(getTodosNotDone);
-    filter$: Observable<Filter> = this.select(getFilter);
+    filter$: Observable<TodoFilter> = this.select(getFilter);
     selectedTodo$: Observable<Todo | undefined> = this.select(getSelectedTodo);
 
-    constructor(private apiService: TodoApiService) {
+    constructor(private apiService: TodosApiService) {
         super('todos', initialState);
 
         this.load();
@@ -90,7 +90,7 @@ export class TodosStateService extends FeatureStore<TodoState> {
         );
     }
 
-    updateFilter(filter: Filter) {
+    updateFilter(filter: TodoFilter) {
         this.setState(
             (state) => ({
                 filter: {
@@ -104,8 +104,8 @@ export class TodosStateService extends FeatureStore<TodoState> {
 
     // API CALLS...
     // ...with effect
-    load = this.effect((payload$) => {
-        return payload$.pipe(
+    load = this.effect((trigger$) => {
+        return trigger$.pipe(
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
                     tapResponse(

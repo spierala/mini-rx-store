@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { ProductStateService } from '../../../products/state/product-state.service';
+import { ProductsStore } from '../../../products/state/products-store.service';
 
 @Component({
-    selector: 'app-cart',
     templateUrl: './cart-shell.component.html',
     styleUrls: ['./cart-shell.component.css'],
 })
 export class CartShellComponent {
-    constructor(public productState: ProductStateService) {}
+    constructor(public productsStore: ProductsStore) {}
 }

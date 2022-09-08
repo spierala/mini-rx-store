@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ProductStateService } from './modules/products/state/product-state.service';
-import { UserStateService } from './modules/user/state/user-state.service';
+import { ProductsStore } from './modules/products/state/products-store.service';
+import { UserStore } from './modules/user/state/user-store.service';
 
 @Component({
     selector: 'app-root',
@@ -9,5 +9,5 @@ import { UserStateService } from './modules/user/state/user-state.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-    constructor(public productState: ProductStateService, public userState: UserStateService) {}
+    constructor(public productsStore: ProductsStore, public userStore: UserStore) {}
 }

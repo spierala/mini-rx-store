@@ -1,4 +1,4 @@
-<div class="d-flex flex-column h-100" *ngIf="userState.permissions$ | async as permissions">
+<div class="d-flex flex-column h-100" *ngIf="userStore.permissions$ | async as permissions">
     <nav class="navbar navbar-light bg-light mb-1">
         <a class="navbar-brand">Products</a>
         <div class="d-flex flex-grow-1 mb-2 justify-content-between mt-2">
@@ -6,14 +6,14 @@
                 <button
                     *ngIf="permissions.canUpdateProducts"
                     class="btn btn-primary btn-sm"
-                    (click)="productState.newProduct()"
+                    (click)="productsStore.newProduct()"
                 >
                     New
                 </button>
             </div>
             <app-product-filter
-                [search]="(productState.search$ | async)!"
-                (searchChanged)="productState.updateSearch($event)"
+                [search]="(productsStore.search$ | async)!"
+                (searchChanged)="productsStore.updateSearch($event)"
             ></app-product-filter>
         </div>
     </nav>
@@ -31,24 +31,24 @@
         <div class="row">
             <div class="col">
                 <app-product-list
-                    [products]="(productState.products$ | async)!"
-                    [selectedProduct]="(productState.selectedProduct$ | async)!"
-                    [displayCode]="(productState.displayCode$ | async)!"
+                    [products]="(productsStore.products$ | async)!"
+                    [selectedProduct]="(productsStore.selectedProduct$ | async)!"
+                    [displayCode]="(productsStore.displayCode$ | async)!"
                     [showCartBtn]="!permissions.canUpdateProducts"
-                    (productSelect)="productState.selectProduct($event)"
-                    (displayCodeChange)="productState.toggleProductCode($event)"
-                    (addToCart)="productState.addProductToCart($event)"
+                    (productSelect)="productsStore.selectProduct($event)"
+                    (displayCodeChange)="productsStore.toggleProductCode($event)"
+                    (addToCart)="productsStore.addProductToCart($event)"
                 ></app-product-list>
             </div>
-            <div class="col" *ngIf="productState.selectedProduct$ | async as selectedProduct">
+            <div class="col" *ngIf="productsStore.selectedProduct$ | async as selectedProduct">
                 <app-product-detail
                     [product]="selectedProduct"
-                    [detailTitle]="(productState.detailTitle$ | async)!"
-                    [permissions]="(userState.permissions$ | async)!"
-                    (create)="productState.create($event)"
-                    (update)="productState.update($event)"
-                    (delete)="productState.delete($event)"
-                    (close)="productState.clearCurrentProduct()"
+                    [detailTitle]="(productsStore.detailTitle$ | async)!"
+                    [permissions]="(userStore.permissions$ | async)!"
+                    (create)="productsStore.create($event)"
+                    (update)="productsStore.update($event)"
+                    (delete)="productsStore.delete($event)"
+                    (close)="productsStore.clearCurrentProduct()"
                 ></app-product-detail>
             </div>
         </div>

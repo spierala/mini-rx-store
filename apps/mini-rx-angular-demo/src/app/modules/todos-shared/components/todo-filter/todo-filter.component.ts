@@ -8,24 +8,24 @@ import {
     Output,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Filter } from '../../models/filter';
+import { TodoFilter } from '../../models/todo-filter';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-filter',
-    templateUrl: './filter.component.html',
-    styleUrls: ['./filter.component.css'],
+    templateUrl: './todo-filter.component.html',
+    styleUrls: ['./todo-filter.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FilterComponent implements OnInit, OnDestroy {
+export class TodoFilterComponent implements OnInit, OnDestroy {
     @Input()
-    set filter(filter: Filter) {
+    set filter(filter: TodoFilter) {
         this.formGroup.setValue(filter, { emitEvent: false });
     }
 
     @Output()
-    filterUpdate = new EventEmitter<Filter>();
+    filterUpdate = new EventEmitter<TodoFilter>();
 
     formGroup: FormGroup = new FormGroup({
         search: new FormControl(),

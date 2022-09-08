@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import * as fromProducts from './product.reducer';
+import * as fromProducts from './products.reducer';
 import { createFeatureSelector, createSelector, Store } from 'mini-rx-store';
 import {
     addProductToCart,
@@ -14,11 +14,11 @@ import {
     toggleProductCode,
     updateProduct,
     updateSearch,
-} from './product.actions';
+} from './products.actions';
 import { Product } from '../models/product';
 import { Observable } from 'rxjs';
 import { CartItem } from '../models/cart-item';
-import { featureKeyUser, UserState } from '../../user/state/user-state.service';
+import { featureKeyUser, UserState } from '../../user/state/user-store.service';
 
 // MEMOIZED SELECTORS
 const getProductFeatureState = createFeatureSelector<fromProducts.ProductState>('products');
@@ -86,7 +86,7 @@ const getDetailTitle = createSelector(
 @Injectable({
     providedIn: 'root',
 })
-export class ProductStateService {
+export class ProductsStore {
     // STATE OBSERVABLES
     displayCode$: Observable<boolean> = this.store.select(getShowProductCode);
     selectedProduct$: Observable<Product | undefined> = this.store.select(getSelectedProduct);

@@ -16,13 +16,13 @@ import {
     updateProductFail,
     updateProductOptimistic,
     updateProductSuccess,
-} from './product.actions';
+} from './products.actions';
 import { Product } from '../models/product';
-import { ProductApiService } from '../services/product-api.service';
+import { ProductsApiService } from '../services/products-api.service';
 
 @Injectable()
-export class ProductEffects {
-    constructor(private productService: ProductApiService, private actions$: Actions) {}
+export class ProductsEffects {
+    constructor(private productService: ProductsApiService, private actions$: Actions) {}
 
     loadProducts$ = createEffect(
         this.actions$.pipe(

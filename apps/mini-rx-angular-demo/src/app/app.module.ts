@@ -6,11 +6,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
-import { TodoModule } from './modules/todo/todo.module';
+import { TodosModule } from './modules/todos/todos.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
 import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
-import { ProductStateModule } from './modules/products/state/product-state.module';
+import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
@@ -23,7 +23,7 @@ import { ToastrModule } from 'ngx-toastr';
         HttpClientInMemoryWebApiModule.forRoot(DbService, { delay: 500, put204: false }),
         AppRoutingModule,
         ToastrModule.forRoot(),
-        TodoModule,
+        TodosModule,
         CounterModule,
         UserModule,
         StoreModule.forRoot({
@@ -35,7 +35,7 @@ import { ToastrModule } from 'ngx-toastr';
             maxAge: 25,
             latency: 250,
         }),
-        ProductStateModule,
+        ProductsStateModule,
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
