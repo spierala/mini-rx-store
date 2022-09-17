@@ -80,7 +80,7 @@ describe('Redux Dev Tools', () => {
         expect(sendFn).toHaveBeenCalledTimes(1);
         expect(sendFn).toHaveBeenCalledWith(
             {
-                type: '@mini-rx/set-state/user',
+                type: '@mini-rx/user/set-state',
                 payload: {
                     firstName: 'Cage',
                 },
