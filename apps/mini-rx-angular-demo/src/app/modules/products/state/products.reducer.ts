@@ -40,6 +40,7 @@ const initialState: ProductState = {
     ],
 };
 
+// REDUCER
 export const productsReducer = reducer<ProductState>(
     initialState,
     on(toggleProductCode, (state, { payload }) => ({ ...state, showProductCode: payload })),

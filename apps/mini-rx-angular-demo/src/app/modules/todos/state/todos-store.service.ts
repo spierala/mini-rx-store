@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Todo } from '../../todos-shared/models/todo';
 import { TodoFilter } from '../../todos-shared/models/todo-filter';
-import { Observable } from 'rxjs';
+import { Observable, pipe } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 import {
@@ -103,9 +103,9 @@ export class TodosStore extends FeatureStore<TodosState> {
     }
 
     // API CALLS...
-    // ...with effect
-    load = this.effect((trigger$) => {
-        return trigger$.pipe(
+    // Effect using the RxJS standalone pipe
+    load = this.effect<void>(
+        pipe(
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
                     tapResponse(
@@ -116,16 +116,16 @@ export class TodosStore extends FeatureStore<TodosState> {
                     )
                 )
             )
-        );
-    });
+        )
+    );
 
-    // ... with effect (and optimistic update / undo)
+    // Effect + optimistic update / undo
+    // We can skip the standalone pipe when using just one RxJS operator
     create = this.effect<Todo>(
-        // FYI: we can skip the payload$.pipe when using just one RxJS operator
         mergeMap((todo) => {
             const optimisticUpdate: Action = this.setState((state) => {
                 // Create a new Todo object to prevent the Immutable Extension from making the current form model immutable
-                // This is only a concern if the create call fails (which would return a new Todo object)
+                // This is only a concern if the create call fails (A successful create call would return a new Todo object)
                 const newTodo: Todo = { ...todo };
                 return {
                     todos: [...state.todos, newTodo],
@@ -133,8 +133,8 @@ export class TodosStore extends FeatureStore<TodosState> {
             }, 'createOptimistic');
 
             return this.apiService.createTodo(todo).pipe(
-                tapResponse({
-                    next: (createdTodo) => {
+                tapResponse(
+                    (createdTodo) => {
                         this.setState(
                             (state) => ({
                                 todos: state.todos.map((item) =>
@@ -145,16 +145,16 @@ export class TodosStore extends FeatureStore<TodosState> {
                             'createSuccess'
                         );
                     },
-                    error: (err) => {
+                    (err) => {
                         console.error(err);
                         this.undo(optimisticUpdate);
-                    },
-                })
+                    }
+                )
             );
         })
     );
 
-    // ...with subscribe (and optimistic update / undo)
+    // Classic subscribe + optimistic update / undo
     update(todo: Todo) {
         const optimisticUpdate: Action = this.setState(
             (state) => ({
@@ -179,7 +179,7 @@ export class TodosStore extends FeatureStore<TodosState> {
         });
     }
 
-    // ...with subscribe (and optimistic update / undo)
+    // Classic subscribe and optimistic update / undo
     delete(todo: Todo) {
         const optimisticUpdate: Action = this.setState(
             (state) => ({
