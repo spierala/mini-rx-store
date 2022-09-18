@@ -179,7 +179,7 @@ export class TodosStore extends FeatureStore<TodosState> {
         });
     }
 
-    // Classic subscribe and optimistic update / undo
+    // Classic subscribe + optimistic update / undo
     delete(todo: Todo) {
         const optimisticUpdate: Action = this.setState(
             (state) => ({
