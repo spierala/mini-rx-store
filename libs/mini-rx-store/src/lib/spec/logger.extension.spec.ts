@@ -39,11 +39,11 @@ describe('LoggerExtension', () => {
         }));
 
         expect(console.log).toHaveBeenCalledWith(
-            expect.stringContaining('@mini-rx/set-state/user'),
+            expect.stringContaining('@mini-rx/user/set-state'),
             expect.stringContaining('color: #25c2a0'),
             expect.stringContaining('Action:'),
             {
-                type: '@mini-rx/set-state/user',
+                type: '@mini-rx/user/set-state',
                 payload: {
                     firstName: 'Cage',
                 },

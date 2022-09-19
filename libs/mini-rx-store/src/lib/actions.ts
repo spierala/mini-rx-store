@@ -16,6 +16,10 @@ export interface SetStateAction<T> {
     miniRxActionType: MiniRxActionType; // Used for `isSetStateAction` type predicate
 }
 
+function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
+    return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
+}
+
 export function createSetStateAction<T>(
     stateOrCallback: StateOrCallback<T>,
     featureId: string,
@@ -42,10 +46,6 @@ export function createMiniRxAction(
     return {
         type: createMiniRxActionType(miniRxActionType, featureKey),
     };
-}
-
-function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
-    return miniRxNameSpace + '/' + miniRxActionType + (featureKey ? '/' + featureKey : '');
 }
 
 const key: keyof SetStateAction<any> = 'miniRxActionType';

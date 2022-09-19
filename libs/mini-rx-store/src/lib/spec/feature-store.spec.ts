@@ -328,7 +328,7 @@ describe('FeatureStore', () => {
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith(
             expect.objectContaining({
-                type: '@mini-rx/set-state/user2/updateCity',
+                type: '@mini-rx/user2/set-state/updateCity',
                 stateOrCallback: { city: 'NY' },
                 miniRxActionType: 'set-state',
                 featureId: expect.any(String),
@@ -395,10 +395,15 @@ describe('FeatureStore', () => {
             expect.objectContaining({ tempFsState: counterInitialState })
         );
 
+        const actionSpy = jest.fn();
+        actions$.subscribe(actionSpy);
+
         fs.destroy();
         expect(spy).toHaveBeenCalledWith(
             expect.not.objectContaining({ tempCounter: counterInitialState })
         );
+
+        expect(actionSpy).toHaveBeenCalledWith({ type: '@mini-rx/tempFsState/destroy-feature' });
     });
 
     it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {

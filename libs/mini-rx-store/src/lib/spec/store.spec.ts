@@ -116,6 +116,13 @@ describe('Store Config', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+    it('should dispatch an initial action', () => {
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+        StoreCore.config();
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/init-store' });
+    });
+
     it('should initialize the store with an empty object when root reducers have no initial state', () => {
         StoreCore.config({
             reducers: {
@@ -404,6 +411,15 @@ describe('Store', () => {
 
     it('should throw when reusing feature name', () => {
         expect(() => store.feature<UserState>('oneMoreFeature', userReducer)).toThrowError();
+    });
+
+    it('should dispatch an initial action when adding a feature', () => {
+        const spy = jest.fn();
+        actions$.subscribe(spy);
+
+        store.feature('oneMoreFeature3', (state) => state);
+
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init-feature' });
     });
 
     it('should update the Feature state', () => {
