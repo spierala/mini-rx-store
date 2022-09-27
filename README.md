@@ -8,9 +8,9 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Store 4 (beta)
+# MiniRx Store 4 (RELEASE CANDIDATE)
 
-MiniRx Store 4 beta has been released.
+MiniRx Store 4 RELEASE CANDIDATE has been released.
 
 What's new?
 
@@ -32,11 +32,11 @@ Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/mast
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/CHANGELOG.md) of the Angular Integration.
 
 ## Installation
-`npm i mini-rx-store@beta`
+`npm i mini-rx-store@next`
 
 Install the Angular Integration if you are using Angular:
 
-`npm i mini-rx-store-ng@beta`
+`npm i mini-rx-store-ng@next`
 
 The Angular Integration requires now Angular@12.
 
