@@ -10,6 +10,7 @@ Feature Stores offer simple yet powerful state management.
 - **Less Boilerplate**: With the `FeatureStore` API you can update state without writing actions and reducers
 - A Feature Store **manages feature state** directly
 - The state of a Feature Store **integrates into the global state**
+- Feature Stores are **destroyable**
 
 ## What's Included
 The MiniRx `FeatureStore` API:
