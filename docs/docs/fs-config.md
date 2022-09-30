@@ -5,13 +5,19 @@ sidebar_label: Local Component State
 slug: /local-component-state
 ---
 
-With MiniRx Feature Stores you can also manage **local component state**...
+With MiniRx Feature Stores you can also manage **local component state**.
 
+### What is local component state?
+- State which is bound to a component
+- State which has the lifetime of a component
+- State which can exist multiple times (if the corresponding component exists multiple times)
+
+
+### Multiple Feature Store instances
 By default, a Feature Store with a certain feature key can only be created **once**.
-But in some situations you might want to create **multiple** instances of the same Feature Store: 
-E.g. if you have to manage state, which is bound to a component and if that component can exist multiple times.
+But in order to manage local component state, you might need to create **multiple** instances of the same Feature Store.
 
-You can use the `{multi: true}` configuration to allow multiple instances of a Feature Store.
+You can use the `{multi: true}` configuration to allow multiple instances.
 
 Example:
 
@@ -50,3 +56,81 @@ In the following screenshot from the [Angular Demo](https://angular-demo.mini-rx
 The Redux DevTools indicate that MiniRx created four Feature Stores with unique feature keys.
 
 ![Redux Dev Tools for MiniRx](/img/local-component-state-mini-rx.png)
+
+## Destroy
+When the component is destroyed, then you most likely want to destroy the corresponding Feature Store as well. 
+
+For that reason, `FeatureStore` exposes the `destroy` method. 
+
+The `destroy` method does two things:
+
+- clean up all internal Observable subscriptions (e.g. from Effects)
+- remove the corresponding feature state from the global state object
+
+### Destroy in Svelte
+
+Example: Call `destroy` manually in Svelte
+
+```ts 
+import { Observable } from 'rxjs';
+import { FeatureStore } from 'mini-rx-store';
+import { onDestroy } from 'svelte';
+
+interface CounterState {
+    count: number;
+}
+
+const initialState: CounterState = {
+    count: 42,
+};
+
+export class CounterStore extends FeatureStore<CounterState> {
+    constructor() {
+        super('counter', initialState, {multi: true});
+
+        onDestroy(() => {
+            this.destroy();
+        });
+    }
+}
+```
+See the source from the [MiniRx Svelte Demo](https://github.com/spierala/mini-rx-svelte-demo/blob/master/frontend/src/modules/counter/components/state/counter-store.ts).
+
+### Automatic destroy in Angular
+In Angular, you can provide a Feature Store on component level in the `@Component` decorator like this: 
+
+```ts
+
+import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { CounterStore } from '../state/counter-store.service';
+
+@Component({
+    selector: 'app-counter',
+    templateUrl: './counter.component.html',
+    styleUrls: ['./counter.component.css'],
+    providers: [CounterStore], // The CounterStore is provided for each counter component instance
+})
+export class CounterComponent {
+    constructor(private counterStore: CounterStore) {}
+}
+```
+Now, the lifetime of the CounterStore is bound to the component lifetime. 
+Angular will instantiate a CounterStore when a CounterComponent is created.
+Angular will also call the Feature Store `destroy` method for us when the component is destroyed.
+
+The CounterStore itself is just an Angular Injectable (without the `providedIn` config):
+
+```ts
+@Injectable()
+export class CounterStore extends FeatureStore<CounterState> {
+    constructor() {
+        super('counter', initialState, { multi: true });
+    }
+}
+```
+
+See the source from the [MiniRx Angular Demo](https://github.com/spierala/mini-rx-store/blob/master/apps/mini-rx-angular-demo/src/app/modules/counter/state/counter-store.service.ts).
+
+### Destroy in other frameworks
+In other frameworks (or without a framework) you have to call the `destroy` method manually, when the corresponding component is destroyed.

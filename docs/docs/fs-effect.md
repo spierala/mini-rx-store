@@ -82,7 +82,7 @@ loadTodoById = this.effect<number>(
 ```
 :::info
 
-### tapResponse
+## tapResponse
 
 When using `effect` it is important to handle possible errors (e.g. when the API call fails).
 The `tapResponse` operator enforces to handle the error case and reduces boilerplate. 
