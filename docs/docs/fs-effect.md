@@ -5,7 +5,7 @@ sidebar_label: Effects
 slug: /effects-for-feature-store
 ---
 `effect` offers an advanced way to trigger side effects (e.g. API calls) for a Feature Store. 
-When the side effect completed we can update feature state straight away (by using `setState()`).
+When the side effect completed, we can update feature state straight away (by using `setState()`).
 
 Using `effect` has the following benefits: 
 - you can more easily handle race conditions with RxJS flattening operators (e.g. switchMap, concatMap)
@@ -109,5 +109,5 @@ loadTodos = this.effect<void>(
 ```
 :::info
 `tapResponse` accepts an optional third parameter for handling the `finalize` case. 
-For example, it can be used to set a loading state to `false` if the API call succeeds **or** fails.
+For example, it could be used to set a loading state to `false` if the API call succeeds **or** fails.
 :::info

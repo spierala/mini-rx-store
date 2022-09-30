@@ -3,13 +3,24 @@ id: effects
 title: Effects
 slug: /effects
 ---
+Effects offer an advanced way to trigger side effects (e.g. API calls)
 
-Effects trigger side effects like API calls and handle the result:
+Using `effect` has the following benefits:
+- you can more easily handle race conditions with RxJS flattening operators (e.g. switchMap, concatMap)
+- the subscriptions are created internally (when registering an Effect)
+- Effects help to isolate side effects from components 
 
-- An Effect listens for a specific action
-- That action triggers the actual side effect
-- The Effect needs to return a new action as soon as the side effect completed
+### Writing Effects
 
+Writing an effect consists of these basic parts:
+
+- Listen for a specific action using (`ofType`)
+- Handle race conditions with RxJS flattening operators (e.g. `mergeMap`)
+- Perform the actual side effect
+- Return a new action when the side effect completes
+- Register the effect
+
+Example:
 ```ts
 import { actions$, ofType } from 'mini-rx-store';
 import {
@@ -18,6 +29,7 @@ import {
   LoadTodosFail,
   TodoActionTypes
 } from './todo-actions';
+import { Todo } from ".";
 import { mergeMap, map, catchError } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 import { of } from 'rxjs';
@@ -25,7 +37,7 @@ import { of } from 'rxjs';
 export const loadEffect = actions$.pipe(
   ofType(TodoActionTypes.LoadTodos),
   mergeMap(() =>
-    ajax('https://jsonplaceholder.typicode.com/todos').pipe(
+    ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
       map(res => new LoadTodosSuccess(res.response)),
       catchError(err => of(new LoadTodosFail(err)))
     )
@@ -39,7 +51,7 @@ store.effect(loadEffect);
 store.dispatch(new LoadTodos())
 ```
 
-The code above creates an effect. As soon as the `LoadTodos` action has been dispatched the API call will be executed.
+The code above creates an effect. As soon as the `LoadTodos` action has been dispatched, the API call will be executed.
 Depending on the result of the API call a new action will be dispatched:
 `LoadTodosSuccess` or `LoadTodosFail`.
 
@@ -49,3 +61,36 @@ The effect needs to be registered using `store.effect`.
 It is important to handle possible API errors with `catchError` to make sure that the effect source does not complete.
 A completed effect source will stop listening to actions, and the effect does not work anymore.
 :::warning
+
+## mapResponse
+
+It is important to handle possible errors (e.g. when the API call fails). 
+The `mapResponse` operator enforces to handle the error case and reduces boilerplate.
+
+`mapResponse` is a thin wrapper around RxJS `map` and `catchError`.
+
+Example:
+
+```ts
+import { actions$, ofType, mapResponse } from 'mini-rx-store';
+import {
+    LoadTodosFail,
+    LoadTodosSuccess,
+    TodoActionTypes,
+} from './todo-actions';
+import { Todo } from '.';
+import { mergeMap } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
+
+export const loadEffect = actions$.pipe(
+  ofType(TodoActionTypes.LoadTodos),
+  mergeMap(() =>
+    ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
+      mapResponse(
+        res => new LoadTodosSuccess(res.response),
+        err => new LoadTodosFail(err)
+      )
+    )
+  )
+);
+```
