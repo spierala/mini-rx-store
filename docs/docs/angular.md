@@ -82,7 +82,7 @@ import { of } from 'rxjs';
 
 import { LoadTodosFail, LoadTodosSuccess, TodoActionTypes } from './todo-actions';
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class TodoEffects {
   loadTodos$ = this.actions$.pipe(
     ofType(TodoActionTypes.LoadTodos),
