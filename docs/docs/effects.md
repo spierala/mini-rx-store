@@ -94,3 +94,26 @@ export const loadEffect = actions$.pipe(
   )
 );
 ```
+
+## Configure the effect with `createEffect`
+
+With `createEffect` you can pass additional configuration to an effect.
+
+### Non-dispatching effects
+In some situations your effect can not return a meaningful action. For example:
+
+- when you only want to log 
+- when you only want to navigate based on an incoming action
+
+You can pass the `{dispatch: false}` config to the `createEffect` function to create an effect which does not dispatch an action.
+
+Example:
+```ts
+export const nonDispatchingEffect = createEffect(actions$.pipe(
+  ofType(TodoActionTypes.LoadTodos),
+  tap((v) => console.log('LoadTodos', v))
+), {dispatch: false});
+
+// Register the effect
+store.effect(nonDispatchingEffect);
+```
