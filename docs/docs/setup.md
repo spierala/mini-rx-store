@@ -23,7 +23,7 @@ Read ["Redux" Store Setup](redux-setup) to see the Redux related configuration o
 We can add extensions to the Store config to add additional functionality.
 
 Currently, these extensions are included in MiniRx:
-- Redux Dev Tools Extension: Inspect state with the Redux Dev Tools
+- Redux DevTools Extension: Inspect state with the Redux DevTools
 - Immutable Extension: Enforce state immutability
 - Undo Extension: Undo dispatched actions
 - Logger Extension: console.log the current action and updated state

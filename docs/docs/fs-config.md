@@ -55,7 +55,7 @@ Now you can create many instances of the CounterStore.
 In the following screenshot from the [Angular Demo](https://angular-demo.mini-rx.io/#/counter) you can see many Counter components.
 The Redux DevTools indicate that MiniRx created four Feature Stores with unique feature keys.
 
-![Redux Dev Tools for MiniRx](/img/local-component-state-mini-rx.png)
+![Redux DevTools for MiniRx](/img/local-component-state-mini-rx.png)
 
 ## Destroy
 When the component is destroyed, then you most likely want to destroy the corresponding Feature Store as well. 
