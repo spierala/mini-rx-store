@@ -11,7 +11,7 @@ Install the packages using npm:
 
 `npm install ts-action ts-action-operators`
 
-#### Create Actions:
+#### Create actions:
 
 ```ts title="ts-todo-actions.ts"
 import { action, payload } from 'ts-action';
@@ -23,7 +23,7 @@ export const loadTodosSuccess = action('LOAD_TODOS_SUCCESS', payload<Todo[]>());
 export const loadTodosFail = action('LOAD_TODOS_FAIL', payload<Error>());
 ```
 
-#### Dispatch an Action:
+#### Dispatch an action:
 
 ```ts
 store.dispatch(addTodo({id: 1, title: 'Use Redux'}))
@@ -63,7 +63,7 @@ import { ofType } from 'ts-action-operators';
 
 import { loadTodos, loadTodosFail, loadTodosSuccess } from './ts-todo-actions';
 
-export const loadEffect = actions$.pipe(
+const loadEffect = actions$.pipe(
   ofType(loadTodos), // Use ofType from 'ts-action-operators'
   mergeMap(() =>
     ajax('https://jsonplaceholder.typicode.com/todos').pipe(

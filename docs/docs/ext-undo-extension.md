@@ -39,7 +39,7 @@ store.dispatch(removeAction); // Dispatch the action to the Store
 store.dispatch(undo(removeAction)); // Undo the dispatched action
 ```
 
-## Undo an setState action (FeatureStore)
+## Undo an setState action (Feature Store)
 The Undo Extension also enables the undo functionality in Feature Stores.
 
 Read more here [Undo setState Actions with `undo`](fs-set-state.md#undo-setstate-actions-with-undo)

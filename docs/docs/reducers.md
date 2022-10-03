@@ -4,7 +4,8 @@ title: Reducers
 slug: /reducers
 ---
 
-Reducers specify how the feature state changes in response to actions sent to the store. A reducer function typically looks like this:
+Reducers specify how the feature state changes in response to actions sent to the store. 
+A reducer function typically looks like this:
 
 ```ts title="todo-reducer.ts"
 import { Todo } from './todo';
@@ -43,7 +44,7 @@ export function todoReducer(
 
 ### Register feature reducer
 Before we can update state by dispatching actions, we need to add the reducer to the store.
-There are 2 options to register a feature reducer:
+There are two options to register a feature reducer:
 #### Option 1: Store Config
 ```ts
 import { configureStore, Store } from 'mini-rx-store';

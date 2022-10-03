@@ -34,7 +34,7 @@ import { mergeMap, map, catchError } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 import { of } from 'rxjs';
 
-export const loadEffect = actions$.pipe(
+const loadEffect = actions$.pipe(
   ofType(TodoActionTypes.LoadTodos),
   mergeMap(() =>
     ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
@@ -52,7 +52,7 @@ store.dispatch(new LoadTodos())
 ```
 
 The code above creates an effect. As soon as the `LoadTodos` action has been dispatched, the API call will be executed.
-Depending on the result of the API call a new action will be dispatched:
+Depending on the result of the API call, a new action will be dispatched:
 `LoadTodosSuccess` or `LoadTodosFail`.
 
 The effect needs to be registered using `store.effect`.
@@ -82,7 +82,7 @@ import { Todo } from '.';
 import { mergeMap } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
 
-export const loadEffect = actions$.pipe(
+const loadEffect = actions$.pipe(
   ofType(TodoActionTypes.LoadTodos),
   mergeMap(() =>
     ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
@@ -109,7 +109,7 @@ You can pass the `{dispatch: false}` config to the `createEffect` function to cr
 
 Example:
 ```ts
-export const nonDispatchingEffect = createEffect(actions$.pipe(
+const nonDispatchingEffect = createEffect(actions$.pipe(
   ofType(TodoActionTypes.LoadTodos),
   tap((v) => console.log('LoadTodos', v))
 ), {dispatch: false});
