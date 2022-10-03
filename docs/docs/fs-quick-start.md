@@ -14,10 +14,12 @@ Feature Stores offer simple yet powerful state management.
 
 ## What's Included
 The MiniRx `FeatureStore` API:
--   `setState()` update the feature state
--   `select()` select state from the feature state object as RxJS Observable
--   `effect()` run side effects like API calls and update feature state
--   `undo()` easily undo setState actions (requires UndoExtension)
+- `setState()` update the feature state
+- `select()` select state from the feature state object as RxJS Observable
+- `effect()` run side effects like API calls and update feature state
+- `undo()` easily undo setState actions (requires UndoExtension)
+- `destroy()` remove the feature state
+- `tapResponse` operator: handle the response in Feature Store `effect` consistently and with less boilerplate
 
 :::info
 **How the FeatureStore works**
