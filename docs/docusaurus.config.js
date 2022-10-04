@@ -61,8 +61,25 @@ module.exports = {
                     title: 'Community',
                     items: [
                         {
+                            label: 'GitHub',
+                            href: 'https://github.com/spierala/mini-rx-store',
+                        },
+                        {
                             label: 'Twitter',
                             href: 'https://twitter.com/spierala',
+                        },
+                    ],
+                },
+                {
+                    title: 'Demos',
+                    items: [
+                        {
+                            label: 'Angular Demo',
+                            href: 'https://angular-demo.mini-rx.io',
+                        },
+                        {
+                            label: 'Svelte Demo',
+                            href: 'https://svelte-demo.mini-rx.io/',
                         },
                     ],
                 },
@@ -70,8 +87,20 @@ module.exports = {
                     title: 'More',
                     items: [
                         {
-                            label: 'GitHub',
-                            href: 'https://github.com/spierala/mini-rx-store',
+                            label: 'MiniRx Feature Store vs. NgRx Component Store vs. Akita',
+                            href: 'https://dev.to/this-is-angular/minirx-feature-store-vs-ngrx-component-store-vs-akita-4983',
+                        },
+                        {
+                            label: 'Angular state management comparison',
+                            href: 'https://github.com/spierala/angular-state-management-comparison',
+                        },
+                        {
+                            label: 'Angular Jira Clone',
+                            href: 'https://github.com/spierala/jira-clone-angular-mini-rx',
+                        },
+                        {
+                            label: 'Angular Spotify',
+                            href: 'https://github.com/spierala/angular-spotify-mini-rx',
                         },
                     ],
                 },
