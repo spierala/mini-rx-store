@@ -10,10 +10,10 @@ sidebar_label: Angular Integration
 With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can use MiniRx Store the Angular way:
 
 - [Configure the store](#configure-the-store-in-the-app-module) using `StoreModule.forRoot()`
-- [Register feature reducers](#register-feature-states-in-angular-feature-modules) using `StoreModule.forFeature()`
+- [Register feature reducers](#register-feature-reducers-in-angular-feature-modules) using `StoreModule.forFeature()`
 - [Register effects](#register-effects) using `EffectsModule.register()` and `createEffect()`
 - [Use Angular Dependency Injection](#get-hold-of-the-store-and-actions-via-the-angular-dependency-injection) for `Store` and `Actions`
-- [Redux DevTools Extension](#redux-dev-tools)
+- [Redux DevTools Extension](#redux-devtools)
 
 ## Usage
 
@@ -24,7 +24,7 @@ With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can u
 
 `npm i mini-rx-store-ng`
 
-### Configure the Store in the App Module
+### Configure the Store in the app module
 ```ts title="app.module.ts"
 import { NgModule } from '@angular/core';
 import { StoreModule } from 'mini-rx-store-ng';
@@ -49,7 +49,7 @@ import { StoreModule } from 'mini-rx-store-ng';
 export class AppModule {}
 ```
 
-### Register feature reducers in Angular Feature Modules
+### Register feature reducers in Angular feature modules
 
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
@@ -64,8 +64,8 @@ import todoReducer from './todo-reducer';
 export class TodoModule {}
 ```
 
-### Register Effects
-Create an Angular service which holds all effects which belong to a specific Feature (e.g. "todo"):
+### Register effects
+Create an Angular service which holds all effects which belong to a specific feature module (e.g. "todo"):
 
 ```ts title="todo-effects.service.ts"
 import { Injectable } from '@angular/core';
@@ -80,21 +80,22 @@ import { Todo } from './todo';
 
 @Injectable()
 export class TodoEffects {
-    loadTodos$ = createEffect(
-        this.actions$.pipe(
-            ofType(TodoActionTypes.LoadTodos),
-            mergeMap(() =>
-                ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
-                    mapResponse(
-                        (res) => new LoadTodosSuccess(res.response),
-                        (err) => new LoadTodosFail(err)
-                    )
-                )
-            )
+  loadTodos$ = createEffect(
+    this.actions$.pipe(
+      ofType(TodoActionTypes.LoadTodos),
+      mergeMap(() =>
+        ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
+          tap(v => v),
+          mapResponse(
+            (res) => new LoadTodosSuccess(res.response),
+            (err) => new LoadTodosFail(err)
+          )
         )
-    );
+      )
+    )
+  );
 
-    constructor(private actions$: Actions) {}
+  constructor(private actions$: Actions) {}
 }
 ```
 
@@ -122,7 +123,7 @@ It can be used in the root module and in feature modules.
 When using `EffectsModule.register`, you **must** write the effect with `createEffect`. Otherwise, the effect will be ignored.
 :::warning
 
-### Get hold of the store and actions via the Angular Dependency Injection
+### Get hold of the store and actions via the Angular dependency injection
 After we registered the StoreModule in the AppModule we can use Angular DI to access `Store` and `Actions`.
 
 For example in a component:

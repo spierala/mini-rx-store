@@ -79,7 +79,7 @@ module.exports = {
                         },
                         {
                             label: 'Svelte Demo',
-                            href: 'https://svelte-demo.mini-rx.io/',
+                            href: 'https://svelte-demo.mini-rx.io',
                         },
                     ],
                 },
