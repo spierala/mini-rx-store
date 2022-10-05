@@ -27,7 +27,7 @@ export class ProductsEffects {
     loadProducts$ = createEffect(
         this.actions$.pipe(
             ofType(load),
-            mergeMap((action) =>
+            mergeMap(() =>
                 this.productService.getProducts().pipe(
                     mapResponse(
                         (products) => loadSuccess(products),
