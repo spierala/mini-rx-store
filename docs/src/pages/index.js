@@ -12,8 +12,8 @@ const features = [
         description: (
             <>
                 <strong>Advanced state management:</strong> MiniRx is a full-blown Redux Store to
-                manage global, application-wide state: It includes
-                <strong>actions, reducers, meta reducers, memoized selectors</strong> and
+                manage global, application-wide state: It includes{' '}
+                <strong>actions, reducers, meta reducers, memoized selectors</strong> and{' '}
                 <strong>Redux DevTools</strong> support.
             </>
         ),
@@ -44,8 +44,9 @@ const features = [
         description: (
             <>
                 MiniRx works with any front-end project built with JavaScript or TypeScript
-                (Angular, Svelte, React, Vue, or anything else). The MiniRx API comes with
-                TypeScript type definitions.
+                (Angular, Svelte, React, Vue, or anything else).
+                <br />
+                The MiniRx API comes with TypeScript type definitions.
             </>
         ),
     },

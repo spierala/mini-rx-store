@@ -18,7 +18,7 @@ What's new?
 - Even more lightweight
 - `tapResponse` operator (handle API response in `FeatureStore.effect`)
 - `mapResponse` operator (handle API response in Redux Effects)
-- Allow many Feature Store instances with the same featureKey using the `multi: true` config
+- Allow many Feature Store instances with the same feature key using the `multi: true` config
 - `FeatureStore.effect`: the returned function accepts also an Observable as argument
 - `createEffect` can be used to create non-dispatching effects (using the `dispatch: false` config)
 - Many more internal improvements
