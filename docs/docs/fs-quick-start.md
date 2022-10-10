@@ -22,7 +22,7 @@ The MiniRx `FeatureStore` API:
 - `tapResponse` operator: handle the response in Feature Store `effect` consistently and with less boilerplate
 
 :::info
-**How the FeatureStore works**
+**How the Feature Store works**
 
 Feature Stores make use of Redux too: Behind the scenes a Feature Store is creating a feature reducer and a "setState" action. MiniRx dispatches that action when calling `setState()` and the corresponding feature reducer will update the feature state accordingly.
 :::

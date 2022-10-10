@@ -9,7 +9,7 @@ With MiniRx Feature Stores you can also manage **local component state**.
 
 ### What is local component state?
 - State which is bound to a component
-- State which has the lifetime of a component
+- State which has the lifespan of a component
 - State which can exist multiple times (if the corresponding component exists multiple times)
 
 
@@ -53,7 +53,7 @@ The code above defines a CounterStore with the `{multi: true}` configuration.
 Now you can create many instances of the CounterStore.
 
 In the following screenshot from the [Angular Demo](https://angular-demo.mini-rx.io/#/counter) you can see many Counter components.
-The Redux DevTools indicate that MiniRx created four Feature Stores with unique feature keys.
+The Redux DevTools indicate that MiniRx created four "counter" Feature Stores with unique feature keys.
 
 ![Redux DevTools for MiniRx](/img/local-component-state-mini-rx.png)
 
@@ -64,7 +64,7 @@ For that reason, `FeatureStore` exposes the `destroy` method.
 
 The `destroy` method does two things:
 
-- clean up all internal Observable subscriptions (e.g. from Effects)
+- clean up all internal Observable subscriptions (e.g. from effects)
 - remove the corresponding feature state from the global state object
 
 ### Destroy in Svelte
@@ -115,7 +115,7 @@ export class CounterComponent {
     constructor(private counterStore: CounterStore) {}
 }
 ```
-Now, the lifetime of the CounterStore is bound to the component lifetime. 
+Now, the lifespan of the CounterStore is bound to the component lifespan. 
 Angular will instantiate a CounterStore when a CounterComponent is created.
 Angular will also call the Feature Store `destroy` method for us when the component is destroyed.
 

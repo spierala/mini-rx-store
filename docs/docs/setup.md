@@ -5,7 +5,7 @@ title: Setup
 
 MiniRx Store requires only a minimum of configuration to get started.
 
-## No Setup
+## `configureStore`
 Pass an empty configuration to `configureStore` to get hold of the `Store` instance:
 ```ts
 import { configureStore, Store } from 'mini-rx-store';

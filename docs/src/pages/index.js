@@ -11,10 +11,7 @@ const features = [
         title: 'Redux Store',
         description: (
             <>
-                <strong>Advanced state management:</strong> MiniRx is a full-blown Redux Store to
-                manage global, application-wide state: It includes{' '}
-                <strong>actions, reducers, meta reducers, memoized selectors</strong> and{' '}
-                <strong>Redux DevTools</strong> support.
+                <strong>Advanced state management:</strong> MiniRx is a full-blown Redux Store to manage global, application-wide state: It includes <strong>actions, reducers, meta reducers, memoized selectors</strong> and <strong>Redux DevTools</strong> support.
             </>
         ),
     },
@@ -22,8 +19,7 @@ const features = [
         title: 'Feature Stores',
         description: (
             <>
-                <strong>Simple yet powerful state management</strong> with MiniRx Feature Stores:
-                manage feature state directly with a minimum of boilerplate.
+                <strong>Simple yet powerful state management</strong> with MiniRx Feature Stores: manage feature state directly with a minimum of boilerplate.
             </>
         ),
     },
@@ -40,7 +36,7 @@ const features = [
         ),
     },
     {
-        title: 'Framework-agnostic and TypeScript friendly',
+        title: 'Framework-agnostic and TypeScript-friendly',
         description: (
             <>
                 MiniRx works with any front-end project built with JavaScript or TypeScript

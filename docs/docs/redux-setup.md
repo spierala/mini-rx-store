@@ -6,7 +6,7 @@ title: Redux Setup
 With `configureStore` we get hold of the global store object. 
 At the same time we can pass a configuration to initialize our feature reducers, meta reducers, initial state and extensions.
 
-## No Setup
+## `configureStore`
 At first, we do not need any configuration to get started.
 
 Let`s just get hold of the store instance:

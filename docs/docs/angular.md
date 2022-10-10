@@ -24,7 +24,7 @@ With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can u
 
 `npm i mini-rx-store-ng`
 
-### Configure the Store in the app module
+### Configure the store in the app module
 ```ts title="app.module.ts"
 import { NgModule } from '@angular/core';
 import { StoreModule } from 'mini-rx-store-ng';
@@ -124,7 +124,7 @@ When using `EffectsModule.register`, you **must** write the effect with `createE
 :::warning
 
 ### Get hold of the store and actions via the Angular dependency injection
-After we registered the StoreModule in the AppModule we can use Angular DI to access `Store` and `Actions`.
+After we registered the StoreModule in the AppModule, we can use Angular DI to access `Store` and `Actions`.
 
 For example in a component:
 

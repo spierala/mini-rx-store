@@ -106,7 +106,7 @@ this.loadTodos(loadTodosTrigger$); // The todos will be fetched every second
 this.loadTodos();
 ```
 
-## tapResponse
+## `tapResponse`
 
 When using `effect` it is important to handle possible errors (e.g. when the API call fails).
 The `tapResponse` operator enforces to handle the error case and reduces boilerplate. 

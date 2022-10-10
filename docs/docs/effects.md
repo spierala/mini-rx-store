@@ -3,11 +3,11 @@ id: effects
 title: Effects
 slug: /effects
 ---
-Effects offer an advanced way to trigger side effects (e.g. API calls)
+Effects offer an advanced way to trigger side effects (e.g. API calls).
 
 Using `effect` has the following benefits:
 - you can more easily handle race conditions with RxJS flattening operators (e.g. switchMap, concatMap)
-- the subscriptions are created internally (when registering an Effect)
+- the subscriptions are created internally (when registering an effect)
 - Effects help to isolate side effects from components 
 
 ### Writing Effects
@@ -58,11 +58,11 @@ Depending on the result of the API call, a new action will be dispatched:
 The effect needs to be registered using `store.effect`.
 
 :::warning
-It is important to handle possible API errors with `catchError` to make sure that the effect source does not complete.
+It is important to handle possible API errors with `catchError`, to make sure that the effect source does not complete.
 A completed effect source will stop listening to actions, and the effect does not work anymore.
 :::warning
 
-## mapResponse
+## `mapResponse`
 
 It is important to handle possible errors (e.g. when the API call fails). 
 The `mapResponse` operator enforces to handle the error case and reduces boilerplate.

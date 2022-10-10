@@ -34,7 +34,7 @@ We have to provide a TypeScript interface to `FeatureStore` to get type safety: 
 
 ### Option 2: Functional creation method
 
-We can create a Feature Store with `createFeatureStore`
+We can create a Feature Store with `createFeatureStore`.
 
 ```ts
 const todoFs: FeatureStore<TodoState> = createFeatureStore<TodoState>('todo', initialState);
