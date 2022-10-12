@@ -14,7 +14,7 @@ Using `effect` has the following benefits:
 
 Writing an effect consists of these basic parts:
 
-- Listen for a specific action using (`ofType`)
+- Listen for a specific action using `ofType`
 - Handle race conditions with RxJS flattening operators (e.g. `mergeMap`)
 - Perform the actual side effect
 - Return a new action when the side effect completes

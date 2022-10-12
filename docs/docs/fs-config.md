@@ -26,27 +26,27 @@ import { Observable } from 'rxjs';
 import { FeatureStore } from 'mini-rx-store';
 
 interface CounterState {
-    count: number;
+  count: number;
 }
 
 const initialState: CounterState = {
-    count: 42,
+  count: 42,
 };
 
 export class CounterStore extends FeatureStore<CounterState> {
-    count$: Observable<number> = this.select((state) => state.count);
+  count$: Observable<number> = this.select((state) => state.count);
 
-    constructor() {
-        super('counter', initialState, { multi: true });
-    }
+  constructor() {
+    super('counter', initialState, { multi: true });
+  }
 
-    increment() {
-        this.setState({ count: this.state.count + 1 }, 'increment');
-    }
+  increment() {
+    this.setState({ count: this.state.count + 1 }, 'increment');
+  }
 
-    decrement() {
-        this.setState({ count: this.state.count - 1 }, 'decrement');
-    }
+  decrement() {
+    this.setState({ count: this.state.count - 1 }, 'decrement');
+  }
 }
 ```
 The code above defines a CounterStore with the `{multi: true}` configuration.
@@ -77,21 +77,21 @@ import { FeatureStore } from 'mini-rx-store';
 import { onDestroy } from 'svelte';
 
 interface CounterState {
-    count: number;
+  count: number;
 }
 
 const initialState: CounterState = {
-    count: 42,
+  count: 42,
 };
 
 export class CounterStore extends FeatureStore<CounterState> {
-    constructor() {
-        super('counter', initialState, {multi: true});
-
-        onDestroy(() => {
-            this.destroy();
-        });
-    }
+  constructor() {
+    super('counter', initialState, {multi: true});
+    
+    onDestroy(() => {
+        this.destroy();
+    });
+  }
 }
 ```
 See the source from the [MiniRx Svelte Demo](https://github.com/spierala/mini-rx-svelte-demo/blob/master/frontend/src/modules/counter/components/state/counter-store.ts).
@@ -106,13 +106,13 @@ import { Observable } from 'rxjs';
 import { CounterStore } from '../state/counter-store.service';
 
 @Component({
-    selector: 'app-counter',
-    templateUrl: './counter.component.html',
-    styleUrls: ['./counter.component.css'],
-    providers: [CounterStore], // The CounterStore is provided for each counter component instance
+  selector: 'app-counter',
+  templateUrl: './counter.component.html',
+  styleUrls: ['./counter.component.css'],
+  providers: [CounterStore], // The CounterStore is provided for each counter component instance
 })
 export class CounterComponent {
-    constructor(private counterStore: CounterStore) {}
+  constructor(private counterStore: CounterStore) {}
 }
 ```
 Now, the lifespan of the CounterStore is bound to the component lifespan. 
@@ -124,9 +124,9 @@ The CounterStore itself is just an Angular Injectable (without the `providedIn` 
 ```ts
 @Injectable()
 export class CounterStore extends FeatureStore<CounterState> {
-    constructor() {
-        super('counter', initialState, { multi: true });
-    }
+  constructor() {
+    super('counter', initialState, { multi: true });
+  }
 }
 ```
 
