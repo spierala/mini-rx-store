@@ -1,12 +1,12 @@
 ---
 id: redux-setup
-title: Setup
+title: Redux Setup
 ---
 
 With `configureStore` we get hold of the global store object. 
 At the same time we can pass a configuration to initialize our feature reducers, meta reducers, initial state and extensions.
 
-## No Setup
+## `configureStore`
 At first, we do not need any configuration to get started.
 
 Let`s just get hold of the store instance:
@@ -16,7 +16,7 @@ import { configureStore, Store } from 'mini-rx-store';
 const store: Store = configureStore({});
 ```
 
-With the `store` instance we can already add reducers (dynamically), select state, dispatch actions and create effects.
+With the `Store` instance we can already add reducers (dynamically), select state, dispatch actions and create effects.
 
 ## Feature Reducers
 We can configure the feature reducers via the configuration object. The reducers will be ready at store initialization.
@@ -46,7 +46,8 @@ store.feature('todo', todoReducer);
 We can set the initial state of the store via the configuration object. The initial state keys must match the provided reducer keys:
 ```ts
 import { configureStore, Store } from 'mini-rx-store';
-import counterReducer from './counter-reducer';
+import { productReducer } from './product-reducer';
+import { userReducer } from './user-reducer';
 
 const store: Store = configureStore({
   reducers: {
@@ -92,11 +93,10 @@ const store: Store = configureStore({
 
 // Select global state
 store.select(state => state).subscribe(console.log);
+// OUTPUT: {'counter':{'count':123}}
 
 // Dispatch the 'increment' action
 store.dispatch({ type: 'inc' });
-
-// OUTPUT: {'counter':{'count':123}}
 // OUTPUT: {'counter':{'count':124}}
 ```
 

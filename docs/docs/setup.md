@@ -5,16 +5,14 @@ title: Setup
 
 MiniRx Store requires only a minimum of configuration to get started.
 
-## No Setup
-The most basic setup is no setup... we can pass an empty configuration to `configureStore`
-and get hold of the Store instance.
-
+## `configureStore`
+Pass an empty configuration to `configureStore` to get hold of the `Store` instance:
 ```ts
 import { configureStore, Store } from 'mini-rx-store';
 
 const store: Store = configureStore({});
 ```
-With the `store` instance we can already add reducers (dynamically), select state, dispatch actions and create effects.
+With the `Store` instance we can already add reducers (dynamically), select state, dispatch actions and create effects.
 
 ## Redux Setup
 Read ["Redux" Store Setup](redux-setup) to see the Redux related configuration options.
@@ -23,7 +21,7 @@ Read ["Redux" Store Setup](redux-setup) to see the Redux related configuration o
 We can add extensions to the Store config to add additional functionality.
 
 Currently, these extensions are included in MiniRx:
-- Redux Dev Tools Extension: Inspect state with the Redux Dev Tools
+- Redux DevTools Extension: Inspect state with the Redux DevTools
 - Immutable Extension: Enforce state immutability
 - Undo Extension: Undo dispatched actions
 - Logger Extension: console.log the current action and updated state

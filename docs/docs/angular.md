@@ -10,21 +10,21 @@ sidebar_label: Angular Integration
 With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can use MiniRx Store the Angular way:
 
 - [Configure the store](#configure-the-store-in-the-app-module) using `StoreModule.forRoot()`
-- [Register feature reducers](#register-feature-states-in-angular-feature-modules) using `StoreModule.forFeature()`
-- [Register effects](#register-effects) using `EffectsModule.register()`
+- [Register feature reducers](#register-feature-reducers-in-angular-feature-modules) using `StoreModule.forFeature()`
+- [Register effects](#register-effects) using `EffectsModule.register()` and `createEffect()`
 - [Use Angular Dependency Injection](#get-hold-of-the-store-and-actions-via-the-angular-dependency-injection) for `Store` and `Actions`
-- [Redux Devtools Extension](#redux-dev-tools)
+- [Redux DevTools Extension](#redux-devtools)
 
 ## Usage
 
 ### Requirements
-- Angular >= 9 
+- Angular >= 12 
 
 ### Installation
 
 `npm i mini-rx-store-ng`
 
-### Configure the Store in the App Module
+### Configure the store in the app module
 ```ts title="app.module.ts"
 import { NgModule } from '@angular/core';
 import { StoreModule } from 'mini-rx-store-ng';
@@ -46,11 +46,10 @@ import { StoreModule } from 'mini-rx-store-ng';
     }),
   ]
 })
-export class AppModule {
-}
+export class AppModule {}
 ```
 
-### Register Feature Reducers in Angular Feature Modules
+### Register feature reducers in Angular feature modules
 
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
@@ -62,46 +61,45 @@ import todoReducer from './todo-reducer';
     StoreModule.forFeature('todo', todoReducer),
   ]
 })
-export class TodoModule {
-  constructor() {
-  }
-}
+export class TodoModule {}
 ```
 
-### Register Effects
-Create an Angular service which holds all effects which belong to a Feature (e.g. "todo").
+### Register effects
+Create an Angular service which holds all effects which belong to a specific feature module (e.g. "todo"):
 
 ```ts title="todo-effects.service.ts"
 import { Injectable } from '@angular/core';
 
-import { Actions, ofType } from 'mini-rx-store';
+import { Actions, createEffect, ofType, mapResponse } from 'mini-rx-store';
 
 import { ajax } from 'rxjs/ajax';
-import { mergeMap, map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
 import { LoadTodosFail, LoadTodosSuccess, TodoActionTypes } from './todo-actions';
+import { Todo } from './todo';
 
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class TodoEffects {
-  loadTodos$ = this.actions$.pipe(
-    ofType(TodoActionTypes.LoadTodos),
-    mergeMap(() =>
-      ajax('https://jsonplaceholder.typicode.com/todos').pipe(
-        map(res => new LoadTodosSuccess(res.response)),
-        catchError(err => of(new LoadTodosFail(err)))
+  loadTodos$ = createEffect(
+    this.actions$.pipe(
+      ofType(TodoActionTypes.LoadTodos),
+      mergeMap(() =>
+        ajax<Todo[]>('https://jsonplaceholder.typicode.com/todos').pipe(
+          tap(v => v),
+          mapResponse(
+            (res) => new LoadTodosSuccess(res.response),
+            (err) => new LoadTodosFail(err)
+          )
+        )
       )
     )
   );
 
-  constructor(
-    private actions$: Actions
-  ) {
-  }
+  constructor(private actions$: Actions) {}
 }
 ```
 
-Register the effects
+Register the effects with `EffectsModule.register`:
 ```ts title="todo.module.ts"
 import { NgModule } from '@angular/core';
 
@@ -116,13 +114,17 @@ import { todoReducer } from './todo-reducer';
     EffectsModule.register([TodoEffects]),
   ]
 })
-export class TodoModule {
-}
+export class TodoModule {}
 ```
-The `register` method from the EffectsModule accepts an array of classes with effects and can be used in both, root and feature modules.
+`EffectsModule.register` accepts an array of classes which contain effects.
+It can be used in the root module and in feature modules.
 
-### Get hold of the store and actions via the Angular Dependency Injection
-After we registered the StoreModule in the AppModule we can use Angular DI to access `Store` and `Actions`.
+:::warning
+When using `EffectsModule.register`, you **must** write the effect with `createEffect`. Otherwise, the effect will be ignored.
+:::warning
+
+### Get hold of the store and actions via the Angular dependency injection
+After we registered the StoreModule in the AppModule, we can use Angular DI to access `Store` and `Actions`.
 
 For example in a component:
 
@@ -139,20 +141,16 @@ export class MyComponent {
   // Select state from the Store
   someState$: Observable<any> = this.store.select(state => state);
 
-  constructor(
-    private store: Store,
-  ) {
-
-  }
+  constructor(private store: Store) {}
 
   doSomething() {
     this.store.dispatch({type: 'some action'})
   }
 }
 ```
-### Redux Dev Tools
+### Redux DevTools
 `StoreDevtoolsModule` is a thin wrapper for the [ReduxDevtoolsExtension](ext-redux-devtools.md) from 'mini-rx-store'.
-It is needed to trigger Angular Change Detection when using time travel in the Redux Dev Tools Browser PlugIn.
+It is needed to trigger Angular Change Detection when using time travel in the Redux DevTools Browser PlugIn.
 
 ```ts
 import { StoreDevtoolsModule } from 'mini-rx-store-ng';
@@ -167,6 +165,5 @@ import { StoreDevtoolsModule } from 'mini-rx-store-ng';
     }),
   ]
 })
-export class AppModule {
-} 
+export class AppModule {} 
 ```

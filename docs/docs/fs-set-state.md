@@ -21,7 +21,7 @@ addTodo(todo: Todo) {
   }))
 }
 ```
-For better logging in the JS Console / Redux Dev Tools you can provide an optional name to the `setState` function:
+For better logging in the JS Console / Redux DevTools you can provide an optional name to the `setState` function:
 
 ```ts
 this.setState({selectedTodoId: id}, 'selectTodo');

@@ -1,13 +1,13 @@
 ---
 id: ext-redux-dev-tools
-title: Redux Dev Tools Extension
-sidebar_label: Redux Dev Tools
+title: Redux DevTools Extension
+sidebar_label: Redux DevTools
 ---
-With the Redux Dev Tools Extension we can easily inspect state and actions.
+With the Redux DevTools Extension we can easily inspect state and actions.
 
-![Redux Dev Tools for MiniRx](/img/redux-dev-tools.gif)
+![Redux DevTools for MiniRx](/img/redux-dev-tools.gif)
 
-MiniRx has basic support for the [Redux Dev Tools](https://github.com/zalmoxisus/redux-devtools-extension).
+MiniRx has basic support for the [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension).
 These are the current possibilities:
 - Inspect current state
 - See the history of actions
@@ -17,8 +17,8 @@ These are the current possibilities:
 ## Preparations
 You need to install the Browser Plugin to make it work.
 
--   [Chrome Redux Dev Tools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
--   [Firefox Redux Dev Tools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
+-   [Chrome Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+-   [Firefox Redux DevTools](https://addons.mozilla.org/nl/firefox/addon/reduxdevtools/)
 
 ## Register the extension
 
@@ -40,7 +40,7 @@ const store: Store = configureStore({
 
 ### Angular
 If you are using Angular you have to register the `StoreDevtoolsModule` from 'mini-rx-store-ng'.
-See [Angular Redux Dev Tools](angular.md#redux-dev-tools) for more information.
+See [Angular Redux DevTools](angular.md#redux-devtools) for more information.
 
 ## Options
 Currently, these options are available to configure the DevTools:
