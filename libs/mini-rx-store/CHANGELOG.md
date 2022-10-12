@@ -2,12 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-rc.1...mini-rx-store-4.0.0) (2022-10-12)
+
 ## [4.0.0-rc.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-rc.0...mini-rx-store-4.0.0-rc.1) (2022-10-05)
 
 
 ### Bug Fixes
 
-* **mini-rx-store:** inter type of mapFn argument correctly ([3c02ba8](https://github.com/spierala/mini-rx-store/commit/3c02ba888c7c6b09ed42603847224d0f0a534b87))
+* **mini-rx-store:** infer type of mapFn argument correctly ([3c02ba8](https://github.com/spierala/mini-rx-store/commit/3c02ba888c7c6b09ed42603847224d0f0a534b87))
 
 ## [4.0.0-rc.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-beta.3...mini-rx-store-4.0.0-rc.0) (2022-09-19)
 
