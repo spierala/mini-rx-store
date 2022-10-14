@@ -6,6 +6,7 @@ export const enum MiniRxActionType {
     INIT_FEATURE = 'init-feature',
     DESTROY_FEATURE = 'destroy-feature',
     SET_STATE = 'set-state',
+    CONNECT = 'connection',
 }
 
 export interface SetStateAction<T> {
@@ -29,6 +30,24 @@ export function createSetStateAction<T>(
     const miniRxActionType = MiniRxActionType.SET_STATE;
     return {
         type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
+        stateOrCallback,
+        featureId,
+        featureKey,
+        miniRxActionType,
+    };
+}
+
+// TODO remove duplicate code, can be unified with createSetStateAction
+export function createConnectAction<T>(
+    stateOrCallback: StateOrCallback<T>,
+    featureId: string,
+    featureKey: string,
+    name?: string
+): SetStateAction<T> {
+    const miniRxActionType = MiniRxActionType.SET_STATE;
+    return {
+        type:
+            createMiniRxActionType(MiniRxActionType.CONNECT, featureKey) + (name ? '/' + name : ''),
         stateOrCallback,
         featureId,
         featureKey,

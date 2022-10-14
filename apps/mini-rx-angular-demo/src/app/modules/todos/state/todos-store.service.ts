@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Todo } from '../../todos-shared/models/todo';
 import { TodoFilter } from '../../todos-shared/models/todo-filter';
-import { Observable, pipe } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, pipe, timer } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 import {
     Action,
@@ -18,6 +18,7 @@ interface TodosState {
     todos: Todo[];
     filter: TodoFilter;
     selectedTodo: Todo | undefined;
+    time: number | undefined;
 }
 
 // INITIAL STATE
@@ -31,6 +32,7 @@ const initialState: TodosState = {
             isPrivate: false,
         },
     },
+    time: undefined,
 };
 
 // MEMOIZED SELECTORS
@@ -54,6 +56,12 @@ const getTodosNotDone = createSelector(getTodosFiltered, (todos) =>
     todos.filter((todo) => !todo.isDone)
 );
 
+const time$ = timer(5000, 1000).pipe(
+    map(() => {
+        return new Date().getTime();
+    })
+);
+
 @Injectable({
     providedIn: 'root',
 })
@@ -63,11 +71,14 @@ export class TodosStore extends FeatureStore<TodosState> {
     todosNotDone$: Observable<Todo[]> = this.select(getTodosNotDone);
     filter$: Observable<TodoFilter> = this.select(getFilter);
     selectedTodo$: Observable<Todo | undefined> = this.select(getSelectedTodo);
+    time$: Observable<number | undefined> = this.select((state) => state.time);
 
     constructor(private apiService: TodosApiService) {
         super('todos', initialState);
 
         this.load();
+
+        this.connect(time$, (state, time) => ({ time }), 'time');
     }
 
     // UPDATE STATE

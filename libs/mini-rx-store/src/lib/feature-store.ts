@@ -4,7 +4,7 @@ import StoreCore from './store-core';
 import { generateId, miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { createSetStateAction, isSetStateAction } from './actions';
+import { createConnectAction, createSetStateAction, isSetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
@@ -42,6 +42,24 @@ export class FeatureStore<StateType extends object> {
         StoreCore.dispatch(action);
 
         return action;
+    }
+
+    connect<T>(
+        obs$: Observable<T>,
+        projectFn: (state: StateType, emittedValue: T) => Partial<StateType>,
+        name: string
+    ): void {
+        this.sub.add(
+            obs$.subscribe((v) => {
+                const action = createConnectAction(
+                    (state) => projectFn(this.state, v),
+                    this.featureId,
+                    this.featureKey,
+                    name
+                );
+                StoreCore.dispatch(action);
+            })
+        );
     }
 
     select(): Observable<StateType>;
