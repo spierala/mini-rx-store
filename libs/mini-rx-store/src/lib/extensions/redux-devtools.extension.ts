@@ -5,12 +5,15 @@ import { beautifyActionForLogging, miniRxError } from '../utils';
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux Dev Tools',
+    traceLimit: 25,
 };
 
 export interface ReduxDevtoolsOptions {
     name: string;
     maxAge: number;
     latency: number;
+    trace: boolean;
+    traceLimit: number;
 }
 
 export class ReduxDevtoolsExtension extends StoreExtension {
@@ -40,7 +43,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
                 .pipe(
                     withLatestFrom(StoreCore.state$),
                     tap(([action, state]) => {
-                        let actionForDevTools: Action = beautifyActionForLogging(action, state);
+                        const actionForDevTools: Action = beautifyActionForLogging(action, state);
                         this.devtoolsConnection.send(actionForDevTools, state);
                     })
                 )

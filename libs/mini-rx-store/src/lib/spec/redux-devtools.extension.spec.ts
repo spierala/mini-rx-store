@@ -43,6 +43,7 @@ describe('Redux Dev Tools', () => {
             name: 'test',
             maxAge: 50,
             latency: 1000,
+            traceLimit: 25,
         };
 
         win.__REDUX_DEVTOOLS_EXTENSION__ = {
