@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.1.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0...mini-rx-store-4.1.0) (2022-11-11)
+
+
+### Features
+
+* **mini-rx-store:** Add trace option to redux devtools ([45f2690](https://github.com/spierala/mini-rx-store/commit/45f2690dd5a2331957d1667caf84175a3b1c4727))
+
 ## [4.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-rc.1...mini-rx-store-4.0.0) (2022-10-12)
 
 ## [4.0.0-rc.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0-rc.0...mini-rx-store-4.0.0-rc.1) (2022-10-05)
