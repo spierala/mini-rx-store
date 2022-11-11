@@ -34,6 +34,8 @@ import { ToastrModule } from 'ngx-toastr';
             name: 'MiniRx Angular Demo',
             maxAge: 25,
             latency: 250,
+            trace: true,
+            traceLimit: 25,
         }),
         ProductsStateModule,
     ],
