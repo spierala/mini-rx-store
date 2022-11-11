@@ -4,7 +4,7 @@ import StoreCore from '../store-core';
 import { beautifyActionForLogging, miniRxError } from '../utils';
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
-    name: 'MiniRx - Redux Dev Tools',
+    name: 'MiniRx - Redux DevTools',
     traceLimit: 25,
 };
 
