@@ -41,6 +41,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "sashion",
+      "name": "sashion",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1050641?v=4",
+      "profile": "https://github.com/sashion",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -48,5 +57,6 @@
   "projectOwner": "spierala",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
