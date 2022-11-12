@@ -1,18 +1,27 @@
 import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { Action, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
-import { generateId, miniRxError, select } from './utils';
+import { miniRxError, select } from './utils';
 import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { createSetStateAction, isSetStateAction } from './actions';
 
 export class FeatureStore<StateType extends object> {
-    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
-        {} as StateType
-    );
-    state$: Observable<StateType> = this.stateSource.asObservable();
+    private stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
+        StateType | undefined
+    >(undefined);
+    state$: Observable<StateType> = this.stateSource.asObservable().pipe(
+        // Skip the first (undefined) value of the BehaviorSubject
+        // Very similar to a ReplaySubject(1), but more lightweight
+        filter((v) => !!v)
+    ) as Observable<StateType>;
     get state(): StateType {
-        return this.stateSource.getValue();
+        const v: StateType | undefined = this.stateSource.getValue();
+        if (!v) {
+            miniRxError(this.notInitializedErrorMessage);
+        }
+        return v!;
     }
 
     // tslint:disable-next-line:variable-name
@@ -21,22 +30,52 @@ export class FeatureStore<StateType extends object> {
         return this._featureKey;
     }
 
-    private sub: Subscription;
+    private sub: Subscription = new Subscription();
     private readonly featureId: string;
 
-    constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
+    private notInitializedErrorMessage =
+        `${this.constructor.name} has no initialState yet. ` +
+        `Please provide an initialState before updating/getting state.`;
+
+    private initializedErrorMessage = `${this.constructor.name} has initialState already.`;
+
+    constructor(
+        featureKey: string,
+        private initialState: StateType | undefined,
+        config: FeatureStoreConfig = {}
+    ) {
         this.featureId = generateId();
+        this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
 
-        this._featureKey = StoreCore.addFeature<StateType>(
-            featureKey,
-            createFeatureReducer(this.featureId, initialState),
-            config
-        );
+        this.initFeature();
+    }
 
-        this.sub = StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource);
+    private initFeature(): void {
+        if (this.initialState) {
+            StoreCore.addFeature<StateType>(
+                this._featureKey,
+                createFeatureReducer(this.featureId, this.initialState)
+            );
+
+            this.sub.add(
+                StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
+            );
+        }
+    }
+
+    setInitialState(initialState: StateType): void {
+        if (this.initialState) {
+            miniRxError(this.initializedErrorMessage);
+        }
+        this.initialState = initialState;
+        this.initFeature();
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+        if (!this.initialState) {
+            miniRxError(this.notInitializedErrorMessage);
+        }
+
         const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
 
         StoreCore.dispatch(action);
@@ -111,6 +150,12 @@ function createFeatureReducer<StateType>(
         }
         return state;
     };
+}
+
+// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
+// This isn't a real GUID!
+function generateId() {
+    return Math.random().toString(36).slice(2);
 }
 
 export function createFeatureStore<T extends object>(

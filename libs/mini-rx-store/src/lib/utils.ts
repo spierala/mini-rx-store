@@ -36,12 +36,6 @@ export function hasEffectMetaData(
     return param.hasOwnProperty(EFFECT_METADATA_KEY);
 }
 
-// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
-// This isn't a real GUID!
-export function generateId() {
-    return Math.random().toString(36).slice(2);
-}
-
 export function beautifyActionForLogging(action: Action, state: AppState): Action {
     if (isSetStateAction(action)) {
         return mapSetStateActionToActionWithPayload(action, state);

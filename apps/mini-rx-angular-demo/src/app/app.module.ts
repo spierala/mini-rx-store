@@ -9,11 +9,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { TodosModule } from './modules/todos/todos.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
-import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
+import {
+    ImmutableStateExtension,
+    LoggerExtension,
+    UndoExtension,
+    FeatureStore,
+} from 'mini-rx-store';
 import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
+import { initialState, TodosState } from './modules/todos/state/todos-store.service';
 
 @NgModule({
     imports: [
@@ -43,4 +49,22 @@ import { ToastrModule } from 'ngx-toastr';
     bootstrap: [AppComponent],
     providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
 })
-export class AppModule {}
+export class AppModule {
+    constructor() {
+        const fs = new FeatureStore<TodosState>('test', undefined);
+        const fsState$ = fs.select();
+        fsState$.subscribe((v) => console.log('# test', v));
+
+        // Test lazy initialization
+        setTimeout(() => {
+            fs.setInitialState(initialState);
+        }, 5000);
+
+        setTimeout(() => {
+            // Use setState as usual
+            fs.setState({
+                todos: [{ id: 123, title: 'test', isDone: false }],
+            });
+        }, 6000);
+    }
+}

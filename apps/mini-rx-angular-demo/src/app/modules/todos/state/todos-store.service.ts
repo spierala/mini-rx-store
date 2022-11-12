@@ -14,14 +14,14 @@ import {
 import { TodosApiService } from '../../todos-shared/services/todos-api.service';
 
 // STATE INTERFACE
-interface TodosState {
+export interface TodosState {
     todos: Todo[];
     filter: TodoFilter;
     selectedTodo: Todo | undefined;
 }
 
 // INITIAL STATE
-const initialState: TodosState = {
+export const initialState: TodosState = {
     todos: [],
     selectedTodo: undefined,
     filter: {
