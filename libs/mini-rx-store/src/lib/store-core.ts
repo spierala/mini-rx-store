@@ -4,6 +4,7 @@ import {
     Action,
     Actions,
     AppState,
+    CombineReducers,
     EFFECT_METADATA_KEY,
     EffectConfig,
     HasEffectMetadata,
@@ -15,7 +16,7 @@ import {
 } from './models';
 import { generateId, hasEffectMetaData, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { combineReducers } from './combine-reducers';
+import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 
 type ReducerState = {
@@ -53,7 +54,7 @@ class StoreCore {
     // EXTENSIONS
     private extensions: StoreExtension[] = [];
 
-    constructor() {
+    constructor(combineReducers: CombineReducers = defaultCombineReducers) {
         let reducer: Reducer<AppState>;
         // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscription (fewer operators = less bundle-size :))
         this.reducerStateSource.subscribe((v) => {

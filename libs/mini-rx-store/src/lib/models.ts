@@ -54,6 +54,8 @@ export type ReducerDictionary<T> = {
     [p in keyof T]: Reducer<T[p]>;
 };
 
+export type CombineReducers<T = any> = (reducers: ReducerDictionary<T>) => Reducer<T>;
+
 export type StateOrCallback<StateType> =
     | Partial<StateType>
     | ((state: StateType) => Partial<StateType>);
