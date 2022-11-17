@@ -37,17 +37,29 @@
                     "namedChunks": false,
                     "extractLicenses": true,
                     "vendorChunk": false
+                },
+                "development": {
+                    "buildOptimizer": false,
+                    "optimization": false,
+                    "vendorChunk": true,
+                    "extractLicenses": false,
+                    "sourceMap": true,
+                    "namedChunks": true
                 }
             }
         },
         "serve": {
             "executor": "@nrwl/web:dev-server",
+            "defaultConfiguration": "development",
             "options": {
                 "buildTarget": "mini-rx-vanilla-demo:build"
             },
             "configurations": {
                 "production": {
                     "buildTarget": "mini-rx-vanilla-demo:build:production"
+                },
+                "development": {
+                    "buildTarget": "mini-rx-vanilla-demo:build:development"
                 }
             }
         },
