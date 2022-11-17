@@ -1,0 +1,28 @@
+{
+    "root": "apps/mini-rx-vanilla-demo-e2e",
+    "sourceRoot": "apps/mini-rx-vanilla-demo-e2e/src",
+    "projectType": "application",
+    "targets": {
+        "e2e": {
+            "executor": "@nrwl/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/mini-rx-vanilla-demo-e2e/cypress.json",
+                "devServerTarget": "mini-rx-vanilla-demo:serve"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "mini-rx-vanilla-demo:serve:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/mini-rx-vanilla-demo-e2e/**/*.{js,ts}"]
+            }
+        }
+    },
+    "tags": [],
+    "implicitDependencies": ["mini-rx-vanilla-demo"]
+}

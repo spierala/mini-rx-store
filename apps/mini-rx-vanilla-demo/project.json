@@ -1,0 +1,70 @@
+{
+    "projectType": "application",
+    "root": "apps/mini-rx-vanilla-demo",
+    "sourceRoot": "apps/mini-rx-vanilla-demo/src",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@nrwl/web:webpack",
+            "outputs": ["{options.outputPath}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "outputPath": "dist/apps/mini-rx-vanilla-demo",
+                "compiler": "babel",
+                "index": "apps/mini-rx-vanilla-demo/src/index.html",
+                "baseHref": "/",
+                "main": "apps/mini-rx-vanilla-demo/src/main.ts",
+                "polyfills": "apps/mini-rx-vanilla-demo/src/polyfills.ts",
+                "tsConfig": "apps/mini-rx-vanilla-demo/tsconfig.app.json",
+                "assets": [
+                    "apps/mini-rx-vanilla-demo/src/favicon.ico",
+                    "apps/mini-rx-vanilla-demo/src/assets"
+                ],
+                "styles": ["apps/mini-rx-vanilla-demo/src/styles.css"],
+                "scripts": []
+            },
+            "configurations": {
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/mini-rx-vanilla-demo/src/environments/environment.ts",
+                            "with": "apps/mini-rx-vanilla-demo/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "optimization": true,
+                    "outputHashing": "all",
+                    "sourceMap": false,
+                    "namedChunks": false,
+                    "extractLicenses": true,
+                    "vendorChunk": false
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nrwl/web:dev-server",
+            "options": {
+                "buildTarget": "mini-rx-vanilla-demo:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "mini-rx-vanilla-demo:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/mini-rx-vanilla-demo/**/*.ts"]
+            }
+        },
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": ["coverage/apps/mini-rx-vanilla-demo"],
+            "options": {
+                "jestConfig": "apps/mini-rx-vanilla-demo/jest.config.js",
+                "passWithNoTests": true
+            }
+        }
+    }
+}

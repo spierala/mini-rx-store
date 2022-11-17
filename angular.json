@@ -4,6 +4,8 @@
         "mini-rx-angular-demo": "apps/mini-rx-angular-demo",
         "mini-rx-angular-demo-e2e": "apps/mini-rx-angular-demo-e2e",
         "mini-rx-store": "libs/mini-rx-store",
-        "mini-rx-store-ng": "libs/mini-rx-store-ng"
+        "mini-rx-store-ng": "libs/mini-rx-store-ng",
+        "mini-rx-vanilla-demo": "apps/mini-rx-vanilla-demo",
+        "mini-rx-vanilla-demo-e2e": "apps/mini-rx-vanilla-demo-e2e"
     }
 }

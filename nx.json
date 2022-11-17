@@ -44,6 +44,17 @@
         },
         "@nrwl/angular:component": {
             "style": "scss"
+        },
+        "@nrwl/web:application": {
+            "style": "css",
+            "linter": "eslint",
+            "unitTestRunner": "jest",
+            "e2eTestRunner": "cypress"
+        },
+        "@nrwl/web:library": {
+            "style": "css",
+            "linter": "eslint",
+            "unitTestRunner": "jest"
         }
     },
     "defaultProject": "mini-rx-angular-demo"
