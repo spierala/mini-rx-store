@@ -57,5 +57,5 @@
             "unitTestRunner": "jest"
         }
     },
-    "defaultProject": "mini-rx-angular-demo"
+    "defaultProject": "mini-rx-vanilla-demo"
 }

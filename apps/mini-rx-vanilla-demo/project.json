@@ -65,6 +65,19 @@
                 "jestConfig": "apps/mini-rx-vanilla-demo/jest.config.js",
                 "passWithNoTests": true
             }
+        },
+        "serveAppAndWatchLibs": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+                "commands": [
+                    {
+                        "command": "nx build mini-rx-store --watch"
+                    },
+                    {
+                        "command": "nx serve"
+                    }
+                ]
+            }
         }
     }
 }
