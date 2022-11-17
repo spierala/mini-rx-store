@@ -18,6 +18,7 @@ import { generateId, hasEffectMetaData, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
+import { commandCombineReducers } from './extensions/command/command-combine-reducers';
 
 type ReducerState = {
     featureReducers: ReducerDictionary<AppState>;
@@ -233,4 +234,6 @@ function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> 
 
 // Created once to initialize singleton
 /** @internal */
-export default new StoreCore();
+export default new StoreCore(commandCombineReducers);
+// @command: this should be somehow configurable from the outside
+// For current prototype, stuck our custom combine reducer function
