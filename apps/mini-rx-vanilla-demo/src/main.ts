@@ -9,7 +9,14 @@ function useAppStore() {
         console.log(users);
     });
 
-    appStore.dispatch(new LoadUsersAction());
+    // run in next JS task, to simulate an event firing and its callback being run
+    setTimeout(() => {
+        appStore.dispatch(new LoadUsersAction());
+    }, 0);
+
+    setTimeout(() => {
+        appStore.dispatch(new LoadUsersAction());
+    }, 1000);
 }
 
 useAppStore();
