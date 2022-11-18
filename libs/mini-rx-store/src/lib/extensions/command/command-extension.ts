@@ -44,7 +44,7 @@ function createCommandMetaReducer(processCommands: ProcessCommandsCallback) {
 
             const { state: nextState, cmds: commands } = unwrapCmds(nextStateWithCmds);
 
-            processCommands([]);
+            processCommands(commands);
 
             return nextState;
         }
