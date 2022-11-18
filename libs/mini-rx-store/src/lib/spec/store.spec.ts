@@ -590,7 +590,6 @@ describe('Store', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
         StoreCore.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(StoreCore['extensions'].length).toBe(2);
     });
 
     it('should call the reducer before running the effect', () => {

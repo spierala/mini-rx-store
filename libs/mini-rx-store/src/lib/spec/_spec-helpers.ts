@@ -22,7 +22,6 @@ export const userState: UserState = {
 export const store: Store = configureStore({});
 
 export function resetStoreConfig() {
-    StoreCore['extensions'] = [];
     StoreCore['reducerStateSource'].next({
         metaReducers: [],
         featureReducers: {},

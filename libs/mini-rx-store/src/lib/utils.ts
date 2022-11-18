@@ -6,6 +6,7 @@ import {
     AppState,
     EFFECT_METADATA_KEY,
     HasEffectMetadata,
+    StateOrCallback,
 } from './models';
 import { isSetStateAction, SetStateAction } from './actions';
 import { miniRxNameSpace } from './constants';
@@ -53,5 +54,14 @@ function mapSetStateActionToActionWithPayload(
         type: action.type,
         payload:
             typeof stateOrCallback === 'function' ? stateOrCallback(featureState) : stateOrCallback,
+    };
+}
+
+export function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
+    const newPartialState =
+        typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+    return {
+        ...state,
+        ...newPartialState,
     };
 }

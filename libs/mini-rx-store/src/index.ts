@@ -5,6 +5,7 @@
 export { actions$, Store, configureStore } from './lib/store';
 export { default as _StoreCore } from './lib/store-core';
 export { FeatureStore, createFeatureStore } from './lib/feature-store';
+export { ComponentStore, createComponentStore } from './lib/component-store';
 export { createFeatureSelector, createSelector } from './lib/selector';
 export {
     Action,

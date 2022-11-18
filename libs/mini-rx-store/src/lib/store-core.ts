@@ -50,9 +50,6 @@ class StoreCore {
         });
     }
 
-    // EXTENSIONS
-    private extensions: StoreExtension[] = [];
-
     constructor() {
         let reducer: Reducer<AppState>;
         // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscription (fewer operators = less bundle-size :))
@@ -168,7 +165,6 @@ class StoreCore {
 
     addExtension(extension: StoreExtension) {
         extension.init();
-        this.extensions.push(extension);
     }
 
     private addReducer(featureKey: string, reducer: Reducer<any>) {
