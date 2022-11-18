@@ -1,6 +1,6 @@
 import { Action, AppState, Reducer, StoreExtension } from '../../models';
 import StoreCore from '../../store-core';
-import { Cmd, Cmd$, RootReducerWithCmds, unwrapCmds, withCmd } from './command-models';
+import { Cmd, Cmd$, CmdEffect, RootReducerWithCmds, unwrapCmds, withCmd } from './command-models';
 import { CommandProcessor } from './command-processor';
 
 type ProcessCommandsCallback = (commands: Cmd[]) => void;
@@ -27,6 +27,10 @@ export class CommandExtension extends StoreExtension {
         const commandMetaReducer = createCommandMetaReducer(processCommands);
 
         StoreCore.addMetaReducers(commandMetaReducer);
+    }
+
+    effect(effect$: CmdEffect): void {
+        this.commandProcessor.addEffect(effect$);
     }
 }
 

@@ -6,8 +6,16 @@ import { Action } from '../../models';
 
 // types of commands
 
+const cmdSym = Symbol('cmd');
+
 export type CmdWithoutPayload<T extends string = string> = {
     type: T;
+    // @command: action and command both have a 'type' property,
+    // add a symbol to distinguish commands from actions in CommandProcessor.
+    // The _actual_ need is an 'isAction' function (better if a TypeScript user-defined type guard)
+    // to detect whether a command-based effect returns an action, as opposed to anything else.
+    // Ideally, a symbol property should go in Action type
+    [cmdSym]: 'command';
 };
 
 export type CmdWithPayload<T extends string = string, P = any> = CmdWithoutPayload<T> & {
@@ -15,6 +23,10 @@ export type CmdWithPayload<T extends string = string, P = any> = CmdWithoutPaylo
 };
 
 export type Cmd<T extends string = string, P = any> = CmdWithPayload<T, P> | CmdWithoutPayload<T>;
+
+export function isCmd(arg: any): arg is Cmd {
+    return typeof arg === 'object' && arg !== null && cmdSym in arg;
+}
 
 // types of command creators
 
@@ -39,6 +51,7 @@ export function configureCmd<T extends string = string>(type: T): CmdCreatorWith
     function cmdCreator(): CmdWithoutPayload<T> {
         return {
             type,
+            [cmdSym]: 'command',
         };
     }
 
@@ -59,6 +72,7 @@ export function configureCmdWithPayload<T extends string = string, P = any>(
     function cmdCreator(arg: P): CmdWithPayload<T, P> {
         return {
             type,
+            [cmdSym]: 'command',
             payload: arg,
         };
     }
@@ -76,6 +90,7 @@ export function configureCmdWithPayload<T extends string = string, P = any>(
 
 export const NOOP_CMD: CmdWithoutPayload<'@@commands/noop'> = {
     type: '@@commands/noop',
+    [cmdSym]: 'command',
 };
 
 // types and utilities to enrich state with commands
@@ -141,9 +156,13 @@ export interface CleanedCmds<S> {
     cmds: Cmd[];
 }
 
-export function cleanCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): CleanedCmds<S> {
+export function cleanCmds<S>(stateWithCmds: S & WithCmds): CleanedCmds<S> {
+    const { [cmdsSym]: cmds, ...state } = stateWithCmds;
+
+    const stateWithEmptyCmds = cmds.length > 0 ? withCmd(state as unknown as S) : stateWithCmds;
+
     return {
-        cleaned: withCmd(state as unknown as S),
+        cleaned: stateWithEmptyCmds,
         cmds,
     };
 }
@@ -162,7 +181,11 @@ export type SliceReducerWithCmds<S, A extends Action = Action> = (
 
 // types and utilities to observe commands
 
-export class Cmd$ extends Observable<Cmd> {}
+export type Cmd$ = Observable<Cmd>;
+
+export type CmdEffectOutput = Action | Cmd | void;
+
+export type CmdEffect = Observable<CmdEffectOutput>;
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Cmd, Cmd> {
     return filter((cmd: Cmd) =>

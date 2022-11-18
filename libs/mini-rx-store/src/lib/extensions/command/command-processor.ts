@@ -1,5 +1,18 @@
-import { asapScheduler, observeOn, Subject } from 'rxjs';
-import { Cmd, Cmd$, NOOP_CMD } from './command-models';
+import { asapScheduler, filter, observeOn, Subject } from 'rxjs';
+import { defaultEffectsErrorHandler } from '../../default-effects-error-handler';
+import { Action } from '../../models';
+import StoreCore from '../../store-core';
+import { Cmd, Cmd$, CmdEffect, CmdEffectOutput, isCmd, NOOP_CMD } from './command-models';
+
+function isAction(result: CmdEffectOutput): result is Action {
+    if (typeof result === 'undefined') {
+        return false;
+    } else if (isCmd(result)) {
+        return false;
+    } else {
+        return true;
+    }
+}
 
 export class CommandProcessor {
     // COMMANDS
@@ -27,5 +40,13 @@ export class CommandProcessor {
         for (const cmd of commands) {
             this.commandsSource.next(cmd);
         }
+    }
+
+    addEffect(effect$: CmdEffect): void {
+        const effectWithErrorHandler$ = defaultEffectsErrorHandler(effect$);
+
+        effectWithErrorHandler$.pipe(filter(isAction)).subscribe((action) => {
+            StoreCore.dispatch(action);
+        });
     }
 }
