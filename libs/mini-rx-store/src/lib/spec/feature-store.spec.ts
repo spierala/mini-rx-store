@@ -1,6 +1,6 @@
 import { createFeatureStore, FeatureStore } from '../feature-store';
-import { mergeMap, tap } from 'rxjs/operators';
-import { Observable, of, Subject } from 'rxjs';
+import { map, mergeMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import { actions$ } from '../store';
@@ -173,6 +173,38 @@ describe('FeatureStore', () => {
         counterFeature.increment();
         expect(spy).toHaveBeenCalledWith(1);
         expect(spy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should update state using Observable', () => {
+        const counterStore = createFeatureStore<CounterState>('observableCounter', { counter: 0 });
+
+        counterStore.setState({ counter: 0 });
+        const observable$: Observable<number> = of(1, 2, 3);
+
+        const nextCallback = jest.fn<void, [number]>();
+        counterStore.select((state) => state.counter).subscribe(nextCallback);
+
+        counterStore.setState(observable$.pipe(map((v) => ({ counter: v }))));
+
+        expect(nextCallback.mock.calls).toEqual([[0], [1], [2], [3]]);
+    });
+
+    it('should unsubscribe from setState Observable on destroy', () => {
+        const counterStore = createFeatureStore<CounterState>('observableCounter-2', {
+            counter: 0,
+        });
+
+        const tapCallback = jest.fn<void, [number]>();
+        const counterSource = new BehaviorSubject(0);
+        const counter$ = counterSource.asObservable().pipe(tap(tapCallback));
+
+        counterStore.setState(combineLatest({ counter: counter$ }));
+
+        counterSource.next(1);
+        counterStore.destroy();
+        counterSource.next(2); // Should be ignored
+
+        expect(tapCallback.mock.calls).toEqual([[0], [1]]);
     });
 
     it('should select state from App State', () => {

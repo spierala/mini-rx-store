@@ -6,6 +6,11 @@ import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { createSetStateAction, isSetStateAction } from './actions';
 
+type SetStateParam<T> = StateOrCallback<T> | Observable<Partial<T>>;
+type SetStateReturn<T, P extends SetStateParam<T>> = P extends Observable<Partial<T>>
+    ? void
+    : Action;
+
 export class FeatureStore<StateType extends object> {
     private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
         {} as StateType
@@ -36,11 +41,25 @@ export class FeatureStore<StateType extends object> {
         this.sub = StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource);
     }
 
-    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+    setState<P extends SetStateParam<StateType>>(
+        stateOrCallback: P,
+        name?: string
+    ): SetStateReturn<StateType, P> {
+        return (
+            isObservable(stateOrCallback)
+                ? this.sub.add(
+                      stateOrCallback.subscribe((v) => this.dispatchSetStateAction(v, name))
+                  )
+                : this.dispatchSetStateAction(stateOrCallback as StateOrCallback<StateType>, name)
+        ) as SetStateReturn<StateType, P>;
+    }
+
+    private dispatchSetStateAction(
+        stateOrCallback: StateOrCallback<StateType>,
+        name?: string
+    ): Action {
         const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
-
         StoreCore.dispatch(action);
-
         return action;
     }
 
