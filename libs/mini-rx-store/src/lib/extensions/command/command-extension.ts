@@ -1,26 +1,32 @@
 import { Action, AppState, Reducer, StoreExtension } from '../../models';
 import StoreCore from '../../store-core';
-import { Cmd, NOOP_CMD, RootReducerWithCmds, unwrapCmds, withCmd } from './command-models';
+import { Cmd, Cmd$, RootReducerWithCmds, unwrapCmds, withCmd } from './command-models';
+import { CommandProcessor } from './command-processor';
 
 type ProcessCommandsCallback = (commands: Cmd[]) => void;
 
 export class CommandExtension extends StoreExtension {
+    private readonly commandProcessor: CommandProcessor;
+
+    public get command$(): Cmd$ {
+        return this.commandProcessor.commands$;
+    }
+
+    constructor() {
+        super();
+        this.commandProcessor = new CommandProcessor();
+    }
+
     init(): void {
         //console.log('CommandExtension initialising');
 
         const processCommands: ProcessCommandsCallback = (cmds) => {
-            this.process(cmds);
+            this.commandProcessor.process(cmds);
         };
 
         const commandMetaReducer = createCommandMetaReducer(processCommands);
 
         StoreCore.addMetaReducers(commandMetaReducer);
-    }
-
-    async process(commands: Cmd[]) {
-        const relevantCmds = commands.filter((cmd) => cmd !== NOOP_CMD);
-
-        console.log(`Received ${commands.length} command(s), ${relevantCmds.length} relevant`);
     }
 }
 

@@ -1,5 +1,7 @@
 // types inspired from redux-toolkit createAction
 
+import { Observable, OperatorFunction } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { Action } from '../../models';
 
 // types of commands
@@ -29,6 +31,9 @@ export interface CmdCreatorWithPayload<T extends string = string, P = any> {
 }
 
 // command configurators
+// @command: configurators and creators are not essential to the overall feature:
+// they're just helpers in the same vein as Redux-Toolkit action creators, but could
+// be swapped for something else, or nothing at all
 
 export function configureCmd<T extends string = string>(type: T): CmdCreatorWithoutPayload<T> {
     function cmdCreator(): CmdWithoutPayload<T> {
@@ -160,3 +165,15 @@ export type SliceReducerWithCmds<S, A extends Action = Action> = (
     state: S & WithCmds,
     action: A
 ) => S & WithCmds;
+
+// types and utilities to observe commands
+
+export class Cmd$ extends Observable<Cmd> {}
+
+export function ofType(...allowedTypes: string[]): OperatorFunction<Cmd, Cmd> {
+    return filter((cmd: Cmd) =>
+        allowedTypes.some((type) => {
+            return type === cmd.type;
+        })
+    );
+}
