@@ -108,11 +108,11 @@ export type WithoutCmds = {
 export type WithoutCmds = Partial<Record<keyof WithCmds, never>>;
 */
 
-export function isWithCmds<T = any>(arg: T): arg is T & WithCmds {
+export function hasCmds<T = any>(arg: T): arg is T & WithCmds {
     return typeof arg === 'object' && arg !== null && cmdsSym in arg;
 }
 
-// - non mutating
+// - set commands, non mutating
 
 export function addCmd<S>(state: S & WithoutCmds, command?: Cmd): S & WithCmds {
     const commands = command ? [command] : [];
@@ -146,7 +146,7 @@ export function withManyCmds<S>(state: S & WithCmds, commands: Cmd[] = []): S & 
     };
 }
 
-// - mutating
+// - set commands, mutating
 
 /*
 export function setCmd<S>(state: S & WithCmds, command: Cmd): void {

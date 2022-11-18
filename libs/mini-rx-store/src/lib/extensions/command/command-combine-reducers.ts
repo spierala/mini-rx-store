@@ -3,7 +3,7 @@ import {
     addManyCmds,
     cleanCmds,
     Cmd,
-    isWithCmds,
+    hasCmds,
     SliceReducerWithCmds,
     withCmd,
 } from './command-models';
@@ -35,7 +35,7 @@ export function commandCombineReducers<T extends object = {}>(
             // when a feature slice reducer returns commands, both input and
             // output state have commands: use this info to detect those reducers
 
-            if (isWithCmds(previousStateForKey)) {
+            if (hasCmds(previousStateForKey)) {
                 // command-based reducer
 
                 const previousStateForKeyWithEmptyCmds = withCmd(previousStateForKey);
