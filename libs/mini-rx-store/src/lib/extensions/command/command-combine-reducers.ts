@@ -16,9 +16,11 @@ export function commandCombineReducers<T extends object = {}>(
     const reducerKeys: Array<keyof T> = Object.keys(reducers) as Array<keyof T>;
     const reducerKeyLength: number = reducerKeys.length;
 
-    let commands = [] as Cmd[];
-
     return (state: T, action: Action) => {
+        //console.log('command-combined reducer invoked');
+
+        let commands = [] as Cmd[];
+
         const stateKeysLength: number = Object.keys(state).length;
 
         let hasChanged: boolean = stateKeysLength !== reducerKeyLength;
