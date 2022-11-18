@@ -148,6 +148,7 @@ export function withManyCmds<S>(state: S & WithCmds, commands: Cmd[] = []): S & 
 
 // - mutating
 
+/*
 export function setCmd<S>(state: S & WithCmds, command: Cmd): void {
     state[cmdsSym] = [command];
 }
@@ -155,9 +156,11 @@ export function setCmd<S>(state: S & WithCmds, command: Cmd): void {
 export function setManyCmds<S>(state: S & WithCmds, commands: Cmd[]): void {
     state[cmdsSym] = commands;
 }
+*/
 
 // - extracting commands
 
+/*
 export function getCmds<S>({ [cmdsSym]: cmds }: S & WithCmds): Cmd[] {
     return cmds;
 }
@@ -167,6 +170,7 @@ export function withoutCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): S &
         ...(state as unknown as S & WithoutCmds),
     };
 }
+*/
 
 export interface UnwrappedCmds<S> {
     state: S & WithoutCmds;
