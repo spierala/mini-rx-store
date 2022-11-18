@@ -1,4 +1,8 @@
-import { withCmd, WithCmds } from 'libs/mini-rx-store/src/lib/extensions/command/command-models';
+import {
+    addCmd,
+    withCmd,
+    WithCmds,
+} from 'libs/mini-rx-store/src/lib/extensions/command/command-models';
 import { Action, Reducer } from 'mini-rx-store';
 import { UserAction, UserActionType } from './user-actions';
 import { loadUsersCmd } from './user-commands';
@@ -6,7 +10,7 @@ import { initialState, UserState } from './user-state';
 
 export const USER_REDUX_SLICE_KEY: string = 'users-redux';
 
-const initialStateWithCmds = withCmd(initialState);
+const initialStateWithCmds = addCmd(initialState);
 
 export const userReducer: Reducer<UserState & WithCmds> = function (
     state: UserState & WithCmds = initialStateWithCmds,

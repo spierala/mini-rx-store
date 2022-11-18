@@ -101,11 +101,20 @@ export interface WithCmds {
     [cmdsSym]: Cmd[];
 }
 
+export type WithoutCmds = {
+    [cmdsSym]?: never;
+};
+/*
+export type WithoutCmds = Partial<Record<keyof WithCmds, never>>;
+*/
+
 export function isWithCmds<T = any>(arg: T): arg is T & WithCmds {
     return typeof arg === 'object' && arg !== null && cmdsSym in arg;
 }
 
-export function withCmd<S>(state: S, command?: Cmd): S & WithCmds {
+// - non mutating
+
+export function addCmd<S>(state: S & WithoutCmds, command?: Cmd): S & WithCmds {
     const commands = command ? [command] : [];
 
     return {
@@ -114,12 +123,30 @@ export function withCmd<S>(state: S, command?: Cmd): S & WithCmds {
     };
 }
 
-export function withManyCmds<S>(state: S, commands: Cmd[] = []): S & WithCmds {
+export function addManyCmds<S>(state: S & WithoutCmds, commands: Cmd[] = []): S & WithCmds {
     return {
         ...state,
         [cmdsSym]: commands,
     };
 }
+
+export function withCmd<S>(state: S & WithCmds, command?: Cmd): S & WithCmds {
+    const commands = command ? [command] : [];
+
+    return {
+        ...state,
+        [cmdsSym]: commands,
+    };
+}
+
+export function withManyCmds<S>(state: S & WithCmds, commands: Cmd[] = []): S & WithCmds {
+    return {
+        ...state,
+        [cmdsSym]: commands,
+    };
+}
+
+// - mutating
 
 export function setCmd<S>(state: S & WithCmds, command: Cmd): void {
     state[cmdsSym] = [command];
@@ -129,24 +156,26 @@ export function setManyCmds<S>(state: S & WithCmds, commands: Cmd[]): void {
     state[cmdsSym] = commands;
 }
 
+// - extracting commands
+
 export function getCmds<S>({ [cmdsSym]: cmds }: S & WithCmds): Cmd[] {
     return cmds;
 }
 
-export function withoutCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): S {
+export function withoutCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): S & WithoutCmds {
     return {
-        ...state,
-    } as unknown as S;
+        ...(state as unknown as S & WithoutCmds),
+    };
 }
 
 export interface UnwrappedCmds<S> {
-    state: S;
+    state: S & WithoutCmds;
     cmds: Cmd[];
 }
 
 export function unwrapCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): UnwrappedCmds<S> {
     return {
-        state: state as unknown as S,
+        state: state as unknown as S & WithoutCmds,
         cmds,
     };
 }
@@ -159,7 +188,8 @@ export interface CleanedCmds<S> {
 export function cleanCmds<S>(stateWithCmds: S & WithCmds): CleanedCmds<S> {
     const { [cmdsSym]: cmds, ...state } = stateWithCmds;
 
-    const stateWithEmptyCmds = cmds.length > 0 ? withCmd(state as unknown as S) : stateWithCmds;
+    const stateWithEmptyCmds =
+        cmds.length > 0 ? addCmd(state as unknown as S & WithoutCmds) : stateWithCmds;
 
     return {
         cleaned: stateWithEmptyCmds,

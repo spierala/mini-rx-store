@@ -1,6 +1,6 @@
 import { Action, AppState, Reducer, StoreExtension } from '../../models';
 import StoreCore from '../../store-core';
-import { Cmd, Cmd$, CmdEffect, RootReducerWithCmds, unwrapCmds, withCmd } from './command-models';
+import { addCmd, Cmd, Cmd$, CmdEffect, RootReducerWithCmds, unwrapCmds } from './command-models';
 import { CommandProcessor } from './command-processor';
 
 type ProcessCommandsCallback = (commands: Cmd[]) => void;
@@ -39,7 +39,7 @@ function createCommandMetaReducer(processCommands: ProcessCommandsCallback) {
         //console.log('commandMetaReducer invoked');
 
         function newReducer(state: AppState, action: Action): AppState {
-            const stateWithCmds = withCmd(state);
+            const stateWithCmds = addCmd(state);
 
             const nextStateWithCmds = (reducer as RootReducerWithCmds<AppState, Action>)(
                 stateWithCmds,
