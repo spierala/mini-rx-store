@@ -37,6 +37,6 @@ export function commandCombineReducers(reducers: ReducerDictionary<any>): Reduce
             nextState[key] = nextStateForKey;
             hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
         }
-        return hasChanged ? withManyCmds(nextState, commands) : withCmd(state);
+        return hasChanged ? withManyCmds(nextState, commands) : withManyCmds(state, commands);
     };
 }
