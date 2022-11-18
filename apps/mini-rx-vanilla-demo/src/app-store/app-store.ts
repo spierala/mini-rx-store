@@ -5,15 +5,18 @@ import {
     ReduxDevtoolsExtension,
     CommandExtension,
 } from 'mini-rx-store';
+import { registerUserCmdEffects } from '../users/user-cmd-effects';
 import { registerUserEffects } from '../users/user-effects';
 import { userReducer, USER_REDUX_SLICE_KEY } from '../users/user-reducer';
+
+export const commandExtension = new CommandExtension();
 
 export const appStore: Store = configureStore({
     reducers: {
         [USER_REDUX_SLICE_KEY]: userReducer,
     },
     extensions: [
-        new CommandExtension(),
+        commandExtension,
         new LoggerExtension(),
         new ReduxDevtoolsExtension({
             name: 'MiniRx Showcase',
@@ -24,3 +27,4 @@ export const appStore: Store = configureStore({
 });
 
 registerUserEffects(appStore);
+registerUserCmdEffects(commandExtension);
