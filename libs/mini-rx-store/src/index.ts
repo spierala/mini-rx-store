@@ -6,20 +6,11 @@ export { actions$, Store, configureStore } from './lib/store';
 export { default as _StoreCore } from './lib/store-core';
 export { FeatureStore, createFeatureStore } from './lib/feature-store';
 export { createFeatureSelector, createSelector } from './lib/selector';
-export {
-    Action,
-    Reducer,
-    Actions,
-    ReducerDictionary,
-    StoreConfig,
-    FeatureConfig,
-    StoreExtension,
-} from './lib/models';
+export type { Action, Reducer, ReducerDictionary, StoreConfig, FeatureConfig } from './lib/models';
+export { Actions, StoreExtension } from './lib/models';
 export { ofType, hasEffectMetaData } from './lib/utils';
-export {
-    ReduxDevtoolsExtension,
-    ReduxDevtoolsOptions,
-} from './lib/extensions/redux-devtools.extension';
+export type { ReduxDevtoolsOptions } from './lib/extensions/redux-devtools.extension';
+export { ReduxDevtoolsExtension } from './lib/extensions/redux-devtools.extension';
 export { CommandExtension } from './lib/extensions/command/command-extension';
 export { LoggerExtension } from './lib/extensions/logger.extension';
 export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
