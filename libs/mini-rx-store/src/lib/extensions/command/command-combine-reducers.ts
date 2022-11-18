@@ -1,42 +1,63 @@
 import { Action, Reducer, ReducerDictionary } from '../../models';
-import { cleanCmds, Cmd, isWithCmds, withCmd, withManyCmds } from './command-models';
+import {
+    addManyCmds,
+    cleanCmds,
+    Cmd,
+    isWithCmds,
+    SliceReducerWithCmds,
+    withCmd,
+} from './command-models';
 
-export function commandCombineReducers<T>(reducers: ReducerDictionary<T>): Reducer<T>;
-export function commandCombineReducers(reducers: ReducerDictionary<any>): Reducer<any> {
+export function commandCombineReducers<T extends object = {}>(
+    reducers: ReducerDictionary<T>
+): Reducer<T> {
     //console.log('commandCombineReducers invoked');
 
-    const reducerKeys: string[] = Object.keys(reducers);
+    const reducerKeys: Array<keyof T> = Object.keys(reducers) as Array<keyof T>;
     const reducerKeyLength: number = reducerKeys.length;
 
     let commands = [] as Cmd[];
 
-    return (state: any = {}, action: Action) => {
+    return (state: T, action: Action) => {
         const stateKeysLength: number = Object.keys(state).length;
 
         let hasChanged: boolean = stateKeysLength !== reducerKeyLength;
-        const nextState: any = {};
+        const nextState: T = {} as T;
 
         for (let i = 0; i < reducerKeyLength; i++) {
             const key = reducerKeys[i];
-            const reducer: any = reducers[key];
+            const reducer = reducers[key];
             const previousStateForKey = state[key];
-            const nextResultForKey = reducer(previousStateForKey, action);
+            let nextStateForKey: T[keyof T];
 
-            let nextStateForKey: any;
-            if (isWithCmds(nextResultForKey)) {
-                const { cleaned: stateForKeyWithoutCmds, cmds: commandsForKey } =
-                    cleanCmds(nextResultForKey);
+            // when a feature slice reducer returns commands, both input and
+            // output state have commands: use this info to detect those reducers
 
-                nextStateForKey = stateForKeyWithoutCmds;
+            if (isWithCmds(previousStateForKey)) {
+                // command-based reducer
 
+                const previousStateForKeyWithEmptyCmds = withCmd(previousStateForKey);
+                const cmdReducer = reducer as unknown as SliceReducerWithCmds<T[keyof T]>;
+
+                const nextStateForKeyWithCmds = cmdReducer(
+                    previousStateForKeyWithEmptyCmds,
+                    action
+                );
+
+                const { cleaned: nextStateForKeyWithEmptyCmds, cmds: commandsForKey } =
+                    cleanCmds(nextStateForKeyWithCmds);
+
+                nextStateForKey = nextStateForKeyWithEmptyCmds;
                 commands = commands.concat(...commandsForKey);
             } else {
-                nextStateForKey = nextResultForKey;
+                // regular reducer
+
+                nextStateForKey = reducer(previousStateForKey, action);
             }
 
             nextState[key] = nextStateForKey;
             hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
         }
-        return hasChanged ? withManyCmds(nextState, commands) : withManyCmds(state, commands);
+        return hasChanged ? addManyCmds(nextState, commands) : addManyCmds(state, commands);
     };
 }
