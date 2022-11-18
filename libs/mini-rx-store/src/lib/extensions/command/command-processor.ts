@@ -31,7 +31,7 @@ export class CommandProcessor {
     process(commands: Cmd[]) {
         const relevantCmds = commands.filter((cmd) => cmd !== NOOP_CMD);
 
-        console.log(`Received ${commands.length} command(s), ${relevantCmds.length} relevant`);
+        //console.log(`Received ${commands.length} command(s), ${relevantCmds.length} relevant`);
 
         if (relevantCmds.length == 0) {
             return;

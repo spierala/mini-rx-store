@@ -9,6 +9,8 @@ import { registerUserCmdEffects } from '../users/user-cmd-effects';
 import { registerUserEffects } from '../users/user-effects';
 import { userReducer, USER_REDUX_SLICE_KEY } from '../users/user-reducer';
 
+const USE_COMMAND_EFFECTS = true;
+
 export const commandExtension = new CommandExtension();
 
 export const appStore: Store = configureStore({
@@ -26,5 +28,8 @@ export const appStore: Store = configureStore({
     ],
 });
 
-registerUserEffects(appStore);
-registerUserCmdEffects(commandExtension);
+if (!USE_COMMAND_EFFECTS) {
+    registerUserEffects(appStore);
+} else {
+    registerUserCmdEffects(commandExtension);
+}

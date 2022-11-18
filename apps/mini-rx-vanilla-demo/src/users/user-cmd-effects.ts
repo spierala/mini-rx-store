@@ -25,7 +25,16 @@ export function registerUserCmdEffects(commandExtension: CommandExtension) {
         mergeMap(() =>
             ajax<User[]>('https://jsonplaceholder.typicode.com/users').pipe(
                 map((res) => res.response.map(httpUserToUser)),
-                map((users) => new LoadUsersSuccessAction(users)),
+                map((users) => {
+                    // simulate random failure
+                    const isSuccess = Math.random() >= 0.5;
+
+                    const action = isSuccess
+                        ? new LoadUsersSuccessAction(users)
+                        : new LoadUsersFailureAction('teapot');
+
+                    return action;
+                }),
                 catchError((err) => of(new LoadUsersFailureAction(err)))
             )
         )
@@ -43,8 +52,6 @@ export function registerUserCmdEffects(commandExtension: CommandExtension) {
         )
     );
 
-    /* @command: TODO
     commandExtension.effect(loadUserCmdsEffect);
     commandExtension.effect(loadUserByIdCmdEffect);
-    */
 }
