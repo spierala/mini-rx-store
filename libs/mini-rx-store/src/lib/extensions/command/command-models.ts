@@ -106,12 +106,6 @@ export function withManyCmds<S>(state: S, commands: Cmd[] = []): S & WithCmds {
     };
 }
 
-export function withSomeCmd<S>(state: S, oneOrMoreCommands: Cmd | Cmd[] = []): S & WithCmds {
-    return Array.isArray(oneOrMoreCommands)
-        ? withManyCmds(state, oneOrMoreCommands)
-        : withCmd(state, oneOrMoreCommands);
-}
-
 export function setCmd<S>(state: S & WithCmds, command: Cmd): void {
     state[cmdsSym] = [command];
 }
@@ -124,7 +118,7 @@ export function getCmds<S>({ [cmdsSym]: cmds }: S & WithCmds): Cmd[] {
     return cmds;
 }
 
-export function removeCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): S {
+export function withoutCmds<S>({ [cmdsSym]: cmds, ...state }: S & WithCmds): S {
     return {
         ...state,
     } as unknown as S;
