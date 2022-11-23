@@ -1,6 +1,13 @@
 import { actions$, configureStore } from '../store';
 import StoreCore from '../store-core';
-import { Action, ActionWithPayload, Reducer, StoreExtension } from '../models';
+import {
+    Action,
+    ActionWithPayload,
+    AppState,
+    Reducer,
+    ReducerDictionary,
+    StoreExtension,
+} from '../models';
 import { createFeatureSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
@@ -17,6 +24,7 @@ import {
 } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createEffect } from 'mini-rx-store';
+import { combineReducers } from '../combine-reducers';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -385,6 +393,27 @@ describe('Store Config', () => {
                 expect.objectContaining({ metaTestFeature: 'abcxde' })
             );
         });
+    });
+
+    it('should call custom combineReducer fn', () => {
+        const combineReducersSpy = jest.fn();
+
+        function customCombineReducers(reducers: ReducerDictionary<AppState>) {
+            combineReducersSpy(reducers);
+
+            return combineReducers(reducers);
+        }
+
+        StoreCore.config({
+            reducers: { user: userReducer },
+            combineReducersFn: customCombineReducers,
+        });
+
+        expect(combineReducersSpy).toBeCalledWith(
+            expect.objectContaining({
+                user: userReducer,
+            })
+        );
     });
 });
 

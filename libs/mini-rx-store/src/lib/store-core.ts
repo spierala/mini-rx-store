@@ -12,10 +12,11 @@ import {
     ReducerDictionary,
     StoreConfig,
     StoreExtension,
+    CombineReducersFn,
 } from './models';
 import { generateId, hasEffectMetaData, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { combineReducers } from './combine-reducers';
+import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 
 type ReducerState = {
@@ -33,6 +34,7 @@ class StoreCore {
     state$: Observable<AppState> = this.stateSource.asObservable();
 
     // REDUCERS (Feature state reducers and meta reducers)
+    private combineReducersFn: CombineReducersFn<AppState> = defaultCombineReducers;
     private reducerStateSource = new BehaviorSubject<ReducerState>({
         featureReducers: {},
         metaReducers: [],
@@ -58,7 +60,7 @@ class StoreCore {
         // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscription (fewer operators = less bundle-size :))
         this.reducerStateSource.subscribe((v) => {
             const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
-            const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
+            const combinedReducer: Reducer<AppState> = this.combineReducersFn(v.featureReducers);
             reducer = combinedMetaReducer(combinedReducer);
         });
 
@@ -78,6 +80,10 @@ class StoreCore {
             miniRxError(
                 '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
             );
+        }
+
+        if (config.combineReducersFn) {
+            this.combineReducersFn = config.combineReducersFn;
         }
 
         if (config.metaReducers?.length) {
