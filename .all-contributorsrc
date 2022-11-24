@@ -50,6 +50,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "BrainCrumbz",
+      "name": "BrainCrumbz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3185573?v=4",
+      "profile": "http://www.braincrumbz.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
