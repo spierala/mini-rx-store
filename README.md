@@ -276,6 +276,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://github.com/Thocaten"><img src="https://avatars.githubusercontent.com/u/79323279?v=4?s=100" width="100px;" alt="Carsten"/><br /><sub><b>Carsten</b></sub></a><br /><a href="#design-Thocaten" title="Design">🎨</a></td>
       <td align="center"><a href="https://github.com/M5150"><img src="https://avatars.githubusercontent.com/u/3443413?v=4?s=100" width="100px;" alt="Maximo Cudich-Sieburger"/><br /><sub><b>Maximo Cudich-Sieburger</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=M5150" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/sashion"><img src="https://avatars.githubusercontent.com/u/1050641?v=4?s=100" width="100px;" alt="sashion"/><br /><sub><b>sashion</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=sashion" title="Code">💻</a></td>
+      <td align="center"><a href="http://www.braincrumbz.com"><img src="https://avatars.githubusercontent.com/u/3185573?v=4?s=100" width="100px;" alt="BrainCrumbz"/><br /><sub><b>BrainCrumbz</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=BrainCrumbz" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
