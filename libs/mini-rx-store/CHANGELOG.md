@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.2.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.1.0...mini-rx-store-4.2.0) (2022-11-24)
+
+
+### Features
+
+* **mini-rx-store:** store can be configured with a custom combineReducer function ([c75b4fa](https://github.com/spierala/mini-rx-store/commit/c75b4fa51ff8e4b00148183fd67b9f3cc663047b))
+
 ## [4.1.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.0.0...mini-rx-store-4.1.0) (2022-11-11)
 
 
