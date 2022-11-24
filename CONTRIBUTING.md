@@ -17,7 +17,7 @@ Start the demo app with a watcher on the app and library code.
 npm run dev
 ```
 
-### Testing a specific library
+## Test
 
 ```shell
 npm run test:mini-rx-store:watch
