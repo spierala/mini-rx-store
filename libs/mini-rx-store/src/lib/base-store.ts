@@ -7,7 +7,7 @@ import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 export abstract class BaseStore<StateType extends object> {
     protected stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
         StateType | undefined
-    >(this.initialState);
+    >(undefined);
     state$: Observable<StateType> = this.stateSource.asObservable().pipe(
         // Skip the first (undefined) value of the BehaviorSubject
         // Very similar to a ReplaySubject(1), but more lightweight
@@ -15,9 +15,7 @@ export abstract class BaseStore<StateType extends object> {
     ) as Observable<StateType>;
     get state(): StateType {
         const v: StateType | undefined = this.stateSource.getValue();
-        if (!v) {
-            miniRxError(this.notInitializedErrorMessage);
-        }
+        this.assertStateIsInitialized();
         return v!;
     }
 
@@ -28,23 +26,20 @@ export abstract class BaseStore<StateType extends object> {
         `Please provide an initialState before updating/getting state.`;
 
     private initializedErrorMessage = `${this.constructor.name} has initialState already.`;
-
-    constructor(protected initialState?: StateType) {}
+    protected isStateInitialized = false;
 
     setInitialState(initialState: StateType): void {
         // Called by ComponentStore/FeatureStore
-        if (this.initialState) {
+        if (this.isStateInitialized) {
             miniRxError(this.initializedErrorMessage);
         }
-        this.initialState = initialState;
+        this.isStateInitialized = true;
         // Update state happens in ComponentStore/FeatureStore
     }
 
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
         // Called by ComponentStore/FeatureStore
-        if (!this.initialState) {
-            miniRxError(this.notInitializedErrorMessage);
-        }
+        this.assertStateIsInitialized();
         // Update state happens in ComponentStore/FeatureStore
     }
 
@@ -82,11 +77,17 @@ export abstract class BaseStore<StateType extends object> {
         }) as unknown as ReturnType;
     }
 
+    abstract undo(action: Action): void; // Implemented by ComponentStore and FeatureStore
+
+    private assertStateIsInitialized(): void {
+        if (!this.isStateInitialized) {
+            miniRxError(this.notInitializedErrorMessage);
+        }
+    }
+
     destroy() {
         this.sub.unsubscribe();
     }
-
-    abstract undo(action: Action): void;
 
     // tslint:disable-next-line:use-lifecycle-interface
     ngOnDestroy() {

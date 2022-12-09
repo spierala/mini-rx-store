@@ -1,12 +1,23 @@
-import { Action, Reducer, StoreExtension } from '../models';
+import {
+    Action,
+    ExtensionId,
+    HasComponentStoreSupport,
+    MetaReducer,
+    Reducer,
+    StoreExtension,
+} from '../models';
 import StoreCore from '../store-core';
 import { beautifyActionForLogging } from '../utils';
 
-export class LoggerExtension extends StoreExtension {
-    override metaReducer = loggerMetaReducer;
+export class LoggerExtension extends StoreExtension implements HasComponentStoreSupport {
+    id = ExtensionId.LOGGER;
 
     init(): void {
-        StoreCore.addMetaReducers(this.metaReducer);
+        StoreCore.addMetaReducers(loggerMetaReducer);
+    }
+
+    initForCs(): MetaReducer<any> {
+        return loggerMetaReducer;
     }
 }
 

@@ -17,6 +17,7 @@ import {
     ComponentStore,
     createFeatureStore,
     createComponentStore,
+    configureComponentStores,
 } from 'mini-rx-store';
 import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
@@ -86,3 +87,5 @@ export class AppModule {
     //     // fs2.setInitialState(initialState);
     // }
 }
+
+configureComponentStores({ extensions: [new LoggerExtension()] });

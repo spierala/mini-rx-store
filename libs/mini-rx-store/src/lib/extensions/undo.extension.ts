@@ -24,7 +24,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, ExtensionSortOrder, MetaReducer, Reducer, StoreExtension } from '../models';
+import {
+    Action,
+    ExtensionId,
+    ExtensionSortOrder,
+    HasComponentStoreSupport,
+    MetaReducer,
+    Reducer,
+    StoreExtension,
+} from '../models';
 import StoreCore from '../store-core';
 import { miniRxNameSpace } from '../constants';
 
@@ -32,18 +40,21 @@ const defaultBufferSize = 100;
 
 export let isUndoExtensionInitialized: boolean;
 
-export class UndoExtension extends StoreExtension {
-    override sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
+export class UndoExtension extends StoreExtension implements HasComponentStoreSupport {
+    id = ExtensionId.UNDO;
+    sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
 
-    constructor(config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
+    constructor(private config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
         super();
-
-        this.metaReducer = createUndoMetaReducer(config.bufferSize);
     }
 
     init(): void {
-        StoreCore.addMetaReducers(this.metaReducer!);
-        isUndoExtensionInitialized = true;
+        StoreCore.addMetaReducers(createUndoMetaReducer(this.config.bufferSize));
+        isUndoExtensionInitialized = true; // TODO: maybe add a flag on StoreCore?
+    }
+
+    initForCs(): MetaReducer<any> {
+        return createUndoMetaReducer(this.config.bufferSize);
     }
 }
 

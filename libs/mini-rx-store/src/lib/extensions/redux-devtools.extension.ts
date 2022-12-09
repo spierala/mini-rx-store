@@ -1,5 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { Action, AppState, MetaReducer, StoreExtension } from '../models';
+import { Action, AppState, ExtensionId, MetaReducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import { beautifyActionForLogging, miniRxError } from '../utils';
 
@@ -17,6 +17,8 @@ export interface ReduxDevtoolsOptions {
 }
 
 export class ReduxDevtoolsExtension extends StoreExtension {
+    id = ExtensionId.REDUX_DEVTOOLS;
+
     private devtoolsExtension: any;
     private devtoolsConnection: any;
 

@@ -18,31 +18,27 @@ export class FeatureStore<StateType extends object> extends BaseStore<StateType>
         initialState: StateType | undefined,
         config: FeatureStoreConfig = {}
     ) {
-        super(initialState);
+        super();
 
         this.featureId = generateId();
         this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
 
-        this.initFeature();
+        if (initialState) {
+            this.setInitialState(initialState);
+        }
     }
 
     override setInitialState(initialState: StateType): void {
         super.setInitialState(initialState);
 
-        this.initFeature();
-    }
+        StoreCore.addFeature<StateType>(
+            this._featureKey,
+            createFeatureReducer(this.featureId, initialState)
+        );
 
-    private initFeature(): void {
-        if (this.initialState) {
-            StoreCore.addFeature<StateType>(
-                this._featureKey,
-                createFeatureReducer(this.featureId, this.initialState)
-            );
-
-            this.sub.add(
-                StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
-            );
-        }
+        this.sub.add(
+            StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
+        );
     }
 
     override setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {

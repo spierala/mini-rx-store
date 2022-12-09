@@ -23,18 +23,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, Reducer, StoreExtension } from '../models';
+import {
+    Action,
+    ExtensionId,
+    HasComponentStoreSupport,
+    MetaReducer,
+    Reducer,
+    StoreExtension,
+} from '../models';
 import StoreCore from '../store-core';
 import { deepFreeze } from '../deep-freeze';
 
 export let isImmutableStateExtensionInitialized: boolean;
 
-export class ImmutableStateExtension extends StoreExtension {
-    override metaReducer = storeFreeze;
+export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
+    id = ExtensionId.IMMUTABLE_STATE;
 
     init(): void {
-        StoreCore.addMetaReducers(this.metaReducer);
+        StoreCore.addMetaReducers(storeFreeze);
         isImmutableStateExtensionInitialized = true;
+    }
+
+    initForCs(): MetaReducer<any> {
+        return storeFreeze;
     }
 }
 

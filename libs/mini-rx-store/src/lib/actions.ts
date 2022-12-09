@@ -6,6 +6,7 @@ export const enum MiniRxActionType {
     INIT_FEATURE = 'init-feature',
     DESTROY_FEATURE = 'destroy-feature',
     SET_STATE = 'set-state',
+    INIT_COMPONENT_STORE = 'init-component-store',
 }
 
 export interface SetStateAction<T> {

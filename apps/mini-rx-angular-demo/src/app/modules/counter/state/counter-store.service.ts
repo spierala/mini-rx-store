@@ -6,6 +6,7 @@ import {
     LoggerExtension,
     UndoExtension,
 } from 'mini-rx-store';
+import { tap } from 'rxjs/operators';
 
 interface CounterState {
     count: number;
@@ -19,7 +20,9 @@ const timer$ = timer(0, 1000);
 
 @Injectable()
 export class CounterStore extends ComponentStore<CounterState> {
-    count$: Observable<number> = this.select((state) => state.count);
+    count$: Observable<number> = this.select((state) => state.count).pipe(
+        tap((v) => console.log('EMIT count$', v))
+    );
 
     // Effect to test destroy
     // Should stop logging when component is destroyed
@@ -27,7 +30,7 @@ export class CounterStore extends ComponentStore<CounterState> {
 
     constructor() {
         super(undefined, {
-            extensions: [new LoggerExtension(), new ImmutableStateExtension(), new UndoExtension()],
+            extensions: [new UndoExtension()],
         });
 
         // Test lazy initialization
@@ -49,7 +52,7 @@ export class CounterStore extends ComponentStore<CounterState> {
         const action = this.setState({ count: this.state.count + 1 }, 'increment');
         setTimeout(() => {
             this.undo(action);
-        }, 1000);
+        }, 3000);
     }
 
     decrement() {
