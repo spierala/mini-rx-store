@@ -1,5 +1,5 @@
 import { counterInitialState, CounterState, store } from './_spec-helpers';
-import { ImmutableStateExtension, storeFreeze } from '../extensions/immutable-state.extension';
+import { ImmutableStateExtension } from '../extensions/immutable-state.extension';
 import { Action, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
 import { createFeatureStore, FeatureStore } from '../feature-store';
@@ -27,6 +27,7 @@ export function counterReducerWithMutation(
 }
 
 describe('Store Freeze Meta Reducer', () => {
+    const storeFreeze = new ImmutableStateExtension().metaReducer;
     const frozenReducer: Reducer<CounterState> = storeFreeze(counterReducerWithMutation);
 
     it('should not throw', () => {

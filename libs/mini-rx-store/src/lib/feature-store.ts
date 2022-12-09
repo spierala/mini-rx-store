@@ -53,7 +53,7 @@ export class FeatureStore<StateType extends object> extends BaseStore<StateType>
         return action;
     }
 
-    undo(action: Action) {
+    undo(action: Action): void {
         isUndoExtensionInitialized
             ? StoreCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');

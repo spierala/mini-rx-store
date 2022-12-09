@@ -16,7 +16,7 @@ export interface SetStateAction<T> {
     miniRxActionType: MiniRxActionType; // Used for `isSetStateAction` type predicate
 }
 
-function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
+export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
     return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
 }
 

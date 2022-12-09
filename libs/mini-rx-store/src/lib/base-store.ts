@@ -1,10 +1,10 @@
 import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { miniRxError, select } from './utils';
-import { StateOrCallback } from './models';
+import { Action, StateOrCallback } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
-export class BaseStore<StateType extends object> {
+export abstract class BaseStore<StateType extends object> {
     protected stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
         StateType | undefined
     >(this.initialState);
@@ -85,6 +85,8 @@ export class BaseStore<StateType extends object> {
     destroy() {
         this.sub.unsubscribe();
     }
+
+    abstract undo(action: Action): void;
 
     // tslint:disable-next-line:use-lifecycle-interface
     ngOnDestroy() {

@@ -30,13 +30,15 @@ import { deepFreeze } from '../deep-freeze';
 export let isImmutableStateExtensionInitialized: boolean;
 
 export class ImmutableStateExtension extends StoreExtension {
+    override metaReducer = storeFreeze;
+
     init(): void {
-        StoreCore.addMetaReducers(storeFreeze);
+        StoreCore.addMetaReducers(this.metaReducer);
         isImmutableStateExtensionInitialized = true;
     }
 }
 
-export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
+function storeFreeze(reducer: Reducer<any>): Reducer<any> {
     return (state = {}, action: Action) => {
         deepFreeze(state);
         const nextState = reducer(state, action);

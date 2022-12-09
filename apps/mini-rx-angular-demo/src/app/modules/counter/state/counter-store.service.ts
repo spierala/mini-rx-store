@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, pipe, timer } from 'rxjs';
-import { ComponentStore } from 'mini-rx-store';
-import { tap } from 'rxjs/operators';
+import { Observable, timer } from 'rxjs';
+import {
+    ComponentStore,
+    ImmutableStateExtension,
+    LoggerExtension,
+    UndoExtension,
+} from 'mini-rx-store';
 
 interface CounterState {
     count: number;
@@ -19,21 +23,33 @@ export class CounterStore extends ComponentStore<CounterState> {
 
     // Effect to test destroy
     // Should stop logging when component is destroyed
-    fx = this.effect(pipe(tap(console.log)));
+    // fx = this.effect(pipe(tap(console.log)));
 
     constructor() {
-        super();
+        super(undefined, {
+            extensions: [new LoggerExtension(), new ImmutableStateExtension(), new UndoExtension()],
+        });
 
         // Test lazy initialization
         setTimeout(() => {
             this.setInitialState(initialState);
         }, 5000);
 
-        this.fx(timer$);
+        // setTimeout(() => {
+        //     this.setState((state) => {
+        //         state.count = 5; // Check if immutable extension is working
+        //         return state;
+        //     });
+        // }, 6000);
+
+        // this.fx(timer$);
     }
 
     increment() {
-        this.setState({ count: this.state.count + 1 }, 'increment');
+        const action = this.setState({ count: this.state.count + 1 }, 'increment');
+        setTimeout(() => {
+            this.undo(action);
+        }, 1000);
     }
 
     decrement() {

@@ -12,6 +12,7 @@ export type AppState = Record<string, any>;
 
 export abstract class StoreExtension {
     sortOrder: ExtensionSortOrder = ExtensionSortOrder.DEFAULT;
+    metaReducer: MetaReducer<any> | undefined; // TODO make private, add getter?
 
     abstract init(): void;
 }

@@ -209,7 +209,7 @@ function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Par
         }, {});
 }
 
-function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
     return (reducer: Reducer<any>): Reducer<T> => {
         return metaReducers.reduceRight(
             (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {

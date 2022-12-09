@@ -1,5 +1,5 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
-import { Action, AppState, StoreExtension } from '../models';
+import { Action, AppState, MetaReducer, StoreExtension } from '../models';
 import StoreCore from '../store-core';
 import { beautifyActionForLogging, miniRxError } from '../utils';
 

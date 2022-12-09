@@ -3,14 +3,16 @@ import StoreCore from '../store-core';
 import { beautifyActionForLogging } from '../utils';
 
 export class LoggerExtension extends StoreExtension {
+    override metaReducer = loggerMetaReducer;
+
     init(): void {
-        StoreCore.addMetaReducers(loggerMetaReducer);
+        StoreCore.addMetaReducers(this.metaReducer);
     }
 }
 
 function loggerMetaReducer(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
-        let actionToLog: Action = beautifyActionForLogging(action, state);
+        const actionToLog: Action = beautifyActionForLogging(action, state);
 
         const nextState = reducer(state, action);
 
