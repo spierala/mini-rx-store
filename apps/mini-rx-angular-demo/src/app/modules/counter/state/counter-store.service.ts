@@ -30,7 +30,7 @@ export class CounterStore extends ComponentStore<CounterState> {
 
     constructor() {
         super(undefined, {
-            extensions: [new UndoExtension()],
+            extensions: [new UndoExtension(), new ImmutableStateExtension()],
         });
 
         // Test lazy initialization

@@ -34,14 +34,11 @@ import {
 import StoreCore from '../store-core';
 import { deepFreeze } from '../deep-freeze';
 
-export let isImmutableStateExtensionInitialized: boolean;
-
 export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.IMMUTABLE_STATE;
 
     init(): void {
         StoreCore.addMetaReducers(storeFreeze);
-        isImmutableStateExtensionInitialized = true;
     }
 
     initForCs(): MetaReducer<any> {
@@ -50,10 +47,15 @@ export class ImmutableStateExtension extends StoreExtension implements HasCompon
 }
 
 function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return (state = {}, action: Action) => {
-        deepFreeze(state);
+    return (state, action: Action) => {
+        if (state) {
+            // Only deepFreeze if state is defined
+            deepFreeze(state);
+            const nextState = reducer(state, action);
+            deepFreeze(nextState);
+            return nextState;
+        }
         const nextState = reducer(state, action);
-        deepFreeze(nextState);
         return nextState;
     };
 }

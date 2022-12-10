@@ -38,8 +38,6 @@ import { miniRxNameSpace } from '../constants';
 
 const defaultBufferSize = 100;
 
-export let isUndoExtensionInitialized: boolean;
-
 export class UndoExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.UNDO;
     sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
@@ -50,7 +48,6 @@ export class UndoExtension extends StoreExtension implements HasComponentStoreSu
 
     init(): void {
         StoreCore.addMetaReducers(createUndoMetaReducer(this.config.bufferSize));
-        isUndoExtensionInitialized = true; // TODO: maybe add a flag on StoreCore?
     }
 
     initForCs(): MetaReducer<any> {
@@ -72,7 +69,7 @@ function createUndoMetaReducer(bufferSize: number): MetaReducer<any> {
     let initialState: any;
 
     return (rootReducer: Reducer<any>): Reducer<any> => {
-        return (state: any = {}, action: any) => {
+        return (state: any, action: any) => {
             if (action.type === UNDO_ACTION) {
                 // if the action is UNDO_ACTION,
                 // then call all the actions again on the rootReducer,

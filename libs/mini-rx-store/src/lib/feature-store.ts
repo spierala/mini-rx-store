@@ -1,7 +1,7 @@
 import { Action, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { calcNewState, miniRxError } from './utils';
-import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
+import { undo } from './extensions/undo.extension';
 import { createSetStateAction, isSetStateAction } from './actions';
 import { BaseStore } from './base-store';
 
@@ -33,7 +33,7 @@ export class FeatureStore<StateType extends object> extends BaseStore<StateType>
 
         StoreCore.addFeature<StateType>(
             this._featureKey,
-            createFeatureReducer(this.featureId, initialState)
+            createFeatureStoreReducer(this.featureId, initialState)
         );
 
         this.sub.add(
@@ -50,7 +50,7 @@ export class FeatureStore<StateType extends object> extends BaseStore<StateType>
     }
 
     undo(action: Action): void {
-        isUndoExtensionInitialized
+        StoreCore.hasUndoExtension
             ? StoreCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
@@ -61,7 +61,7 @@ export class FeatureStore<StateType extends object> extends BaseStore<StateType>
     }
 }
 
-function createFeatureReducer<StateType>(
+function createFeatureStoreReducer<StateType>(
     featureId: string,
     initialState: StateType
 ): Reducer<StateType> {

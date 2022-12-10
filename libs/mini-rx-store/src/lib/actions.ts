@@ -41,7 +41,8 @@ export function createMiniRxAction(
     miniRxActionType:
         | MiniRxActionType.INIT_STORE
         | MiniRxActionType.INIT_FEATURE
-        | MiniRxActionType.DESTROY_FEATURE,
+        | MiniRxActionType.DESTROY_FEATURE
+        | MiniRxActionType.INIT_COMPONENT_STORE,
     featureKey?: string
 ): Action {
     return {

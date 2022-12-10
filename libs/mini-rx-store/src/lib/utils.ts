@@ -6,6 +6,8 @@ import {
     AppState,
     EFFECT_METADATA_KEY,
     HasEffectMetadata,
+    MetaReducer,
+    Reducer,
     StateOrCallback,
 } from './models';
 import { isSetStateAction, SetStateAction } from './actions';
@@ -63,5 +65,16 @@ export function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): 
     return {
         ...state,
         ...newPartialState,
+    };
+}
+
+export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+    return (reducer: Reducer<any>): Reducer<T> => {
+        return metaReducers.reduceRight(
+            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
+                return currentValue(previousValue);
+            },
+            reducer
+        );
     };
 }

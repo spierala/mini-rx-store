@@ -6,6 +6,7 @@ import {
     AppState,
     EFFECT_METADATA_KEY,
     EffectConfig,
+    ExtensionId,
     HasEffectMetadata,
     MetaReducer,
     Reducer,
@@ -13,7 +14,7 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { hasEffectMetaData, miniRxError, select } from './utils';
+import { combineMetaReducers, hasEffectMetaData, miniRxError, select } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
@@ -49,6 +50,7 @@ class StoreCore {
             featureReducers,
         });
     }
+    hasUndoExtension = false;
 
     constructor() {
         let reducer: Reducer<AppState>;
@@ -165,6 +167,10 @@ class StoreCore {
 
     addExtension(extension: StoreExtension) {
         extension.init();
+
+        if (extension.id === ExtensionId.UNDO) {
+            this.hasUndoExtension = true;
+        }
     }
 
     private addReducer(featureKey: string, reducer: Reducer<any>) {
@@ -207,17 +213,6 @@ function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Par
             prevValue[key] = object[key];
             return prevValue;
         }, {});
-}
-
-export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
-    return (reducer: Reducer<any>): Reducer<T> => {
-        return metaReducers.reduceRight(
-            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
-                return currentValue(previousValue);
-            },
-            reducer
-        );
-    };
 }
 
 // Created once to initialize singleton
