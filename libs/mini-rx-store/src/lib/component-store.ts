@@ -4,11 +4,9 @@ import {
     ComponentStoreConfig,
     ComponentStoreExtension,
     ExtensionId,
-    HasComponentStoreSupport,
     MetaReducer,
     Reducer,
     StateOrCallback,
-    StoreExtension,
 } from './models';
 import { calcNewState, combineMetaReducers, miniRxError } from './utils';
 import { queueScheduler, Subject } from 'rxjs';
@@ -45,6 +43,7 @@ export class ComponentStore<StateType extends object> extends BaseStore<StateTyp
                 extensions = config.extensions;
             }
         }
+
         extensions.forEach((ext) => {
             if (!ext.initForCs) {
                 miniRxError(
@@ -53,6 +52,7 @@ export class ComponentStore<StateType extends object> extends BaseStore<StateTyp
             }
 
             metaReducers.push(ext.initForCs());
+
             if (ext.id === ExtensionId.UNDO) {
                 this.hasUndoExtension = true;
             }

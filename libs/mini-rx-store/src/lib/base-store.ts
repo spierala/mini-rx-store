@@ -43,6 +43,8 @@ export abstract class BaseStore<StateType extends object> {
         // Update state happens in ComponentStore/FeatureStore
     }
 
+    abstract undo(action: Action): void; // Implemented by ComponentStore and FeatureStore
+
     select(): Observable<StateType>;
     select<R>(mapFn: (state: StateType) => R): Observable<R>;
     select(mapFn?: any): Observable<any> {
@@ -76,8 +78,6 @@ export abstract class BaseStore<StateType extends object> {
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
-
-    abstract undo(action: Action): void; // Implemented by ComponentStore and FeatureStore
 
     private assertStateIsInitialized(): void {
         if (!this.isStateInitialized) {
