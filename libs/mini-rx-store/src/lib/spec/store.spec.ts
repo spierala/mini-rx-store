@@ -371,7 +371,7 @@ describe('Store Config', () => {
                 });
 
                 const spy = jest.fn();
-                StoreCore.select(getMetaTestFeature).subscribe(spy);
+                StoreCore.appState.select(getMetaTestFeature).subscribe(spy);
                 StoreCore.dispatch({ type: 'metaTest' });
                 expect(spy).toHaveBeenCalledWith('abcxde');
             }
@@ -891,7 +891,7 @@ describe('Store Feature MetaReducers', () => {
         });
 
         const spy = jest.fn();
-        StoreCore.select(getCount).subscribe(spy);
+        StoreCore.appState.select(getCount).subscribe(spy);
         StoreCore.dispatch({ type: 'metaTest2' });
         expect(spy).toHaveBeenCalledWith('0');
         expect(spy).toHaveBeenCalledWith('0123');

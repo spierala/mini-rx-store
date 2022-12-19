@@ -18,6 +18,7 @@ import { combineMetaReducers, hasEffectMetaData, miniRxError, select } from './u
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
+import { State } from './state';
 
 type ReducerState = {
     featureReducers: ReducerDictionary<AppState>;
@@ -30,8 +31,7 @@ class StoreCore {
     actions$: Actions = this.actionsSource.asObservable();
 
     // APP STATE
-    private stateSource = new BehaviorSubject<AppState>({}); // Init App State with empty object
-    state$: Observable<AppState> = this.stateSource.asObservable();
+    appState = new State<AppState>();
 
     // REDUCERS (Feature state reducers and meta reducers)
     private reducerStateSource = new BehaviorSubject<ReducerState>({
@@ -61,14 +61,17 @@ class StoreCore {
             reducer = combinedMetaReducer(combinedReducer);
         });
 
-        // Listen to the Actions Stream and update state accordingly
+        // Listen to the Actions stream and update state accordingly
         this.actions$
             .pipe(
                 observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
             )
             .subscribe((action) => {
-                const newState: AppState = reducer(this.stateSource.getValue(), action);
-                this.updateState(newState);
+                const newState: AppState = reducer(
+                    this.appState.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                    action
+                );
+                this.appState.set(newState);
             });
     }
 
@@ -96,7 +99,7 @@ class StoreCore {
         }
 
         if (config.initialState) {
-            this.updateState(config.initialState);
+            this.appState.set(config.initialState);
         }
 
         this.dispatch(createMiniRxAction(MiniRxActionType.INIT_STORE));
@@ -131,14 +134,6 @@ class StoreCore {
 
     dispatch(action: Action) {
         this.actionsSource.next(action);
-    }
-
-    updateState(state: AppState) {
-        this.stateSource.next(state);
-    }
-
-    select<R>(mapFn: (state: AppState) => R): Observable<R> {
-        return this.state$.pipe(select(mapFn));
     }
 
     effect(effect$: Observable<any> & HasEffectMetadata): void;
@@ -216,5 +211,4 @@ function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Par
 }
 
 // Created once to initialize singleton
-/** @internal */
 export default new StoreCore();

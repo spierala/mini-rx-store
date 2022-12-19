@@ -4,6 +4,7 @@ import {
     ComponentStoreConfig,
     ComponentStoreExtension,
     ExtensionId,
+    ComponentStoreLike,
     MetaReducer,
     Reducer,
     StateOrCallback,
@@ -24,7 +25,10 @@ export function configureComponentStores(config: { extensions: ComponentStoreExt
     miniRxError('`configureComponentStores` was called multiple times.');
 }
 
-export class ComponentStore<StateType extends object> extends BaseStore<StateType> {
+export class ComponentStore<StateType extends object>
+    extends BaseStore<StateType>
+    implements ComponentStoreLike<StateType>
+{
     private actionsSource = new Subject<Action>();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
@@ -60,7 +64,7 @@ export class ComponentStore<StateType extends object> extends BaseStore<StateTyp
 
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
-        this.sub.add(
+        this._sub.add(
             this.actionsSource
                 .pipe(
                     observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
@@ -68,10 +72,10 @@ export class ComponentStore<StateType extends object> extends BaseStore<StateTyp
                 .subscribe((action) => {
                     const newState: StateType = this.reducer!(
                         // We are sure, there is a reducer!
-                        this.stateSource.getValue()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                        this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
                         action
                     );
-                    this.stateSource.next(newState);
+                    this._state.set(newState);
                 })
         );
 
@@ -87,9 +91,13 @@ export class ComponentStore<StateType extends object> extends BaseStore<StateTyp
         this.dispatch(createMiniRxAction(MiniRxActionType.INIT_COMPONENT_STORE));
     }
 
-    override setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        super.setState(stateOrCallback, name);
-
+    /** @internal
+     * Implementation of abstract method from BaseStore
+     */
+    _dispatchSetStateAction(
+        stateOrCallback: StateOrCallback<StateType>,
+        name: string | undefined
+    ): Action {
         const action: Action = createSetStateAction(stateOrCallback, 'component-store', name);
         this.dispatch(action);
         return action;
@@ -99,6 +107,7 @@ export class ComponentStore<StateType extends object> extends BaseStore<StateTyp
         this.actionsSource.next(action);
     }
 
+    // Implementation of abstract method from BaseStore
     undo(action: Action) {
         this.hasUndoExtension
             ? this.dispatch(undo(action))
@@ -115,7 +124,7 @@ function createSetStateAction<T>(
     return {
         type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
         stateOrCallback,
-        miniRxActionType, // Used to trigger
+        miniRxActionType, // Used to trigger LoggerExtension `beautifyActionForLogging`
     };
 }
 

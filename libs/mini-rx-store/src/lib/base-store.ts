@@ -1,58 +1,59 @@
-import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { miniRxError, select } from './utils';
-import { Action, StateOrCallback } from './models';
+import { isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { miniRxError } from './utils';
+import { Action, SetStateParam, SetStateReturn, StateOrCallback } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
+import { State } from './state';
 
 export abstract class BaseStore<StateType extends object> {
-    protected stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
-        StateType | undefined
-    >(undefined);
-    state$: Observable<StateType> = this.stateSource.asObservable().pipe(
-        // Skip the first (undefined) value of the BehaviorSubject
-        // Very similar to a ReplaySubject(1), but more lightweight
-        filter((v) => !!v)
-    ) as Observable<StateType>;
+    /**
+     * @internal Used by ComponentStore/FeatureStore
+     */
+    protected _sub: Subscription = new Subscription();
+    /**
+     * @internal Used by ComponentStore/FeatureStore
+     */
+    protected _state = new State<StateType>();
     get state(): StateType {
-        const v: StateType | undefined = this.stateSource.getValue();
         this.assertStateIsInitialized();
-        return v!;
+        return this._state.get()!;
     }
-
-    protected sub: Subscription = new Subscription();
-
+    private isStateInitialized = false;
     private notInitializedErrorMessage =
         `${this.constructor.name} has no initialState yet. ` +
         `Please provide an initialState before updating/getting state.`;
-
     private initializedErrorMessage = `${this.constructor.name} has initialState already.`;
-    protected isStateInitialized = false;
 
+    // Called by ComponentStore/FeatureStore
     setInitialState(initialState: StateType): void {
-        // Called by ComponentStore/FeatureStore
-        if (this.isStateInitialized) {
-            miniRxError(this.initializedErrorMessage);
-        }
+        this.assertStateIsNotInitialized();
         this.isStateInitialized = true;
         // Update state happens in ComponentStore/FeatureStore
     }
 
-    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void {
-        // Called by ComponentStore/FeatureStore
-        this.assertStateIsInitialized();
-        // Update state happens in ComponentStore/FeatureStore
+    setState<P extends SetStateParam<StateType>>(
+        stateOrCallback: P,
+        name?: string
+    ): SetStateReturn<StateType, P> {
+        const dispatch = (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
+            this.assertStateIsInitialized();
+            return this._dispatchSetStateAction(stateOrCallback, name);
+        };
+
+        return (
+            isObservable(stateOrCallback)
+                ? this._sub.add(stateOrCallback.subscribe((v) => dispatch(v, name)))
+                : dispatch(stateOrCallback as StateOrCallback<StateType>, name)
+        ) as SetStateReturn<StateType, P>;
     }
 
-    abstract undo(action: Action): void; // Implemented by ComponentStore and FeatureStore
+    // Implemented by ComponentStore/FeatureStore
+    abstract _dispatchSetStateAction(
+        stateOrCallback: StateOrCallback<StateType>,
+        name?: string
+    ): Action;
 
-    select(): Observable<StateType>;
-    select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    select(mapFn?: any): Observable<any> {
-        if (!mapFn) {
-            return this.state$;
-        }
-        return this.state$.pipe(select(mapFn));
-    }
+    // Implemented by ComponentStore/FeatureStore
+    abstract undo(action: Action): void;
 
     effect<
         // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
@@ -70,11 +71,11 @@ export abstract class BaseStore<StateType extends object> {
         const effect$ = effectFn(subject as OriginType);
         const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(effect$);
 
-        this.sub.add(effectWithDefaultErrorHandler.subscribe());
+        this._sub.add(effectWithDefaultErrorHandler.subscribe());
 
         return ((observableOrValue?: ObservableType | Observable<ObservableType>) => {
             isObservable(observableOrValue)
-                ? this.sub.add(observableOrValue.subscribe((v) => subject.next(v)))
+                ? this._sub.add(observableOrValue.subscribe((v) => subject.next(v)))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
@@ -85,11 +86,22 @@ export abstract class BaseStore<StateType extends object> {
         }
     }
 
-    destroy() {
-        this.sub.unsubscribe();
+    private assertStateIsNotInitialized(): void {
+        if (this.isStateInitialized) {
+            miniRxError(this.initializedErrorMessage);
+        }
     }
 
-    // tslint:disable-next-line:use-lifecycle-interface
+    select = this._state.select.bind(this._state);
+
+    destroy() {
+        this._sub.unsubscribe();
+    }
+
+    /**
+     * @internal
+     * Can be called by Angular if ComponentStore/FeatureStore is provided in a component
+     */
     ngOnDestroy() {
         this.destroy();
     }

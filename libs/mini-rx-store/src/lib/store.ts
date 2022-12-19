@@ -16,7 +16,9 @@ export class Store {
     }
 
     dispatch: (action: Action) => void = StoreCore.dispatch.bind(StoreCore);
-    select: <R>(mapFn: (state: AppState) => R) => Observable<R> = StoreCore.select.bind(StoreCore);
+    select: <R>(mapFn: (state: AppState) => R) => Observable<R> = StoreCore.appState.select.bind(
+        StoreCore.appState
+    );
     effect = StoreCore.effect.bind(StoreCore);
 
     // Prevent direct construction calls with the `new` operator.

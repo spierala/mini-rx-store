@@ -21,6 +21,7 @@ export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featu
     return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
 }
 
+// TODO move to FeatureStore
 export function createSetStateAction<T>(
     stateOrCallback: StateOrCallback<T>,
     featureId: string,

@@ -43,7 +43,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
 
             StoreCore.actions$
                 .pipe(
-                    withLatestFrom(StoreCore.state$),
+                    withLatestFrom(StoreCore.appState.select()),
                     tap(([action, state]) => {
                         const actionForDevTools: Action = beautifyActionForLogging(action, state);
                         this.devtoolsConnection.send(actionForDevTools, state);
@@ -66,7 +66,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
     }
 
     protected updateState(state: AppState) {
-        StoreCore.updateState(state);
+        StoreCore.appState.set(state);
     }
 }
 

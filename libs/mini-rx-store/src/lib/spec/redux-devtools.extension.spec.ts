@@ -98,7 +98,7 @@ describe('Redux Dev Tools', () => {
     });
 
     it('should update the Store state', () => {
-        const spy = jest.spyOn(StoreCore, 'updateState');
+        const spy = jest.spyOn(StoreCore.appState, 'set');
 
         extension['onDevToolsMessage']({
             type: 'DISPATCH',

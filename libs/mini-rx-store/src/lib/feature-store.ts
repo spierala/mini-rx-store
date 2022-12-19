@@ -1,11 +1,14 @@
-import { Action, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
+import { Action, FeatureStoreConfig, ComponentStoreLike, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { calcNewState, miniRxError } from './utils';
 import { undo } from './extensions/undo.extension';
 import { createSetStateAction, isSetStateAction } from './actions';
 import { BaseStore } from './base-store';
 
-export class FeatureStore<StateType extends object> extends BaseStore<StateType> {
+export class FeatureStore<StateType extends object>
+    extends BaseStore<StateType>
+    implements ComponentStoreLike<StateType>
+{
     private readonly _featureKey: string;
     get featureKey(): string {
         return this._featureKey;
@@ -36,19 +39,26 @@ export class FeatureStore<StateType extends object> extends BaseStore<StateType>
             createFeatureStoreReducer(this.featureId, initialState)
         );
 
-        this.sub.add(
-            StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource)
+        this._sub.add(
+            StoreCore.appState
+                .select((state) => state[this.featureKey])
+                .subscribe((v) => this._state.set(v))
         );
     }
 
-    override setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        super.setState(stateOrCallback, name);
-
+    /** @internal
+     * Implementation of abstract method from BaseStore
+     */
+    _dispatchSetStateAction(
+        stateOrCallback: StateOrCallback<StateType>,
+        name: string | undefined
+    ): Action {
         const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
         StoreCore.dispatch(action);
         return action;
     }
 
+    // Implementation of abstract method from BaseStore
     undo(action: Action): void {
         StoreCore.hasUndoExtension
             ? StoreCore.dispatch(undo(action))
