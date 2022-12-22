@@ -1,5 +1,4 @@
-import { BehaviorSubject, Observable, queueScheduler, Subject } from 'rxjs';
-import { observeOn } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import {
     Action,
     Actions,
@@ -14,11 +13,12 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { combineMetaReducers, hasEffectMetaData, miniRxError, select } from './utils';
+import { combineMetaReducers, hasEffectMetaData, miniRxError } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 import { State } from './state';
+import { ActionsOnQueue } from './actions-on-queue';
 
 type ReducerState = {
     featureReducers: ReducerDictionary<AppState>;
@@ -27,8 +27,8 @@ type ReducerState = {
 
 class StoreCore {
     // ACTIONS
-    private actionsSource = new Subject<Action>();
-    actions$: Actions = this.actionsSource.asObservable();
+    private actionsOnQueue = new ActionsOnQueue();
+    actions$: Actions = this.actionsOnQueue.actions$;
 
     // APP STATE
     appState = new State<AppState>();
@@ -62,17 +62,13 @@ class StoreCore {
         });
 
         // Listen to the Actions stream and update state accordingly
-        this.actions$
-            .pipe(
-                observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
-            )
-            .subscribe((action) => {
-                const newState: AppState = reducer(
-                    this.appState.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
-                    action
-                );
-                this.appState.set(newState);
-            });
+        this.actionsOnQueue.actions$.subscribe((action) => {
+            const newState: AppState = reducer(
+                this.appState.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                action
+            );
+            this.appState.set(newState);
+        });
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
@@ -133,7 +129,7 @@ class StoreCore {
     }
 
     dispatch(action: Action) {
-        this.actionsSource.next(action);
+        this.actionsOnQueue.dispatch(action);
     }
 
     effect(effect$: Observable<any> & HasEffectMetadata): void;

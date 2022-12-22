@@ -3,17 +3,16 @@ import {
     Action,
     ComponentStoreConfig,
     ComponentStoreExtension,
-    ExtensionId,
     ComponentStoreLike,
+    ExtensionId,
     MetaReducer,
     Reducer,
     StateOrCallback,
 } from './models';
 import { calcNewState, combineMetaReducers, miniRxError } from './utils';
-import { queueScheduler, Subject } from 'rxjs';
-import { observeOn } from 'rxjs/operators';
 import { createMiniRxAction, createMiniRxActionType, MiniRxActionType } from './actions';
 import { undo } from './extensions/undo.extension';
+import { ActionsOnQueue } from './actions-on-queue';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -29,7 +28,7 @@ export class ComponentStore<StateType extends object>
     extends BaseStore<StateType>
     implements ComponentStoreLike<StateType>
 {
-    private actionsSource = new Subject<Action>();
+    private actionsOnQueue = new ActionsOnQueue();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
     private hasUndoExtension = false;
@@ -65,18 +64,14 @@ export class ComponentStore<StateType extends object>
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
         this._sub.add(
-            this.actionsSource
-                .pipe(
-                    observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
-                )
-                .subscribe((action) => {
-                    const newState: StateType = this.reducer!(
-                        // We are sure, there is a reducer!
-                        this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
-                        action
-                    );
-                    this._state.set(newState);
-                })
+            this.actionsOnQueue.actions$.subscribe((action) => {
+                const newState: StateType = this.reducer!(
+                    // We are sure, there is a reducer!
+                    this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                    action
+                );
+                this._state.set(newState);
+            })
         );
 
         if (initialState) {
@@ -104,7 +99,7 @@ export class ComponentStore<StateType extends object>
     }
 
     private dispatch(action: Action) {
-        this.actionsSource.next(action);
+        this.actionsOnQueue.dispatch(action);
     }
 
     // Implementation of abstract method from BaseStore

@@ -21,23 +21,6 @@ export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featu
     return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
 }
 
-// TODO move to FeatureStore
-export function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    featureId: string,
-    featureKey: string,
-    name?: string
-): SetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
-    return {
-        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-        featureId,
-        featureKey,
-        miniRxActionType,
-    };
-}
-
 export function createMiniRxAction(
     miniRxActionType:
         | MiniRxActionType.INIT_STORE
@@ -51,10 +34,8 @@ export function createMiniRxAction(
     };
 }
 
-const key: keyof SetStateAction<any> = 'miniRxActionType';
-const type: MiniRxActionType = MiniRxActionType.SET_STATE;
-
 // Type predicate
 export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
-    return action[key] === type;
+    const key: keyof SetStateAction<any> = 'miniRxActionType';
+    return action[key] === MiniRxActionType.SET_STATE;
 }

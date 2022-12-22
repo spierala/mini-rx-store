@@ -2,7 +2,12 @@ import { Action, FeatureStoreConfig, ComponentStoreLike, Reducer, StateOrCallbac
 import StoreCore from './store-core';
 import { calcNewState, miniRxError } from './utils';
 import { undo } from './extensions/undo.extension';
-import { createSetStateAction, isSetStateAction } from './actions';
+import {
+    createMiniRxActionType,
+    isSetStateAction,
+    MiniRxActionType,
+    SetStateAction,
+} from './actions';
 import { BaseStore } from './base-store';
 
 export class FeatureStore<StateType extends object>
@@ -80,6 +85,22 @@ function createFeatureStoreReducer<StateType>(
             return calcNewState(state, action.stateOrCallback);
         }
         return state;
+    };
+}
+
+function createSetStateAction<T>(
+    stateOrCallback: StateOrCallback<T>,
+    featureId: string,
+    featureKey: string,
+    name?: string
+): SetStateAction<T> {
+    const miniRxActionType = MiniRxActionType.SET_STATE;
+    return {
+        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
+        stateOrCallback,
+        featureId,
+        featureKey,
+        miniRxActionType,
     };
 }
 
