@@ -12,10 +12,11 @@ import {
     ReducerDictionary,
     StoreConfig,
     StoreExtension,
+    CombineReducersFn,
 } from './models';
 import { combineMetaReducers, hasEffectMetaData, miniRxError } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { combineReducers } from './combine-reducers';
+import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 import { State } from './state';
 import { ActionsOnQueue } from './actions-on-queue';
@@ -24,13 +25,14 @@ import { ComponentStore } from './component-store';
 type ReducerState = {
     featureReducers: ReducerDictionary<AppState>;
     metaReducers: MetaReducer<AppState>[];
+    combineReducersFn: CombineReducersFn<AppState>;
 };
 
 class ReducerStore extends ComponentStore<ReducerState> {
     // APP STATE REDUCER
     reducer$: Observable<Reducer<AppState>> = this.select((v) => {
         const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
-        const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
+        const combinedReducer: Reducer<AppState> = v.combineReducersFn(v.featureReducers);
         return combinedMetaReducer(combinedReducer);
     });
 
@@ -42,6 +44,7 @@ class ReducerStore extends ComponentStore<ReducerState> {
         super({
             featureReducers: {},
             metaReducers: [],
+            combineReducersFn: defaultCombineReducers,
         });
     }
 
@@ -63,6 +66,10 @@ class ReducerStore extends ComponentStore<ReducerState> {
         this.setState((state) => ({
             metaReducers: [...state.metaReducers, ...reducers],
         }));
+    }
+
+    updateCombineReducersFs(combineReducersFn: CombineReducersFn<AppState>) {
+        this.setState({ combineReducersFn });
     }
 
     private checkFeatureExists(featureKey: string) {
@@ -105,6 +112,10 @@ class StoreCore {
             miniRxError(
                 '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
             );
+        }
+
+        if (config.combineReducersFn) {
+            this.reducerStore.updateCombineReducersFs(config.combineReducersFn);
         }
 
         if (config.metaReducers?.length) {
