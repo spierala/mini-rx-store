@@ -68,7 +68,7 @@ class ReducerStore extends ComponentStore<ReducerState> {
         }));
     }
 
-    updateCombineReducersFs(combineReducersFn: CombineReducersFn<AppState>) {
+    updateCombineReducersFn(combineReducersFn: CombineReducersFn<AppState>) {
         this.setState({ combineReducersFn });
     }
 
@@ -115,7 +115,7 @@ class StoreCore {
         }
 
         if (config.combineReducersFn) {
-            this.reducerStore.updateCombineReducersFs(config.combineReducersFn);
+            this.reducerStore.updateCombineReducersFn(config.combineReducersFn);
         }
 
         if (config.metaReducers?.length) {
