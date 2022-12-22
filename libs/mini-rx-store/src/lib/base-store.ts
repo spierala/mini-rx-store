@@ -46,7 +46,9 @@ export abstract class BaseStore<StateType extends object> {
         ) as SetStateReturn<StateType, P>;
     }
 
-    // Implemented by ComponentStore/FeatureStore
+    /** @internal
+     * Implemented by ComponentStore/FeatureStore
+     */
     abstract _dispatchSetStateAction(
         stateOrCallback: StateOrCallback<StateType>,
         name?: string
