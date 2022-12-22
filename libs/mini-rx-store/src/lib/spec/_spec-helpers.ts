@@ -22,7 +22,7 @@ export const userState: UserState = {
 export const store: Store = configureStore({});
 
 export function resetStoreConfig() {
-    StoreCore['reducerStateSource'].next({
+    StoreCore['reducerStore'].setState({
         metaReducers: [],
         featureReducers: {},
     });

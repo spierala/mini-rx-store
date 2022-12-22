@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
     Action,
     Actions,
@@ -19,11 +19,58 @@ import { combineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 import { State } from './state';
 import { ActionsOnQueue } from './actions-on-queue';
+import { ComponentStore } from './component-store';
 
 type ReducerState = {
     featureReducers: ReducerDictionary<AppState>;
     metaReducers: MetaReducer<AppState>[];
 };
+
+class ReducerStore extends ComponentStore<ReducerState> {
+    // APP STATE REDUCER
+    reducer$: Observable<Reducer<AppState>> = this.select((v) => {
+        const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
+        const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
+        return combinedMetaReducer(combinedReducer);
+    });
+
+    hasFeatureReducers(): boolean {
+        return !!Object.keys(this.state.featureReducers).length;
+    }
+
+    constructor() {
+        super({
+            featureReducers: {},
+            metaReducers: [],
+        });
+    }
+
+    addReducer(featureKey: string, reducer: Reducer<any>) {
+        this.checkFeatureExists(featureKey);
+
+        this.setState((state) => ({
+            featureReducers: { ...state.featureReducers, [featureKey]: reducer },
+        }));
+    }
+
+    removeReducer(featureKey: string) {
+        this.setState((state) => ({
+            featureReducers: omit(state.featureReducers, featureKey) as ReducerDictionary<AppState>,
+        }));
+    }
+
+    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
+        this.setState((state) => ({
+            metaReducers: [...state.metaReducers, ...reducers],
+        }));
+    }
+
+    private checkFeatureExists(featureKey: string) {
+        if (this.state.featureReducers.hasOwnProperty(featureKey)) {
+            miniRxError(`Feature "${featureKey}" already exists.`);
+        }
+    }
+}
 
 class StoreCore {
     // ACTIONS
@@ -33,33 +80,15 @@ class StoreCore {
     // APP STATE
     appState = new State<AppState>();
 
-    // REDUCERS (Feature state reducers and meta reducers)
-    private reducerStateSource = new BehaviorSubject<ReducerState>({
-        featureReducers: {},
-        metaReducers: [],
-    });
-    private get reducerState(): ReducerState {
-        return this.reducerStateSource.getValue();
-    }
-    private get featureReducers(): ReducerDictionary<AppState> {
-        return this.reducerState.featureReducers;
-    }
-    private set featureReducers(featureReducers: ReducerDictionary<AppState>) {
-        this.reducerStateSource.next({
-            ...this.reducerState,
-            featureReducers,
-        });
-    }
+    // REDUCERS
+    reducerStore = new ReducerStore();
+
     hasUndoExtension = false;
 
     constructor() {
         let reducer: Reducer<AppState>;
-        // 👇 Refactored `withLatestFrom` in actions$.pipe to own subscription (fewer operators = less bundle-size :))
-        this.reducerStateSource.subscribe((v) => {
-            const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
-            const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
-            reducer = combinedMetaReducer(combinedReducer);
-        });
+        // 👇 Instead of using `withLatestFrom` inside this.actionsOnQueue.actions$.pipe (fewer operators = less bundle-size :))
+        this.reducerStore.reducer$.subscribe((v) => (reducer = v));
 
         // Listen to the Actions stream and update state accordingly
         this.actionsOnQueue.actions$.subscribe((action) => {
@@ -72,14 +101,14 @@ class StoreCore {
     }
 
     config(config: Partial<StoreConfig<AppState>> = {}) {
-        if (Object.keys(this.featureReducers).length) {
+        if (this.reducerStore.hasFeatureReducers()) {
             miniRxError(
                 '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
             );
         }
 
         if (config.metaReducers?.length) {
-            this.addMetaReducers(...config.metaReducers);
+            this.reducerStore.addMetaReducers(...config.metaReducers);
         }
 
         if (config.extensions?.length) {
@@ -89,8 +118,7 @@ class StoreCore {
 
         if (config.reducers) {
             Object.keys(config.reducers).forEach((featureKey) => {
-                checkFeatureExists(featureKey, this.featureReducers);
-                this.addReducer(featureKey, config.reducers![featureKey]); // config.reducers! (prevent TS2532: Object is possibly 'undefined')
+                this.reducerStore.addReducer(featureKey, config.reducers![featureKey]); // config.reducers! (prevent TS2532: Object is possibly 'undefined')
             });
         }
 
@@ -113,18 +141,16 @@ class StoreCore {
             ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
             : reducer;
 
-        checkFeatureExists(featureKey, this.featureReducers);
-
         if (typeof config.initialState !== 'undefined') {
             reducer = createReducerWithInitialState(reducer, config.initialState);
         }
 
-        this.addReducer(featureKey, reducer);
+        this.reducerStore.addReducer(featureKey, reducer);
         this.dispatch(createMiniRxAction(MiniRxActionType.INIT_FEATURE, featureKey));
     }
 
     removeFeature(featureKey: string) {
-        this.removeReducer(featureKey);
+        this.reducerStore.removeReducer(featureKey);
         this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY_FEATURE, featureKey));
     }
 
@@ -149,12 +175,7 @@ class StoreCore {
         });
     }
 
-    addMetaReducers(...reducers: MetaReducer<AppState>[]) {
-        this.reducerStateSource.next({
-            ...this.reducerState,
-            metaReducers: [...this.reducerState.metaReducers, ...reducers],
-        });
-    }
+    addMetaReducers = this.reducerStore.addMetaReducers.bind(this.reducerStore);
 
     addExtension(extension: StoreExtension) {
         extension.init();
@@ -162,17 +183,6 @@ class StoreCore {
         if (extension.id === ExtensionId.UNDO) {
             this.hasUndoExtension = true;
         }
-    }
-
-    private addReducer(featureKey: string, reducer: Reducer<any>) {
-        this.featureReducers = { ...this.featureReducers, [featureKey]: reducer };
-    }
-
-    private removeReducer(featureKey: string) {
-        this.featureReducers = omit(
-            this.featureReducers,
-            featureKey
-        ) as ReducerDictionary<AppState>;
     }
 }
 
@@ -183,12 +193,6 @@ function createReducerWithInitialState<StateType>(
     return (state: StateType = initialState, action: Action): StateType => {
         return reducer(state, action);
     };
-}
-
-function checkFeatureExists(featureKey: string, reducers: ReducerDictionary<AppState>) {
-    if (reducers.hasOwnProperty(featureKey)) {
-        miniRxError(`Feature "${featureKey}" already exists.`);
-    }
 }
 
 function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
