@@ -6,17 +6,13 @@ import {
     Reducer,
     StoreExtension,
 } from '../models';
-import StoreCore from '../store-core';
 import { beautifyActionForLogging } from '../utils';
 
 export class LoggerExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.LOGGER;
+    hasCsSupport = true as const;
 
-    init(): void {
-        StoreCore.addMetaReducers(loggerMetaReducer);
-    }
-
-    initForCs(): MetaReducer<any> {
+    init(): MetaReducer<any> {
         return loggerMetaReducer;
     }
 }

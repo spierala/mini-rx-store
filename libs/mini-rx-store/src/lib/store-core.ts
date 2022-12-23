@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import {
     Action,
-    Actions,
     AppState,
+    CombineReducersFn,
     EFFECT_METADATA_KEY,
     EffectConfig,
     ExtensionId,
@@ -12,14 +12,13 @@ import {
     ReducerDictionary,
     StoreConfig,
     StoreExtension,
-    CombineReducersFn,
 } from './models';
 import { combineMetaReducers, hasEffectMetaData, miniRxError } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 import { State } from './state';
-import { ActionsOnQueue } from './actions-on-queue';
+import { actionsOnQueue } from './store-core-actions';
 
 class ReducerState extends State<{
     featureReducers: ReducerDictionary<AppState>;
@@ -76,11 +75,7 @@ class ReducerState extends State<{
     }
 }
 
-class StoreCore {
-    // ACTIONS
-    private actionsOnQueue = new ActionsOnQueue();
-    actions$: Actions = this.actionsOnQueue.actions$;
-
+export class StoreCore {
     // APP STATE
     appState = new State<AppState>();
 
@@ -95,7 +90,7 @@ class StoreCore {
         this.reducerState.reducer$.subscribe((v) => (reducer = v));
 
         // Listen to the Actions stream and update state accordingly
-        this.actionsOnQueue.actions$.subscribe((action) => {
+        actionsOnQueue.actions$.subscribe((action) => {
             const newState: AppState = reducer(
                 this.appState.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
                 action
@@ -163,7 +158,7 @@ class StoreCore {
     }
 
     dispatch(action: Action) {
-        this.actionsOnQueue.dispatch(action);
+        actionsOnQueue.dispatch(action);
     }
 
     effect(effect$: Observable<any> & HasEffectMetadata): void;
@@ -186,7 +181,11 @@ class StoreCore {
     addMetaReducers = this.reducerState.addMetaReducers.bind(this.reducerState);
 
     addExtension(extension: StoreExtension) {
-        extension.init();
+        const metaReducer: MetaReducer<any> | void = extension.init(); // TODO void?
+
+        if (metaReducer) {
+            this.addMetaReducers(metaReducer);
+        }
 
         if (extension.id === ExtensionId.UNDO) {
             this.hasUndoExtension = true;
@@ -218,5 +217,12 @@ function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Par
         }, {});
 }
 
-// Created once to initialize singleton
-export default new StoreCore();
+let storeCore: StoreCore | undefined;
+
+export function getStoreCore(): StoreCore {
+    if (storeCore) {
+        return storeCore;
+    }
+    storeCore = new StoreCore();
+    return storeCore;
+}

@@ -1,5 +1,4 @@
 import { Action, FeatureStoreConfig, ComponentStoreLike, Reducer, StateOrCallback } from './models';
-import StoreCore from './store-core';
 import { calcNewState, miniRxError } from './utils';
 import {
     createMiniRxActionType,
@@ -9,6 +8,7 @@ import {
     undo,
 } from './actions';
 import { BaseStore } from './base-store';
+import { getStoreCore } from './store-core';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>
@@ -20,6 +20,8 @@ export class FeatureStore<StateType extends object>
     }
 
     private readonly featureId: string;
+
+    private storeCore = getStoreCore();
 
     constructor(
         featureKey: string,
@@ -39,13 +41,13 @@ export class FeatureStore<StateType extends object>
     override setInitialState(initialState: StateType): void {
         super.setInitialState(initialState);
 
-        StoreCore.addFeature<StateType>(
+        this.storeCore.addFeature<StateType>(
             this._featureKey,
             createFeatureStoreReducer(this.featureId, initialState)
         );
 
         this._sub.add(
-            StoreCore.appState
+            this.storeCore.appState
                 .select((state) => state[this.featureKey])
                 .subscribe((v) => this._state.set(v))
         );
@@ -59,20 +61,20 @@ export class FeatureStore<StateType extends object>
         name: string | undefined
     ): Action {
         const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
-        StoreCore.dispatch(action);
+        this.storeCore.dispatch(action);
         return action;
     }
 
     // Implementation of abstract method from BaseStore
     undo(action: Action): void {
-        StoreCore.hasUndoExtension
-            ? StoreCore.dispatch(undo(action))
+        this.storeCore.hasUndoExtension
+            ? this.storeCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
 
     override destroy() {
         super.destroy();
-        StoreCore.removeFeature(this._featureKey);
+        this.storeCore.removeFeature(this._featureKey);
     }
 }
 

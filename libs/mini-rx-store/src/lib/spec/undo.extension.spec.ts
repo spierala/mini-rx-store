@@ -10,10 +10,13 @@ import {
     resetStoreConfig,
     store,
 } from './_spec-helpers';
-import { undo, UndoExtension } from '../extensions/undo.extension';
+import { UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
-import StoreCore from '../store-core';
+import { undo } from '../actions';
+import { getStoreCore } from '../store-core';
+
+const StoreCore = getStoreCore();
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);

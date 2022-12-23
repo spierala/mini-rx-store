@@ -1,6 +1,6 @@
 import { queueScheduler, Subject } from 'rxjs';
-import { Action, Actions } from 'mini-rx-store';
 import { observeOn } from 'rxjs/operators';
+import { Action, Actions } from './models';
 
 export class ActionsOnQueue {
     private actionsSource = new Subject<Action>();

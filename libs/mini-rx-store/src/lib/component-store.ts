@@ -47,13 +47,13 @@ export class ComponentStore<StateType extends object>
         }
 
         extensions.forEach((ext) => {
-            if (!ext.initForCs) {
+            if (!ext.hasCsSupport) {
                 miniRxError(
                     `Extension "${ext.constructor.name}" is not supported by Component Store.`
                 );
             }
 
-            metaReducers.push(ext.initForCs());
+            metaReducers.push(ext.init()!); // TODO better typing for CS extension, then `!` can be removed
 
             if (ext.id === ExtensionId.UNDO) {
                 this.hasUndoExtension = true;

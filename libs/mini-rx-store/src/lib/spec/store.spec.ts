@@ -1,5 +1,4 @@
-import { actions$, configureStore } from '../store';
-import StoreCore from '../store-core';
+import { configureStore, Store } from '../store';
 import {
     Action,
     ActionWithPayload,
@@ -23,8 +22,12 @@ import {
     store,
 } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
-import { createEffect } from 'mini-rx-store';
+import { createEffect } from '../create-effect';
 import { combineReducers } from '../combine-reducers';
+import { actions$ } from '../store-core-actions';
+import { getStoreCore } from '../store-core';
+
+const StoreCore = getStoreCore();
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',

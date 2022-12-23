@@ -31,17 +31,13 @@ import {
     Reducer,
     StoreExtension,
 } from '../models';
-import StoreCore from '../store-core';
 import { deepFreeze } from '../deep-freeze';
 
 export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.IMMUTABLE_STATE;
+    hasCsSupport = true as const;
 
-    init(): void {
-        StoreCore.addMetaReducers(storeFreeze);
-    }
-
-    initForCs(): MetaReducer<any> {
+    init(): MetaReducer<any> {
         return storeFreeze;
     }
 }

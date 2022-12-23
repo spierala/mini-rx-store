@@ -1,4 +1,4 @@
-import { actions$ } from '../store';
+import { actions$ } from '../store-core-actions';
 import { ofType } from '../utils';
 import { Action } from '../models';
 import { store } from './_spec-helpers';

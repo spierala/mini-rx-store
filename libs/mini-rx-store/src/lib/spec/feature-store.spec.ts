@@ -3,8 +3,7 @@ import { mergeMap, tap } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
-import { actions$ } from '../store';
-import StoreCore from '../store-core';
+import { actions$ } from '../store-core-actions';
 import {
     counterInitialState,
     counterReducer,
@@ -15,7 +14,9 @@ import {
 } from './_spec-helpers';
 import { Action, Reducer } from '../models';
 import { tapResponse } from '../tap-response';
+import { getStoreCore } from '../store-core';
 
+const StoreCore = getStoreCore();
 const initialState: UserState = userState;
 
 const asyncUser: UserState = {

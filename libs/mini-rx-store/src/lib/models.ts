@@ -10,16 +10,6 @@ export const enum ExtensionSortOrder {
 
 export type AppState = Record<string, any>;
 
-export interface HasComponentStoreSupport {
-    initForCs: () => MetaReducer<any>;
-}
-
-export type ComponentStoreExtension = StoreExtension & HasComponentStoreSupport;
-
-export interface ComponentStoreConfig {
-    extensions: ComponentStoreExtension[];
-}
-
 export const enum ExtensionId {
     IMMUTABLE_STATE,
     UNDO,
@@ -33,7 +23,19 @@ export abstract class StoreExtension {
 
     test!: 'global' | 'local'; // TODO remove!
 
-    abstract init(): void;
+    abstract init(): MetaReducer<any> | void;
+}
+
+export interface HasComponentStoreSupport {
+    hasCsSupport: true;
+
+    init(): MetaReducer<any>;
+}
+
+export type ComponentStoreExtension = StoreExtension & HasComponentStoreSupport;
+
+export interface ComponentStoreConfig {
+    extensions: ComponentStoreExtension[];
 }
 
 export interface Action {

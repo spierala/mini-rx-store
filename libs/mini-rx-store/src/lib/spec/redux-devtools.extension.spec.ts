@@ -1,4 +1,3 @@
-import StoreCore from '../store-core';
 import {
     ReduxDevtoolsExtension,
     ReduxDevtoolsOptions,
@@ -6,6 +5,9 @@ import {
 import { Action } from '../models';
 import { counterReducer, CounterState, store, userState, UserState } from './_spec-helpers';
 import { createFeatureStore, FeatureStore } from '../feature-store';
+import { getStoreCore } from '../store-core';
+
+const StoreCore = getStoreCore();
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
