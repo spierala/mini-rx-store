@@ -39,3 +39,12 @@ export function isSetStateAction<T>(action: Action): action is SetStateAction<T>
     const key: keyof SetStateAction<any> = 'miniRxActionType';
     return action[key] === MiniRxActionType.SET_STATE;
 }
+
+export const UNDO_ACTION = miniRxNameSpace + '/undo';
+
+export function undo(action: Action) {
+    return {
+        type: UNDO_ACTION,
+        payload: action,
+    };
+}

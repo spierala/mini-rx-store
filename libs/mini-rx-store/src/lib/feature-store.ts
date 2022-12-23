@@ -1,12 +1,12 @@
 import { Action, FeatureStoreConfig, ComponentStoreLike, Reducer, StateOrCallback } from './models';
 import StoreCore from './store-core';
 import { calcNewState, miniRxError } from './utils';
-import { undo } from './extensions/undo.extension';
 import {
     createMiniRxActionType,
     isSetStateAction,
     MiniRxActionType,
     SetStateAction,
+    undo,
 } from './actions';
 import { BaseStore } from './base-store';
 

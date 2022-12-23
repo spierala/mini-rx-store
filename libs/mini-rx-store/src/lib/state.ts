@@ -1,11 +1,12 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { select } from './utils';
+import { calcNewState, select } from './utils';
+import { StateOrCallback } from './models';
 
 export class State<StateType extends object> {
     private stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
         StateType | undefined
-    >(undefined);
+    >(this.initialState);
     state$: Observable<StateType> = this.stateSource.asObservable().pipe(
         // Skip the first (undefined) value of the BehaviorSubject
         // Very similar to a ReplaySubject(1), but more lightweight
@@ -13,12 +14,22 @@ export class State<StateType extends object> {
         filter((v) => !!v)
     ) as Observable<StateType>;
 
+    constructor(private initialState?: StateType) {}
+
     get(): StateType | undefined {
         return this.stateSource.value;
     }
 
     set(v: StateType) {
         this.stateSource.next(v);
+    }
+
+    patch(stateOrCallback: StateOrCallback<StateType>) {
+        if (!this.stateSource.value) {
+            throw new Error('State is not initialized.');
+        }
+
+        this.stateSource.next(calcNewState(this.get()!, stateOrCallback));
     }
 
     select(): Observable<StateType>;

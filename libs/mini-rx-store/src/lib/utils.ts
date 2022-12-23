@@ -32,7 +32,6 @@ export function miniRxConsoleError(message: string, err: any): void {
     console.error(miniRxNameSpace + ': ' + message + '\nDetails:', err);
 }
 
-/** @internal */
 export function hasEffectMetaData(
     param: Observable<Action>
 ): param is Observable<Action> & HasEffectMetadata {
@@ -54,14 +53,16 @@ function mapSetStateActionToActionWithPayload(
     const featureState = state[action.featureKey];
     return {
         type: action.type,
-        payload:
-            typeof stateOrCallback === 'function' ? stateOrCallback(featureState) : stateOrCallback,
+        payload: calcNewPartialState(featureState, stateOrCallback),
     };
 }
 
+function calcNewPartialState<T>(state: T, stateOrCallback: StateOrCallback<T>): Partial<T> {
+    return typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+}
+
 export function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
-    const newPartialState =
-        typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+    const newPartialState = calcNewPartialState(state, stateOrCallback);
     return {
         ...state,
         ...newPartialState,

@@ -34,7 +34,7 @@ import {
     StoreExtension,
 } from '../models';
 import StoreCore from '../store-core';
-import { miniRxNameSpace } from '../constants';
+import { UNDO_ACTION } from '../actions';
 
 const defaultBufferSize = 100;
 
@@ -53,15 +53,6 @@ export class UndoExtension extends StoreExtension implements HasComponentStoreSu
     initForCs(): MetaReducer<any> {
         return createUndoMetaReducer(this.config.bufferSize);
     }
-}
-
-const UNDO_ACTION = miniRxNameSpace + '/undo';
-
-export function undo(action: Action) {
-    return {
-        type: UNDO_ACTION,
-        payload: action,
-    };
 }
 
 function createUndoMetaReducer(bufferSize: number): MetaReducer<any> {

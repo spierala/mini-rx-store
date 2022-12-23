@@ -3,7 +3,6 @@
  */
 
 export { actions$, Store, configureStore } from './lib/store';
-export { default as _StoreCore } from './lib/store-core';
 export { FeatureStore, createFeatureStore } from './lib/feature-store';
 export {
     ComponentStore,
@@ -27,7 +26,12 @@ export {
 } from './lib/extensions/redux-devtools.extension';
 export { LoggerExtension } from './lib/extensions/logger.extension';
 export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
-export { UndoExtension, undo } from './lib/extensions/undo.extension';
+export { UndoExtension } from './lib/extensions/undo.extension';
 export { tapResponse } from './lib/tap-response';
 export { mapResponse } from './lib/map-response';
 export { createEffect } from './lib/create-effect';
+export { undo } from './lib/actions';
+
+// Attention: The API of StoreCore is meant of internal use, e.g. for the Angular `NgReduxDevtoolsService`
+// The StoreCore API can change anytime soon!
+export { default as _StoreCore } from './lib/store-core';

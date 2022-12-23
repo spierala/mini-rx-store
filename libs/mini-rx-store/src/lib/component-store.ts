@@ -10,8 +10,7 @@ import {
     StateOrCallback,
 } from './models';
 import { calcNewState, combineMetaReducers, miniRxError } from './utils';
-import { createMiniRxAction, createMiniRxActionType, MiniRxActionType } from './actions';
-import { undo } from './extensions/undo.extension';
+import { createMiniRxAction, createMiniRxActionType, MiniRxActionType, undo } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
