@@ -1,7 +1,7 @@
-import { actions$ } from '../store-core-actions';
 import { ofType } from '../utils';
 import { Action } from '../models';
 import { store } from './_spec-helpers';
+import { actions$ } from '../store-core';
 
 const action1: Action = {
     type: 'updateUser',

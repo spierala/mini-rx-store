@@ -1,8 +1,7 @@
 import { tap, withLatestFrom } from 'rxjs/operators';
 import { Action, AppState, ExtensionId, StoreExtension } from '../models';
-import { actions$ } from '../store-core-actions';
+import { actions$, appState } from '../store-core';
 import { beautifyActionForLogging, miniRxError } from '../utils';
-import { getStoreCore } from '../store-core';
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux DevTools',
@@ -18,7 +17,7 @@ export interface ReduxDevtoolsOptions {
 }
 
 export class ReduxDevtoolsExtension extends StoreExtension {
-    id = ExtensionId.REDUX_DEVTOOLS;
+    override id = ExtensionId.REDUX_DEVTOOLS;
 
     private devtoolsExtension: any;
     private devtoolsConnection: any;
@@ -44,7 +43,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
 
             actions$
                 .pipe(
-                    withLatestFrom(getStoreCore().appState.select()),
+                    withLatestFrom(appState.select()),
                     tap(([action, state]) => {
                         const actionForDevTools: Action = beautifyActionForLogging(action, state);
                         this.devtoolsConnection.send(actionForDevTools, state);
@@ -67,7 +66,7 @@ export class ReduxDevtoolsExtension extends StoreExtension {
     }
 
     protected updateState(state: AppState) {
-        getStoreCore().appState.set(state);
+        appState.set(state);
     }
 }
 

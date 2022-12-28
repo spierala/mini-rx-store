@@ -14,9 +14,7 @@ import { UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 import { undo } from '../actions';
-import { getStoreCore } from '../store-core';
-
-const StoreCore = getStoreCore();
+import { addExtension, addFeature, removeFeature } from '../store-core';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
@@ -52,7 +50,7 @@ describe('Undo Extension', () => {
     describe('FeatureStore', () => {
         beforeEach(() => {
             resetStoreConfig();
-            StoreCore.addExtension(new UndoExtension());
+            addExtension(new UndoExtension());
         });
 
         it('should throw if Undo Extension is not added', () => {
@@ -156,7 +154,7 @@ describe('Undo Extension', () => {
     describe('Store Feature', () => {
         beforeEach(() => {
             resetStoreConfig();
-            StoreCore.addExtension(new UndoExtension());
+            addExtension(new UndoExtension());
         });
 
         it('should undo dispatched actions', () => {
@@ -207,8 +205,8 @@ describe('Undo Extension', () => {
         });
 
         it('should not affect removed feature states / reducers', () => {
-            StoreCore.addFeature<CounterState>('tempCounter1', counterReducer);
-            StoreCore.addFeature<CounterState>('tempCounter2', counterReducer);
+            addFeature<CounterState>('tempCounter1', counterReducer);
+            addFeature<CounterState>('tempCounter2', counterReducer);
 
             const spy = jest.fn();
 
@@ -238,7 +236,7 @@ describe('Undo Extension', () => {
 
             spy.mockReset();
 
-            StoreCore.removeFeature('tempCounter2');
+            removeFeature('tempCounter2');
             store.dispatch(undo(counterAction));
             expect(spy).toHaveBeenCalledWith(
                 expect.objectContaining({ tempCounter1: counterInitialState })

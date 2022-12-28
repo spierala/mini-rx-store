@@ -1,9 +1,7 @@
 import { counterReducer, resetStoreConfig, userState } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createFeatureStore } from '../feature-store';
-import { getStoreCore } from '../store-core';
-
-const StoreCore = getStoreCore();
+import { configureStore, addFeature, dispatch } from '../store-core';
 
 describe('LoggerExtension', () => {
     console.log = jest.fn();
@@ -11,17 +9,17 @@ describe('LoggerExtension', () => {
     beforeEach(() => {
         resetStoreConfig();
 
-        StoreCore.config({
+        configureStore({
             extensions: [new LoggerExtension()],
         });
     });
 
     it('should log a dispatched Action', () => {
-        StoreCore.addFeature('counter', counterReducer);
+        addFeature('counter', counterReducer);
 
         const action = { type: 'counter' };
 
-        StoreCore.dispatch(action);
+        dispatch(action);
 
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining('counter'),

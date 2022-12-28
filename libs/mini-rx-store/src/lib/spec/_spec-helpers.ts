@@ -2,7 +2,7 @@ import { Action, ActionWithPayload, Reducer } from '../models';
 import { configureStore, Store } from '../store';
 import { v4 as uuid } from 'uuid';
 import { combineReducers } from '../combine-reducers';
-import { getStoreCore } from '../store-core';
+import { reducerState } from '../store-core';
 
 export interface UserState {
     firstName: string;
@@ -21,10 +21,9 @@ export const userState: UserState = {
 };
 
 export const store: Store = configureStore({});
-const StoreCore = getStoreCore();
 
 export function resetStoreConfig() {
-    StoreCore['reducerState'].set({
+    reducerState.set({
         metaReducers: [],
         featureReducers: {},
         combineReducersFn: combineReducers,

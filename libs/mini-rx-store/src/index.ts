@@ -3,7 +3,7 @@
  */
 
 export { Store, configureStore } from './lib/store';
-export { actions$ } from './lib/store-core-actions';
+export { actions$ } from './lib/store-core';
 export { FeatureStore, createFeatureStore } from './lib/feature-store';
 export {
     ComponentStore,
@@ -35,4 +35,4 @@ export { undo } from './lib/actions';
 
 // Attention: The API of StoreCore is meant of internal use, e.g. for the Angular `NgReduxDevtoolsService`
 // The StoreCore API can change anytime soon!
-// export { default as _StoreCore } from './lib/store-core';
+export * as _StoreCore from './lib/store-core';

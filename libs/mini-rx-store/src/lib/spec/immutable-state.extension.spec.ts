@@ -3,9 +3,7 @@ import { ImmutableStateExtension } from '../extensions/immutable-state.extension
 import { Action, MetaReducer, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
 import { createFeatureStore, FeatureStore } from '../feature-store';
-import { getStoreCore } from '../store-core';
-
-const StoreCore = getStoreCore();
+import { addExtension } from '../store-core';
 
 export function counterReducerWithMutation(
     state: CounterState = counterInitialState,
@@ -77,7 +75,7 @@ describe('Immutable State Extension', () => {
     const fs: FeatureStore<CounterState> = createFeatureStore('fsImmutable', counterInitialState);
 
     beforeAll(() => {
-        StoreCore.addExtension(new ImmutableStateExtension());
+        addExtension(new ImmutableStateExtension());
         store.feature<CounterState>('immutableCounter2', counterReducerWithMutation);
         store.select(featureSelector).subscribe((state) => (counterStateRaw = state));
     });

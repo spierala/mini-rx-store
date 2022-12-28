@@ -24,10 +24,8 @@ import {
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createEffect } from '../create-effect';
 import { combineReducers } from '../combine-reducers';
-import { actions$ } from '../store-core-actions';
-import { getStoreCore } from '../store-core';
-
-const StoreCore = getStoreCore();
+import * as StoreCore from '../store-core';
+import { actions$ } from '../store-core';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -130,12 +128,12 @@ describe('Store Config', () => {
     it('should dispatch an initial action', () => {
         const spy = jest.fn();
         actions$.subscribe(spy);
-        StoreCore.config();
+        StoreCore.configureStore();
         expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/init-store' });
     });
 
     it('should initialize the store with an empty object when root reducers have no initial state', () => {
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: {
                 test: (state) => {
                     return state;
@@ -150,7 +148,7 @@ describe('Store Config', () => {
     });
 
     it('should initialize a Feature state with a root reducer', () => {
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: { user: userReducer },
         });
 
@@ -166,7 +164,7 @@ describe('Store Config', () => {
             user: { name: 'Nicolas' },
         };
 
-        StoreCore.config({
+        StoreCore.configureStore({
             initialState: rootInitialState,
             reducers: {
                 user: userReducer,
@@ -185,7 +183,7 @@ describe('Store Config', () => {
 
     it('should throw when calling Store.config after a Feature Store was initialized', () => {
         createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
-        expect(() => StoreCore.config({})).toThrowError(
+        expect(() => StoreCore.configureStore({})).toThrowError(
             '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
         );
     });
@@ -206,7 +204,7 @@ describe('Store Config', () => {
                 };
             }
 
-            StoreCore.config({
+            StoreCore.configureStore({
                 metaReducers: [rootMetaReducer1],
                 initialState: rootInitialState,
             });
@@ -231,7 +229,7 @@ describe('Store Config', () => {
                 };
             }
 
-            StoreCore.config({
+            StoreCore.configureStore({
                 metaReducers: [rootMetaReducer1, rootMetaReducer2],
             });
 
@@ -282,7 +280,7 @@ describe('Store Config', () => {
                 }
             }
 
-            StoreCore.config({
+            StoreCore.configureStore({
                 extensions: [new Extension(), new Extension2(), new Extension3()],
             });
 
@@ -372,7 +370,7 @@ describe('Store Config', () => {
 
                 const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
 
-                StoreCore.config({
+                StoreCore.configureStore({
                     metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
                     extensions: [new Extension()],
                 });
@@ -407,7 +405,7 @@ describe('Store Config', () => {
             return combineReducers(reducers);
         }
 
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: { user: userReducer },
             combineReducersFn: customCombineReducers,
         });
@@ -424,7 +422,7 @@ describe('Store', () => {
     beforeAll(() => {
         resetStoreConfig();
 
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: { user: userReducer },
         });
     });

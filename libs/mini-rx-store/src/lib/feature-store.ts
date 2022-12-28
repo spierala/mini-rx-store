@@ -8,7 +8,7 @@ import {
     undo,
 } from './actions';
 import { BaseStore } from './base-store';
-import { getStoreCore } from './store-core';
+import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>
@@ -20,8 +20,6 @@ export class FeatureStore<StateType extends object>
     }
 
     private readonly featureId: string;
-
-    private storeCore = getStoreCore();
 
     constructor(
         featureKey: string,
@@ -41,15 +39,13 @@ export class FeatureStore<StateType extends object>
     override setInitialState(initialState: StateType): void {
         super.setInitialState(initialState);
 
-        this.storeCore.addFeature<StateType>(
+        addFeature<StateType>(
             this._featureKey,
             createFeatureStoreReducer(this.featureId, initialState)
         );
 
         this._sub.add(
-            this.storeCore.appState
-                .select((state) => state[this.featureKey])
-                .subscribe((v) => this._state.set(v))
+            appState.select((state) => state[this.featureKey]).subscribe((v) => this._state.set(v))
         );
     }
 
@@ -61,20 +57,20 @@ export class FeatureStore<StateType extends object>
         name: string | undefined
     ): Action {
         const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
-        this.storeCore.dispatch(action);
+        dispatch(action);
         return action;
     }
 
     // Implementation of abstract method from BaseStore
     undo(action: Action): void {
-        this.storeCore.hasUndoExtension
-            ? this.storeCore.dispatch(undo(action))
+        hasUndoExtension
+            ? dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
 
     override destroy() {
         super.destroy();
-        this.storeCore.removeFeature(this._featureKey);
+        removeFeature(this._featureKey);
     }
 }
 
