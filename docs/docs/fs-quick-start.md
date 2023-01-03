@@ -4,7 +4,7 @@ title: Feature Store
 sidebar_label: Quick Start
 ---
 
-Feature Stores offer simple yet powerful state management.
+Feature Stores offer simple yet powerful (global) state management.
 
 ## Key Principles
 - **Less Boilerplate**: With the `FeatureStore` API you can update state without writing actions and reducers

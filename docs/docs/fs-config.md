@@ -12,6 +12,11 @@ With MiniRx Feature Stores you can also manage **local component state**.
 - State which has the lifespan of a component
 - State which can exist multiple times (if the corresponding component exists multiple times)
 
+:::info
+If you want to go for fully local state management, take a look at MiniRx [Component Store](component-store).
+Component Store state does not become part of the global state object.
+:::info
+
 
 ### Multiple Feature Store instances
 By default, a Feature Store with a certain feature key can only be created **once**.

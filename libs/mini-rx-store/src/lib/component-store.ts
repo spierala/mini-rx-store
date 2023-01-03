@@ -32,7 +32,7 @@ export class ComponentStore<StateType extends object>
     private reducer: Reducer<StateType> | undefined;
     private hasUndoExtension = false;
 
-    constructor(initialState?: StateType, config?: { extensions: ComponentStoreExtension[] }) {
+    constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
 
         let extensions: ComponentStoreExtension[] = [];
@@ -166,7 +166,8 @@ function mergeExtensions(
 }
 
 export function createComponentStore<T extends object>(
-    initialState: T | undefined
+    initialState?: T | undefined,
+    config?: ComponentStoreConfig
 ): ComponentStore<T> {
     return new ComponentStore<T>(initialState);
 }

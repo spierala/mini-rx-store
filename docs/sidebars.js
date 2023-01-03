@@ -38,6 +38,10 @@ module.exports = {
             ],
         },
         {
+            type: 'doc',
+            id: 'component-store',
+        },
+        {
             type: 'category',
             label: 'Extensions',
             items: [
