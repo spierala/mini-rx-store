@@ -1,20 +1,36 @@
 ---
-id: component-store
+id: local-store
 title: Local Store
 sidebar_label: Local Store
 ---
 
-Local Store is perfect if you have to manage **local** component state.
-
-### What is local component state?
-- State which is bound to a component
-- State which has the lifespan of a component
-- State which can exist multiple times (if the corresponding component exists multiple times)
+MiniRx supports "local" state management with **Local Store**.
+Local Store allows you to manage state **independently** of the global state object (which is used by [Store](redux) and [Feature Store](fs-quick-start    ))     .
 
 ## Key Principles of Local Store
-- Local Store has the same simple API as [Feature Store](fs-quick-start)
+- Local Store has the **same simple API as [Feature Store](fs-quick-start)**
 - Local Store state is **independent** of the global state object
-- Local Stores are **destroyable**
+- Local Store is **destroyable**
+
+
+
+## Use-cases
+- You have to create and destroy a lot of Stores at the same time: Local Stores will show better performance 
+(while creating/destroying Feature Stores has more overhead).
+- Very frequent state changes could lead to performance issues when using `Store` or `FeatureStore` (both update the global state object using actions and reducers, which means more overhead).
+- State is local to a component, and you do not want to bother the global state object with that state.
+
+:::info
+Are you doubting between Feature Store and Local Store?
+
+Then use Feature Store!
+
+Feature Store state becomes part of the global state object.
+That object can be inspected with Redux DevTools for a better debugging experience.
+Feature Stores automatically use the Store extensions (Local Stores have a dedicated extension setup: see Local Store ["Extensions"](#extensions)). 
+
+If you encounter the use-cases from above, it will be easy to refactor from `FeatureStore` to `LocalStore`.
+:::info
 
 ## What's Included
 The MiniRx `LocalStore` API:

@@ -39,7 +39,7 @@ module.exports = {
         },
         {
             type: 'doc',
-            id: 'component-store',
+            id: 'local-store',
         },
         {
             type: 'category',
