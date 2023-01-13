@@ -327,9 +327,9 @@ describe('FeatureStore', () => {
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith(
             expect.objectContaining({
+                setStateActionType: '@mini-rx/feature-store',
                 type: '@mini-rx/user2/set-state/updateCity',
                 stateOrCallback: { city: 'NY' },
-                miniRxActionType: 'set-state',
                 featureId: expect.any(String),
             })
         );

@@ -1,7 +1,7 @@
 import { counterReducer, resetStoreConfig, userState } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createFeatureStore } from '../feature-store';
-import { configureStore, addFeature, dispatch } from '../store-core';
+import { addFeature, configureStore, dispatch } from '../store-core';
 
 describe('LoggerExtension', () => {
     console.log = jest.fn();

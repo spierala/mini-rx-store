@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import {
     addFeature,
     appState,
+    configureStore as _configureStore,
     dispatch,
     effect,
-    configureStore as _configureStore,
 } from './store-core';
 
 export abstract class Store {

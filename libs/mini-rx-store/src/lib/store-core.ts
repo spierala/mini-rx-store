@@ -14,7 +14,7 @@ import {
     StoreConfig,
     StoreExtension,
 } from './models';
-import { combineMetaReducers, hasEffectMetaData, miniRxError } from './utils';
+import { combineMetaReducers, hasEffectMetaData, miniRxError, sortExtensions } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
@@ -212,12 +212,6 @@ function createReducerWithInitialState<StateType>(
     return (state: StateType = initialState, action: Action): StateType => {
         return reducer(state, action);
     };
-}
-
-function sortExtensions(extensions: StoreExtension[]): StoreExtension[] {
-    return [...extensions].sort((a, b) => {
-        return a.sortOrder - b.sortOrder;
-    });
 }
 
 function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {

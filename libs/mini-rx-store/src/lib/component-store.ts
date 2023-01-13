@@ -9,8 +9,16 @@ import {
     Reducer,
     StateOrCallback,
 } from './models';
-import { calcNewState, combineMetaReducers, miniRxError } from './utils';
-import { createMiniRxAction, createMiniRxActionType, MiniRxActionType, undo } from './actions';
+import { calcNewState, combineMetaReducers, miniRxError, sortExtensions } from './utils';
+import {
+    ComponentStoreSetStateAction,
+    createMiniRxAction,
+    createMiniRxActionType,
+    isComponentStoreSetStateAction,
+    MiniRxActionType,
+    SetStateActionType,
+    undo,
+} from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
@@ -44,9 +52,11 @@ export class ComponentStore<StateType extends object>
             } else {
                 extensions = config.extensions;
             }
+        } else if (componentStoreConfig?.extensions) {
+            extensions = componentStoreConfig.extensions;
         }
 
-        extensions.forEach((ext) => {
+        sortExtensions(extensions).forEach((ext) => {
             if (!ext.hasCsSupport) {
                 miniRxError(
                     `Extension "${ext.constructor.name}" is not supported by Component Store.`
@@ -92,7 +102,7 @@ export class ComponentStore<StateType extends object>
         stateOrCallback: StateOrCallback<StateType>,
         name: string | undefined
     ): Action {
-        const action: Action = createSetStateAction(stateOrCallback, 'component-store', name);
+        const action: Action = createSetStateAction(stateOrCallback, name);
         this.dispatch(action);
         return action;
     }
@@ -111,20 +121,23 @@ export class ComponentStore<StateType extends object>
 
 function createSetStateAction<T>(
     stateOrCallback: StateOrCallback<T>,
-    featureKey: string,
     name?: string
-): Action {
+): ComponentStoreSetStateAction<T> {
     const miniRxActionType = MiniRxActionType.SET_STATE;
     return {
-        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
+        setStateActionType: SetStateActionType.COMPONENT_STORE,
+        type:
+            createMiniRxActionType(miniRxActionType, 'component-store') + (name ? '/' + name : ''),
         stateOrCallback,
-        miniRxActionType, // Used to trigger LoggerExtension `beautifyActionForLogging`
     };
 }
 
 function createComponentStoreReducer<StateType>(initialState: StateType): Reducer<StateType> {
     return (state: StateType = initialState, action: Action) => {
-        return calcNewState(state, action['stateOrCallback']);
+        if (isComponentStoreSetStateAction<StateType>(action)) {
+            return calcNewState(state, action.stateOrCallback);
+        }
+        return state;
     };
 }
 

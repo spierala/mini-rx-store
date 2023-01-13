@@ -33,9 +33,7 @@ describe('Selectors', () => {
         it('should deliver the value of selectors to the projection function', () => {
             const projectFn = jasmine.createSpy('projectionFn');
 
-            const selector = createSelector(incrementOne, incrementTwo, projectFn)(
-                {}
-            );
+            const selector = createSelector(incrementOne, incrementTwo, projectFn)({});
 
             expect(projectFn).toHaveBeenCalledWith(countOne, countTwo);
         });
@@ -61,12 +59,7 @@ describe('Selectors', () => {
             const firstState = { first: 'state' };
             const secondState = { second: 'state' };
             const projectFn = jasmine.createSpy('projectionFn');
-            const selector = createSelector(
-                incrementOne,
-                incrementTwo,
-                incrementThree,
-                projectFn
-            );
+            const selector = createSelector(incrementOne, incrementTwo, incrementThree, projectFn);
 
             selector(firstState);
             selector(firstState);
@@ -90,7 +83,10 @@ describe('Selectors', () => {
                 .createSpy('projectorFn', (s: any) => (s.ok ? s.ok : fail()))
                 .and.callThrough();
             const selectorFn = jasmine
-                .createSpy('selectorFn', createSelector(state => state, projectorFn))
+                .createSpy(
+                    'selectorFn',
+                    createSelector((state) => state, projectorFn)
+                )
                 .and.callThrough();
 
             selectorFn(firstState);

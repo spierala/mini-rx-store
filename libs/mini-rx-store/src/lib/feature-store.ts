@@ -1,10 +1,11 @@
-import { Action, FeatureStoreConfig, ComponentStoreLike, Reducer, StateOrCallback } from './models';
+import { Action, ComponentStoreLike, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
 import { calcNewState, miniRxError } from './utils';
 import {
     createMiniRxActionType,
-    isSetStateAction,
+    FeatureStoreSetStateAction,
+    isFeatureStoreSetStateAction,
     MiniRxActionType,
-    SetStateAction,
+    SetStateActionType,
     undo,
 } from './actions';
 import { BaseStore } from './base-store';
@@ -79,7 +80,7 @@ function createFeatureStoreReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action): StateType => {
-        if (isSetStateAction<StateType>(action) && action.featureId === featureId) {
+        if (isFeatureStoreSetStateAction<StateType>(action) && action.featureId === featureId) {
             return calcNewState(state, action.stateOrCallback);
         }
         return state;
@@ -91,14 +92,14 @@ function createSetStateAction<T>(
     featureId: string,
     featureKey: string,
     name?: string
-): SetStateAction<T> {
+): FeatureStoreSetStateAction<T> {
     const miniRxActionType = MiniRxActionType.SET_STATE;
     return {
+        setStateActionType: SetStateActionType.FEATURE_STORE,
         type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
         stateOrCallback,
         featureId,
         featureKey,
-        miniRxActionType,
     };
 }
 

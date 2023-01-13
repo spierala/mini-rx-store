@@ -24,6 +24,7 @@ import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
 import { initialState, TodosState } from './modules/todos/state/todos-store.service';
+import { PixelArtModule } from './modules/pixel-art/pixel-art.module';
 
 @NgModule({
     imports: [
@@ -48,6 +49,7 @@ import { initialState, TodosState } from './modules/todos/state/todos-store.serv
             traceLimit: 25,
         }),
         ProductsStateModule,
+        PixelArtModule,
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
