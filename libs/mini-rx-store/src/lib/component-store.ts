@@ -182,7 +182,7 @@ export function createComponentStore<T extends object>(
     initialState?: T | undefined,
     config?: ComponentStoreConfig
 ): ComponentStore<T> {
-    return new ComponentStore<T>(initialState);
+    return new ComponentStore<T>(initialState, config);
 }
 
 // TODO

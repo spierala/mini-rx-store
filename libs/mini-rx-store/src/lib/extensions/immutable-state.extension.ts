@@ -45,13 +45,10 @@ export class ImmutableStateExtension extends StoreExtension implements HasCompon
 function storeFreeze(reducer: Reducer<any>): Reducer<any> {
     return (state, action: Action) => {
         if (state) {
-            // Only deepFreeze if state is defined
             deepFreeze(state);
-            const nextState = reducer(state, action);
-            deepFreeze(nextState);
-            return nextState;
         }
         const nextState = reducer(state, action);
+        deepFreeze(nextState);
         return nextState;
     };
 }

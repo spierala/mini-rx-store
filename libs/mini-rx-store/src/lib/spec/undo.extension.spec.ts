@@ -15,6 +15,7 @@ import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 import { undo } from '../actions';
 import { addExtension, addFeature, removeFeature } from '../store-core';
+import { createComponentStore } from 'mini-rx-store';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
@@ -58,7 +59,7 @@ describe('Undo Extension', () => {
             expect(featureStore.undoLastAction).toThrow();
         });
 
-        it('should undo dispatched actions', () => {
+        it('should undo dispatched (setState) actions', () => {
             const featureStore: MyFeatureStore = new MyFeatureStore();
             const counterSpy = jest.fn();
             featureStore.count$.subscribe(counterSpy);
@@ -148,6 +149,42 @@ describe('Undo Extension', () => {
             fs2.undo(lastAction);
 
             expect(spy).toHaveBeenCalledWith(2);
+        });
+    });
+
+    describe('ComponentStore', () => {
+        it('should throw if Undo Extension is not added', () => {
+            const cs = createComponentStore();
+            expect(cs.undo).toThrow();
+        });
+
+        it('should undo dispatched (setState) actions', () => {
+            const cs = createComponentStore(counterStringInitialState, {
+                extensions: [new UndoExtension()],
+            });
+
+            const addNumberToCounterString = (v: string) =>
+                cs.setState((state) => ({ counter: state.counter + v }));
+
+            const subscribeCallback = jest.fn<void, [string]>();
+
+            cs.select((state) => state.counter).subscribe(subscribeCallback);
+
+            addNumberToCounterString('2');
+            const actionToUndo = addNumberToCounterString('3');
+            addNumberToCounterString('4');
+            addNumberToCounterString('5');
+
+            cs.undo(actionToUndo);
+
+            expect(subscribeCallback.mock.calls).toEqual([
+                ['1'],
+                ['12'],
+                ['123'],
+                ['1234'],
+                ['12345'],
+                ['1245'], // '3' has been removed
+            ]);
         });
     });
 
