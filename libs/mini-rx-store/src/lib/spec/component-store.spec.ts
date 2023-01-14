@@ -1,7 +1,8 @@
-import { createComponentStore } from '../component-store';
+import { _resetConfig, configureComponentStores, createComponentStore } from '../component-store';
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
@@ -61,6 +62,33 @@ describe('ComponentStore', () => {
         cs.setState((state) => ({ counter: state.counter + 1 }));
 
         expect(subscribeCallback.mock.calls).toEqual([[1], [2], [3], [4], [5], [6], [7]]);
+    });
+
+    it('should dispatch an Action when updating state', () => {
+        const cs = createComponentStore(counterInitialState);
+
+        const spy = jest.fn();
+        cs['actionsOnQueue'].actions$.subscribe(spy);
+
+        const setStateCallback = (state: CounterState) => ({ counter: state.counter + 1 });
+        cs.setState(setStateCallback);
+        expect(spy).toHaveBeenCalledWith({
+            setStateActionType: '@mini-rx/component-store',
+            type: '@mini-rx/component-store/set-state',
+            stateOrCallback: setStateCallback,
+        });
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        spy.mockReset();
+
+        // With setState name
+        cs.setState(setStateCallback, 'increment');
+        expect(spy).toHaveBeenCalledWith({
+            setStateActionType: '@mini-rx/component-store',
+            type: '@mini-rx/component-store/set-state/increment',
+            stateOrCallback: setStateCallback,
+        });
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should unsubscribe from setState Observable on destroy', () => {
@@ -169,5 +197,77 @@ describe('ComponentStore', () => {
         expect(() => cs.setInitialState(counterInitialState)).toThrowError(
             '@mini-rx: ComponentStore has initialState already.'
         );
+    });
+
+    it('should throw when calling `configureComponentStores` more than once', () => {
+        configureComponentStores({ extensions: [] });
+        expect(() => configureComponentStores({ extensions: [] })).toThrowError(
+            '@mini-rx: `configureComponentStores` was called multiple times.'
+        );
+    });
+
+    it('should throw when using undo without extension', () => {
+        const cs = createComponentStore();
+
+        expect(() => cs.undo({ type: 'someType' })).toThrowError(
+            '@mini-rx: ComponentStore has no UndoExtension yet.'
+        );
+    });
+
+    it('should throw when a not supported extension is used', () => {
+        const loggerExtension = new LoggerExtension();
+        // @ts-ignore
+        loggerExtension.hasCsSupport = false;
+
+        expect(() =>
+            createComponentStore(undefined, { extensions: [loggerExtension] })
+        ).toThrowError(
+            '@mini-rx: Extension "LoggerExtension" is not supported by Component Store.'
+        );
+    });
+
+    describe('Extensions', () => {
+        beforeEach(() => {
+            _resetConfig();
+        });
+
+        it('should be local', () => {
+            const extensions = [new LoggerExtension(), new UndoExtension()];
+            const cs = createComponentStore(undefined, { extensions });
+
+            expect(cs['extensions']).toBe(extensions);
+        });
+
+        it('should be global', () => {
+            const extensions = [new LoggerExtension(), new UndoExtension()];
+
+            configureComponentStores({ extensions });
+            const cs = createComponentStore(undefined);
+
+            expect(cs['extensions']).toBe(extensions);
+        });
+
+        it('should be merged', () => {
+            const globalExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
+            const localExtensions = [new UndoExtension()];
+
+            configureComponentStores({ extensions: globalExtensions });
+            const cs = createComponentStore(undefined, { extensions: localExtensions });
+
+            expect(cs['extensions'][0]).toBe(localExtensions[0]);
+            expect(cs['extensions'][1]).toBe(globalExtensions[0]);
+            expect(cs['extensions'][2]).toBe(globalExtensions[1]);
+        });
+
+        it('should be merged (use local if extension is used globally and locally)', () => {
+            const globalExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
+            const localExtensions = [new LoggerExtension()];
+
+            configureComponentStores({ extensions: globalExtensions });
+            const cs = createComponentStore(undefined, { extensions: localExtensions });
+
+            expect(cs['extensions'][0]).toBe(localExtensions[0]);
+            expect(cs['extensions'][1]).toBe(globalExtensions[1]);
+        });
     });
 });

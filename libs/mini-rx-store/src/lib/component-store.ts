@@ -21,7 +21,14 @@ import {
 } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 
-let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
+let componentStoreConfig: ComponentStoreConfig | undefined = undefined; // Exported for testing purposes
+
+/** @internal
+ * This function exists for testing purposes only
+ */
+export function _resetConfig() {
+    componentStoreConfig = undefined;
+}
 
 export function configureComponentStores(config: { extensions: ComponentStoreExtension[] }) {
     if (!componentStoreConfig) {
@@ -39,24 +46,27 @@ export class ComponentStore<StateType extends object>
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
     private hasUndoExtension = false;
+    private extensions: ComponentStoreExtension[] = []; // This is a class property just for testing purposes
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
 
-        let extensions: ComponentStoreExtension[] = [];
         const metaReducers: MetaReducer<StateType>[] = [];
 
         if (config?.extensions) {
             if (config.extensions && componentStoreConfig?.extensions) {
-                extensions = mergeExtensions(componentStoreConfig.extensions, config.extensions);
+                this.extensions = mergeExtensions(
+                    componentStoreConfig.extensions,
+                    config.extensions
+                );
             } else {
-                extensions = config.extensions;
+                this.extensions = config.extensions;
             }
         } else if (componentStoreConfig?.extensions) {
-            extensions = componentStoreConfig.extensions;
+            this.extensions = componentStoreConfig.extensions;
         }
 
-        sortExtensions(extensions).forEach((ext) => {
+        sortExtensions(this.extensions).forEach((ext) => {
             if (!ext.hasCsSupport) {
                 miniRxError(
                     `Extension "${ext.constructor.name}" is not supported by Component Store.`
@@ -150,32 +160,26 @@ function mergeExtensions(
     // If extension is only global => use global
     // If extension is only local => use local
 
-    if (global.length && local.length) {
-        const extensions: ComponentStoreExtension[] = [];
-        let globalCopy = [...global];
-        let localCopy = [...local];
+    const extensions: ComponentStoreExtension[] = [];
+    let globalCopy = [...global];
+    let localCopy = [...local];
 
-        global.forEach((globalExt) => {
-            local.forEach((localExt) => {
-                if (localExt.id === globalExt.id) {
-                    // Found extension which is global and local
-                    extensions.push(localExt); // Use local!
-                    localCopy = localCopy.filter((item) => item.id !== localExt.id); // Remove found extension from local
-                    globalCopy = globalCopy.filter((item) => item.id !== globalExt.id); // Remove found extension from global
-                }
-            });
+    global.forEach((globalExt) => {
+        local.forEach((localExt) => {
+            if (localExt.id === globalExt.id) {
+                // Found extension which is global and local
+                extensions.push(localExt); // Use local!
+                localCopy = localCopy.filter((item) => item.id !== localExt.id); // Remove found extension from local
+                globalCopy = globalCopy.filter((item) => item.id !== globalExt.id); // Remove found extension from global
+            }
         });
+    });
 
-        return [
-            ...extensions, // Extensions which are global and local, but use local
-            ...localCopy, // Local only
-            ...globalCopy, // Global only
-        ];
-    } else if (global.length) {
-        return global;
-    } else {
-        return local;
-    }
+    return [
+        ...extensions, // Extensions which are global and local, but use local
+        ...localCopy, // Local only
+        ...globalCopy, // Global only
+    ];
 }
 
 export function createComponentStore<T extends object>(
