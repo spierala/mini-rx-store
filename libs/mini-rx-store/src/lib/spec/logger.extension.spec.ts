@@ -2,6 +2,7 @@ import { counterReducer, resetStoreConfig, userState } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createFeatureStore } from '../feature-store';
 import { addFeature, configureStore, dispatch } from '../store-core';
+import { createComponentStore } from 'mini-rx-store';
 
 describe('LoggerExtension', () => {
     console.log = jest.fn();
@@ -54,6 +55,46 @@ describe('LoggerExtension', () => {
                     ...userState,
                     firstName: 'Cage',
                 },
+            }
+        );
+    });
+});
+
+describe('LoggerExtension with ComponentStore', () => {
+    it('should log a SetStateAction with only type and payload', () => {
+        console.log = jest.fn();
+
+        const cs = createComponentStore(userState, { extensions: [new LoggerExtension()] });
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('@mini-rx/init-component-store'),
+            expect.stringContaining('color: #25c2a0'),
+            expect.stringContaining('Action:'),
+            {
+                type: '@mini-rx/init-component-store',
+            },
+            expect.stringContaining('State:'),
+            userState
+        );
+
+        cs.setState((state) => ({
+            firstName: 'Cage',
+        }));
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('@mini-rx/component-store/set-state'),
+            expect.stringContaining('color: #25c2a0'),
+            expect.stringContaining('Action:'),
+            {
+                type: '@mini-rx/component-store/set-state',
+                payload: {
+                    firstName: 'Cage',
+                },
+            },
+            expect.stringContaining('State: '),
+            {
+                ...userState,
+                firstName: 'Cage',
             }
         );
     });
