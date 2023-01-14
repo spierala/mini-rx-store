@@ -21,7 +21,7 @@ import {
 } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 
-let componentStoreConfig: ComponentStoreConfig | undefined = undefined; // Exported for testing purposes
+let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
 /** @internal
  * This function exists for testing purposes only
@@ -188,26 +188,3 @@ export function createComponentStore<T extends object>(
 ): ComponentStore<T> {
     return new ComponentStore<T>(initialState, config);
 }
-
-// TODO
-// TEST mergeExtensions
-// const global: ComponentStoreExtension[] = [
-//     // markAs(new ImmutableStateExtension(), 'global'),
-//     // markAs(new UndoExtension(), 'global'),
-//     // markAs(new LoggerExtension(), 'global'),
-// ];
-// const local: ComponentStoreExtension[] = [
-//     // markAs(new ImmutableStateExtension(), 'local'),
-//     // markAs(new UndoExtension(), 'local'),
-//     // markAs(new LoggerExtension(), 'local'),
-// ];
-//
-// console.log(mergeExtensions(global, local));
-//
-// function markAs(
-//     extension: ComponentStoreExtension,
-//     globalLocal: 'global' | 'local'
-// ): ComponentStoreExtension {
-//     extension.test = globalLocal;
-//     return extension;
-// }
