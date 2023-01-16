@@ -190,7 +190,7 @@ export function effect(effect$: any): void {
 
 export function addExtension(extension: StoreExtension) {
     // exported for testing purposes
-    const metaReducer: MetaReducer<any> | void = extension.init(); // TODO void?
+    const metaReducer: MetaReducer<any> | void = extension.init();
 
     if (metaReducer) {
         addMetaReducers(metaReducer);

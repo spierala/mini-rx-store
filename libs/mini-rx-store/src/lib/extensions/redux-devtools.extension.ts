@@ -17,7 +17,7 @@ export interface ReduxDevtoolsOptions {
 }
 
 export class ReduxDevtoolsExtension extends StoreExtension {
-    override id = ExtensionId.REDUX_DEVTOOLS;
+    id = ExtensionId.REDUX_DEVTOOLS;
 
     private devtoolsExtension: any;
     private devtoolsConnection: any;

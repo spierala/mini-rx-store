@@ -34,7 +34,7 @@ import {
 import { deepFreeze } from '../deep-freeze';
 
 export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
-    override id = ExtensionId.IMMUTABLE_STATE;
+    id = ExtensionId.IMMUTABLE_STATE;
     hasCsSupport = true as const;
 
     init(): MetaReducer<any> {

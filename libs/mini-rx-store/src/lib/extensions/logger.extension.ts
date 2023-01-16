@@ -9,7 +9,7 @@ import {
 import { beautifyActionForLogging } from '../utils';
 
 export class LoggerExtension extends StoreExtension implements HasComponentStoreSupport {
-    override id = ExtensionId.LOGGER;
+    id = ExtensionId.LOGGER;
     hasCsSupport = true as const;
 
     init(): MetaReducer<any> {

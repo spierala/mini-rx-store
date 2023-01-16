@@ -18,10 +18,8 @@ export const enum ExtensionId {
 }
 
 export abstract class StoreExtension {
-    id!: ExtensionId;
+    abstract id: ExtensionId;
     sortOrder: ExtensionSortOrder = ExtensionSortOrder.DEFAULT;
-
-    test!: 'global' | 'local'; // TODO remove!
 
     abstract init(): MetaReducer<any> | void;
 }

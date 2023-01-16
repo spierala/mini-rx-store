@@ -73,7 +73,7 @@ export class ComponentStore<StateType extends object>
                 );
             }
 
-            metaReducers.push(ext.init()!); // TODO better typing for CS extension, then `!` can be removed
+            metaReducers.push(ext.init()!); // Non-null assertion: Here we know for sure: init will return a MetaReducer
 
             if (ext.id === ExtensionId.UNDO) {
                 this.hasUndoExtension = true;

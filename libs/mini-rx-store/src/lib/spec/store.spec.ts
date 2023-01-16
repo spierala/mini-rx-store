@@ -3,6 +3,7 @@ import {
     Action,
     ActionWithPayload,
     AppState,
+    ExtensionId,
     Reducer,
     ReducerDictionary,
     StoreExtension,
@@ -247,6 +248,8 @@ describe('Store Config', () => {
             }
 
             class Extension extends StoreExtension {
+                id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension);
                 }
@@ -260,7 +263,8 @@ describe('Store Config', () => {
             }
 
             class Extension2 extends StoreExtension {
-                override sortOrder = 100;
+                id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+                sortOrder = 100;
 
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension2);
@@ -275,6 +279,8 @@ describe('Store Config', () => {
             }
 
             class Extension3 extends StoreExtension {
+                id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension3);
                 }
@@ -308,12 +314,14 @@ describe('Store Config', () => {
                 }
 
                 class Extension extends StoreExtension {
+                    id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+
                     init(): void {
                         StoreCore.addMetaReducers(rootMetaReducerForExtension);
                     }
                 }
 
-                function aFeatureReducer(state: string = 'a', action: Action): string {
+                function aFeatureReducer(state = 'a', action: Action): string {
                     switch (action.type) {
                         case 'metaTest':
                             return state + 'e';
