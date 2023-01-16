@@ -7,7 +7,7 @@ import {
     ReducerDictionary,
     StoreExtension,
 } from '../models';
-import { createFeatureSelector, createSelector } from '../selector';
+import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
 import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
@@ -91,13 +91,13 @@ function userReducer(state: UserState = userInitialState, action: ActionWithPayl
     }
 }
 
-const getUserFeatureState = createFeatureSelector<UserState>('user');
+const getUserFeatureState = createFeatureStateSelector<UserState>('user');
 const getFirstName = createSelector(getUserFeatureState, (user) => user.firstName);
 const getAge = createSelector(getUserFeatureState, (user) => user.age);
 
-const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
+const getCounterFeatureState = createFeatureStateSelector<CounterState>('counter');
 const getCounter1 = createSelector(getCounterFeatureState, (state) => state.counter);
-const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
+const getCounter2FeatureState = createFeatureStateSelector<CounterState>('counter2');
 const getCounter2 = createSelector(getCounter2FeatureState, (state) => state.counter);
 
 class CounterFeatureState extends FeatureStore<CounterState> {
@@ -110,7 +110,7 @@ class CounterFeatureState extends FeatureStore<CounterState> {
     }
 }
 
-const getCounter3FeatureState = createFeatureSelector<CounterState>('counter3');
+const getCounter3FeatureState = createFeatureStateSelector<CounterState>('counter3');
 const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
 
 describe('Store Config', () => {
@@ -368,7 +368,7 @@ describe('Store Config', () => {
                     };
                 }
 
-                const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+                const getMetaTestFeature = createFeatureStateSelector<string>('metaTestFeature');
 
                 StoreCore.configureStore({
                     metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
@@ -482,7 +482,7 @@ describe('Store', () => {
     });
 
     it('should return undefined if feature does not exist yet', () => {
-        const featureSelector = createFeatureSelector('notExistingFeature');
+        const featureSelector = createFeatureStateSelector('notExistingFeature');
 
         const spy = jest.fn();
         store.select(featureSelector).subscribe(spy);
@@ -855,7 +855,7 @@ describe('Store', () => {
 });
 
 describe('Store Feature MetaReducers', () => {
-    const getMetaTestFeature = createFeatureSelector<CounterStringState>('metaTestFeature2');
+    const getMetaTestFeature = createFeatureStateSelector<CounterStringState>('metaTestFeature2');
     const getCount = createSelector(getMetaTestFeature, (state) => state.count);
 
     interface CounterStringState {

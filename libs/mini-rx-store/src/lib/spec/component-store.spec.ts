@@ -2,7 +2,13 @@ import { _resetConfig, configureComponentStores, createComponentStore } from '..
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
+import {
+    createComponentStateSelector,
+    createSelector,
+    ImmutableStateExtension,
+    LoggerExtension,
+    UndoExtension,
+} from 'mini-rx-store';
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
@@ -62,6 +68,34 @@ describe('ComponentStore', () => {
         cs.setState((state) => ({ counter: state.counter + 1 }));
 
         expect(subscribeCallback.mock.calls).toEqual([[1], [2], [3], [4], [5], [6], [7]]);
+    });
+
+    it('should select state with memoized selectors', () => {
+        const getCounterSpy = jest.fn<void, [number]>();
+        const getSquareCounterSpy = jest.fn<void, [number]>();
+
+        const cs = createComponentStore(counterInitialState);
+
+        const getComponentState = createComponentStateSelector<CounterState>();
+        const getCounter = createSelector(getComponentState, (state) => {
+            getCounterSpy(state.counter);
+            return state.counter;
+        });
+        const getSquareCounter = createSelector(getCounter, (counter) => {
+            getSquareCounterSpy(counter);
+            return counter * 2;
+        });
+
+        cs.select(getSquareCounter).subscribe();
+
+        cs.setState({ counter: 2 });
+        cs.setState({ counter: 2 });
+        cs.setState({ counter: 3 });
+        cs.setState({ counter: 3 });
+        cs.setState({ counter: 4 });
+
+        expect(getCounterSpy.mock.calls).toEqual([[1], [2], [2], [3], [3], [4]]); // No memoization: because a new state object is created for every call of `setState`
+        expect(getSquareCounterSpy.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
 
     it('should dispatch an Action when updating state', () => {

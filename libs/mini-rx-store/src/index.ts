@@ -10,7 +10,12 @@ export {
     createComponentStore,
     configureComponentStores,
 } from './lib/component-store';
-export { createFeatureSelector, createSelector } from './lib/selector';
+export {
+    createFeatureSelector,
+    createSelector,
+    createFeatureStateSelector,
+    createComponentStateSelector,
+} from './lib/selector';
 export {
     Action,
     Reducer,
