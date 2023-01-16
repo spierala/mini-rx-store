@@ -67,11 +67,11 @@ describe('LoggerExtension with ComponentStore', () => {
         const cs = createComponentStore(userState, { extensions: [new LoggerExtension()] });
 
         expect(console.log).toHaveBeenCalledWith(
-            expect.stringContaining('@mini-rx/init-component-store'),
+            expect.stringContaining('@mini-rx/component-store/init'),
             expect.stringContaining('color: #25c2a0'),
             expect.stringContaining('Action:'),
             {
-                type: '@mini-rx/init-component-store',
+                type: '@mini-rx/component-store/init',
             },
             expect.stringContaining('State:'),
             userState

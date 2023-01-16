@@ -396,7 +396,7 @@ describe('FeatureStore', () => {
             expect.not.objectContaining({ tempCounter: counterInitialState })
         );
 
-        expect(actionSpy).toHaveBeenCalledWith({ type: '@mini-rx/tempFsState/destroy-feature' });
+        expect(actionSpy).toHaveBeenCalledWith({ type: '@mini-rx/tempFsState/destroy' });
     });
 
     it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {

@@ -2,11 +2,9 @@ import { Action, StateOrCallback } from './models';
 import { miniRxNameSpace } from './constants';
 
 export const enum MiniRxActionType {
-    INIT_STORE = 'init-store',
-    INIT_FEATURE = 'init-feature',
-    DESTROY_FEATURE = 'destroy-feature',
+    INIT = 'init',
+    DESTROY = 'destroy',
     SET_STATE = 'set-state',
-    INIT_COMPONENT_STORE = 'init-component-store',
 }
 
 export const enum SetStateActionType {
@@ -36,11 +34,7 @@ export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featu
 }
 
 export function createMiniRxAction(
-    miniRxActionType:
-        | MiniRxActionType.INIT_STORE
-        | MiniRxActionType.INIT_FEATURE
-        | MiniRxActionType.DESTROY_FEATURE
-        | MiniRxActionType.INIT_COMPONENT_STORE,
+    miniRxActionType: MiniRxActionType.INIT | MiniRxActionType.DESTROY,
     featureKey?: string
 ): Action {
     return {

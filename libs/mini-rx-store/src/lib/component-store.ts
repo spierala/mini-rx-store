@@ -38,6 +38,8 @@ export function configureComponentStores(config: { extensions: ComponentStoreExt
     miniRxError('`configureComponentStores` was called multiple times.');
 }
 
+const csFeatureKey = 'component-store';
+
 export class ComponentStore<StateType extends object>
     extends BaseStore<StateType>
     implements ComponentStoreLike<StateType>
@@ -102,7 +104,7 @@ export class ComponentStore<StateType extends object>
         super.setInitialState(initialState);
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
-        this.dispatch(createMiniRxAction(MiniRxActionType.INIT_COMPONENT_STORE));
+        this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
     }
 
     /** @internal
@@ -136,8 +138,7 @@ function createSetStateAction<T>(
     const miniRxActionType = MiniRxActionType.SET_STATE;
     return {
         setStateActionType: SetStateActionType.COMPONENT_STORE,
-        type:
-            createMiniRxActionType(miniRxActionType, 'component-store') + (name ? '/' + name : ''),
+        type: createMiniRxActionType(miniRxActionType, csFeatureKey) + (name ? '/' + name : ''),
         stateOrCallback,
     };
 }

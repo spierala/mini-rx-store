@@ -130,7 +130,7 @@ describe('Store Config', () => {
         const spy = jest.fn();
         actions$.subscribe(spy);
         StoreCore.configureStore();
-        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/init-store' });
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/init' });
     });
 
     it('should initialize the store with an empty object when root reducers have no initial state', () => {
@@ -457,7 +457,7 @@ describe('Store', () => {
 
         store.feature('oneMoreFeature3', (state) => state);
 
-        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init-feature' });
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init' });
     });
 
     it('should update the Feature state', () => {

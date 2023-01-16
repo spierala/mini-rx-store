@@ -143,7 +143,7 @@ export function configureStore(config: Partial<StoreConfig<AppState>> = {}) {
         appState.set(config.initialState);
     }
 
-    dispatch(createMiniRxAction(MiniRxActionType.INIT_STORE));
+    dispatch(createMiniRxAction(MiniRxActionType.INIT));
 }
 
 export function addFeature<StateType>(
@@ -163,12 +163,12 @@ export function addFeature<StateType>(
     }
 
     addReducer(featureKey, reducer);
-    dispatch(createMiniRxAction(MiniRxActionType.INIT_FEATURE, featureKey));
+    dispatch(createMiniRxAction(MiniRxActionType.INIT, featureKey));
 }
 
 export function removeFeature(featureKey: string) {
     removeReducer(featureKey);
-    dispatch(createMiniRxAction(MiniRxActionType.DESTROY_FEATURE, featureKey));
+    dispatch(createMiniRxAction(MiniRxActionType.DESTROY, featureKey));
 }
 
 export function effect(effect$: Observable<any> & HasEffectMetadata): void;
