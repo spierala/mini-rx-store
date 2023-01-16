@@ -4,6 +4,7 @@ import { Action, SetStateParam, SetStateReturn, StateOrCallback } from './models
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { State } from './state';
 
+// BaseStore is extended by ComponentStore/FeatureStore
 export abstract class BaseStore<StateType extends object> {
     /**
      * @internal Used by ComponentStore/FeatureStore
@@ -13,6 +14,8 @@ export abstract class BaseStore<StateType extends object> {
      * @internal Used by ComponentStore/FeatureStore
      */
     protected _state = new State<StateType>();
+    /** @deprecated Use the `select` method without arguments */
+    state$: Observable<StateType> = this._state.select();
     get state(): StateType {
         this.assertStateIsInitialized();
         return this._state.get()!;

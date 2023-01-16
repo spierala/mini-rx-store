@@ -98,6 +98,15 @@ describe('ComponentStore', () => {
         expect(getSquareCounterSpy.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
 
+    it('should select component state with the `state$` property', () => {
+        const spy = jest.fn();
+
+        const cs = createComponentStore(counterInitialState);
+        cs.state$.subscribe(spy);
+
+        expect(spy).toHaveBeenCalledWith(counterInitialState);
+    });
+
     it('should dispatch an Action when updating state', () => {
         const cs = createComponentStore(counterInitialState);
 
