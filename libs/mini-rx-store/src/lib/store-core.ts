@@ -25,8 +25,8 @@ export let hasUndoExtension = false;
 let isStoreInitialized = false;
 
 // REDUCER STATE
+// exported for testing purposes
 export const reducerState = new State<{
-    // exported for testing purposes
     featureReducers: ReducerDictionary<AppState>;
     metaReducers: MetaReducer<AppState>[];
     combineReducersFn: CombineReducersFn<AppState>;
@@ -64,8 +64,8 @@ function removeReducer(featureKey: string) {
     }));
 }
 
+// exported for testing purposes
 export function addMetaReducers(...reducers: MetaReducer<AppState>[]) {
-    // exported for testing purposes
     reducerState.patch((state) => ({
         metaReducers: [...state.metaReducers, ...reducers],
     }));
@@ -188,8 +188,8 @@ export function effect(effect$: any): void {
     });
 }
 
+// exported for testing purposes
 export function addExtension(extension: StoreExtension) {
-    // exported for testing purposes
     const metaReducer: MetaReducer<any> | void = extension.init();
 
     if (metaReducer) {

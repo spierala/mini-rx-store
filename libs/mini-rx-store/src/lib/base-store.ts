@@ -37,15 +37,15 @@ export abstract class BaseStore<StateType extends object> {
         stateOrCallback: P,
         name?: string
     ): SetStateReturn<StateType, P> {
-        const dispatch = (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
+        const dispatchFn = (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
             this.assertStateIsInitialized();
             return this._dispatchSetStateAction(stateOrCallback, name);
         };
 
         return (
             isObservable(stateOrCallback)
-                ? this._sub.add(stateOrCallback.subscribe((v) => dispatch(v, name)))
-                : dispatch(stateOrCallback as StateOrCallback<StateType>, name)
+                ? this._sub.add(stateOrCallback.subscribe((v) => dispatchFn(v, name)))
+                : dispatchFn(stateOrCallback as StateOrCallback<StateType>, name)
         ) as SetStateReturn<StateType, P>;
     }
 
