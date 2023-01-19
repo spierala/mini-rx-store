@@ -18,12 +18,14 @@ export class ArtStoreService extends ComponentStore<ArtState> {
     constructor() {
         super(initialState);
 
-        const delayedClear$: Observable<ArtState> = timer(Math.random() * 5000).pipe(
+        const delayedOpacity$: Observable<ArtState> = timer(Math.random() * 5000).pipe(
             take(1),
             map(() => ({ opacity: Math.random() }))
         );
 
-        this.setState(delayedClear$);
+        // You could use JS setTimeout, but that approach would require some cleanup code to cancel the timer when the component destroys
+        // setState with Observable manages cleanup (of subscriptions) internally
+        this.setState(delayedOpacity$);
     }
 
     reset() {
