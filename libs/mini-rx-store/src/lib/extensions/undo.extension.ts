@@ -39,7 +39,7 @@ const defaultBufferSize = 100;
 
 export class UndoExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.UNDO;
-    sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
+    override sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
     hasCsSupport = true as const;
 
     constructor(private config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {

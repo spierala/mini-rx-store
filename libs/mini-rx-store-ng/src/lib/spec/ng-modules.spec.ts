@@ -153,6 +153,8 @@ describe(`Ng Modules`, () => {
     const extensionSpy = jest.fn();
 
     class SomeExtension extends StoreExtension {
+        id = 1; // id does not matter, but it has to be implemented
+
         init(): void {
             extensionSpy();
         }
