@@ -10,6 +10,8 @@ import {
 } from './store-core';
 
 export abstract class Store {
+    // Abstract class for Angular Dependency injection
+    // mini-rx-store itself uses `Store` just as a type (return type of `configureStore`)
     abstract feature<StateType>(
         featureKey: string,
         reducer: Reducer<StateType>,

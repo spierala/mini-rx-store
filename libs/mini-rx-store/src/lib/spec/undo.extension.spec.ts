@@ -15,7 +15,7 @@ import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
 import { undo } from '../actions';
 import { addExtension, addFeature, removeFeature } from '../store-core';
-import { createComponentStore } from 'mini-rx-store';
+import { createComponentStore } from '../component-store';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);

@@ -4,7 +4,7 @@ import { Action, MetaReducer, Reducer } from '../models';
 import { createFeatureSelector } from '../selector';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import { addExtension } from '../store-core';
-import { createComponentStore } from 'mini-rx-store';
+import { createComponentStore } from '../component-store';
 
 // Return a fresh (shallow) copy
 function getCounterInitialState() {

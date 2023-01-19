@@ -25,7 +25,7 @@ export class State<StateType extends object> {
     }
 
     patch(stateOrCallback: StateOrCallback<StateType>) {
-        if (!this.stateSource.value) {
+        if (!this.get()) {
             throw new Error('State is not initialized.');
         }
 

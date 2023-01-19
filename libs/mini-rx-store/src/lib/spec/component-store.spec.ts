@@ -2,13 +2,11 @@ import { _resetConfig, configureComponentStores, createComponentStore } from '..
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import {
-    createComponentStateSelector,
-    createSelector,
-    ImmutableStateExtension,
-    LoggerExtension,
-    UndoExtension,
-} from 'mini-rx-store';
+import { createComponentStateSelector, createSelector } from '../selector';
+import { LoggerExtension } from '../extensions/logger.extension';
+import { ImmutableStateExtension } from '../extensions/immutable-state.extension';
+import { UndoExtension } from '../extensions/undo.extension';
+import { ComponentStoreExtension, ExtensionId, StoreExtension } from '../models';
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
@@ -258,12 +256,15 @@ describe('ComponentStore', () => {
     });
 
     it('should throw when a not supported extension is used', () => {
-        const loggerExtension = new LoggerExtension();
-        // @ts-ignore
-        loggerExtension.hasCsSupport = false;
+        class MyExtension extends StoreExtension {
+            id: ExtensionId = ExtensionId.LOGGER;
+            init(): void {}
+        }
 
         expect(() =>
-            createComponentStore(undefined, { extensions: [loggerExtension] })
+            createComponentStore(undefined, {
+                extensions: [new MyExtension() as ComponentStoreExtension],
+            })
         ).toThrowError(
             '@mini-rx: Extension "LoggerExtension" is not supported by Component Store.'
         );
