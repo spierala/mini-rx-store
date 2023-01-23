@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0...mini-rx-store-ng-4.0.0-alpha.0) (2023-01-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store-ng:** requires mini-rx-store@5
+
+### Features
+
+* **mini-rx-store-ng:** component store module ([61193d5](https://github.com/spierala/mini-rx-store/commit/61193d59f9661861ab6a0fba30cb8146dd1127d7))
+
 ## [3.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-rc.0...mini-rx-store-ng-3.0.0) (2022-10-12)
 
 ## [3.0.0-rc.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-beta.1...mini-rx-store-ng-3.0.0-rc.0) (2022-09-19)
