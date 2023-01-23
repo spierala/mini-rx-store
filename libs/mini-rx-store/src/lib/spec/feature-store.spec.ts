@@ -3,8 +3,6 @@ import { mergeMap, tap } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { createFeatureSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
-import { actions$ } from '../store';
-import StoreCore from '../store-core';
 import {
     counterInitialState,
     counterReducer,
@@ -15,6 +13,7 @@ import {
 } from './_spec-helpers';
 import { Action, Reducer } from '../models';
 import { tapResponse } from '../tap-response';
+import { actions$, addMetaReducers } from '../store-core';
 
 const initialState: UserState = userState;
 
@@ -107,12 +106,6 @@ class CounterFeature extends FeatureStore<CounterState> {
     increment() {
         // Update state using callback
         this.setState((state) => ({ counter: state.counter + 1 }));
-    }
-}
-
-class CounterFeature2 extends FeatureStore<any> {
-    constructor() {
-        super('counterFeature2', {});
     }
 }
 
@@ -328,9 +321,9 @@ describe('FeatureStore', () => {
         userFeature.updateCity('NY');
         expect(spy).toHaveBeenCalledWith(
             expect.objectContaining({
+                setStateActionType: '@mini-rx/feature-store',
                 type: '@mini-rx/user2/set-state/updateCity',
                 stateOrCallback: { city: 'NY' },
-                miniRxActionType: 'set-state',
                 featureId: expect.any(String),
             })
         );
@@ -347,7 +340,7 @@ describe('FeatureStore', () => {
             };
         }
 
-        StoreCore.addMetaReducers(metaReducer);
+        addMetaReducers(metaReducer);
 
         userFeature.updateCity('NY');
         counterFeature.increment();
@@ -403,7 +396,7 @@ describe('FeatureStore', () => {
             expect.not.objectContaining({ tempCounter: counterInitialState })
         );
 
-        expect(actionSpy).toHaveBeenCalledWith({ type: '@mini-rx/tempFsState/destroy-feature' });
+        expect(actionSpy).toHaveBeenCalledWith({ type: '@mini-rx/tempFsState/destroy' });
     });
 
     it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {
@@ -434,26 +427,25 @@ describe('FeatureStore', () => {
 
         const fs1 = new Fs();
         const fs2 = new Fs();
-        const fs3 = new Fs();
-        const fs4 = createFeatureStore(featureKey, counterInitialState, { multi: true }); // Functional creation method should also support multi: true
+        const fs3 = createFeatureStore(featureKey, counterInitialState, { multi: true }); // Functional creation method should also support multi: true
 
         function incrementFs4(): void {
-            fs4.setState((state) => ({ counter: state.counter + 1 }));
+            fs3.setState((state) => ({ counter: state.counter + 1 }));
         }
 
         const spy = jest.fn();
         const spy2 = jest.fn();
         const spy3 = jest.fn();
 
-        const fs2FeatureKey = fs2.featureKey;
+        const fs2FeatureKey = fs1.featureKey;
         const getFs2Feature = createFeatureSelector<CounterState>(fs2FeatureKey);
         const getFs2Counter = createSelector(getFs2Feature, (state) => state?.counter);
 
-        const fs3FeatureKey = fs3.featureKey;
+        const fs3FeatureKey = fs2.featureKey;
         const getFs3Feature = createFeatureSelector<CounterState>(fs3FeatureKey);
         const getFs3Counter = createSelector(getFs3Feature, (state) => state?.counter);
 
-        const fs4FeatureKey = fs4.featureKey;
+        const fs4FeatureKey = fs3.featureKey;
         const getFs4Feature = createFeatureSelector<CounterState>(fs4FeatureKey);
         const getFs4Counter = createSelector(getFs4Feature, (state) => state?.counter);
 
@@ -461,16 +453,16 @@ describe('FeatureStore', () => {
         store.select(getFs3Counter).subscribe(spy2);
         store.select(getFs4Counter).subscribe(spy3);
 
+        fs1.increment();
+
+        fs2.increment();
         fs2.increment();
 
-        fs3.increment();
-        fs3.increment();
-
         incrementFs4();
         incrementFs4();
         incrementFs4();
 
-        fs3.destroy();
+        fs2.destroy();
 
         expect(spy.mock.calls).toEqual([[1], [2]]);
         expect(spy2.mock.calls).toEqual([[1], [2], [3], [undefined]]);

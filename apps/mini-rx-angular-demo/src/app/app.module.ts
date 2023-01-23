@@ -9,11 +9,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { TodosModule } from './modules/todos/todos.module';
 import { CounterModule } from './modules/counter/counter.module';
 import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
-import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
+import {
+    configureComponentStores,
+    ImmutableStateExtension,
+    LoggerExtension,
+    UndoExtension,
+} from 'mini-rx-store';
 import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
+import { PixelArtModule } from './modules/pixel-art/pixel-art.module';
 
 @NgModule({
     imports: [
@@ -38,9 +44,12 @@ import { ToastrModule } from 'ngx-toastr';
             traceLimit: 25,
         }),
         ProductsStateModule,
+        PixelArtModule,
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
     providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
 })
 export class AppModule {}
+
+configureComponentStores({ extensions: [new LoggerExtension()] });

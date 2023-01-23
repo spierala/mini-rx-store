@@ -24,67 +24,64 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, ExtensionSortOrder, Reducer, StoreExtension } from '../models';
-import StoreCore from '../store-core';
-import { miniRxNameSpace } from '../constants';
+import {
+    Action,
+    ExtensionId,
+    ExtensionSortOrder,
+    HasComponentStoreSupport,
+    MetaReducer,
+    Reducer,
+    StoreExtension,
+} from '../models';
+import { UNDO_ACTION } from '../actions';
 
 const defaultBufferSize = 100;
 
-export let isUndoExtensionInitialized: boolean;
-let executedActions: Array<Action> = [];
-let initialState: any;
-let bufferSize: number;
-
-export class UndoExtension extends StoreExtension {
+export class UndoExtension extends StoreExtension implements HasComponentStoreSupport {
+    id = ExtensionId.UNDO;
     override sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
+    hasCsSupport = true as const;
 
-    constructor(config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
+    constructor(private config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
         super();
-
-        bufferSize = config.bufferSize;
     }
 
-    init(): void {
-        StoreCore.addMetaReducers(undoMetaReducer);
-        isUndoExtensionInitialized = true;
+    init(): MetaReducer<any> {
+        return createUndoMetaReducer(this.config.bufferSize);
     }
 }
 
-const UNDO_ACTION = miniRxNameSpace + '/undo';
+function createUndoMetaReducer(bufferSize: number): MetaReducer<any> {
+    let executedActions: Array<Action> = [];
+    let initialState: any;
 
-export function undo(action: Action) {
-    return {
-        type: UNDO_ACTION,
-        payload: action,
-    };
-}
-
-function undoMetaReducer(rootReducer: Reducer<any>): Reducer<any> {
-    return (state: any = {}, action: any) => {
-        if (action.type === UNDO_ACTION) {
-            // if the action is UNDO_ACTION,
-            // then call all the actions again on the rootReducer,
-            // except the one we want to rollback
-            let newState: any = initialState;
-            executedActions = executedActions.filter((eAct) => eAct !== action.payload);
-            // update the state for every action until we get the
-            // exact same state as before, but without the action we want to rollback
-            executedActions.forEach((executedAction) => {
-                newState = rootReducer(newState, executedAction);
-            });
-            return newState;
-        } else {
-            // push every action that isn't UNDO_ACTION
-            executedActions.push(action);
-        }
-        const updatedState = rootReducer(state, action);
-        if (executedActions.length === bufferSize + 1) {
-            const firstAction = executedActions[0];
-            // calculate the state x (buffersize) actions ago
-            initialState = rootReducer(initialState, firstAction);
-            // keep the correct actions
-            executedActions = executedActions.slice(1, bufferSize + 1);
-        }
-        return updatedState;
+    return (rootReducer: Reducer<any>): Reducer<any> => {
+        return (state: any, action: any) => {
+            if (action.type === UNDO_ACTION) {
+                // if the action is UNDO_ACTION,
+                // then call all the actions again on the rootReducer,
+                // except the one we want to rollback
+                let newState: any = initialState;
+                executedActions = executedActions.filter((eAct) => eAct !== action.payload);
+                // update the state for every action until we get the
+                // exact same state as before, but without the action we want to rollback
+                executedActions.forEach((executedAction) => {
+                    newState = rootReducer(newState, executedAction);
+                });
+                return newState;
+            } else {
+                // push every action that isn't UNDO_ACTION
+                executedActions.push(action);
+            }
+            const updatedState = rootReducer(state, action);
+            if (executedActions.length === bufferSize + 1) {
+                const firstAction = executedActions[0];
+                // calculate the state x (bufferSize) actions ago
+                initialState = rootReducer(initialState, firstAction);
+                // keep the correct actions
+                executedActions = executedActions.slice(1, bufferSize + 1);
+            }
+            return updatedState;
+        };
     };
 }

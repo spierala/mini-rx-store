@@ -1,121 +1,117 @@
-import { BehaviorSubject, isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { Action, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
-import StoreCore from './store-core';
-import { generateId, miniRxError, select } from './utils';
-import { isUndoExtensionInitialized, undo } from './extensions/undo.extension';
-import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { createSetStateAction, isSetStateAction } from './actions';
+import { Action, ComponentStoreLike, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
+import { calcNewState, miniRxError } from './utils';
+import {
+    createMiniRxActionType,
+    FeatureStoreSetStateAction,
+    isFeatureStoreSetStateAction,
+    MiniRxActionType,
+    SetStateActionType,
+    undo,
+} from './actions';
+import { BaseStore } from './base-store';
+import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
 
-export class FeatureStore<StateType extends object> {
-    private stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(
-        {} as StateType
-    );
-    state$: Observable<StateType> = this.stateSource.asObservable();
-    get state(): StateType {
-        return this.stateSource.getValue();
-    }
-
-    // tslint:disable-next-line:variable-name
+export class FeatureStore<StateType extends object>
+    extends BaseStore<StateType>
+    implements ComponentStoreLike<StateType>
+{
     private readonly _featureKey: string;
     get featureKey(): string {
         return this._featureKey;
     }
 
-    private sub: Subscription;
     private readonly featureId: string;
 
-    constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
+    constructor(
+        featureKey: string,
+        initialState: StateType | undefined,
+        config: FeatureStoreConfig = {}
+    ) {
+        super();
+
         this.featureId = generateId();
+        this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
 
-        this._featureKey = StoreCore.addFeature<StateType>(
-            featureKey,
-            createFeatureReducer(this.featureId, initialState),
-            config
-        );
-
-        this.sub = StoreCore.select((state) => state[this.featureKey]).subscribe(this.stateSource);
+        if (initialState) {
+            this.setInitialState(initialState);
+        }
     }
 
-    setState(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+    override setInitialState(initialState: StateType): void {
+        super.setInitialState(initialState);
+
+        addFeature<StateType>(
+            this._featureKey,
+            createFeatureStoreReducer(this.featureId, initialState)
+        );
+
+        this._sub.add(
+            appState.select((state) => state[this.featureKey]).subscribe((v) => this._state.set(v))
+        );
+    }
+
+    /** @internal
+     * Implementation of abstract method from BaseStore
+     */
+    _dispatchSetStateAction(
+        stateOrCallback: StateOrCallback<StateType>,
+        name: string | undefined
+    ): Action {
         const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
-
-        StoreCore.dispatch(action);
-
+        dispatch(action);
         return action;
     }
 
-    select(): Observable<StateType>;
-    select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    select(mapFn?: any): Observable<any> {
-        if (!mapFn) {
-            return this.state$;
-        }
-        return this.state$.pipe(select(mapFn));
-    }
-
-    effect<
-        // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
-        ProvidedType = void,
-        // The actual origin$ type, which could be unknown, when not specified
-        OriginType extends Observable<ProvidedType> | unknown = Observable<ProvidedType>,
-        // Unwrapped actual type of the origin$ Observable, after default was applied
-        ObservableType = OriginType extends Observable<infer A> ? A : never,
-        // Return either an empty callback or a function requiring specific types as inputs
-        ReturnType = ProvidedType | ObservableType extends void
-            ? () => void
-            : (observableOrValue: ObservableType | Observable<ObservableType>) => void
-    >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
-        const subject = new Subject<ObservableType>();
-        const effect$ = effectFn(subject as OriginType);
-        const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(effect$);
-
-        this.sub.add(effectWithDefaultErrorHandler.subscribe());
-
-        return ((observableOrValue?: ObservableType | Observable<ObservableType>) => {
-            isObservable(observableOrValue)
-                ? this.sub.add(observableOrValue.subscribe((v) => subject.next(v)))
-                : subject.next(observableOrValue as ObservableType);
-        }) as unknown as ReturnType;
-    }
-
-    undo(action: Action) {
-        isUndoExtensionInitialized
-            ? StoreCore.dispatch(undo(action))
+    // Implementation of abstract method from BaseStore
+    undo(action: Action): void {
+        hasUndoExtension
+            ? dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
 
-    destroy() {
-        this.sub.unsubscribe();
-        StoreCore.removeFeature(this._featureKey);
-    }
-
-    // tslint:disable-next-line:use-lifecycle-interface
-    ngOnDestroy() {
-        this.destroy();
+    override destroy() {
+        super.destroy();
+        removeFeature(this._featureKey);
     }
 }
 
-function createFeatureReducer<StateType>(
+function createFeatureStoreReducer<StateType>(
     featureId: string,
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action): StateType => {
-        if (isSetStateAction<StateType>(action) && action.featureId === featureId) {
-            const stateOrCallback = action.stateOrCallback;
-            const newPartialState =
-                typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
-            return {
-                ...state,
-                ...newPartialState,
-            };
+        if (isFeatureStoreSetStateAction<StateType>(action) && action.featureId === featureId) {
+            return calcNewState(state, action.stateOrCallback);
         }
         return state;
     };
 }
 
+function createSetStateAction<T>(
+    stateOrCallback: StateOrCallback<T>,
+    featureId: string,
+    featureKey: string,
+    name?: string
+): FeatureStoreSetStateAction<T> {
+    const miniRxActionType = MiniRxActionType.SET_STATE;
+    return {
+        setStateActionType: SetStateActionType.FEATURE_STORE,
+        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
+        stateOrCallback,
+        featureId,
+        featureKey,
+    };
+}
+
+// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
+// This isn't a real GUID!
+function generateId() {
+    return Math.random().toString(36).slice(2);
+}
+
 export function createFeatureStore<T extends object>(
     featureKey: string,
-    initialState: T,
+    initialState: T | undefined,
     config: FeatureStoreConfig = {}
 ): FeatureStore<T> {
     return new FeatureStore<T>(featureKey, initialState, config);

@@ -2,12 +2,15 @@ import { Observable, OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import {
     Action,
-    ActionWithPayload,
     AppState,
     EFFECT_METADATA_KEY,
     HasEffectMetadata,
+    MetaReducer,
+    Reducer,
+    StateOrCallback,
+    StoreExtension,
 } from './models';
-import { isSetStateAction, SetStateAction } from './actions';
+import { isComponentStoreSetStateAction, isFeatureStoreSetStateAction } from './actions';
 import { miniRxNameSpace } from './constants';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
@@ -29,35 +32,55 @@ export function miniRxConsoleError(message: string, err: any): void {
     console.error(miniRxNameSpace + ': ' + message + '\nDetails:', err);
 }
 
-/** @internal */
 export function hasEffectMetaData(
     param: Observable<Action>
 ): param is Observable<Action> & HasEffectMetadata {
+    // eslint-disable-next-line no-prototype-builtins
     return param.hasOwnProperty(EFFECT_METADATA_KEY);
 }
 
-// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
-// This isn't a real GUID!
-export function generateId() {
-    return Math.random().toString(36).slice(2);
-}
-
-export function beautifyActionForLogging(action: Action, state: AppState): Action {
-    if (isSetStateAction(action)) {
-        return mapSetStateActionToActionWithPayload(action, state);
+// Calculate the setState callback and remove internal properties (only display type and payload in the LoggingExtension and Redux DevTools)
+export function beautifyActionForLogging(action: Action, state: object): Action {
+    if (isFeatureStoreSetStateAction(action)) {
+        const featureState = (state as AppState)[action.featureKey];
+        return {
+            type: action.type,
+            payload: calcNewPartialState(featureState, action.stateOrCallback),
+        };
+    } else if (isComponentStoreSetStateAction(action)) {
+        return {
+            type: action.type,
+            payload: calcNewPartialState(state, action.stateOrCallback),
+        };
     }
     return action;
 }
 
-function mapSetStateActionToActionWithPayload(
-    action: SetStateAction<any>,
-    state: AppState
-): ActionWithPayload {
-    const stateOrCallback = action.stateOrCallback;
-    const featureState = state[action.featureKey];
+function calcNewPartialState<T>(state: T, stateOrCallback: StateOrCallback<T>): Partial<T> {
+    return typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
+}
+
+export function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
+    const newPartialState = calcNewPartialState(state, stateOrCallback);
     return {
-        type: action.type,
-        payload:
-            typeof stateOrCallback === 'function' ? stateOrCallback(featureState) : stateOrCallback,
+        ...state,
+        ...newPartialState,
     };
+}
+
+export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaReducer<T> {
+    return (reducer: Reducer<any>): Reducer<T> => {
+        return metaReducers.reduceRight(
+            (previousValue: Reducer<T>, currentValue: MetaReducer<T>) => {
+                return currentValue(previousValue);
+            },
+            reducer
+        );
+    };
+}
+
+export function sortExtensions<T extends StoreExtension>(extensions: T[]): T[] {
+    return [...extensions].sort((a, b) => {
+        return a.sortOrder - b.sortOrder;
+    });
 }

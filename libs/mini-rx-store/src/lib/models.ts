@@ -10,10 +10,30 @@ export const enum ExtensionSortOrder {
 
 export type AppState = Record<string, any>;
 
+export const enum ExtensionId {
+    IMMUTABLE_STATE,
+    UNDO,
+    LOGGER,
+    REDUX_DEVTOOLS,
+}
+
 export abstract class StoreExtension {
+    abstract id: ExtensionId;
     sortOrder: ExtensionSortOrder = ExtensionSortOrder.DEFAULT;
 
-    abstract init(): void;
+    abstract init(): MetaReducer<any> | void;
+}
+
+export interface HasComponentStoreSupport {
+    hasCsSupport: true;
+
+    init(): MetaReducer<any>;
+}
+
+export type ComponentStoreExtension = StoreExtension & HasComponentStoreSupport;
+
+export interface ComponentStoreConfig {
+    extensions: ComponentStoreExtension[];
 }
 
 export interface Action {
@@ -73,4 +93,19 @@ export interface EffectConfig {
 
 export interface HasEffectMetadata {
     [EFFECT_METADATA_KEY]: EffectConfig;
+}
+
+export type SetStateParam<T> = StateOrCallback<T> | Observable<Partial<T>>;
+export type SetStateReturn<T, P extends SetStateParam<T>> = P extends Observable<Partial<T>>
+    ? void
+    : Action;
+
+export interface ComponentStoreLike<StateType> {
+    setInitialState(initialState: StateType): void;
+    setState(stateOrCallback: SetStateParam<StateType>, name?: string): void;
+    get state(): StateType;
+    select(mapFn?: any): Observable<any>;
+    effect(effectFn: (origin$: Observable<any>) => Observable<any>): () => void;
+    undo(action: Action): void;
+    destroy(): void;
 }

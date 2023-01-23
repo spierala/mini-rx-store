@@ -1,7 +1,8 @@
 import { counterReducer, resetStoreConfig, userState } from './_spec-helpers';
-import StoreCore from '../store-core';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createFeatureStore } from '../feature-store';
+import { addFeature, configureStore, dispatch } from '../store-core';
+import { createComponentStore } from '../component-store';
 
 describe('LoggerExtension', () => {
     console.log = jest.fn();
@@ -9,17 +10,17 @@ describe('LoggerExtension', () => {
     beforeEach(() => {
         resetStoreConfig();
 
-        StoreCore.config({
+        configureStore({
             extensions: [new LoggerExtension()],
         });
     });
 
     it('should log a dispatched Action', () => {
-        StoreCore.addFeature('counter', counterReducer);
+        addFeature('counter', counterReducer);
 
         const action = { type: 'counter' };
 
-        StoreCore.dispatch(action);
+        dispatch(action);
 
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining('counter'),
@@ -54,6 +55,46 @@ describe('LoggerExtension', () => {
                     ...userState,
                     firstName: 'Cage',
                 },
+            }
+        );
+    });
+});
+
+describe('LoggerExtension with ComponentStore', () => {
+    it('should log a SetStateAction with only type and payload', () => {
+        console.log = jest.fn();
+
+        const cs = createComponentStore(userState, { extensions: [new LoggerExtension()] });
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('@mini-rx/component-store/init'),
+            expect.stringContaining('color: #25c2a0'),
+            expect.stringContaining('Action:'),
+            {
+                type: '@mini-rx/component-store/init',
+            },
+            expect.stringContaining('State:'),
+            userState
+        );
+
+        cs.setState((state) => ({
+            firstName: 'Cage',
+        }));
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('@mini-rx/component-store/set-state'),
+            expect.stringContaining('color: #25c2a0'),
+            expect.stringContaining('Action:'),
+            {
+                type: '@mini-rx/component-store/set-state',
+                payload: {
+                    firstName: 'Cage',
+                },
+            },
+            expect.stringContaining('State: '),
+            {
+                ...userState,
+                firstName: 'Cage',
             }
         );
     });
