@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [5.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.2.0...mini-rx-store-5.0.0-alpha.0) (2023-01-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store:** configureStore does not return a Store instance, it returns an object
+
+### Features
+
+* **mini-rx-store:** component store ([50bb452](https://github.com/spierala/mini-rx-store/commit/50bb452a8beb1323323721c829cc7dfc42b4b100))
+* **mini-rx-store:** lazy state initialisation (setInitialState),
+* **mini-rx-store:** setState with Observable
+* **mini-rx-store:** more tree-shakable
+
 ## [4.2.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.1.0...mini-rx-store-4.2.0) (2022-11-24)
 
 
