@@ -30,7 +30,7 @@ export function _resetConfig() {
     componentStoreConfig = undefined;
 }
 
-export function configureComponentStores(config: { extensions: ComponentStoreExtension[] }) {
+export function configureComponentStores(config: ComponentStoreConfig) {
     if (!componentStoreConfig) {
         componentStoreConfig = config;
         return;

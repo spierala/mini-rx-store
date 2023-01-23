@@ -8,13 +8,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { TodosModule } from './modules/todos/todos.module';
 import { CounterModule } from './modules/counter/counter.module';
-import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
-import {
-    configureComponentStores,
-    ImmutableStateExtension,
-    LoggerExtension,
-    UndoExtension,
-} from 'mini-rx-store';
+import { StoreDevtoolsModule, StoreModule, ComponentStoreModule } from 'mini-rx-store-ng';
+import { ImmutableStateExtension, LoggerExtension, UndoExtension } from 'mini-rx-store';
 import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
@@ -32,8 +27,14 @@ import { PixelArtModule } from './modules/pixel-art/pixel-art.module';
         TodosModule,
         CounterModule,
         UserModule,
+        // TODO exclude extensions (ImmutableStateExtension, LoggerExtension) from production: https://ngrx.io/guide/store-devtools/recipes/exclude
         StoreModule.forRoot({
             extensions: [new ImmutableStateExtension(), new UndoExtension(), new LoggerExtension()],
+        }),
+        ComponentStoreModule.forRoot({
+            extensions: [
+                // new LoggerExtension()
+            ],
         }),
         // TODO exclude from production: https://ngrx.io/guide/store-devtools/recipes/exclude
         StoreDevtoolsModule.instrument({
@@ -51,5 +52,3 @@ import { PixelArtModule } from './modules/pixel-art/pixel-art.module';
     providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
 })
 export class AppModule {}
-
-configureComponentStores({ extensions: [new LoggerExtension()] });
