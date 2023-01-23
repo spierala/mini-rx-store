@@ -3,17 +3,23 @@ import { StoreModule } from '../store.module';
 import {
     Action,
     Actions,
+    configureComponentStores,
+    createComponentStore,
     createEffect,
     FeatureStore,
+    ImmutableStateExtension,
+    LoggerExtension,
     ofType,
     Reducer,
     Store,
     StoreExtension,
+    UndoExtension,
 } from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { EffectsModule } from '../effects.module';
+import { ComponentStoreModule } from 'mini-rx-store-ng';
 
 export const loadAction: Action = {
     type: 'LOAD',
@@ -137,6 +143,8 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 }
 
+const globalCsExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
+
 describe(`Ng Modules`, () => {
     let actions$: Actions;
     let store: Store;
@@ -176,6 +184,9 @@ describe(`Ng Modules`, () => {
                     extensions: [new SomeExtension()],
                 }),
                 Counter5Module,
+                ComponentStoreModule.forRoot({
+                    extensions: globalCsExtensions,
+                }),
             ],
         });
 
@@ -280,6 +291,21 @@ describe(`Ng Modules`, () => {
                 counter4: { counter: 2 },
                 counter5: { counter: 556 },
             });
+        });
+    });
+
+    describe(`ComponentStore`, () => {
+        // Just make sure that the global config is set via the ComponentStoreModule.forRoot static method
+        // For the other aspects of the config we can rely on the ComponentStore tests
+
+        it('should merge global config with local config', () => {
+            const localCsExtensions = [new UndoExtension()];
+
+            const cs = createComponentStore(undefined, { extensions: localCsExtensions });
+
+            expect(cs['extensions'][0]).toBe(localCsExtensions[0]);
+            expect(cs['extensions'][1]).toBe(globalCsExtensions[0]);
+            expect(cs['extensions'][2]).toBe(globalCsExtensions[1]);
         });
     });
 });
