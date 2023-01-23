@@ -258,6 +258,7 @@ describe('ComponentStore', () => {
     it('should throw when a not supported extension is used', () => {
         class MyExtension extends StoreExtension {
             id: ExtensionId = ExtensionId.LOGGER;
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             init(): void {}
         }
 
@@ -265,9 +266,7 @@ describe('ComponentStore', () => {
             createComponentStore(undefined, {
                 extensions: [new MyExtension() as ComponentStoreExtension],
             })
-        ).toThrowError(
-            '@mini-rx: Extension "LoggerExtension" is not supported by Component Store.'
-        );
+        ).toThrowError('@mini-rx: Extension "MyExtension" is not supported by Component Store.');
     });
 
     describe('Extensions', () => {
