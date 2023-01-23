@@ -8,37 +8,43 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Store 4
+# MiniRx Store 5 (alpha)
 
-MiniRx Store 4 has been released!
+MiniRx Store 5 (alpha) has been released (2023-01-23)!
 
 What's new?
 
-- Refactor to [Nx](https://nx.dev/)
-- Even more lightweight
-- `tapResponse` operator (handle API response in `FeatureStore.effect`)
-- `mapResponse` operator (handle API response in Redux Effects)
-- Allow many Feature Store instances with the same feature key using the `multi: true` config
-- `FeatureStore.effect`: the returned function accepts also an Observable as argument
-- `createEffect` can be used to create non-dispatching effects (using the `dispatch: false` config)
-- Many more internal improvements
+- **Component Store**: 
+  - Manage state independently of the global state object (which is used by Store and Feature Store)
+  - Component Store and Feature Store share the same API (`setState`, `select`, `effect`...)
+  - Component Store is perfect for managing smaller and local state (most times that is Component state)
+  - You can use most of the MiniRx extensions: Logger Extension, Undo Extension and Immutable Extension
+  - Component Store extensions can be configured globally or individually for each store 
+- **Tree-shakable**: even more lightweight!
+- **Lazy state initialisation** with `setInitialState`
+- **`setState` accepts also an Observable**: use an Observable to update state
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
 
 #### Angular Integration (mini-rx-store-ng)
-- Full Ivy support in Angular
-- BREAKING CHANGE: `createEffect` **must** be used for creating effects which are registered via the EffectsModule
+- `ComponentStoreModule`: Configure ComponentStore extensions globally with the `forRoot` static method
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/CHANGELOG.md) of the Angular Integration.
 
-## Installation
-`npm i mini-rx-store@4`
+### Installation
+`npm i mini-rx-store@5@alpha`
 
 Install the Angular Integration if you are using Angular:
 
-`npm i mini-rx-store-ng@3`
+`npm i mini-rx-store-ng@4@alpha`
 
 The Angular Integration requires now Angular@12.
+
+### Final todos until the major release
+
+- Update documentation
+- Deploy the Angular Demo to https://angular-demo.mini-rx.io
+- Update the Svelte Demo and deploy to https://svelte-demo.mini-rx.io/
 
 # MiniRx Store
 
@@ -242,6 +248,9 @@ More about MiniRx:
 ## Blog Posts:
 - [Introducing MiniRx - Scalable reactive state management](https://dev.to/spierala/introducing-minirx-scalable-reactive-state-management-d7)
 - [MiniRx Feature Store vs. NgRx Component Store vs. Akita](https://dev.to/this-is-angular/minirx-feature-store-vs-ngrx-component-store-vs-akita-4983)
+
+## Community
+- [MiniRx on Mastodon](https://mas.to/@spierala/tagged/MiniRx)
 
 ## References
 These projects, articles and courses helped and inspired us to create MiniRx:
