@@ -23,19 +23,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, Reducer, StoreExtension } from '../models';
-import StoreCore from '../store-core';
+import {
+    Action,
+    ExtensionId,
+    HasComponentStoreSupport,
+    MetaReducer,
+    Reducer,
+    StoreExtension,
+} from '../models';
 import { deepFreeze } from '../deep-freeze';
 
-export class ImmutableStateExtension extends StoreExtension {
-    init(): void {
-        StoreCore.addMetaReducers(storeFreeze);
+export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
+    id = ExtensionId.IMMUTABLE_STATE;
+    hasCsSupport = true as const;
+
+    init(): MetaReducer<any> {
+        return storeFreeze;
     }
 }
 
-export function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return (state = {}, action: Action) => {
-        deepFreeze(state);
+function storeFreeze(reducer: Reducer<any>): Reducer<any> {
+    return (state, action: Action) => {
+        if (state) {
+            deepFreeze(state);
+        }
         const nextState = reducer(state, action);
         deepFreeze(nextState);
         return nextState;

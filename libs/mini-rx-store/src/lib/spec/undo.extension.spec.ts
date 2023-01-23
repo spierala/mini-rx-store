@@ -10,10 +10,12 @@ import {
     resetStoreConfig,
     store,
 } from './_spec-helpers';
-import { undo, UndoExtension } from '../extensions/undo.extension';
+import { UndoExtension } from '../extensions/undo.extension';
 import { FeatureStore } from '../feature-store';
 import { Observable } from 'rxjs';
-import StoreCore from '../store-core';
+import { undo } from '../actions';
+import { addExtension, addFeature, removeFeature } from '../store-core';
+import { createComponentStore } from '../component-store';
 
 class MyFeatureStore extends FeatureStore<CounterStringState> {
     count$: Observable<string> = this.select((state) => state.counter);
@@ -49,7 +51,7 @@ describe('Undo Extension', () => {
     describe('FeatureStore', () => {
         beforeEach(() => {
             resetStoreConfig();
-            StoreCore.addExtension(new UndoExtension());
+            addExtension(new UndoExtension());
         });
 
         it('should throw if Undo Extension is not added', () => {
@@ -57,7 +59,7 @@ describe('Undo Extension', () => {
             expect(featureStore.undoLastAction).toThrow();
         });
 
-        it('should undo dispatched actions', () => {
+        it('should undo dispatched (setState) actions', () => {
             const featureStore: MyFeatureStore = new MyFeatureStore();
             const counterSpy = jest.fn();
             featureStore.count$.subscribe(counterSpy);
@@ -150,10 +152,46 @@ describe('Undo Extension', () => {
         });
     });
 
+    describe('ComponentStore', () => {
+        it('should throw if Undo Extension is not added', () => {
+            const cs = createComponentStore();
+            expect(cs.undo).toThrow();
+        });
+
+        it('should undo dispatched (setState) actions', () => {
+            const cs = createComponentStore(counterStringInitialState, {
+                extensions: [new UndoExtension()],
+            });
+
+            const addNumberToCounterString = (v: string) =>
+                cs.setState((state) => ({ counter: state.counter + v }));
+
+            const subscribeCallback = jest.fn<void, [string]>();
+
+            cs.select((state) => state.counter).subscribe(subscribeCallback);
+
+            addNumberToCounterString('2');
+            const actionToUndo = addNumberToCounterString('3');
+            addNumberToCounterString('4');
+            addNumberToCounterString('5');
+
+            cs.undo(actionToUndo);
+
+            expect(subscribeCallback.mock.calls).toEqual([
+                ['1'],
+                ['12'],
+                ['123'],
+                ['1234'],
+                ['12345'],
+                ['1245'], // '3' has been removed
+            ]);
+        });
+    });
+
     describe('Store Feature', () => {
         beforeEach(() => {
             resetStoreConfig();
-            StoreCore.addExtension(new UndoExtension());
+            addExtension(new UndoExtension());
         });
 
         it('should undo dispatched actions', () => {
@@ -204,8 +242,8 @@ describe('Undo Extension', () => {
         });
 
         it('should not affect removed feature states / reducers', () => {
-            StoreCore.addFeature<CounterState>('tempCounter1', counterReducer);
-            StoreCore.addFeature<CounterState>('tempCounter2', counterReducer);
+            addFeature<CounterState>('tempCounter1', counterReducer);
+            addFeature<CounterState>('tempCounter2', counterReducer);
 
             const spy = jest.fn();
 
@@ -235,7 +273,7 @@ describe('Undo Extension', () => {
 
             spy.mockReset();
 
-            StoreCore.removeFeature('tempCounter2');
+            removeFeature('tempCounter2');
             store.dispatch(undo(counterAction));
             expect(spy).toHaveBeenCalledWith(
                 expect.objectContaining({ tempCounter1: counterInitialState })

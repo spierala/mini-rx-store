@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 import { Observable } from 'rxjs';
-import { EFFECT_METADATA_KEY, HasEffectMetadata, EffectConfig, Action } from './models';
+import { Action, EFFECT_METADATA_KEY, EffectConfig, HasEffectMetadata } from './models';
 
 const DEFAULT_EFFECT_CONFIG: Readonly<Required<EffectConfig>> = {
     dispatch: true,

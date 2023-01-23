@@ -1,14 +1,14 @@
-import { actions$, configureStore } from '../store';
-import StoreCore from '../store-core';
+import { configureStore, Store } from '../store';
 import {
     Action,
     ActionWithPayload,
     AppState,
+    ExtensionId,
     Reducer,
     ReducerDictionary,
     StoreExtension,
 } from '../models';
-import { createFeatureSelector, createSelector } from '../selector';
+import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
 import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
@@ -23,8 +23,10 @@ import {
     store,
 } from './_spec-helpers';
 import { LoggerExtension } from '../extensions/logger.extension';
-import { createEffect } from 'mini-rx-store';
+import { createEffect } from '../create-effect';
 import { combineReducers } from '../combine-reducers';
+import * as StoreCore from '../store-core';
+import { actions$ } from '../store-core';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -90,13 +92,13 @@ function userReducer(state: UserState = userInitialState, action: ActionWithPayl
     }
 }
 
-const getUserFeatureState = createFeatureSelector<UserState>('user');
+const getUserFeatureState = createFeatureStateSelector<UserState>('user');
 const getFirstName = createSelector(getUserFeatureState, (user) => user.firstName);
 const getAge = createSelector(getUserFeatureState, (user) => user.age);
 
-const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
+const getCounterFeatureState = createFeatureStateSelector<CounterState>('counter');
 const getCounter1 = createSelector(getCounterFeatureState, (state) => state.counter);
-const getCounter2FeatureState = createFeatureSelector<CounterState>('counter2');
+const getCounter2FeatureState = createFeatureStateSelector<CounterState>('counter2');
 const getCounter2 = createSelector(getCounter2FeatureState, (state) => state.counter);
 
 class CounterFeatureState extends FeatureStore<CounterState> {
@@ -109,7 +111,7 @@ class CounterFeatureState extends FeatureStore<CounterState> {
     }
 }
 
-const getCounter3FeatureState = createFeatureSelector<CounterState>('counter3');
+const getCounter3FeatureState = createFeatureStateSelector<CounterState>('counter3');
 const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
 
 describe('Store Config', () => {
@@ -127,12 +129,12 @@ describe('Store Config', () => {
     it('should dispatch an initial action', () => {
         const spy = jest.fn();
         actions$.subscribe(spy);
-        StoreCore.config();
-        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/init-store' });
+        StoreCore.configureStore();
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/init' });
     });
 
     it('should initialize the store with an empty object when root reducers have no initial state', () => {
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: {
                 test: (state) => {
                     return state;
@@ -147,7 +149,7 @@ describe('Store Config', () => {
     });
 
     it('should initialize a Feature state with a root reducer', () => {
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: { user: userReducer },
         });
 
@@ -163,7 +165,7 @@ describe('Store Config', () => {
             user: { name: 'Nicolas' },
         };
 
-        StoreCore.config({
+        StoreCore.configureStore({
             initialState: rootInitialState,
             reducers: {
                 user: userReducer,
@@ -182,7 +184,7 @@ describe('Store Config', () => {
 
     it('should throw when calling Store.config after a Feature Store was initialized', () => {
         createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
-        expect(() => StoreCore.config({})).toThrowError(
+        expect(() => StoreCore.configureStore({})).toThrowError(
             '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
         );
     });
@@ -203,7 +205,7 @@ describe('Store Config', () => {
                 };
             }
 
-            StoreCore.config({
+            StoreCore.configureStore({
                 metaReducers: [rootMetaReducer1],
                 initialState: rootInitialState,
             });
@@ -228,7 +230,7 @@ describe('Store Config', () => {
                 };
             }
 
-            StoreCore.config({
+            StoreCore.configureStore({
                 metaReducers: [rootMetaReducer1, rootMetaReducer2],
             });
 
@@ -246,6 +248,8 @@ describe('Store Config', () => {
             }
 
             class Extension extends StoreExtension {
+                id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension);
                 }
@@ -259,7 +263,8 @@ describe('Store Config', () => {
             }
 
             class Extension2 extends StoreExtension {
-                override sortOrder = 100;
+                id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+                sortOrder = 100;
 
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension2);
@@ -274,12 +279,14 @@ describe('Store Config', () => {
             }
 
             class Extension3 extends StoreExtension {
+                id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+
                 init(): void {
                     StoreCore.addMetaReducers(rootMetaReducerForExtension3);
                 }
             }
 
-            StoreCore.config({
+            StoreCore.configureStore({
                 extensions: [new Extension(), new Extension2(), new Extension3()],
             });
 
@@ -307,12 +314,14 @@ describe('Store Config', () => {
                 }
 
                 class Extension extends StoreExtension {
+                    id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
+
                     init(): void {
                         StoreCore.addMetaReducers(rootMetaReducerForExtension);
                     }
                 }
 
-                function aFeatureReducer(state: string = 'a', action: Action): string {
+                function aFeatureReducer(state = 'a', action: Action): string {
                     switch (action.type) {
                         case 'metaTest':
                             return state + 'e';
@@ -367,9 +376,9 @@ describe('Store Config', () => {
                     };
                 }
 
-                const getMetaTestFeature = createFeatureSelector<string>('metaTestFeature');
+                const getMetaTestFeature = createFeatureStateSelector<string>('metaTestFeature');
 
-                StoreCore.config({
+                StoreCore.configureStore({
                     metaReducers: [rootMetaReducer1, inTheMiddleRootMetaReducer, rootMetaReducer2],
                     extensions: [new Extension()],
                 });
@@ -379,7 +388,7 @@ describe('Store Config', () => {
                 });
 
                 const spy = jest.fn();
-                StoreCore.select(getMetaTestFeature).subscribe(spy);
+                StoreCore.appState.select(getMetaTestFeature).subscribe(spy);
                 StoreCore.dispatch({ type: 'metaTest' });
                 expect(spy).toHaveBeenCalledWith('abcxde');
             }
@@ -404,7 +413,7 @@ describe('Store Config', () => {
             return combineReducers(reducers);
         }
 
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: { user: userReducer },
             combineReducersFn: customCombineReducers,
         });
@@ -421,7 +430,7 @@ describe('Store', () => {
     beforeAll(() => {
         resetStoreConfig();
 
-        StoreCore.config({
+        StoreCore.configureStore({
             reducers: { user: userReducer },
         });
     });
@@ -448,7 +457,7 @@ describe('Store', () => {
 
         store.feature('oneMoreFeature3', (state) => state);
 
-        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init-feature' });
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init' });
     });
 
     it('should update the Feature state', () => {
@@ -481,7 +490,7 @@ describe('Store', () => {
     });
 
     it('should return undefined if feature does not exist yet', () => {
-        const featureSelector = createFeatureSelector('notExistingFeature');
+        const featureSelector = createFeatureStateSelector('notExistingFeature');
 
         const spy = jest.fn();
         store.select(featureSelector).subscribe(spy);
@@ -619,7 +628,6 @@ describe('Store', () => {
         const spy = jest.spyOn(StoreCore, 'addExtension');
         StoreCore.addExtension(new ReduxDevtoolsExtension({}));
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(StoreCore['extensions'].length).toBe(2);
     });
 
     it('should call the reducer before running the effect', () => {
@@ -855,7 +863,7 @@ describe('Store', () => {
 });
 
 describe('Store Feature MetaReducers', () => {
-    const getMetaTestFeature = createFeatureSelector<CounterStringState>('metaTestFeature2');
+    const getMetaTestFeature = createFeatureStateSelector<CounterStringState>('metaTestFeature2');
     const getCount = createSelector(getMetaTestFeature, (state) => state.count);
 
     interface CounterStringState {
@@ -921,7 +929,7 @@ describe('Store Feature MetaReducers', () => {
         });
 
         const spy = jest.fn();
-        StoreCore.select(getCount).subscribe(spy);
+        StoreCore.appState.select(getCount).subscribe(spy);
         StoreCore.dispatch({ type: 'metaTest2' });
         expect(spy).toHaveBeenCalledWith('0');
         expect(spy).toHaveBeenCalledWith('0123');

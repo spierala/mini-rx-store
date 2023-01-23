@@ -1,46 +1,40 @@
-import { StateOrCallback, Action } from './models';
+import { Action, StateOrCallback } from './models';
 import { miniRxNameSpace } from './constants';
 
 export const enum MiniRxActionType {
-    INIT_STORE = 'init-store',
-    INIT_FEATURE = 'init-feature',
-    DESTROY_FEATURE = 'destroy-feature',
+    INIT = 'init',
+    DESTROY = 'destroy',
     SET_STATE = 'set-state',
 }
 
-export interface SetStateAction<T> {
-    type: string; // The action type visible in DevTools / Logging Extension (really only for logging!)
-    stateOrCallback: StateOrCallback<T>; // Used in feature reducer to calc new state
-    featureId: string; // Links the feature reducer to its corresponding FeatureStore
-    featureKey: string; // Used in DevTools / Logging Extension to calculate the action payload (see `mapSetStateActionToActionWithPayload`)
-    miniRxActionType: MiniRxActionType; // Used for `isSetStateAction` type predicate
+export const enum SetStateActionType {
+    FEATURE_STORE = '@mini-rx/feature-store',
+    COMPONENT_STORE = '@mini-rx/component-store',
 }
 
-function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
+export interface FeatureStoreSetStateAction<T> {
+    setStateActionType: SetStateActionType.FEATURE_STORE; // Used for type predicate `isFeatureStoreSetStateAction`
+    stateOrCallback: StateOrCallback<T>; // Used in feature reducer to calc new state
+    type: string; // The action type visible in DevTools / Logging Extension (really only for logging!)
+    featureId: string; // Links the feature reducer to its corresponding FeatureStore
+    featureKey: string; // Used in Redux DevTools / Logging Extension to calculate the action payload (see `beautifyActionForLogging`)
+}
+
+export interface ComponentStoreSetStateAction<T> {
+    setStateActionType: SetStateActionType.COMPONENT_STORE; // Used for type predicate `isComponentStoreSetStateAction`
+    stateOrCallback: StateOrCallback<T>; // Used in component store reducer to calc new state
+    type: string; // The action type visible in DevTools / Logging Extension (really only for logging!)
+}
+
+// Union type
+export type SetStateAction<T> = FeatureStoreSetStateAction<T> | ComponentStoreSetStateAction<T>;
+
+export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
     return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
 }
 
-export function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    featureId: string,
-    featureKey: string,
-    name?: string
-): SetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
-    return {
-        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-        featureId,
-        featureKey,
-        miniRxActionType,
-    };
-}
-
 export function createMiniRxAction(
-    miniRxActionType:
-        | MiniRxActionType.INIT_STORE
-        | MiniRxActionType.INIT_FEATURE
-        | MiniRxActionType.DESTROY_FEATURE,
+    miniRxActionType: MiniRxActionType.INIT | MiniRxActionType.DESTROY,
     featureKey?: string
 ): Action {
     return {
@@ -48,10 +42,26 @@ export function createMiniRxAction(
     };
 }
 
-const key: keyof SetStateAction<any> = 'miniRxActionType';
-const type: MiniRxActionType = MiniRxActionType.SET_STATE;
+const setStateActionTypeKey: keyof SetStateAction<any> = 'setStateActionType';
 
 // Type predicate
-export function isSetStateAction<T>(action: Action): action is SetStateAction<T> {
-    return action[key] === type;
+export function isFeatureStoreSetStateAction<StateType>(
+    action: Action
+): action is FeatureStoreSetStateAction<StateType> {
+    return action[setStateActionTypeKey] === SetStateActionType.FEATURE_STORE;
+}
+
+export function isComponentStoreSetStateAction<StateType>(
+    action: Action
+): action is ComponentStoreSetStateAction<StateType> {
+    return action[setStateActionTypeKey] === SetStateActionType.COMPONENT_STORE;
+}
+
+export const UNDO_ACTION = miniRxNameSpace + '/undo';
+
+export function undo(action: Action) {
+    return {
+        type: UNDO_ACTION,
+        payload: action,
+    };
 }

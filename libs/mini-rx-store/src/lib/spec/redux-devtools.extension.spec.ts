@@ -1,4 +1,3 @@
-import StoreCore from '../store-core';
 import {
     ReduxDevtoolsExtension,
     ReduxDevtoolsOptions,
@@ -6,6 +5,7 @@ import {
 import { Action } from '../models';
 import { counterReducer, CounterState, store, userState, UserState } from './_spec-helpers';
 import { createFeatureStore, FeatureStore } from '../feature-store';
+import { addExtension, appState } from '../store-core';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
@@ -51,7 +51,7 @@ describe('Redux Dev Tools', () => {
         };
 
         extension = new ReduxDevtoolsExtension(options);
-        StoreCore.addExtension(extension);
+        addExtension(extension);
 
         expect(connectFn).toHaveBeenCalledTimes(1);
         expect(connectFn).toHaveBeenCalledWith(options);
@@ -98,7 +98,7 @@ describe('Redux Dev Tools', () => {
     });
 
     it('should update the Store state', () => {
-        const spy = jest.spyOn(StoreCore, 'updateState');
+        const spy = jest.spyOn(appState, 'set');
 
         extension['onDevToolsMessage']({
             type: 'DISPATCH',

@@ -107,16 +107,22 @@ export function createSelector(...args: any[]): Selector<any, any> {
     });
 }
 
+/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
 export function createFeatureSelector<T>(featureKey?: string): Selector<object, T>;
+/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
 export function createFeatureSelector<T, V>(featureKey: keyof T): Selector<T, V>;
+/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
 export function createFeatureSelector(featureKey?: any): Selector<any, any> {
-    return createSelector(
-        (state: any) => {
-            if (featureKey) {
-                return state[featureKey];
-            }
-            return state;
-        },
-        (featureState) => featureState
-    );
+    if (featureKey) {
+        return createSelector(
+            (state: any) => state[featureKey],
+            (featureState) => featureState
+        );
+    }
+    return (state) => state; // Do not memoize: when used with FeatureStore there is a new state object created for every `setState`
+}
+
+export const createFeatureStateSelector = createFeatureSelector;
+export function createComponentStateSelector<T>(): Selector<T, T> {
+    return (state: T) => state;
 }
