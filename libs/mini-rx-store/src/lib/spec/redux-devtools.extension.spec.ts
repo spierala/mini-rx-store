@@ -28,7 +28,7 @@ const connectFn = jest.fn().mockImplementation(() => {
 
 let fs: FeatureStore<UserState>;
 
-describe('Redux Dev Tools', () => {
+describe('Redux DevTools', () => {
     beforeAll(() => {
         store.feature<CounterState>('devToolsCounter', counterReducer);
         fs = createFeatureStore('user', userState);

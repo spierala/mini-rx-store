@@ -19,8 +19,13 @@ export interface ReduxDevtoolsOptions {
 export class ReduxDevtoolsExtension extends StoreExtension {
     id = ExtensionId.REDUX_DEVTOOLS;
 
-    private devtoolsExtension: any;
+    private readonly devtoolsExtension: any;
     private devtoolsConnection: any;
+    private readonly _optionsForNgExtension: Partial<ReduxDevtoolsOptions>;
+
+    get optionsForNgExtension(): Partial<ReduxDevtoolsOptions> {
+        return this._optionsForNgExtension;
+    }
 
     constructor(private readonly options: Partial<ReduxDevtoolsOptions>) {
         super();
@@ -28,6 +33,8 @@ export class ReduxDevtoolsExtension extends StoreExtension {
         if (!window) {
             miniRxError('The Redux DevTools are only supported in browser environments.');
         }
+
+        this._optionsForNgExtension = options;
 
         this.devtoolsExtension = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
 
