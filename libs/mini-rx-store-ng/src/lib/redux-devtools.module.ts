@@ -1,4 +1,5 @@
 // Inspired by: Akita: https://github.com/datorama/akita/blob/master/libs/akita-ng-devtools/src/lib/ng-devtools.module.ts)
+// TODO remove in one of the coming major versions
 
 import {
     APP_INITIALIZER,
@@ -35,7 +36,9 @@ export function init(devtoolsService: NgReduxDevtoolsService) {
 }
 
 @NgModule()
+/** @deprecated Use the normal `ReduxDevtoolsExtension` from mini-rx-store with the `StoreModule.forRoot` config */
 export class StoreDevtoolsModule {
+    /** @deprecated Use the normal `ReduxDevtoolsExtension` from mini-rx-store with the `StoreModule.forRoot` config */
     static instrument(
         config: Partial<ReduxDevtoolsOptions> = {}
     ): ModuleWithProviders<StoreDevtoolsModule> {
