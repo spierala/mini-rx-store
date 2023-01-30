@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Todo } from '../../../todos-shared/models/todo';
 import { map } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { TodosSimpleStore } from '../../state/todos-simple-store.service';
 @Component({
     templateUrl: './todos-simple-shell.component.html',
     styleUrls: ['./todos-simple-shell.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TodosSimpleShellComponent {
     todosDone$: Observable<Todo[]> = this.todosSimpleStore.todosDone$;
