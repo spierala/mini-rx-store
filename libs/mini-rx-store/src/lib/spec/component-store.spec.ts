@@ -130,6 +130,31 @@ describe('ComponentStore', () => {
             stateOrCallback: setStateCallback,
         });
         expect(spy).toHaveBeenCalledTimes(1);
+
+        spy.mockReset();
+
+        // With setState name (when passing an Observable to setState)
+        cs.setState(of(1, 2).pipe(map((v) => ({ counter: v }))), 'updateCounterFromObservable');
+        expect(spy.mock.calls).toEqual([
+            [
+                {
+                    setStateActionType: '@mini-rx/component-store',
+                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    stateOrCallback: {
+                        counter: 1,
+                    },
+                },
+            ],
+            [
+                {
+                    setStateActionType: '@mini-rx/component-store',
+                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    stateOrCallback: {
+                        counter: 2,
+                    },
+                },
+            ],
+        ]);
     });
 
     it('should unsubscribe from setState Observable on destroy', () => {
