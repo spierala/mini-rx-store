@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Product } from '../../models/product';
 import { NgForm } from '@angular/forms';
 import { Permissions } from '../../../user/state/user-store.service';
@@ -7,6 +7,7 @@ import { Permissions } from '../../../user/state/user-store.service';
     selector: 'app-product-detail',
     templateUrl: './product-detail.component.html',
     styleUrls: ['./product-detail.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductDetailComponent {
     @Input()
