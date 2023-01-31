@@ -157,6 +157,34 @@ describe('ComponentStore', () => {
         ]);
     });
 
+    it('should dispatch an Action on destroy (only if initial state has been set)', () => {
+        // Without initial state
+        const cs = createComponentStore();
+
+        const spy = jest.fn();
+        cs['actionsOnQueue'].actions$.subscribe(spy);
+
+        cs.destroy();
+
+        expect(spy).toHaveBeenCalledTimes(0);
+
+        // With initial state
+        const cs2 = createComponentStore(counterInitialState);
+
+        const spy2 = jest.fn();
+        cs2['actionsOnQueue'].actions$.subscribe(spy2);
+
+        cs2.destroy();
+
+        expect(spy2.mock.calls).toEqual([
+            [
+                {
+                    type: '@mini-rx/component-store/destroy',
+                },
+            ],
+        ]);
+    });
+
     it('should unsubscribe from setState Observable on destroy', () => {
         const cs = createComponentStore(counterInitialState);
 
