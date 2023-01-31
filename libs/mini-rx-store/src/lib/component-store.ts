@@ -129,6 +129,15 @@ export class ComponentStore<StateType extends object>
             ? this.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
+
+    override destroy() {
+        if (this.reducer) {
+            // Dispatch an action really just for logging via LoggerExtension
+            // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
+            this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY, csFeatureKey));
+        }
+        super.destroy();
+    }
 }
 
 function createSetStateAction<T>(
