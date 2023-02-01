@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [5.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.0-alpha.0...mini-rx-store-5.0.0-alpha.1) (2023-02-01)
+
+
+### Features
+
+* **mini-rx-store:** Component Store: dispatch a destroy Action (for logging) on destroy ([d678548](https://github.com/spierala/mini-rx-store/commit/d678548ff9a708fdc56e8ec4a8897ed1a7bbfb88))
+
 ## [5.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-4.2.0...mini-rx-store-5.0.0-alpha.0) (2023-01-23)
 
 
