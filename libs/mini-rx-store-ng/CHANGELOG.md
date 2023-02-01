@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.0...mini-rx-store-ng-4.0.0-alpha.1) (2023-02-01)
+
+
+### Features
+
+* **mini-rx-store-ng:** use ReduxDevtoolsExtension with the normal StoreModule.forRoot config ([1e7dd80](https://github.com/spierala/mini-rx-store/commit/1e7dd803b44cd85d2866765019534daed35c39a3))
+
 ## [4.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0...mini-rx-store-ng-4.0.0-alpha.0) (2023-01-23)
 
 
