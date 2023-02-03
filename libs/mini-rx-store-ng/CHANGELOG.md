@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.1...mini-rx-store-ng-4.0.0-alpha.2) (2023-02-03)
+
+
+### Bug Fixes
+
+* **mini-rx-store-ng:** in StoreModule: prevent exception if extensions prop is not defined ([429cda6](https://github.com/spierala/mini-rx-store/commit/429cda6e768aafcfabc0760ddcbf789c5819da85))
+
 ## [4.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.0...mini-rx-store-ng-4.0.0-alpha.1) (2023-02-01)
 
 
