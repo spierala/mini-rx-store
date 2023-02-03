@@ -13,26 +13,20 @@ Component Store allows you to manage state **independently** of the global state
 - Component Store is **destroyable**
 
 ## Use-cases
-- State is local to a component, and you do not want to bother the global state object with that state.
-- You have to create and destroy a lot of Stores at the same time: Component Stores are created and destroyed in a performant way.
-- Very frequent state changes could lead to performance issues when using `Store` or `FeatureStore` 
+- State is fully **local** to a component, and you do not want to bother the global state object with that state.
+- **Frequent create/destroy:** Component Stores are created and destroyed in a performant way.
+- **Very frequent state changes** could lead to performance issues when using `Store` or `FeatureStore` 
 (both update the global state object using actions and reducers, which means more overhead).
 
 :::info
-Are you doubting between Feature Store and Component Store?
+Component Store is great for the mentioned use-cases. However, in most other cases you will be better off using MiniRx [Feature Store](fs-quick-start):
 
-Then use Feature Store! Wait with ComponentStore until you have a use-case.
-Till then, you can benefit from these advantages of Feature Store.
-
-- Debug state with Redux DevTools: Feature Store state becomes part of the global state object.
-That object can be inspected with Redux DevTools for a better debugging experience.
+- Better debugging experience: Inspect Feature Store state with Redux DevTools
 - Feature Store state can be more easily shared with other interested components/services (with `store.select()`)
 - Feature Store automatically uses the Store extensions (provided via `configureStore` or `StoreModule.forRoot` in Angular). 
-Component Store needs a dedicated extension setup: see Component Store ["Extensions"](#extensions).
+- It is even possible to manage local state with Feature Stores (see [Local Component State with Feature Store](fs-config)).
 
-Feature Stores are also destroyable and the same Feature Store can be instantiated many times. This makes them suitable for local state management as well (see [Local Component State](fs-config)).
-
-If you encounter the Component Store use-cases from above, it will be easy to refactor from `FeatureStore` to `ComponentStore` (in most cases).
+But don't worry, your Component Store can be easily migrated to a Feature Store and vice versa!  
 :::info
 
 ## What's Included
@@ -107,6 +101,8 @@ It's possible to configure the Component Store extensions globally or individual
 
 ### Global setup
 
+Configure extensions globally for every Component Store:
+
 ```typescript
 import {
   configureComponentStores,
@@ -119,6 +115,9 @@ configureComponentStores({
 Now every Component Store instance will have the ImmutableStateExtension. 
 
 ### Local setup
+
+Configure extensions individually via the Component Store configuration object:
+
 ```typescript
 import { ComponentStore, LoggerExtension } from 'mini-rx-store';
 
@@ -133,9 +132,11 @@ export class CounterStore extends ComponentStore<CounterState> {
 }
 ```
 
-Every `CounterStore` instance will have the LoggerExtension **and** the 
-ImmutableStateExtension from the global `configureComponentStores` setup: 
-"local" extensions are merged with the extensions from `configureComponentStores`.
+"Local" extensions are merged with the (global) extensions from `configureComponentStores`.
+Therefore, every `CounterStore` instance will have the LoggerExtension (from the local extension setup) **and** the
+ImmutableStateExtension (from the `configureComponentStores` extensions).
+
+If an extension is defined globally and locally, then the local extension takes precedence.
 
 :::info
 It makes sense to add the ImmutableStateExtension to `configureComponentStores`.
@@ -146,3 +147,45 @@ The LoggerExtension can be added to individual Component Stores for debugging pu
 Regarding the `undo` API: add the UndoExtension to the Component Stores which need the undo functionality (["Local setup"](#local-setup)). 
 :::info
 
+## Memoized selectors
+
+Of course, you can use memoized selectors also with Component Store! 
+
+### `createComponentStateSelector`
+
+You can use `createComponentStateSelector` together with `createSelector` to create your selector functions.
+
+Example:
+
+```ts
+// Memoized Selectors
+const getTodoFeatureState = createComponentStateSelector<TodoState>();
+
+const getTodos = createSelector(
+  getTodoFeatureState,
+  state => state.todos
+);
+
+const getSelectedTodoId = createSelector(
+  getTodoFeatureState,
+  state => state.selectedTodoId
+)
+
+const getSelectedTodo = createSelector(
+  getTodos,
+  getSelectedTodoId,
+  (todos, id) => todos.find(item => item.id === id)
+)
+
+class TodoFeatureStore extends ComponentStore<TodoState> {
+
+  // State Observables
+  todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
+  todos$: Observable<Todo[]> = this.select(getTodos);
+  selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
+
+  constructor() {
+    super(initialState)
+  }
+}
+```
