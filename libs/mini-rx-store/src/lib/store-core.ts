@@ -111,7 +111,7 @@ function initStore() {
     isStoreInitialized = true;
 }
 
-export function configureStore(config: Partial<StoreConfig<AppState>> = {}) {
+export function configureStore(config: StoreConfig<AppState> = {}) {
     initStore();
 
     if (hasFeatureReducers()) {

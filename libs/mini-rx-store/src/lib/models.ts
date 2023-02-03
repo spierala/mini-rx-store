@@ -47,11 +47,11 @@ export interface ActionWithPayload extends Action {
 }
 
 export interface StoreConfig<T> {
-    reducers: ReducerDictionary<T>;
-    initialState: T;
-    metaReducers: MetaReducer<AppState>[];
-    extensions: StoreExtension[];
-    combineReducersFn: CombineReducersFn<AppState>;
+    reducers?: ReducerDictionary<T>;
+    initialState?: T;
+    metaReducers?: MetaReducer<AppState>[];
+    extensions?: StoreExtension[];
+    combineReducersFn?: CombineReducersFn<AppState>;
 }
 
 // Used for the Redux API: Store.feature / StoreModule.forFeature
