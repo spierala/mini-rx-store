@@ -15,7 +15,6 @@ import {
     StoreExtension,
     UndoExtension,
     _StoreCore,
-    StoreConfig,
 } from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
@@ -156,7 +155,6 @@ const stateFromReduxDevTools = {
 describe(`Ng Modules`, () => {
     let actions$: Actions;
     let store: Store;
-    let storeConfig: Partial<StoreConfig<Record<string, any>>>;
 
     const rootMetaReducerSpy = jest.fn();
     const configureStoreSpy = jest.spyOn(_StoreCore, 'configureStore');

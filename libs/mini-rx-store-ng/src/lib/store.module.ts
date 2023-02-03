@@ -20,17 +20,20 @@ export const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>(
 );
 
 export function storeFactory<T>(config: StoreConfig<T>, injector: Injector) {
-    config.extensions = config.extensions.map((ext) => {
-        if (ext.id === ExtensionId.REDUX_DEVTOOLS) {
-            // Use NgReduxDevtoolsExtension which uses NgZone.run (to make sure that Angular updates the View when using time-travel)
-            // TODO check if this is still necessary in newer Angular versions (it works without NgZone in Angular 13)
-            return new NgReduxDevtoolsExtension(
-                (ext as ReduxDevtoolsExtension).optionsForNgExtension,
-                injector
-            );
-        }
-        return ext;
-    });
+    config.extensions =
+        config.extensions && config.extensions.length
+            ? config.extensions.map((ext) => {
+                  if (ext.id === ExtensionId.REDUX_DEVTOOLS) {
+                      // Use NgReduxDevtoolsExtension which uses NgZone.run (to make sure that Angular updates the View when using time-travel)
+                      // TODO check if this is still necessary in newer Angular versions (it works without NgZone in Angular 13)
+                      return new NgReduxDevtoolsExtension(
+                          (ext as ReduxDevtoolsExtension).optionsForNgExtension,
+                          injector
+                      );
+                  }
+                  return ext;
+              })
+            : config.extensions;
 
     return configureStore(config);
 }
@@ -59,7 +62,7 @@ export class StoreFeatureModule {
 
 @NgModule()
 export class StoreModule {
-    static forRoot<T>(config: Partial<StoreConfig<T>>): ModuleWithProviders<StoreRootModule> {
+    static forRoot<T>(config: StoreConfig<T>): ModuleWithProviders<StoreRootModule> {
         return {
             ngModule: StoreRootModule,
             providers: [
