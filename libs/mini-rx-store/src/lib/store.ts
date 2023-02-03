@@ -24,7 +24,7 @@ export abstract class Store {
 
 let isStoreConfigured = false;
 
-export function configureStore<T>(config: Partial<StoreConfig<T>>): Store | never {
+export function configureStore<T>(config: StoreConfig<T>): Store | never {
     if (!isStoreConfigured) {
         _configureStore(config);
         isStoreConfigured = true;

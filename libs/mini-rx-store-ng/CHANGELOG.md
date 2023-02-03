@@ -2,6 +2,42 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [4.0.0-alpha.3](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.2...mini-rx-store-ng-4.0.0-alpha.3) (2023-02-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store-ng:** Use the normal `ReduxDevtoolsExtension` from mini-rx-store with `StoreModule.forRoot`
+
+### Code Refactoring
+
+* **mini-rx-store-ng:** remove StoreDevtoolsModule ([2635ef6](https://github.com/spierala/mini-rx-store/commit/2635ef6312dbff9333938c4e6d4e540cbe10de42))
+
+## [4.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.1...mini-rx-store-ng-4.0.0-alpha.2) (2023-02-03)
+
+
+### Bug Fixes
+
+* **mini-rx-store-ng:** in StoreModule: prevent exception if extensions prop is not defined ([429cda6](https://github.com/spierala/mini-rx-store/commit/429cda6e768aafcfabc0760ddcbf789c5819da85))
+
+## [4.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.0...mini-rx-store-ng-4.0.0-alpha.1) (2023-02-01)
+
+
+### Features
+
+* **mini-rx-store-ng:** use ReduxDevtoolsExtension with the normal StoreModule.forRoot config ([1e7dd80](https://github.com/spierala/mini-rx-store/commit/1e7dd803b44cd85d2866765019534daed35c39a3))
+
+## [4.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0...mini-rx-store-ng-4.0.0-alpha.0) (2023-01-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store-ng:** requires mini-rx-store@5
+
+### Features
+
+* **mini-rx-store-ng:** component store module ([61193d5](https://github.com/spierala/mini-rx-store/commit/61193d59f9661861ab6a0fba30cb8146dd1127d7))
+
 ## [3.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-rc.0...mini-rx-store-ng-3.0.0) (2022-10-12)
 
 ## [3.0.0-rc.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-3.0.0-beta.1...mini-rx-store-ng-3.0.0-rc.0) (2022-09-19)

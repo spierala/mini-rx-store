@@ -23,7 +23,9 @@ export {
     ReducerDictionary,
     StoreConfig,
     FeatureConfig,
+    ComponentStoreConfig,
     StoreExtension,
+    ExtensionId,
 } from './lib/models';
 export { ofType, hasEffectMetaData } from './lib/utils';
 export {

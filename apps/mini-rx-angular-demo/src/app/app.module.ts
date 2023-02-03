@@ -8,12 +8,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { TodosModule } from './modules/todos/todos.module';
 import { CounterModule } from './modules/counter/counter.module';
-import { StoreDevtoolsModule, StoreModule } from 'mini-rx-store-ng';
+import { StoreModule, ComponentStoreModule } from 'mini-rx-store-ng';
 import {
-    configureComponentStores,
     ImmutableStateExtension,
     LoggerExtension,
     UndoExtension,
+    ReduxDevtoolsExtension,
 } from 'mini-rx-store';
 import { ProductsStateModule } from './modules/products/state/products-state.module';
 import { UserModule } from './modules/user/user.module';
@@ -32,16 +32,25 @@ import { PixelArtModule } from './modules/pixel-art/pixel-art.module';
         TodosModule,
         CounterModule,
         UserModule,
+        // TODO exclude extensions (ImmutableStateExtension, LoggerExtension) from production: https://ngrx.io/guide/store-devtools/recipes/exclude
         StoreModule.forRoot({
-            extensions: [new ImmutableStateExtension(), new UndoExtension(), new LoggerExtension()],
+            extensions: [
+                new ImmutableStateExtension(),
+                new UndoExtension(),
+                new LoggerExtension(),
+                new ReduxDevtoolsExtension({
+                    name: 'MiniRx Angular Demo',
+                    maxAge: 25,
+                    latency: 250,
+                    trace: true,
+                    traceLimit: 25,
+                }),
+            ],
         }),
-        // TODO exclude from production: https://ngrx.io/guide/store-devtools/recipes/exclude
-        StoreDevtoolsModule.instrument({
-            name: 'MiniRx Angular Demo',
-            maxAge: 25,
-            latency: 250,
-            trace: true,
-            traceLimit: 25,
+        ComponentStoreModule.forRoot({
+            extensions: [
+                // new LoggerExtension()
+            ],
         }),
         ProductsStateModule,
         PixelArtModule,
@@ -51,5 +60,3 @@ import { PixelArtModule } from './modules/pixel-art/pixel-art.module';
     providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
 })
 export class AppModule {}
-
-configureComponentStores({ extensions: [new LoggerExtension()] });

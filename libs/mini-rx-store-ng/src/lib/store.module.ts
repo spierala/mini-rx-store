@@ -1,13 +1,16 @@
-import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
+import { Inject, InjectionToken, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import {
     Actions,
     actions$,
     configureStore,
+    ExtensionId,
     FeatureConfig,
     Reducer,
+    ReduxDevtoolsExtension,
     Store,
     StoreConfig,
 } from 'mini-rx-store';
+import { NgReduxDevtoolsExtension } from './ng-redux-devtools.extension';
 
 export const STORE_CONFIG = new InjectionToken<StoreConfig<any>>('@mini-rx/store-config');
 export const FEATURE_NAMES = new InjectionToken<string[]>('@mini-rx/feature-name');
@@ -16,7 +19,22 @@ export const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>(
     '@mini-rx/feature-store-config'
 );
 
-export function storeFactory<T>(config: StoreConfig<T>) {
+export function storeFactory<T>(config: StoreConfig<T>, injector: Injector) {
+    config.extensions =
+        config.extensions && config.extensions.length
+            ? config.extensions.map((ext) => {
+                  if (ext.id === ExtensionId.REDUX_DEVTOOLS) {
+                      // Use NgReduxDevtoolsExtension which uses NgZone.run (to make sure that Angular updates the View when using time-travel)
+                      // TODO check if this is still necessary in newer Angular versions (it works without NgZone in Angular 13)
+                      return new NgReduxDevtoolsExtension(
+                          (ext as ReduxDevtoolsExtension).optionsForNgExtension,
+                          injector
+                      );
+                  }
+                  return ext;
+              })
+            : config.extensions;
+
     return configureStore(config);
 }
 
@@ -44,7 +62,7 @@ export class StoreFeatureModule {
 
 @NgModule()
 export class StoreModule {
-    static forRoot<T>(config: Partial<StoreConfig<T>>): ModuleWithProviders<StoreRootModule> {
+    static forRoot<T>(config: StoreConfig<T>): ModuleWithProviders<StoreRootModule> {
         return {
             ngModule: StoreRootModule,
             providers: [
@@ -52,7 +70,7 @@ export class StoreModule {
                 {
                     provide: Store,
                     useFactory: storeFactory,
-                    deps: [STORE_CONFIG],
+                    deps: [STORE_CONFIG, Injector],
                 },
                 {
                     provide: Actions,

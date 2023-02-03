@@ -130,6 +130,59 @@ describe('ComponentStore', () => {
             stateOrCallback: setStateCallback,
         });
         expect(spy).toHaveBeenCalledTimes(1);
+
+        spy.mockReset();
+
+        // With setState name (when passing an Observable to setState)
+        cs.setState(of(1, 2).pipe(map((v) => ({ counter: v }))), 'updateCounterFromObservable');
+        expect(spy.mock.calls).toEqual([
+            [
+                {
+                    setStateActionType: '@mini-rx/component-store',
+                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    stateOrCallback: {
+                        counter: 1,
+                    },
+                },
+            ],
+            [
+                {
+                    setStateActionType: '@mini-rx/component-store',
+                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    stateOrCallback: {
+                        counter: 2,
+                    },
+                },
+            ],
+        ]);
+    });
+
+    it('should dispatch an Action on destroy (only if initial state has been set)', () => {
+        // Without initial state
+        const cs = createComponentStore();
+
+        const spy = jest.fn();
+        cs['actionsOnQueue'].actions$.subscribe(spy);
+
+        cs.destroy();
+
+        expect(spy).toHaveBeenCalledTimes(0);
+
+        // With initial state
+        const cs2 = createComponentStore(counterInitialState);
+
+        const spy2 = jest.fn();
+        cs2['actionsOnQueue'].actions$.subscribe(spy2);
+
+        cs2.destroy();
+
+        expect(spy2.mock.calls).toEqual([
+            [
+                {
+                    type: '@mini-rx/component-store/destroy',
+                },
+            ],
+        ]);
     });
 
     it('should unsubscribe from setState Observable on destroy', () => {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore } from 'mini-rx-store';
 import { Observable, timer } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 interface ArtState {
     opacity: number;
@@ -18,8 +18,9 @@ export class ArtStoreService extends ComponentStore<ArtState> {
     constructor() {
         super(initialState);
 
+        // This Observable is passed to setState: therefore the Observable has to emit ArtState
+        // FYI: the typing of setState would also allow Observable<Partial<ArtState>>
         const delayedOpacity$: Observable<ArtState> = timer(Math.random() * 5000).pipe(
-            take(1),
             map(() => ({ opacity: Math.random() }))
         );
 

@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
@@ -7,6 +15,7 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
     selector: 'app-product-filter',
     templateUrl: './product-filter.component.html',
     styleUrls: ['./product-filter.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductFilterComponent implements OnInit, OnDestroy {
     private unsubscribe$: Subject<void> = new Subject();

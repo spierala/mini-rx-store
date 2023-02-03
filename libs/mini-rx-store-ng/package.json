@@ -1,32 +1,32 @@
 {
-  "name": "mini-rx-store-ng",
-  "version": "3.0.0",
-  "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
-  "license": "MIT",
-  "homepage": "https://github.com/spierala/mini-rx-store",
-  "readme": "https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/README.md",
-  "description": "Angular friendly API for MiniRx Store",
-  "keywords": [
-    "RxJS",
-    "Redux",
-    "State Management",
-    "Angular",
-    "Store",
-    "Redux DevTools"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spierala/mini-rx-store.git"
-  },
-  "bugs": {
-    "url": "https://github.com/spierala/mini-rx-store/issues"
-  },
-  "peerDependencies": {
-    "@angular/core": ">= 12.0.0",
-    "mini-rx-store": ">= 4.0.0-alpha.14",
-    "rxjs": "^6.4.0 || ^7.0.0"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
-  }
+    "name": "mini-rx-store-ng",
+    "version": "4.0.0-alpha.3",
+    "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
+    "license": "MIT",
+    "homepage": "https://github.com/spierala/mini-rx-store",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/README.md",
+    "description": "Angular friendly API for MiniRx Store",
+    "keywords": [
+        "RxJS",
+        "Redux",
+        "State Management",
+        "Angular",
+        "Store",
+        "Redux DevTools"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/spierala/mini-rx-store.git"
+    },
+    "bugs": {
+        "url": "https://github.com/spierala/mini-rx-store/issues"
+    },
+    "peerDependencies": {
+        "@angular/core": ">= 12.0.0",
+        "mini-rx-store": ">= 5.0.0-alpha.0",
+        "rxjs": "^6.4.0 || ^7.0.0"
+    },
+    "dependencies": {
+        "tslib": "^2.3.0"
+    }
 }
