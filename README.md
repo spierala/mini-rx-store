@@ -28,6 +28,7 @@ Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/mast
 
 #### Angular Integration (mini-rx-store-ng)
 - `ComponentStoreModule`: Configure ComponentStore extensions globally with the `forRoot` static method
+- BREAKING CHANGE: `StoreDevtoolsModule` has been removed. You can use now the normal `ReduxDevtoolsExtension` from mini-rx-store with `StoreModule.forRoot`.
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/CHANGELOG.md) of the Angular Integration.
 
