@@ -20,6 +20,6 @@ The MiniRx Redux Store comes with these APIs:
 - `feature()` add feature state reducers dynamically
 - `dispatch()` dispatch an action
 - `select()` select state from the global state object as RxJS Observable
-- `createFeatureSelector` and `createSelector` to create memoized selectors
+- `createFeatureStateSelector` and `createSelector` to create memoized selectors
 - `effect()` register an effect to isolate and handle side effects
 - `mapResponse()` handle side effect response in effects

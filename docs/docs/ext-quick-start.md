@@ -4,7 +4,7 @@ title: Extensions
 sidebar_label: Quick Start
 ---
 
-With extensions, we can extend the functionality of the MiniRx Store.
+With extensions, we can extend the functionality of MiniRx Store.
 
 ## What's Included
 MiniRx Store comes with following extensions:

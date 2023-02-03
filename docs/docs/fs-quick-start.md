@@ -15,6 +15,7 @@ Feature Stores offer simple yet powerful (global) state management.
 ## What's Included
 The MiniRx `FeatureStore` API:
 - `setState()` update the feature state
+- `setInitialState()` initialize feature state lazily
 - `select()` select state from the feature state object as RxJS Observable
 - `effect()` run side effects like API calls and update feature state
 - `undo()` easily undo setState actions (requires the UndoExtension)

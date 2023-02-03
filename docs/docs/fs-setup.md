@@ -41,3 +41,21 @@ const todoFs: FeatureStore<TodoState> = createFeatureStore<TodoState>('todo', in
 ```
 
 The following examples will be based on Option 1 (Extend).
+
+## Lazy state initialization with `setInitialState`
+
+In some situations you do not know yet the initialState when creating a Feature Store.
+For that reason you can initialize the state later with `setInitialState`. 
+
+Example:
+```ts
+export class TodoFeatureStore extends FeatureStore<TodoState> {
+  constructor() {
+    super('todo', undefined); // Initial state is undefined! 
+  }
+  
+  init() {
+    this.setInitialState(initialState);
+  }
+}
+```

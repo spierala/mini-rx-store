@@ -1,6 +1,6 @@
 ---
 id: fs-config
-title: Local Component State
+title: Local Component State with Feature Store
 sidebar_label: Local Component State
 slug: /local-component-state
 ---

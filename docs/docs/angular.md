@@ -13,7 +13,6 @@ With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can u
 - [Register feature reducers](#register-feature-reducers-in-angular-feature-modules) using `StoreModule.forFeature()`
 - [Register effects](#register-effects) using `EffectsModule.register()` and `createEffect()`
 - [Use Angular Dependency Injection](#get-hold-of-the-store-and-actions-via-the-angular-dependency-injection) for `Store` and `Actions`
-- [Redux DevTools Extension](#redux-devtools)
 
 ## Usage
 
@@ -147,23 +146,4 @@ export class MyComponent {
     this.store.dispatch({type: 'some action'})
   }
 }
-```
-### Redux DevTools
-`StoreDevtoolsModule` is a thin wrapper for the [ReduxDevtoolsExtension](ext-redux-devtools.md) from 'mini-rx-store'.
-It is needed to trigger Angular Change Detection when using time travel in the Redux DevTools Browser PlugIn.
-
-```ts
-import { StoreDevtoolsModule } from 'mini-rx-store-ng';
-
-@NgModule({
-  imports: [
-    // ...
-    StoreDevtoolsModule.instrument({
-      name: 'MiniRx Store',
-      maxAge: 25,
-      latency: 250,
-    }),
-  ]
-})
-export class AppModule {} 
 ```

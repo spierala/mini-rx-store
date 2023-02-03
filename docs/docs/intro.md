@@ -57,8 +57,8 @@ Observable state can be selected with memoized selectors.
 import {
   Action,
   Store,
-  configureStore,
-  createFeatureSelector,
+  configureStore, 
+  createFeatureStateSelector,
   createSelector
 } from 'mini-rx-store';
 import { Observable } from 'rxjs';
@@ -97,7 +97,7 @@ const store: Store = configureStore({
 });
 
 // 5.) Create memoized selectors
-const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
+const getCounterFeatureState = createFeatureStateSelector<CounterState>('counter');
 const getCount = createSelector(
   getCounterFeatureState,
   state => state.count

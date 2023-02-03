@@ -24,14 +24,14 @@ const todoState$: Observable<TodoState> = store.select(state => state['todo']);
 
 MiniRx comes with memoized selectors out of the box. With the selectors we can easily select and combine state. The MiniRx selectors are memoized to prevent unnecessary calculations.
 
-### `createFeatureSelector`
-`createFeatureSelector` selects a feature state from the global state object.
+### `createFeatureStateSelector`
+`createFeatureStateSelector` selects a feature state from the global state object.
 We have to use the same key that we used for registering the feature reducer (e.g. we used the 'todo' key for the todoReducer).
 ```ts title="todo-selectors.ts"
-import { createFeatureSelector } from 'mini-rx-store';
+import { createFeatureStateSelector } from 'mini-rx-store';
 import { TodoState } from './todo-reducer';
 
-export const getTodoFeatureState = createFeatureSelector<TodoState>('todo');
+export const getTodoFeatureState = createFeatureStateSelector<TodoState>('todo');
 ```
 
 ### `createSelector`

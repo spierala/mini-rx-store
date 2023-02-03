@@ -5,36 +5,40 @@ sidebar_label: Component Store
 ---
 
 MiniRx supports "local" state management with **Component Store**.
-Component Store allows you to manage state **independently** of the global state object (which is used by [Store](redux) and [Feature Store](fs-quick-start    ))     .
+Component Store allows you to manage state **independently** of the global state object (which is used by [Store](redux) and [Feature Store](fs-quick-start))     .
 
 ## Key Principles of Component Store
 - Component Store has the **same simple API as [Feature Store](fs-quick-start)**
 - Component Store state is **independent** of the global state object
 - Component Store is **destroyable**
 
-
-
 ## Use-cases
-- You have to create and destroy a lot of Stores at the same time: Component Stores will show better performance 
-(while creating/destroying Feature Stores has more overhead).
-- Very frequent state changes could lead to performance issues when using `Store` or `FeatureStore` (both update the global state object using actions and reducers, which means more overhead).
 - State is local to a component, and you do not want to bother the global state object with that state.
+- You have to create and destroy a lot of Stores at the same time: Component Stores are created and destroyed in a performant way.
+- Very frequent state changes could lead to performance issues when using `Store` or `FeatureStore` 
+(both update the global state object using actions and reducers, which means more overhead).
 
 :::info
 Are you doubting between Feature Store and Component Store?
 
-Then use Feature Store!
+Then use Feature Store! Wait with ComponentStore until you have a use-case.
+Till then, you can benefit from these advantages of Feature Store.
 
-Feature Store state becomes part of the global state object.
+- Debug state with Redux DevTools: Feature Store state becomes part of the global state object.
 That object can be inspected with Redux DevTools for a better debugging experience.
-Feature Stores automatically use the Store extensions (Component Stores have a dedicated extension setup: see Component Store ["Extensions"](#extensions)). 
+- Feature Store state can be more easily shared with other interested components/services (with `store.select()`)
+- Feature Store automatically uses the Store extensions (provided via `configureStore` or `StoreModule.forRoot` in Angular). 
+Component Store needs a dedicated extension setup: see Component Store ["Extensions"](#extensions).
 
-If you encounter the use-cases from above, it will be easy to refactor from `FeatureStore` to `ComponentStore`.
+Feature Stores are also destroyable and the same Feature Store can be instantiated many times. This makes them suitable for local state management as well (see [Local Component State](fs-config)).
+
+If you encounter the Component Store use-cases from above, it will be easy to refactor from `FeatureStore` to `ComponentStore` (in most cases).
 :::info
 
 ## What's Included
 The MiniRx `ComponentStore` API:
 - `setState()` update the state
+- `setInitialState()` initialize state lazily
 - `select()` select state as RxJS Observable
 - `effect()` run side effects like API calls and update state
 - `undo()` easily undo setState actions (requires the UndoExtension)
