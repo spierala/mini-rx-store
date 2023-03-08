@@ -11,15 +11,28 @@ const features = [
         title: 'Redux Store',
         description: (
             <>
-                <strong>Advanced state management:</strong> MiniRx is a full-blown Redux Store to manage global, application-wide state: It includes <strong>actions, reducers, meta reducers, memoized selectors</strong> and <strong>Redux DevTools</strong> support.
+                <strong>Advanced state management:</strong> MiniRx is a full-blown Redux Store to
+                manage global, application-wide state: It includes{' '}
+                <strong>actions, reducers, meta reducers, memoized selectors</strong> and{' '}
+                <strong>Redux DevTools</strong> support.
             </>
         ),
     },
     {
-        title: 'Feature Stores',
+        title: 'Feature Store',
         description: (
             <>
-                <strong>Simple yet powerful state management</strong> with MiniRx Feature Stores: manage feature state directly with a minimum of boilerplate.
+                <strong>Simple yet powerful state management</strong> with MiniRx Feature Store:
+                manage feature state directly with a minimum of boilerplate.
+            </>
+        ),
+    },
+    {
+        title: 'Component Store',
+        description: (
+            <>
+                <strong>Local state management</strong> with MiniRx Component Store: manage state
+                independently of the global state object.
             </>
         ),
     },
@@ -32,17 +45,6 @@ const features = [
                 flattening operators.
                 <br />
                 State and actions are exposed as <strong>RxJS Observables</strong>.
-            </>
-        ),
-    },
-    {
-        title: 'Framework-agnostic and TypeScript-friendly',
-        description: (
-            <>
-                MiniRx works with any front-end project built with JavaScript or TypeScript
-                (Angular, Svelte, React, Vue, or anything else).
-                <br />
-                The MiniRx API comes with TypeScript type definitions.
             </>
         ),
     },

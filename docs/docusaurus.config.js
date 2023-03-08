@@ -1,5 +1,5 @@
 module.exports = {
-    title: 'MiniRx - The RxJS Redux Store',
+    title: 'MiniRx - RxJS state management',
     tagline: 'Make hard things simple - Keep simple things simple',
     url: 'https://mini-rx.io',
     baseUrl: '/',
@@ -40,12 +40,16 @@ module.exports = {
                             to: 'docs/intro',
                         },
                         {
-                            label: 'Store (Redux)',
+                            label: 'Store (Redux API)',
                             to: 'docs/redux',
                         },
                         {
                             label: 'Feature Store',
                             to: 'docs/fs-quick-start',
+                        },
+                        {
+                            label: 'Component Store',
+                            to: 'docs/component-store',
                         },
                         {
                             label: 'Extensions',
@@ -63,6 +67,10 @@ module.exports = {
                         {
                             label: 'GitHub',
                             href: 'https://github.com/spierala/mini-rx-store',
+                        },
+                        {
+                            label: 'Mastodon',
+                            href: 'https://mas.to/tags/MiniRx',
                         },
                         {
                             label: 'Twitter',

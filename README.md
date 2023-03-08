@@ -53,7 +53,6 @@ MiniRx Store provides **Reactive State Management** for JavaScript and TypeScrip
 It is a **global**, application-wide solution to manage state and is powered by [**RxJS**](https://rxjs.dev/).
 MiniRx will help you to manage state at large scale (with the **Redux** pattern), but it also offers a simple form of state management: **Feature Stores**.
 
-
 - 🤓 Learn about MiniRx on the [docs site](https://mini-rx.io)
 - 🚀 See MiniRx in action:
   - [Angular Demo](https://angular-demo.mini-rx.io) ([source code](https://github.com/spierala/mini-rx-store/tree/master/apps/mini-rx-angular-demo))
@@ -72,11 +71,16 @@ MiniRx will help you to manage state at large scale (with the **Redux** pattern)
     -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create and consume actions with as little boilerplate as possible
 -   [Feature Store](https://mini-rx.io/docs/fs-quick-start): Manage feature state directly with a minimum of boilerplate:
     - `setState()` update the feature state
+    - `setInitialState()` initialize state lazily
     - `select()` select state from the feature state object as RxJS Observable
     - `effect()` run side effects like API calls and update feature state
     - `undo()` easily undo setState actions (requires UndoExtension)
     - `destroy()` remove the feature state
     - `tapResponse` operator: handle the side effect response in Feature Store `effect`
+-   [Component Store](https://mini-rx.io/docs/component-store): Manage state locally:
+    - Component Store has the same simple API as Feature Store (`setState`, `select`, ...)
+    - Component Store state is independent of the global state object
+    - Component Store is destroyable
 -   [Extensions](https://mini-rx.io/docs/ext-quick-start):
     - Redux DevTools Extension: Inspect global state with the Redux DevTools
     - Immutable Extension: Enforce state immutability

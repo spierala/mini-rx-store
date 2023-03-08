@@ -32,3 +32,13 @@ const store: Store = configureStore({
   ]
 });
 ```
+Like this, the extensions are available for the (Redux) Store and for every Feature Store.
+
+## Component Store
+
+These extensions have support for Component Store:
+- Immutable Extension
+- Undo Extension
+- Logger Extension
+
+For registering Extensions with Component Store, please refer to the [Component Store docs](component-store.md#extensions).

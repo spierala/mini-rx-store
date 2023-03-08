@@ -22,11 +22,16 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
     -   [Support for ts-action](ts-action): Create and consume actions with as little boilerplate as possible
 -   [Feature Store](fs-quick-start): Manage feature state directly with a minimum of boilerplate:
     - `setState()` update the feature state
+    - `setInitialState()` initialize state lazily
     - `select()` select state from the feature state object as RxJS Observable
     - `effect()` run side effects like API calls and update feature state
     - `undo()` easily undo setState actions (requires UndoExtension)
     - `destroy()` remove the feature state
     - `tapResponse` operator: handle the side effect response in Feature Store `effect` 
+-   [Component Store](component-store): Manage state locally:
+    - Component Store has the same simple API as Feature Store (`setState`, `select`, ...)
+    - Component Store state is independent of the global state object
+    - Component Store is destroyable
 -   [Extensions](ext-quick-start):
     - Redux DevTools Extension: Inspect global state with the Redux DevTools
     - Immutable Extension: Enforce state immutability

@@ -57,7 +57,7 @@ const store: Store = configureStore({
 });
 ```
 
-Like this the reducers are ready when the store is initialized.
+Like this, the reducers are ready when the store is initialized.
 
 #### Option 2: Add feature reducers dynamically
 We can add feature reducers at any time with `store.feature`.

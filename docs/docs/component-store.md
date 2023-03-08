@@ -13,10 +13,12 @@ Component Store allows you to manage state **independently** of the global state
 - Component Store is **destroyable**
 
 ## Use-cases
-- State is fully **local** to a component, and you do not want to bother the global state object with that state.
-- **Frequent create/destroy:** Component Stores are created and destroyed in a performant way.
+- State is fully **local** to a component: 
+  - State is not shared with other components 
+  - You do not want to "pollute" the global state object with that state
+- **Frequent create/destroy:** Creating and destroying Component Stores is fast
 - **Very frequent state changes** could lead to performance issues when using `Store` or `FeatureStore` 
-(both update the global state object using actions and reducers, which means more overhead).
+(both update the global state object using actions and reducers, which means more overhead)
 
 :::info
 Component Store is great for the mentioned use-cases. However, in most other cases you will be better off using MiniRx [Feature Store](fs-quick-start):
@@ -68,11 +70,11 @@ export class CounterStore extends ComponentStore<CounterState> {
   }
 
   increment() {
-    this.setState({ count: this.state.count + 1 }, 'increment');
+    this.setState(state => ({ count: state.count + 1 }), 'increment');
   }
 
   decrement() {
-    this.setState({ count: this.state.count - 1 }, 'decrement');
+    this.setState(state => ({ count: state.count - 1 }), 'decrement');
   }
 }
 ```
@@ -87,6 +89,14 @@ import { ComponentStore, createComponentStore } from 'mini-rx-store';
 const counterCs: ComponentStore<CounterState> = createComponentStore<CounterState>(initialState);
 ```
 
+## Destroy
+:::warning
+If you manage local component state with Component Store..., please make sure to destroy the Component Store when the component is destroyed! 
+:::warning
+
+You can destroy a Component Store with the `destroy` method. The `destroy` method will unsubscribe all internal RxJS subscriptions (e.g. from effects).
+
+The Component Store `destroy` method follows the same principles as the `destroy` method of Feature Store. Read more in the [Feature Store "Destroy" docs](fs-config.md#destroy).
 
 ## Extensions
 You can use most of the [MiniRx extensions](ext-quick-start) with the Component Store.
@@ -94,14 +104,14 @@ You can use most of the [MiniRx extensions](ext-quick-start) with the Component 
 Extensions with Component Store support:
 
 - Immutable Extension: Enforce state immutability
-- Undo Extension: Undo dispatched actions
+- Undo Extension: Undo state changes from `setState`
 - Logger Extension: console.log the current "setState" action and updated state
 
 It's possible to configure the Component Store extensions globally or individually for each Component Store instance.
 
-### Global setup
+### Global extensions setup
 
-Configure extensions globally for every Component Store:
+Configure extensions globally for every Component Store with the `configureComponentStores` function:
 
 ```typescript
 import {
@@ -114,7 +124,7 @@ configureComponentStores({
 ```
 Now every Component Store instance will have the ImmutableStateExtension. 
 
-### Local setup
+### Local extensions setup
 
 Configure extensions individually via the Component Store configuration object:
 
@@ -133,18 +143,18 @@ export class CounterStore extends ComponentStore<CounterState> {
 ```
 
 "Local" extensions are merged with the (global) extensions from `configureComponentStores`.
-Therefore, every `CounterStore` instance will have the LoggerExtension (from the local extension setup) **and** the
+Therefore, every `CounterStore` instance from the example will have the LoggerExtension (from the local extension setup) **and** the
 ImmutableStateExtension (from the `configureComponentStores` extensions).
 
 If an extension is defined globally and locally, then the local extension takes precedence.
 
 :::info
 It makes sense to add the ImmutableStateExtension to `configureComponentStores`.
-Like that every Component Store can benefit from immutable state.
+Like this, every Component Store can benefit from immutable state.
 
-The LoggerExtension can be added to individual Component Stores for debugging purposes (["Local setup"](#local-setup)).
+The LoggerExtension can be added to individual Component Stores for debugging purposes (["Local extensions setup"](#local-extensions-setup)).
 
-Regarding the `undo` API: add the UndoExtension to the Component Stores which need the undo functionality (["Local setup"](#local-setup)). 
+Regarding the `undo` API: add the UndoExtension to the Component Stores which need the undo functionality (["Local extensions setup"](#local-extensions-setup)). 
 :::info
 
 ## Memoized selectors

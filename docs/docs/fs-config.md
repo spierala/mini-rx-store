@@ -41,11 +41,11 @@ export class CounterStore extends FeatureStore<CounterState> {
   }
 
   increment() {
-    this.setState({ count: this.state.count + 1 }, 'increment');
+    this.setState(state => ({ count: state.count + 1 }), 'increment');
   }
 
   decrement() {
-    this.setState({ count: this.state.count - 1 }, 'decrement');
+    this.setState(state => ({ count: state.count - 1 }), 'decrement');
   }
 }
 ```
