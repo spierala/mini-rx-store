@@ -44,8 +44,6 @@ The Angular Integration requires now Angular@12.
 ### Final todos until the major release
 
 - Update documentation
-- Deploy the Angular Demo to https://angular-demo.mini-rx.io
-- Update the Svelte Demo and deploy to https://svelte-demo.mini-rx.io/
 
 # MiniRx Store
 
