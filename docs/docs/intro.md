@@ -5,14 +5,18 @@ sidebar_label: Quick Start
 slug: /intro
 ---
 
-## Purpose
-**MiniRx Store** provides Reactive State Management for JavaScript Applications, inspired by [Redux](https://redux.js.org/).
-It is a global, application-wide solution to manage state and is powered by [RxJS](https://rxjs.dev/).
+MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/).
+
+MiniRx is a highly flexible solution and scales with your state management requirements:
+
+- Manage **global** state at large scale with the **Redux API**
+- Manage **global** state directly and with a minimum of boilerplate using **Feature Stores**
+- Manage **local** component state with **Component Stores**
 
 ## What's Included
 -   RxJS powered global state management
 -   State and actions are exposed as RxJS Observables
--   [Store (Redux API)](redux):
+-   [Store (Redux)](redux):
     -   Actions
     -   Reducers
     -   Meta Reducers
@@ -32,6 +36,7 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
     - Component Store has the same simple API as Feature Store (`setState`, `select`, ...)
     - Component Store state is independent of the global state object
     - Component Store is destroyable
+    - Component Store is perfect for local component state
 -   [Extensions](ext-quick-start):
     - Redux DevTools Extension: Inspect global state with the Redux DevTools
     - Immutable Extension: Enforce state immutability
@@ -54,7 +59,7 @@ It is a global, application-wide solution to manage state and is powered by [RxJ
 ## Basic Tutorial
 Let's dive into some code to see MiniRx in action. You can play with the tutorial code on [StackBlitz](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts). 
 
-### Store (Redux API)
+### Store (Redux)
 MiniRx supports the classic Redux API with registering reducers and dispatching actions.
 Observable state can be selected with memoized selectors.
 
@@ -118,7 +123,7 @@ store.dispatch({ type: 'inc' });
 // OUTPUT: count: 2
 ```
 
-### Feature Store API
+### Feature Store
 With MiniRx Feature Stores we can manage feature state directly with a minimum of boilerplate.
 
 ```ts title="counter-feature-store.ts"
@@ -152,7 +157,7 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
 }
 ```
 
-Use the "counterFs" Feature Store like this:
+Use the "CounterFeatureStore" like this:
 ```ts
 import { CounterFeatureStore } from "./counter-feature-store";
 
@@ -167,12 +172,57 @@ counterFs.inc();
 :::info
 **The state of a Feature Store becomes part of the global state**
 
-Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs').
+Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs'):
 ```ts
 store.select(state => state).subscribe(console.log);
 // OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
 ```
 :::
+
+### Component Store
+Manage state locally and independently of the global state object.
+Component Store has the identical API as Feature Store.
+
+```ts
+import { ComponentStore } from 'mini-rx-store';
+import { Observable } from 'rxjs';
+
+// State interface
+interface CounterState {
+  count: number;
+}
+
+// Initial state
+const counterInitialState: CounterState = {
+  count: 111,
+};
+
+// Extend ComponentStore and pass the State interface
+export class CounterComponentStore extends ComponentStore<CounterState> {
+  // Select state as RxJS Observable
+  count$: Observable<number> = this.select((state) => state.count);
+
+  constructor() {
+    // Call super with the initial state
+    super(counterInitialState);
+  }
+
+  // Update state with `setState`
+  inc() {
+    this.setState((state) => ({ count: state.count + 1 }));
+  }
+}
+```
+Use the "CounterComponentStore" like this:
+```ts
+const counterCs = new CounterComponentStore();
+counterCs.count$.subscribe(count => console.log('count:', count));
+// OUTPUT: count: 111
+
+counterCs.inc();
+// OUTPUT: count: 112
+```
+
 
 ## Demos
 - [MiniRx Store - Basic Tutorial](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts): See the basic tutorial in action

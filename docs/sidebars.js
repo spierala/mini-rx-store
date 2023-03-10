@@ -14,7 +14,7 @@ module.exports = {
         },
         {
             type: 'category',
-            label: 'Store (Redux API)',
+            label: 'Store (Redux)',
             items: [
                 'redux',
                 'redux-setup',

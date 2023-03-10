@@ -1,6 +1,6 @@
 ---
 id: redux
-title: Store (Redux API)
+title: Store (Redux)
 sidebar_label: Quick Start
 slug: /redux
 ---

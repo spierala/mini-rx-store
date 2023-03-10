@@ -40,7 +40,7 @@ module.exports = {
                             to: 'docs/intro',
                         },
                         {
-                            label: 'Store (Redux API)',
+                            label: 'Store (Redux)',
                             to: 'docs/redux',
                         },
                         {
