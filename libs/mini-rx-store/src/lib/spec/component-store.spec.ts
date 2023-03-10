@@ -1,4 +1,9 @@
-import { _resetConfig, configureComponentStores, createComponentStore } from '../component-store';
+import {
+    _resetConfig,
+    ComponentStore,
+    configureComponentStores,
+    createComponentStore,
+} from '../component-store';
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -320,6 +325,49 @@ describe('ComponentStore', () => {
                 extensions: [new MyExtension() as ComponentStoreExtension],
             })
         ).toThrowError('@mini-rx: Extension "MyExtension" is not supported by Component Store.');
+    });
+
+    it('should queue actions', () => {
+        const counter1Spy = jest.fn<void, [number]>();
+        const counter2Spy = jest.fn<void, [number]>();
+
+        class CounterStore extends ComponentStore<{
+            counter1: number;
+            counter2: number;
+        }> {
+            counter1$ = this.select((state) => state.counter1);
+            counter2$ = this.select((state) => state.counter2);
+
+            constructor() {
+                super({ counter1: 1, counter2: 10 });
+            }
+
+            updateCounter1(v: number): void {
+                this.setState({ counter1: v });
+            }
+
+            updateCounter2(v: number): void {
+                this.setState({ counter2: v });
+            }
+        }
+
+        // Situation: A state change is triggering another state change
+        const store = new CounterStore();
+
+        store.counter1$.subscribe((v) => {
+            counter1Spy(v);
+            store.updateCounter2(v);
+        });
+        store.counter2$.subscribe(counter2Spy);
+
+        // expect(counter1Spy.calls.allArgs()).toEqual([[1]]);
+        expect(counter1Spy.mock.calls).toEqual([[1]]);
+        expect(counter2Spy.mock.calls).toEqual([[1]]);
+
+        store.updateCounter1(2);
+
+        expect(counter1Spy.mock.calls).toEqual([[1], [2]]);
+        expect(counter1Spy.mock.calls).toEqual([[1], [2]]); // Without queuing the actions we would see here: [[1], [2], [1]]
     });
 
     describe('Extensions', () => {
