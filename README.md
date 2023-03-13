@@ -49,14 +49,14 @@ The Angular Integration requires now Angular@12.
 
 # MiniRx Store
 
-MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/). 
+MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/).
 It is a **highly flexible** solution and **scales** with your state management needs:
 
 - Manage **global** state at large scale with the **Store (Redux) API**
 - Manage **global** state with a minimum of boilerplate using **Feature Stores**
 - Manage **local** component state with **Component Stores**
 
-MiniRx always tries to find the sweet spot between **powerful, simple and lightweight**. 
+MiniRx always tries to find the sweet spot between **powerful, simple and lightweight**.
 
 🤓 Learn more about MiniRx on the [docs site](https://mini-rx.io)
 
@@ -65,7 +65,7 @@ MiniRx always tries to find the sweet spot between **powerful, simple and lightw
   - [Svelte Demo](https://svelte-demo.mini-rx.io) ([source code](https://github.com/spierala/mini-rx-svelte-demo))
 
 ## What's Included
--   RxJS powered state management
+-   RxJS powered global state management
 -   State and actions are exposed as RxJS Observables
 -   [Store (Redux)](https://mini-rx.io/docs/redux):
     -   Actions
@@ -83,7 +83,7 @@ MiniRx always tries to find the sweet spot between **powerful, simple and lightw
     - `undo()` easily undo setState actions (requires the UndoExtension)
     - `destroy()` remove the feature state from the global state object
     - `tapResponse` operator: handle the side effect response in Feature Store `effect`
--   [Component Store](https://mini-rx.io/docs/component-store): Manage state locally: 
+-   [Component Store](https://mini-rx.io/docs/component-store): Manage state locally:
     - Component Store is perfect for local component state
     - Component Store has the same simple API as Feature Store (`setState`, `select`, ...)
     - Component Store state is independent of the global state object
@@ -99,7 +99,7 @@ MiniRx always tries to find the sweet spot between **powerful, simple and lightw
     - Configure the Store with `StoreModule.forRoot()`
     - Add feature state with `StoreModule.forFeature()`
     - Inject `Store` and `Actions`
-    
+
 ## Key Concepts
 - State and actions are exposed as **RxJS Observables**
 - **Single source of truth**: The Store holds a single object which represents the **global** application state
@@ -236,13 +236,14 @@ counterFs.inc();
 // OUTPUT: count: 12
 ```
 
-:information_source: **The state of a Feature Store becomes part of the global state**
+:information_source:
+**The state of a Feature Store becomes part of the global state**
 
 Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs'):
 
 ```ts
 store.select(state => state).subscribe(console.log);
-//OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
+// OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
 ```
 Read more in the MiniRx docs: [Feature Store](https://mini-rx.io/docs/fs-quick-start)
 
