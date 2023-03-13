@@ -49,13 +49,14 @@ The Angular Integration requires now Angular@12.
 
 # MiniRx Store
 
-MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/).
+MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/). 
+It is a **highly flexible** solution and **scales** with your state management needs:
 
-MiniRx is a highly flexible solution and scales with your state management requirements:
-
-- Manage **global** state at large scale with the **Redux API**
-- Manage **global** state directly and with a minimum of boilerplate using **Feature Stores**
+- Manage **global** state at large scale with the **Store (Redux) API**
+- Manage **global** state with a minimum of boilerplate using **Feature Stores**
 - Manage **local** component state with **Component Stores**
+
+MiniRx always tries to find the sweet spot between **powerful, simple and lightweight**. 
 
 🤓 Learn more about MiniRx on the [docs site](https://mini-rx.io)
 
@@ -64,7 +65,7 @@ MiniRx is a highly flexible solution and scales with your state management requi
   - [Svelte Demo](https://svelte-demo.mini-rx.io) ([source code](https://github.com/spierala/mini-rx-svelte-demo))
 
 ## What's Included
--   RxJS powered global state management
+-   RxJS powered state management
 -   State and actions are exposed as RxJS Observables
 -   [Store (Redux)](https://mini-rx.io/docs/redux):
     -   Actions
@@ -73,26 +74,26 @@ MiniRx is a highly flexible solution and scales with your state management requi
     -   Memoized Selectors
     -   Effects
     -   `mapResponse` operator: handle the side effect response in Effects
-    -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create and consume actions with as little boilerplate as possible
+    -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create actions and reducers more efficiently
 -   [Feature Store](https://mini-rx.io/docs/fs-quick-start): Manage feature state directly with a minimum of boilerplate:
     - `setState()` update the feature state
     - `setInitialState()` initialize state lazily
     - `select()` select state from the feature state object as RxJS Observable
     - `effect()` run side effects like API calls and update feature state
-    - `undo()` easily undo setState actions (requires UndoExtension)
-    - `destroy()` remove the feature state
+    - `undo()` easily undo setState actions (requires the UndoExtension)
+    - `destroy()` remove the feature state from the global state object
     - `tapResponse` operator: handle the side effect response in Feature Store `effect`
--   [Component Store](https://mini-rx.io/docs/component-store): Manage state locally:
+-   [Component Store](https://mini-rx.io/docs/component-store): Manage state locally: 
+    - Component Store is perfect for local component state
     - Component Store has the same simple API as Feature Store (`setState`, `select`, ...)
     - Component Store state is independent of the global state object
     - Component Store is destroyable
-    - Component Store is perfect for local component state
 -   [Extensions](https://mini-rx.io/docs/ext-quick-start):
     - Redux DevTools Extension: Inspect global state with the Redux DevTools
     - Immutable Extension: Enforce state immutability
     - Undo Extension: Undo dispatched actions
     - Logger Extension: console.log the current action and updated state
--   Framework-agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
+-   Framework-agnostic: MiniRx works with any frontend project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
 -   TypeScript support: The MiniRx API comes with TypeScript type definitions
 -   [Angular Integration](https://mini-rx.io/docs/angular): Use MiniRx Store the Angular way:
     - Configure the Store with `StoreModule.forRoot()`
@@ -100,11 +101,13 @@ MiniRx is a highly flexible solution and scales with your state management requi
     - Inject `Store` and `Actions`
     
 ## Key Concepts
-- The store is a single object which holds the global application state. It is the **"single source of truth"**
 - State and actions are exposed as **RxJS Observables**
-- State has a **flat hierarchy** and is divided into "feature states" (also called "slices" in Redux world)
-- For each "feature state" we can decide to use the **Redux API** with actions and reducers or the simplified **Feature Store API**
-- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using `setState` (Feature Store API)
+- **Single source of truth**: The Store holds a single object which represents the **global** application state
+- The global state has a **flat hierarchy** and is divided into "feature states" (also called "slices" in Redux world)
+- For each "feature state" we can decide to use the `Store` (Redux) API with actions and reducers or the simplified `FeatureStore` API
+- `Store` and `FeatureStore` are different APIs for one and the same Redux store
+- Use `ComponentStore` to manage state which is independent of the global state object
+- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using `setState` (Feature Store/ Component Store)
 
 ## Installation
 Install from the NPM repository using npm:

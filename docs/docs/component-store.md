@@ -13,9 +13,10 @@ Component Store allows you to manage state **independently** of the global state
 - Component Store is **destroyable**
 
 ## Use-cases
-- State is fully **local** to a component: 
-  - State is not shared with other components 
-  - You do not want to "pollute" the global state object with that state
+- **Local** component state: 
+  - State which is bound to a component
+  - State which has the lifespan of a component
+  - State which can exist multiple times (if the corresponding component exists multiple times)
 - **Frequent create/destroy:** Creating and destroying Component Stores is fast
 - **Very frequent state changes** could lead to performance issues when using `Store` or `FeatureStore` 
 (both update the global state object using actions and reducers, which means more overhead)
@@ -169,15 +170,15 @@ Example:
 
 ```ts
 // Memoized Selectors
-const getTodoFeatureState = createComponentStateSelector<TodoState>();
+const getComponentState = createComponentStateSelector<TodoState>();
 
 const getTodos = createSelector(
-  getTodoFeatureState,
+  getComponentState,
   state => state.todos
 );
 
 const getSelectedTodoId = createSelector(
-  getTodoFeatureState,
+  getComponentState,
   state => state.selectedTodoId
 )
 
@@ -187,10 +188,10 @@ const getSelectedTodo = createSelector(
   (todos, id) => todos.find(item => item.id === id)
 )
 
-class TodoFeatureStore extends ComponentStore<TodoState> {
+class TodoStore extends ComponentStore<TodoState> {
 
   // State Observables
-  todoState$: Observable<TodoState> = this.select(getTodoFeatureState);
+  todoState$: Observable<TodoState> = this.select(getComponentState);
   todos$: Observable<Todo[]> = this.select(getTodos);
   selectedTodo$: Observable<Todo> = this.select(getSelectedTodo);
 
