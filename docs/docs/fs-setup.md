@@ -54,8 +54,12 @@ export class TodoFeatureStore extends FeatureStore<TodoState> {
     super('todo', undefined); // Initial state is undefined! 
   }
   
-  init() {
+  // Called later
+  init(initialState: TodoState) {
     this.setInitialState(initialState);
   }
 }
 ```
+:::warning
+An error will be thrown, if you call `setState` before an initial state was set (via the constructor or `setInitialState`).
+:::warning
