@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [5.0.0-alpha.3](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.0-alpha.2...mini-rx-store-5.0.0-alpha.3) (2023-03-21)
+
+
+### Bug Fixes
+
+* **mini-rx-store:** remove setstate callback calculation (for loggerextension and redux devtools) ([291987c](https://github.com/spierala/mini-rx-store/commit/291987cf9a3fb5a7ca9d1a3c5703c4189c50cfbf))
+
 ## [5.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.0-alpha.1...mini-rx-store-5.0.0-alpha.2) (2023-02-03)
 
 ## [5.0.0-alpha.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.0-alpha.0...mini-rx-store-5.0.0-alpha.1) (2023-02-01)

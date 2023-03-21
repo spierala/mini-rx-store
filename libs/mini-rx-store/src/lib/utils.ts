@@ -2,7 +2,6 @@ import { Observable, OperatorFunction, pipe } from 'rxjs';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import {
     Action,
-    AppState,
     EFFECT_METADATA_KEY,
     HasEffectMetadata,
     MetaReducer,
@@ -39,29 +38,20 @@ export function hasEffectMetaData(
     return param.hasOwnProperty(EFFECT_METADATA_KEY);
 }
 
-// Calculate the setState callback and remove internal properties (only display type and payload in the LoggingExtension and Redux DevTools)
+// Only display type and payload in the LoggingExtension and Redux DevTools
 export function beautifyActionForLogging(action: Action, state: object): Action {
-    if (isFeatureStoreSetStateAction(action)) {
-        const featureState = (state as AppState)[action.featureKey];
+    if (isFeatureStoreSetStateAction(action) || isComponentStoreSetStateAction(action)) {
         return {
             type: action.type,
-            payload: calcNewPartialState(featureState, action.stateOrCallback),
-        };
-    } else if (isComponentStoreSetStateAction(action)) {
-        return {
-            type: action.type,
-            payload: calcNewPartialState(state, action.stateOrCallback),
+            payload: action.stateOrCallback,
         };
     }
     return action;
 }
 
-function calcNewPartialState<T>(state: T, stateOrCallback: StateOrCallback<T>): Partial<T> {
-    return typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
-}
-
 export function calcNewState<T>(state: T, stateOrCallback: StateOrCallback<T>): T {
-    const newPartialState = calcNewPartialState(state, stateOrCallback);
+    const newPartialState =
+        typeof stateOrCallback === 'function' ? stateOrCallback(state) : stateOrCallback;
     return {
         ...state,
         ...newPartialState,

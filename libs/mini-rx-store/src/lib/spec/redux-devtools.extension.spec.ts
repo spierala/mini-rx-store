@@ -71,9 +71,11 @@ describe('Redux DevTools', () => {
     });
 
     it('should receive state and a SetStateAction with only type and payload', () => {
-        fs.setState((state) => ({
+        const setStateCallback = () => ({
             firstName: 'Cage',
-        }));
+        });
+
+        fs.setState(setStateCallback);
 
         let currAppState = {};
         store.select((state) => state).subscribe((state) => (currAppState = state));
@@ -82,9 +84,7 @@ describe('Redux DevTools', () => {
         expect(sendFn).toHaveBeenCalledWith(
             {
                 type: '@mini-rx/user/set-state',
-                payload: {
-                    firstName: 'Cage',
-                },
+                payload: setStateCallback,
             },
             {
                 ...currAppState,
