@@ -34,10 +34,11 @@ describe('LoggerExtension', () => {
 
     it('should log a SetStateAction with only type and payload', () => {
         const fs = createFeatureStore('user', userState);
-
-        fs.setState((state) => ({
+        const setStateCallback = () => ({
             firstName: 'Cage',
-        }));
+        });
+
+        fs.setState(setStateCallback);
 
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining('@mini-rx/user/set-state'),
@@ -45,9 +46,7 @@ describe('LoggerExtension', () => {
             expect.stringContaining('Action:'),
             {
                 type: '@mini-rx/user/set-state',
-                payload: {
-                    firstName: 'Cage',
-                },
+                payload: setStateCallback,
             },
             expect.stringContaining('State: '),
             {
@@ -77,9 +76,11 @@ describe('LoggerExtension with ComponentStore', () => {
             userState
         );
 
-        cs.setState((state) => ({
+        const setStateCallback = () => ({
             firstName: 'Cage',
-        }));
+        });
+
+        cs.setState(setStateCallback);
 
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining('@mini-rx/component-store/set-state'),
@@ -87,9 +88,7 @@ describe('LoggerExtension with ComponentStore', () => {
             expect.stringContaining('Action:'),
             {
                 type: '@mini-rx/component-store/set-state',
-                payload: {
-                    firstName: 'Cage',
-                },
+                payload: setStateCallback,
             },
             expect.stringContaining('State: '),
             {
