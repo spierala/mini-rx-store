@@ -5,7 +5,7 @@ sidebar_label: Component Store
 ---
 
 MiniRx supports "local" state management with **Component Store**.
-Component Store allows you to manage state **independently** of the global state object (which is used by [Store](redux) and [Feature Store](fs-quick-start))     .
+Component Store allows you to manage state **independently** of the global state object (which is used by [Store](redux) and [Feature Store](fs-quick-start)).
 
 ## Key Principles of Component Store
 - Component Store has the **same simple API as [Feature Store](fs-quick-start)**
@@ -71,11 +71,11 @@ export class CounterStore extends ComponentStore<CounterState> {
   }
 
   increment() {
-    this.setState(state => ({ count: state.count + 1 }), 'increment');
+    this.setState(state => ({ count: state.count + 1 }));
   }
 
   decrement() {
-    this.setState(state => ({ count: state.count - 1 }), 'decrement');
+    this.setState(state => ({ count: state.count - 1 }));
   }
 }
 ```
@@ -92,7 +92,7 @@ const counterCs: ComponentStore<CounterState> = createComponentStore<CounterStat
 
 ## Destroy
 :::warning
-If you manage local component state with Component Store..., please make sure to destroy the Component Store when the component is destroyed! 
+If you manage local component state with Component Store..., please make sure to destroy the Component Store when the corresponding component is destroyed! 
 :::warning
 
 You can destroy a Component Store with the `destroy` method. The `destroy` method will unsubscribe all internal RxJS subscriptions (e.g. from effects).
@@ -135,27 +135,25 @@ import { ComponentStore, LoggerExtension } from 'mini-rx-store';
 export class CounterStore extends ComponentStore<CounterState> {
   constructor() {
     super(initialState, {
-      extensions: [
-        new LoggerExtension(),
-      ]
+      extensions: [ new LoggerExtension() ]
     });
   }
 }
 ```
 
 "Local" extensions are merged with the (global) extensions from `configureComponentStores`.
-Therefore, every `CounterStore` instance from the example will have the LoggerExtension (from the local extension setup) **and** the
+Therefore, every `CounterStore` instance will have the LoggerExtension (from the local extension setup) **and** the
 ImmutableStateExtension (from the `configureComponentStores` extensions).
 
-If an extension is defined globally and locally, then the local extension takes precedence.
+If an extension is defined globally and locally, then only the local extension is used.
 
 :::info
-It makes sense to add the ImmutableStateExtension to `configureComponentStores`.
+It makes sense to add the ImmutableStateExtension to `configureComponentStores` (["Global extensions setup"](#global-extensions-setup)).
 Like this, every Component Store can benefit from immutable state.
 
 The LoggerExtension can be added to individual Component Stores for debugging purposes (["Local extensions setup"](#local-extensions-setup)).
 
-Regarding the `undo` API: add the UndoExtension to the Component Stores which need the undo functionality (["Local extensions setup"](#local-extensions-setup)). 
+Regarding the `undo` API: It is recommended to add the UndoExtension to the Component Stores which need the undo functionality (["Local extensions setup"](#local-extensions-setup)). 
 :::info
 
 ## Memoized selectors
