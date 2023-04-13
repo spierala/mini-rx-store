@@ -8,9 +8,9 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Store 5 (alpha)
+# MiniRx Store 5 (release candidate)
 
-MiniRx Store 5 (alpha) has been released (2023-01-23)!
+MiniRx Store 5 (release candidate) has been released (2023-04-13)!
 
 What's new?
 
@@ -19,7 +19,7 @@ What's new?
   - Component Store and Feature Store share the same API (`setState`, `select`, `effect`...)
   - Component Store is perfect for managing smaller and local state (most times that is Component state)
   - You can use most of the MiniRx extensions: Logger Extension, Undo Extension and Immutable Extension
-  - Component Store extensions can be configured globally or individually for each store 
+  - Extensions can be configured globally or individually for each Component Store instance 
 - **Tree-shakable**: even more lightweight!
 - **Lazy state initialisation** with `setInitialState`
 - **`setState` accepts also an Observable**: use an Observable to update state
@@ -34,17 +34,13 @@ Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/mast
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/CHANGELOG.md) of the Angular Integration.
 
 ### Installation
-`npm i mini-rx-store@5@alpha`
+`npm i mini-rx-store@next`
 
 Install the Angular Integration if you are using Angular:
 
-`npm i mini-rx-store-ng@4@alpha`
+`npm i mini-rx-store-ng@next`
 
 The Angular Integration requires now Angular@12.
-
-### Final todos until the major release
-
-- Update documentation
 
 # MiniRx Store
 
