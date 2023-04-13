@@ -55,9 +55,9 @@ MiniRx always tries to find the sweet spot between **powerful, simple and lightw
 - **Single source of truth**: The Store holds a single object which represents the **global** application state
 - The global state has a **flat hierarchy** and is divided into "feature states" (also called "slices" in Redux world)
 - For each "feature state" we can decide to use the `Store` (Redux) API with actions and reducers or the simplified `FeatureStore` API
-- `Store` and `FeatureStore` are different APIs for one and the same Redux store
+- `Store` and `FeatureStore` are different APIs for one and the same Redux Store
 - Use `ComponentStore` to manage state which is independent of the global state object
-- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using `setState` (Feature Store/ Component Store)
+- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using `setState` (Feature Store / Component Store)
 
 ## Basic Tutorial
 Let's dive into some code to see MiniRx in action. You can play with the tutorial code on [StackBlitz](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts).

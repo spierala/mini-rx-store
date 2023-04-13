@@ -44,7 +44,7 @@ The following examples will be based on Option 1 (Extend).
 
 ## Lazy state initialization with `setInitialState`
 
-In some situations you do not know yet the initialState when creating a Feature Store.
+In some situations, you do not know yet the initialState when creating a Feature Store.
 For that reason you can initialize the state later with `setInitialState`. 
 
 Example:

@@ -30,7 +30,7 @@ this.setState({selectedTodoId: id}, 'selectTodo');
 ### Use an Observable to update state
 
 `setState` also accepts an Observable. This can be useful if your feature state depends on the values of an Observable.
-You just have to make sure that the Observable which is passed to `setState` emits values with the Partial type of your state interface.
+You just have to make sure that the Observable, which is passed to `setState`, emits values with the (partial) type of your state interface.
 
 Example code from the MiniRx Demo: 
 
@@ -60,7 +60,7 @@ export class ArtStoreService extends FeatureStore<ArtState> {
   }
 }
 ```
-In this example you can see that there is no further subscription code needed on `delayedOpacity$`.
+In this example, you can see that there is no further subscription code needed on `delayedOpacity$`.
 The subscription (and the cleanup of the subscription) happens internally.
 
 ### Undo setState Actions with `undo`
