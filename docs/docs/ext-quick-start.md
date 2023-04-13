@@ -4,7 +4,7 @@ title: Extensions
 sidebar_label: Quick Start
 ---
 
-With extensions, we can extend the functionality of the MiniRx Store.
+With extensions, we can extend the functionality of MiniRx Store.
 
 ## What's Included
 MiniRx Store comes with following extensions:
@@ -32,3 +32,13 @@ const store: Store = configureStore({
   ]
 });
 ```
+Like this, the extensions are available for the (Redux) Store and for every Feature Store.
+
+## Component Store
+
+These extensions have support for Component Store:
+- Immutable Extension
+- Undo Extension
+- Logger Extension
+
+For registering Extensions with Component Store, please refer to the [Component Store docs](component-store.md#extensions).

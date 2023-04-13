@@ -11,15 +11,24 @@ const features = [
         title: 'Redux Store',
         description: (
             <>
-                <strong>Advanced state management:</strong> MiniRx is a full-blown Redux Store to manage global, application-wide state: It includes <strong>actions, reducers, meta reducers, memoized selectors</strong> and <strong>Redux DevTools</strong> support.
+                Manage <strong>global</strong> application state with the powerful Redux pattern
             </>
         ),
     },
     {
-        title: 'Feature Stores',
+        title: 'Feature Store',
         description: (
             <>
-                <strong>Simple yet powerful state management</strong> with MiniRx Feature Stores: manage feature state directly with a minimum of boilerplate.
+                Manage <strong>global</strong> state with a minimum of boilerplate using{' '}
+                <strong>Feature Stores</strong>
+            </>
+        ),
+    },
+    {
+        title: 'Component Store',
+        description: (
+            <>
+                Manage <strong>local</strong> component state with <strong>Component Stores</strong>
             </>
         ),
     },
@@ -27,22 +36,8 @@ const features = [
         title: 'RxJS',
         description: (
             <>
-                <strong>RxJS-based side effects model</strong>: Let the action stream trigger side
-                effects like API calls and <strong>handle race conditions</strong> with RxJS
-                flattening operators.
-                <br />
-                State and actions are exposed as <strong>RxJS Observables</strong>.
-            </>
-        ),
-    },
-    {
-        title: 'Framework-agnostic and TypeScript-friendly',
-        description: (
-            <>
-                MiniRx works with any front-end project built with JavaScript or TypeScript
-                (Angular, Svelte, React, Vue, or anything else).
-                <br />
-                The MiniRx API comes with TypeScript type definitions.
+                MiniRx is powered by <strong>RxJS</strong>. State and actions are exposed as{' '}
+                <strong>RxJS Observables</strong>. MiniRx has a RxJS-based side effects model.
             </>
         ),
     },

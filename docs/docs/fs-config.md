@@ -1,8 +1,7 @@
 ---
 id: fs-config
-title: Local Component State
+title: Local Component State with Feature Store
 sidebar_label: Local Component State
-slug: /local-component-state
 ---
 
 With MiniRx Feature Stores you can also manage **local component state**.
@@ -41,11 +40,11 @@ export class CounterStore extends FeatureStore<CounterState> {
   }
 
   increment() {
-    this.setState({ count: this.state.count + 1 }, 'increment');
+    this.setState(state => ({ count: state.count + 1 }), 'increment');
   }
 
   decrement() {
-    this.setState({ count: this.state.count - 1 }, 'decrement');
+    this.setState(state => ({ count: state.count - 1 }), 'decrement');
   }
 }
 ```

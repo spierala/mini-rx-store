@@ -14,7 +14,7 @@ module.exports = {
         },
         {
             type: 'category',
-            label: 'Store (Redux API)',
+            label: 'Store (Redux)',
             items: [
                 'redux',
                 'redux-setup',
@@ -36,6 +36,10 @@ module.exports = {
                 'fs-effect',
                 'fs-config',
             ],
+        },
+        {
+            type: 'doc',
+            id: 'component-store',
         },
         {
             type: 'category',

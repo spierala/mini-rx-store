@@ -19,15 +19,15 @@ Within that function you can pick a specific piece of state.
 ## Memoized Selectors
 
 You can use memoized selectors also with the Feature Store...
-You only have to omit the feature key when using `createFeatureSelector`.
+You only have to omit the feature key when using `createFeatureStateSelector`.
 This is because the Feature Store is operating on a specific feature state already
 (the corresponding feature key has been provided in the constructor).
 
 ```ts title="todo-feature-store.ts"
-import { createFeatureSelector, createSelector } from 'mini-rx-store';
+import { createFeatureStateSelector, createSelector } from 'mini-rx-store';
 
 // Memoized Selectors
-const getTodoFeatureState = createFeatureSelector<TodoState>(); // Omit the feature key!
+const getTodoFeatureState = createFeatureStateSelector<TodoState>(); // Omit the feature key!
 
 const getTodos = createSelector(
   getTodoFeatureState,

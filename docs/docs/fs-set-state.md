@@ -26,6 +26,43 @@ For better logging in the JS Console / Redux DevTools you can provide an optiona
 ```ts
 this.setState({selectedTodoId: id}, 'selectTodo');
 ```
+
+### Use an Observable to update state
+
+`setState` also accepts an Observable. This can be useful if your feature state depends on the values of an Observable.
+You just have to make sure that the Observable, which is passed to `setState`, emits values with the (partial) type of your state interface.
+
+Example code from the MiniRx Demo: 
+
+```ts
+import { FeatureStore } from "mini-rx-store";
+import { map, Observable, timer } from "rxjs";
+
+interface ArtState {
+  opacity: number;
+}
+
+const initialState: ArtState = {
+  opacity: 1,
+};
+
+export class ArtStoreService extends FeatureStore<ArtState> {
+  opacity$: Observable<number> = this.select((state) => state.opacity);
+
+  constructor() {
+      super('art', initialState);
+
+      const delayedOpacity$: Observable<ArtState> = timer(Math.random() * 5000).pipe(
+          map(() => ({ opacity: Math.random() })) // map data to ArtState
+      );
+
+      this.setState(delayedOpacity$); // setState will be triggerd by the Observable
+  }
+}
+```
+In this example, you can see that there is no further subscription code needed on `delayedOpacity$`.
+The subscription (and the cleanup of the subscription) happens internally.
+
 ### Undo setState Actions with `undo`
 We can easily undo `setState` actions with the [Undo Extension](ext-undo-extension) installed.
 

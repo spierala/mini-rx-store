@@ -23,6 +23,7 @@ What's new?
 - **Tree-shakable**: even more lightweight!
 - **Lazy state initialisation** with `setInitialState`
 - **`setState` accepts also an Observable**: use an Observable to update state
+- `createFeatureSelector` has been deprecated. Use now `createFeatureStateSelector` which is more in line with `createComponentStateSelector`
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
 
@@ -47,52 +48,65 @@ The Angular Integration requires now Angular@12.
 
 # MiniRx Store
 
-MiniRx Store provides **Reactive State Management** for JavaScript and TypeScript applications.
-It is a **global**, application-wide solution to manage state and is powered by [**RxJS**](https://rxjs.dev/).
-MiniRx will help you to manage state at large scale (with the **Redux** pattern), but it also offers a simple form of state management: **Feature Stores**.
+MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/).
+It is a **highly flexible** solution and **scales** with your state management needs:
 
+- Manage **global** state at large scale with the **Store (Redux) API**
+- Manage **global** state with a minimum of boilerplate using **Feature Stores**
+- Manage **local** component state with **Component Stores**
 
-- 🤓 Learn about MiniRx on the [docs site](https://mini-rx.io)
-- 🚀 See MiniRx in action:
+MiniRx always tries to find the sweet spot between **powerful, simple and lightweight**.
+
+🤓 Learn more about MiniRx on the [docs site](https://mini-rx.io)
+
+🚀 See MiniRx in action:
   - [Angular Demo](https://angular-demo.mini-rx.io) ([source code](https://github.com/spierala/mini-rx-store/tree/master/apps/mini-rx-angular-demo))
   - [Svelte Demo](https://svelte-demo.mini-rx.io) ([source code](https://github.com/spierala/mini-rx-svelte-demo))
 
 ## What's Included
 -   RxJS powered global state management
 -   State and actions are exposed as RxJS Observables
--   [Store (Redux API)](https://mini-rx.io/docs/redux):
+-   [Store (Redux)](https://mini-rx.io/docs/redux):
     -   Actions
     -   Reducers
     -   Meta Reducers
     -   Memoized Selectors
     -   Effects
     -   `mapResponse` operator: handle the side effect response in Effects
-    -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create and consume actions with as little boilerplate as possible
+    -   [Support for ts-action](https://mini-rx.io/docs/ts-action): Create actions and reducers more efficiently
 -   [Feature Store](https://mini-rx.io/docs/fs-quick-start): Manage feature state directly with a minimum of boilerplate:
     - `setState()` update the feature state
+    - `setInitialState()` initialize state lazily
     - `select()` select state from the feature state object as RxJS Observable
     - `effect()` run side effects like API calls and update feature state
-    - `undo()` easily undo setState actions (requires UndoExtension)
-    - `destroy()` remove the feature state
+    - `undo()` easily undo setState actions (requires the UndoExtension)
+    - `destroy()` remove the feature state from the global state object
     - `tapResponse` operator: handle the side effect response in Feature Store `effect`
+-   [Component Store](https://mini-rx.io/docs/component-store): Manage state locally:
+    - Component Store is perfect for local component state
+    - Component Store has the same simple API as Feature Store (`setState`, `select`, ...)
+    - Component Store state is independent of the global state object
+    - Component Store is destroyable
 -   [Extensions](https://mini-rx.io/docs/ext-quick-start):
     - Redux DevTools Extension: Inspect global state with the Redux DevTools
     - Immutable Extension: Enforce state immutability
     - Undo Extension: Undo dispatched actions
     - Logger Extension: console.log the current action and updated state
--   Framework-agnostic: MiniRx works with any front-end project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
+-   Framework-agnostic: MiniRx works with any frontend project built with JavaScript or TypeScript (Angular, Svelte, React, Vue, or anything else)
 -   TypeScript support: The MiniRx API comes with TypeScript type definitions
 -   [Angular Integration](https://mini-rx.io/docs/angular): Use MiniRx Store the Angular way:
     - Configure the Store with `StoreModule.forRoot()`
     - Add feature state with `StoreModule.forFeature()`
     - Inject `Store` and `Actions`
-    
+
 ## Key Concepts
-- The store is a single object which holds the global application state. It is the **"single source of truth"**
 - State and actions are exposed as **RxJS Observables**
-- State has a **flat hierarchy** and is divided into "feature states" (also called "slices" in Redux world)
-- For each "feature state" we can decide to use the **Redux API** with actions and reducers or the simplified **Feature Store API**
-- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using `setState` (Feature Store API)
+- **Single source of truth**: The Store holds a single object which represents the **global** application state
+- The global state has a **flat hierarchy** and is divided into "feature states" (also called "slices" in Redux world)
+- For each "feature state" we can decide to use the `Store` (Redux) API with actions and reducers or the simplified `FeatureStore` API
+- `Store` and `FeatureStore` are different APIs for one and the same Redux Store
+- Use `ComponentStore` to manage state which is independent of the global state object
+- State is **read-only** (immutable) and can only be changed by dispatching actions (Redux API) or by using `setState` (Feature Store / Component Store)
 
 ## Installation
 Install from the NPM repository using npm:
@@ -109,7 +123,7 @@ npm install rxjs
 ## Basic Tutorial
 Let's dive into some code to see MiniRx in action. You can play with the tutorial code on [StackBlitz](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts).
 
-### Store (Redux API)
+### Store (Redux)
 MiniRx supports the classic Redux API with registering reducers and dispatching actions.
 Observable state can be selected with memoized selectors.
 
@@ -118,7 +132,7 @@ import {
   Action,
   Store,
   configureStore,
-  createFeatureSelector,
+  createFeatureStateSelector,
   createSelector
 } from 'mini-rx-store';
 import { Observable } from 'rxjs';
@@ -157,7 +171,7 @@ const store: Store = configureStore({
 });
 
 // 5.) Create memoized selectors
-const getCounterFeatureState = createFeatureSelector<CounterState>('counter');
+const getCounterFeatureState = createFeatureStateSelector<CounterState>('counter');
 const getCount = createSelector(
   getCounterFeatureState,
   state => state.count
@@ -173,7 +187,9 @@ store.dispatch({ type: 'inc' });
 // OUTPUT: count: 2
 ```
 
-### Feature Store API
+Read more in the MiniRx docs: [Store (Redux)](https://mini-rx.io/docs/redux)
+
+### Feature Store
 With MiniRx Feature Stores we can manage feature state directly with a minimum of boilerplate.
 
 ```ts
@@ -207,7 +223,7 @@ export class CounterFeatureStore extends FeatureStore<CounterState> {
 }
 ```
 
-Use the "counterFs" Feature Store like this:
+Use the "CounterFeatureStore" like this:
 ```ts
 import { CounterFeatureStore } from "./counter-feature-store";
 
@@ -219,15 +235,64 @@ counterFs.inc();
 // OUTPUT: count: 12
 ```
 
-:information_source: **The state of a Feature Store becomes part of the global state**
+:information_source:
+**The state of a Feature Store becomes part of the global state**
 
-Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs').
+Every new Feature Store will show up in the global state with the corresponding feature key (e.g. 'counterFs'):
 
 ```ts
 store.select(state => state).subscribe(console.log);
-//OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
+// OUTPUT: {"counter":{"count":2},"counterFs":{"count":12}}
 ```
-See the basic tutorial on Stackblitz: [MiniRx Store - Basic Tutorial](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts)
+Read more in the MiniRx docs: [Feature Store](https://mini-rx.io/docs/fs-quick-start)
+
+### Component Store
+Manage state locally and independently of the global state object.
+Component Store has the identical API as Feature Store.
+
+```ts
+import { ComponentStore } from 'mini-rx-store';
+import { Observable } from 'rxjs';
+
+// State interface
+interface CounterState {
+  count: number;
+}
+
+// Initial state
+const counterInitialState: CounterState = {
+  count: 111,
+};
+
+// Extend ComponentStore and pass the State interface
+export class CounterComponentStore extends ComponentStore<CounterState> {
+  // Select state as RxJS Observable
+  count$: Observable<number> = this.select((state) => state.count);
+
+  constructor() {
+    // Call super with the initial state
+    super(counterInitialState);
+  }
+
+  // Update state with `setState`
+  inc() {
+    this.setState((state) => ({ count: state.count + 1 }));
+  }
+}
+```
+Use the "CounterComponentStore" like this:
+```ts
+const counterCs = new CounterComponentStore();
+counterCs.count$.subscribe(count => console.log('count:', count));
+// OUTPUT: count: 111
+
+counterCs.inc();
+// OUTPUT: count: 112
+```
+
+Read more in the MiniRx docs: [Component Store](https://mini-rx.io/docs/component-store)
+
+See the basic tutorial on StackBlitz: [MiniRx Store - Basic Tutorial](https://stackblitz.com/edit/mini-rx-store-basic-tutorial?file=index.ts)
 
 ## Demos and examples:
 Demos:
