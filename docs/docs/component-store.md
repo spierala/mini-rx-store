@@ -135,7 +135,7 @@ import { ComponentStore, LoggerExtension } from 'mini-rx-store';
 export class CounterStore extends ComponentStore<CounterState> {
   constructor() {
     super(initialState, {
-      extensions: [ new LoggerExtension() ]
+      extensions: [new LoggerExtension()]
     });
   }
 }

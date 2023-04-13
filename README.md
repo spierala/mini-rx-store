@@ -23,6 +23,7 @@ What's new?
 - **Tree-shakable**: even more lightweight!
 - **Lazy state initialisation** with `setInitialState`
 - **`setState` accepts also an Observable**: use an Observable to update state
+- `createFeatureSelector` has been deprecated. Use now `createFeatureStateSelector` which is more in line with `createComponentStateSelector`
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
 
