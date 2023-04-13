@@ -53,7 +53,7 @@ export class ArtStoreService extends FeatureStore<ArtState> {
       super('art', initialState);
 
       const delayedOpacity$: Observable<ArtState> = timer(Math.random() * 5000).pipe(
-          map(() => ({ opacity: Math.random() })) // map data to Partial<ArtState>
+          map(() => ({ opacity: Math.random() })) // map data to ArtState
       );
 
       this.setState(delayedOpacity$); // setState will be triggerd by the Observable
