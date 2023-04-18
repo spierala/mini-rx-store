@@ -7,5 +7,5 @@
         "stripInternal": true
     },
     "include": ["**/*.ts"],
-    "exclude": ["src/lib/spec/**/*"]
+    "exclude": ["src/lib/spec/**/*", "jest.config.ts"]
 }

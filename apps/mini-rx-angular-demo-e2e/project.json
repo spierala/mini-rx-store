@@ -1,28 +1,29 @@
 {
-  "root": "apps/mini-rx-angular-demo-e2e",
-  "sourceRoot": "apps/mini-rx-angular-demo-e2e/src",
-  "projectType": "application",
-  "targets": {
-    "e2e": {
-      "executor": "@nrwl/cypress:cypress",
-      "options": {
-        "cypressConfig": "apps/mini-rx-angular-demo-e2e/cypress.json",
-        "devServerTarget": "mini-rx-angular-demo:serve:development"
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "mini-rx-angular-demo:serve:production"
+    "name": "mini-rx-angular-demo-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/mini-rx-angular-demo-e2e/src",
+    "projectType": "application",
+    "targets": {
+        "e2e": {
+            "executor": "@nrwl/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/mini-rx-angular-demo-e2e/cypress.json",
+                "devServerTarget": "mini-rx-angular-demo:serve:development"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "mini-rx-angular-demo:serve:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/mini-rx-angular-demo-e2e/**/*.{js,ts}"]
+            }
         }
-      }
     },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/mini-rx-angular-demo-e2e/**/*.{js,ts}"]
-      }
-    }
-  },
-  "tags": [],
-  "implicitDependencies": ["mini-rx-angular-demo"]
+    "tags": [],
+    "implicitDependencies": ["mini-rx-angular-demo"]
 }

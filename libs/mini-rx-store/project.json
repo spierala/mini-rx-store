@@ -1,10 +1,11 @@
 {
-    "root": "libs/mini-rx-store",
+    "name": "mini-rx-store",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "libs/mini-rx-store/src",
     "projectType": "library",
     "targets": {
         "build": {
-            "executor": "@nrwl/web:rollup",
+            "executor": "@nrwl/rollup:rollup",
             "outputs": ["{options.outputPath}"],
             "options": {
                 "outputPath": "dist/libs/mini-rx-store",
@@ -40,9 +41,9 @@
         },
         "test": {
             "executor": "@nrwl/jest:jest",
-            "outputs": ["coverage/libs/mini-rx-store"],
+            "outputs": ["{workspaceRoot}/coverage/libs/mini-rx-store"],
             "options": {
-                "jestConfig": "libs/mini-rx-store/jest.config.js",
+                "jestConfig": "libs/mini-rx-store/jest.config.ts",
                 "passWithNoTests": true
             }
         },

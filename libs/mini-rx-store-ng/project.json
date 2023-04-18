@@ -1,12 +1,13 @@
 {
+    "name": "mini-rx-store-ng",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "library",
-    "root": "libs/mini-rx-store-ng",
     "sourceRoot": "libs/mini-rx-store-ng/src",
     "prefix": "mini-rx",
     "targets": {
         "build": {
             "executor": "@nrwl/angular:package",
-            "outputs": ["dist/libs/mini-rx-store-ng"],
+            "outputs": ["{workspaceRoot}/dist/libs/mini-rx-store-ng"],
             "options": {
                 "project": "libs/mini-rx-store-ng/ng-package.json"
             },
@@ -22,9 +23,9 @@
         },
         "test": {
             "executor": "@nrwl/jest:jest",
-            "outputs": ["coverage/libs/mini-rx-store-ng"],
+            "outputs": ["{workspaceRoot}/coverage/libs/mini-rx-store-ng"],
             "options": {
-                "jestConfig": "libs/mini-rx-store-ng/jest.config.js",
+                "jestConfig": "libs/mini-rx-store-ng/jest.config.ts",
                 "passWithNoTests": true
             }
         },
