@@ -1,6 +1,7 @@
 {
+    "name": "mini-rx-angular-demo",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
-    "root": "apps/mini-rx-angular-demo",
     "sourceRoot": "apps/mini-rx-angular-demo/src",
     "prefix": "app",
     "targets": {
@@ -77,7 +78,7 @@
             }
         },
         "lint": {
-            "executor": "@nrwl/linter:eslint",
+            "executor": "@nx/linter:eslint",
             "options": {
                 "lintFilePatterns": [
                     "apps/mini-rx-angular-demo/src/**/*.ts",
@@ -86,15 +87,15 @@
             }
         },
         "test": {
-            "executor": "@nrwl/jest:jest",
-            "outputs": ["coverage/apps/mini-rx-angular-demo"],
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/apps/mini-rx-angular-demo"],
             "options": {
-                "jestConfig": "apps/mini-rx-angular-demo/jest.config.js",
+                "jestConfig": "apps/mini-rx-angular-demo/jest.config.ts",
                 "passWithNoTests": true
             }
         },
         "serveAppAndWatchLibs": {
-            "executor": "@nrwl/workspace:run-commands",
+            "executor": "nx:run-commands",
             "options": {
                 "commands": [
                     {

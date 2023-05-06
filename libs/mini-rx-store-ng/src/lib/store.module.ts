@@ -19,7 +19,7 @@ export const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>(
     '@mini-rx/feature-store-config'
 );
 
-export function storeFactory<T>(config: StoreConfig<T>, injector: Injector) {
+export function storeFactory(config: StoreConfig<Record<string, any>>, injector: Injector) {
     config.extensions =
         config.extensions && config.extensions.length
             ? config.extensions.map((ext) => {

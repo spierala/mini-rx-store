@@ -23,7 +23,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: npm ci
+            - run: yarn install --frozen-lockfile
             - run: npm run build:all
             - run: npm run test:mini-rx-store
             - run: npm run test:mini-rx-store-ng

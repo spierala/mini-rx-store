@@ -1,17 +1,18 @@
 {
-    "root": "libs/mini-rx-store",
+    "name": "mini-rx-store",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "libs/mini-rx-store/src",
     "projectType": "library",
     "targets": {
         "build": {
-            "executor": "@nrwl/web:rollup",
+            "executor": "@nx/rollup:rollup",
             "outputs": ["{options.outputPath}"],
             "options": {
                 "outputPath": "dist/libs/mini-rx-store",
                 "tsConfig": "libs/mini-rx-store/tsconfig.lib.json",
                 "project": "libs/mini-rx-store/package.json",
                 "entryFile": "libs/mini-rx-store/src/index.ts",
-                "format": ["esm", "umd", "cjs"],
+                "format": ["esm", "cjs"],
                 "globals": [
                     {
                         "global": "Rx",
@@ -32,17 +33,17 @@
             }
         },
         "lint": {
-            "executor": "@nrwl/linter:eslint",
+            "executor": "@nx/linter:eslint",
             "outputs": ["{options.outputFile}"],
             "options": {
                 "lintFilePatterns": ["libs/mini-rx-store/**/*.ts"]
             }
         },
         "test": {
-            "executor": "@nrwl/jest:jest",
-            "outputs": ["coverage/libs/mini-rx-store"],
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/libs/mini-rx-store"],
             "options": {
-                "jestConfig": "libs/mini-rx-store/jest.config.js",
+                "jestConfig": "libs/mini-rx-store/jest.config.ts",
                 "passWithNoTests": true
             }
         },
