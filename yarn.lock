@@ -8578,7 +8578,7 @@ neo-async@^2.6.0, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-ng-packagr@16.0.0:
+ng-packagr@~16.0.0:
   version "16.0.0"
   resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-16.0.0.tgz#fd8bbe36b3b60783a365f37705c5770f358f113f"
   integrity sha512-PSgzS9WMypXyZbI5G54mNiarT54a3j5vf5pj84BOWJaSh6MbX3q49fR1ql41A+qtkPkG+e7xQ3IhMOnOMilobg==

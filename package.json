@@ -32,6 +32,7 @@
         "@angular/platform-browser": "16.0.0",
         "@angular/platform-browser-dynamic": "16.0.0",
         "@angular/router": "16.0.0",
+        "@nx/angular": "16.1.1",
         "angular-in-memory-web-api": "^0.15.0",
         "bootstrap": "^4.4.1",
         "bootstrap-icons": "^1.4.0",
@@ -40,9 +41,8 @@
         "rxjs": "7.8.0",
         "ts-action": "^11.0.0",
         "ts-action-operators": "^9.1.1",
-        "tslib": "^2.0.0",
-        "zone.js": "0.13.0",
-        "@nx/angular": "16.1.1"
+        "tslib": "^2.3.0",
+        "zone.js": "0.13.0"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "16.0.0",
@@ -57,6 +57,14 @@
         "@commitlint/cli": "^16.2.1",
         "@commitlint/config-conventional": "^16.2.1",
         "@jscutlery/semver": "^2.30.1",
+        "@nx/cypress": "16.1.1",
+        "@nx/eslint-plugin": "16.1.1",
+        "@nx/jest": "16.1.1",
+        "@nx/js": "16.1.1",
+        "@nx/linter": "16.1.1",
+        "@nx/rollup": "16.1.1",
+        "@nx/web": "16.1.1",
+        "@nx/workspace": "16.1.1",
         "@schematics/angular": "16.0.0",
         "@types/jest": "29.4.4",
         "@types/lodash-es": "^4.17.6",
@@ -75,8 +83,9 @@
         "jest-marbles": "^3.0.2",
         "jest-preset-angular": "13.0.0",
         "lint-staged": "^12.3.7",
-        "ng-packagr": "16.0.0",
+        "ng-packagr": "~16.0.0",
         "nx": "16.1.1",
+        "nx-cloud": "16.0.5",
         "postcss": "^8.4.5",
         "postcss-import": "14.1.0",
         "postcss-preset-env": "7.5.0",
@@ -85,16 +94,7 @@
         "source-map-explorer": "^2.5.2",
         "ts-jest": "29.1.0",
         "ts-node": "10.9.1",
-        "typescript": "5.0.4",
-        "nx-cloud": "16.0.5",
-        "@nx/workspace": "16.1.1",
-        "@nx/linter": "16.1.1",
-        "@nx/js": "16.1.1",
-        "@nx/cypress": "16.1.1",
-        "@nx/jest": "16.1.1",
-        "@nx/web": "16.1.1",
-        "@nx/eslint-plugin": "16.1.1",
-        "@nx/rollup": "16.1.1"
+        "typescript": "5.0.4"
     },
     "lint-staged": {
         "*.{js,json,css,scss,md,ts,html}": [
