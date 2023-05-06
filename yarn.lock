@@ -8610,10 +8610,10 @@ ng-packagr@16.0.0:
   optionalDependencies:
     esbuild "^0.17.0"
 
-ngx-toastr@^15.2.2:
-  version "15.2.2"
-  resolved "https://registry.yarnpkg.com/ngx-toastr/-/ngx-toastr-15.2.2.tgz#8df1e880e6b111ede424350add200d97bb2fa524"
-  integrity sha512-srdxKKf1+B/7z11M4Ty7bnkme2xjdUcnP/t7mNG/2gRM1h0P/7Lbz71FIQHuKZOCdnGdXjsT6OXU0dRvNyrkyg==
+ngx-toastr@^16.2.0:
+  version "16.2.0"
+  resolved "https://registry.yarnpkg.com/ngx-toastr/-/ngx-toastr-16.2.0.tgz#f138c31c3b6960a1059aeea7133a44e4db95db79"
+  integrity sha512-7X6UhOKiaUeC2eTOsUqctZH0ZWKG8VlzDxWJhdEF1N3kPod46SU/Vn2l0hbt8EDwTjxHKfKyevU2idkYDoZYog==
   dependencies:
     tslib "^2.3.0"
 
