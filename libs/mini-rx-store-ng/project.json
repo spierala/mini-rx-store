@@ -6,7 +6,7 @@
     "prefix": "mini-rx",
     "targets": {
         "build": {
-            "executor": "@nrwl/angular:package",
+            "executor": "@nx/angular:package",
             "outputs": ["{workspaceRoot}/dist/libs/mini-rx-store-ng"],
             "options": {
                 "project": "libs/mini-rx-store-ng/ng-package.json"
@@ -22,7 +22,7 @@
             "defaultConfiguration": "production"
         },
         "test": {
-            "executor": "@nrwl/jest:jest",
+            "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/libs/mini-rx-store-ng"],
             "options": {
                 "jestConfig": "libs/mini-rx-store-ng/jest.config.ts",
@@ -30,7 +30,7 @@
             }
         },
         "lint": {
-            "executor": "@nrwl/linter:eslint",
+            "executor": "@nx/linter:eslint",
             "options": {
                 "lintFilePatterns": [
                     "libs/mini-rx-store-ng/src/**/*.ts",

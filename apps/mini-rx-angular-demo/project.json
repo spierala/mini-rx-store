@@ -78,7 +78,7 @@
             }
         },
         "lint": {
-            "executor": "@nrwl/linter:eslint",
+            "executor": "@nx/linter:eslint",
             "options": {
                 "lintFilePatterns": [
                     "apps/mini-rx-angular-demo/src/**/*.ts",
@@ -87,7 +87,7 @@
             }
         },
         "test": {
-            "executor": "@nrwl/jest:jest",
+            "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/mini-rx-angular-demo"],
             "options": {
                 "jestConfig": "apps/mini-rx-angular-demo/jest.config.ts",

@@ -13,18 +13,21 @@ To manage state at large scale you can use the classic **[Redux API](https://spi
 
 This demo uses both the Redux API and the Feature Store API:
 
-- Todos Simple: Feature Store API
-- Todos: Feature Store API
-- Products and Cart: Redux API
-- User: Feature Store API
+-   Todos Simple: Feature Store API
+-   Todos: Feature Store API
+-   Products and Cart: Redux API
+-   User: Feature Store API
 
 ### Install dependencies
+
 `npm install`
 
 ### Run the demo
+
 `npm run start:angular-demo`
 
 ### NX
-This demo app is part of a Nx workspace. The workspace includes also the MiniRx libraries.  Read more about Nx here: https://nx.dev
 
-The demo app was created with the Nx Angular Plugin ([@nrwl/angular](https://nx.dev/packages/angular)).
+This demo app is part of a Nx workspace. The workspace includes also the MiniRx libraries. Read more about Nx here: https://nx.dev
+
+The demo app was created with the Nx Angular Plugin ([@nx/angular](https://nx.dev/packages/angular)).
