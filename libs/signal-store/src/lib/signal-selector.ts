@@ -108,18 +108,22 @@ export function createSelector(...args: any[]): SignalSelector<any, any> {
     const selectors = args.slice(0, args.length - 1);
     const projector = args[args.length - 1];
 
-    const newSelector: Selector<any, any> = (state) => {
-        const selectorSignals: Signal<any>[] = selectors.map((fn) => fn(state));
+    const selector: Selector<any, any> = (state) => {
+        const signalsFromSelectors: Signal<any>[] = selectors.map((fn) => {
+            return fn(state); // Pass the state Signal
+        });
+
+        // Return computed Signal which recalculates when one of the `signalsFromSelectors` notifies about changes
         return computed(
             () => {
-                const selectorSignalResults: any[] = selectorSignals.map((aSignal) => aSignal());
-                return projector(...selectorSignalResults);
+                const results: any[] = signalsFromSelectors.map((aSignal) => aSignal());
+                return projector(...results);
             },
-            { equal: signalEquality }
+            { equal: signalEquality } // Notify about changes only if there is a new primitive / object reference
         );
     };
 
-    return addSignalSelectorKey(newSelector);
+    return addSignalSelectorKey(selector);
 }
 
 export function createFeatureStateSelector<T>(featureKey?: string): SignalSelector<object, T>;
@@ -137,7 +141,8 @@ export function createFeatureStateSelector(featureKey?: any): SignalSelector<any
     return addSignalSelectorKey(selector);
 }
 
-function addSignalSelectorKey<T, R>(s: Selector<T, R>): SignalSelector<T, R> {
+// Exported for testing
+export function addSignalSelectorKey<T, R>(s: Selector<T, R>): SignalSelector<T, R> {
     Object.defineProperty(s, SIGNAL_SELECTOR_KEY, {
         value: true,
     });
