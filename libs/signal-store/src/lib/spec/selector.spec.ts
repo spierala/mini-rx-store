@@ -1,5 +1,3 @@
-// Credits to NgRx: https://github.com/ngrx/platform/blob/8.6.0/modules/store/spec/selector.spec.ts
-
 import {
     addSignalSelectorKey,
     createFeatureStateSelector,
@@ -29,15 +27,18 @@ describe('Selectors', () => {
             const selector = createSelector(neverChangingSelector, projectFn);
 
             const selectedState = selector(state);
-            selectedState();
+            selectedState(); // Read Signal
 
             state.set({ someProp: 2, unchanged: 'state' }); // Change only someProp
-            selectedState();
+            selectedState(); // Read Signal
+
+            state.set({ someProp: 3, unchanged: 'state' }); // Change only someProp
+            selectedState(); // Read Signal
 
             expect(projectFn).toHaveBeenCalledTimes(1);
         });
 
-        it('should run computed callback only if dependent state signal changes', () => {
+        it('should run computed callback only if dependent signal state changes', () => {
             const firstState = 1;
             const secondState = 2;
 
@@ -79,15 +80,15 @@ describe('Selectors', () => {
             const selectedState = selector(signalState);
 
             signalState.set(firstState);
-            selectedState(); // read Signal
+            selectedState(); // Read Signal
             signalState.set(firstState);
-            selectedState(); // read Signal
+            selectedState(); // Read Signal
             signalState.set(firstState);
-            selectedState(); // read Signal
+            selectedState(); // Read Signal
             signalState.set(secondState);
-            selectedState(); // read Signal
+            selectedState(); // Read Signal
             signalState.set(secondState);
-            selectedState(); // read Signal
+            selectedState(); // Read Signal
 
             expect(selector1Spy).toHaveBeenCalledTimes(2);
             expect(selector2Spy).toHaveBeenCalledTimes(2);
@@ -95,34 +96,48 @@ describe('Selectors', () => {
             expect(projectFn).toHaveBeenCalledTimes(2);
         });
 
-        // it('should not memoize last successful projection result in case of error', () => {
-        //     const firstState = { ok: true };
-        //     const secondState = { ok: false };
-        //     const fail = () => {
-        //         throw new Error();
-        //     };
-        //     const projectorFn = jasmine
-        //         .createSpy('projectorFn', (s: any) => (s.ok ? s.ok : fail()))
-        //         .and.callThrough();
-        //     const selectorFn = jasmine
-        //         .createSpy(
-        //             'selectorFn',
-        //             createSelector(addSignalSelectorKey((state) => state), projectorFn)
-        //         )
-        //         .and.callThrough();
-        //
-        //     selectorFn(firstState);
-        //
-        //     expect(() => selectorFn(secondState)).toThrow(new Error());
-        //     expect(() => selectorFn(secondState)).toThrow(new Error());
-        //
-        //     selectorFn(firstState);
-        //     expect(selectorFn).toHaveBeenCalledTimes(4);
-        //     expect(projectorFn).toHaveBeenCalledTimes(3);
-        // });
+        it('should memoize the error', () => {
+            const signalState: WritableSignal<number> = signal(1);
+
+            const selectorSpy = jest.fn();
+            const projectSpy = jest.fn().mockImplementation((v) => v);
+
+            const selector = (state: Signal<any>) => {
+                return computed(() => {
+                    selectorSpy();
+                    if (state() % 2 === 0) {
+                        // Throw only for even numbers
+                        throw new Error();
+                    }
+                    return state();
+                });
+            };
+
+            const createdSelector = createSelector(
+                addSignalSelectorKey(selector), // Use `addSignalSelectorKey` to make selector compatible with `createSelector`
+                projectSpy
+            );
+            const selectedState = createdSelector(signalState);
+
+            signalState.set(1);
+
+            expect(selectedState()).toBe(1);
+            expect(selectorSpy).toHaveBeenCalledTimes(1);
+
+            signalState.set(2);
+            expect(() => selectedState()).toThrow();
+            expect(selectorSpy).toHaveBeenCalledTimes(2);
+
+            signalState.set(2); // Set the same state again
+            expect(() => selectedState()).toThrow(); // but the same error is thrown
+            expect(selectorSpy).toHaveBeenCalledTimes(2); // computed does not run again
+            expect(projectSpy).toHaveBeenCalledTimes(1);
+
+            // A new Signal value (which does not cause an error) will clear the memoized error
+            signalState.set(3);
+            expect(selectedState()).toBe(3);
+            expect(selectorSpy).toHaveBeenCalledTimes(3);
+            expect(projectSpy).toHaveBeenCalledTimes(2);
+        });
     });
 });
-
-function signalEquality(a: any, b: any) {
-    return a === b;
-}
