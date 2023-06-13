@@ -33,7 +33,7 @@ describe('Selectors', () => {
         it('should deliver the value of selectors to the projection function', () => {
             const projectFn = jasmine.createSpy('projectionFn');
 
-            const selector = createSelector(incrementOne, incrementTwo, projectFn)({});
+            createSelector(incrementOne, incrementTwo, projectFn)({});
 
             expect(projectFn).toHaveBeenCalledWith(countOne, countTwo);
         });
@@ -97,6 +97,37 @@ describe('Selectors', () => {
             selectorFn(firstState);
             expect(selectorFn).toHaveBeenCalledTimes(4);
             expect(projectorFn).toHaveBeenCalledTimes(3);
+        });
+
+        it('should create a selector from selectors dictionary', () => {
+            interface State {
+                x: number;
+                y: string;
+            }
+
+            const selectX = (state: State) => state.x + 1;
+            const selectY = (state: State) => state.y;
+
+            const selectDictionary = createSelector({
+                s: selectX,
+                m: selectY,
+            });
+
+            expect(selectDictionary({ x: 1, y: 'mini-rx' })).toEqual({
+                s: 2,
+                m: 'mini-rx',
+            });
+            expect(selectDictionary({ x: 2, y: 'mini-rx' })).toEqual({
+                s: 3,
+                m: 'mini-rx',
+            });
+        });
+
+        it('should create a selector from empty dictionary', () => {
+            const selectDictionary = createSelector({});
+
+            expect(selectDictionary({ x: 1, y: 'mini-rx' })).toEqual({});
+            expect(selectDictionary({ x: 2, y: 'store' })).toEqual({});
         });
     });
 });

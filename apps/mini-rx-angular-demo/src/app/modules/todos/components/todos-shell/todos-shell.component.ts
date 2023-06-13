@@ -1,10 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Todo } from '../../../todos-shared/models/todo';
-import { TodoFilter } from '../../../todos-shared/models/todo-filter';
-import { TodosStore } from '../../state/todos-store.service';
-import { map } from 'rxjs/operators';
-import { cloneDeep } from 'lodash-es';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {TodosStore} from '../../state/todos-store.service';
 
 @Component({
     templateUrl: './todos-shell.component.html',
@@ -12,12 +7,7 @@ import { cloneDeep } from 'lodash-es';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TodosShellComponent {
-    todosDone$: Observable<Todo[]> = this.todosState.todosDone$;
-    todosNotDone$: Observable<Todo[]> = this.todosState.todosNotDone$;
-    selectedTodo$: Observable<Todo | undefined> = this.todosState.selectedTodo$.pipe(
-        map(cloneDeep) // Prevent [(ngModel)] from mutating the state
-    );
-    filter$: Observable<TodoFilter> = this.todosState.filter$;
+    vm$ = this.todosState.vm$;
 
     constructor(public todosState: TodosStore) {}
 }

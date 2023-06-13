@@ -1,11 +1,12 @@
-<div class="d-flex flex-column h-100">
+<ng-container *ngIf="vm$ | async as viewModel">
+<div  class="d-flex flex-column h-100">
     <nav class="navbar navbar-light bg-light mb-1">
         <a class="navbar-brand">Todos</a>
         <div class="d-flex flex-grow-1 mb-2 justify-content-between mt-2">
             <button class="btn btn-primary btn-sm" (click)="todosState.initNewTodo()">New</button>
             <app-filter
                 (filterUpdate)="todosState.updateFilter($event)"
-                [filter]="(filter$ | async)!"
+                [filter]="viewModel.filter"
             ></app-filter>
         </div>
     </nav>
@@ -29,8 +30,8 @@
                         <span>Todos</span>
                     </div>
                     <app-todo-list
-                        [todos]="(todosNotDone$ | async)!"
-                        [selectedTodo]="(selectedTodo$ | async)!"
+                        [todos]="viewModel.todosNotDone"
+                        [selectedTodo]="viewModel.selectedTodo"
                         (selectTodo)="todosState.selectTodo($event)"
                     ></app-todo-list>
                 </div>
@@ -41,13 +42,13 @@
                         <span>Todos Done</span>
                     </div>
                     <app-todo-list
-                        [todos]="(todosDone$ | async)!"
-                        [selectedTodo]="(selectedTodo$ | async)!"
+                        [todos]="viewModel.todosDone"
+                        [selectedTodo]="viewModel.selectedTodo"
                         (selectTodo)="todosState.selectTodo($event)"
                     ></app-todo-list>
                 </div>
             </div>
-            <div class="col" *ngIf="selectedTodo$ | async as selectedTodo">
+            <div class="col" *ngIf="viewModel.selectedTodo as selectedTodo">
                 <app-todo-detail
                     [todo]="selectedTodo"
                     (create)="todosState.create($event)"
@@ -59,3 +60,4 @@
         </div>
     </div>
 </div>
+</ng-container>
