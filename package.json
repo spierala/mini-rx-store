@@ -35,7 +35,7 @@
         "@angular/platform-browser-dynamic": "16.0.0",
         "@angular/router": "16.0.0",
         "@nx/angular": "16.1.1",
-        "angular-in-memory-web-api": "^0.15.0",
+        "angular-in-memory-web-api": "^0.16.0",
         "bootstrap": "^4.4.1",
         "bootstrap-icons": "^1.4.0",
         "lodash-es": "^4.17.21",

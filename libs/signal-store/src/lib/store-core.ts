@@ -25,7 +25,8 @@ export let hasUndoExtension = false;
 let isStoreInitialized = false;
 
 // REDUCER STATE
-const reducerState: WritableSignal<{
+// exported for testing purposes
+export const reducerState: WritableSignal<{
     featureReducers: ReducerDictionary<AppState>;
     metaReducers: MetaReducer<AppState>[];
 }> = signal({
