@@ -1,12 +1,14 @@
 import { Action, ActionWithPayload, Reducer } from '../models';
 import { v4 as uuid } from 'uuid';
-import { reducerState } from '../store-core';
+import { dispatch, reducerState } from '../store-core';
 
 export function resetStoreConfig() {
     reducerState.set({
         metaReducers: [],
         featureReducers: {},
     });
+
+    dispatch({ type: 'resetStoreConfig' }); // Trigger action to recalculate state
 }
 
 export interface UserState {

@@ -11,16 +11,20 @@ import {
     StoreExtension,
 } from '../models';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
-import { BehaviorSubject, Observable, of, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, mapTo, Observable, of } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
-import { FeatureStore } from '../feature-store';
-import { counterInitialState, CounterState, resetStoreConfig } from './_spec-helpers';
+import { createFeatureStore, FeatureStore } from '../feature-store';
+import {
+    counterInitialState,
+    counterReducer,
+    CounterState,
+    resetStoreConfig,
+} from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../ng-modules/store.module';
-import { actions$, addExtension, addFeature, rxEffect } from '../store-core';
+import { addExtension, addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
 import { ofType } from '../utils';
 import { map, mergeMap, tap } from 'rxjs/operators';
-import { createRxEffect } from '../create-rx-effect';
 import { LoggerExtension } from '../extensions/logger.extension';
 
 const asyncUser: Partial<UserState> = {
@@ -35,8 +39,8 @@ const updatedAsyncUser: Partial<UserState> = {
     age: 31,
 };
 
-function fakeApiGet(): Observable<Partial<UserState>> {
-    return of(asyncUser);
+function fakeApiGet(): Observable<UserState> {
+    return cold('---a', { a: asyncUser });
 }
 
 function fakeApiUpdate(): Observable<UserState> {
@@ -131,6 +135,7 @@ function setup(
     store = TestBed.inject(Store);
     actions = TestBed.inject(Actions);
 }
+
 describe('Store Config', () => {
     afterEach(() => {
         resetStoreConfig();
@@ -195,13 +200,12 @@ describe('Store Config', () => {
         });
     });
 
-    // TODO what happens if StoreModule forRoot is called many times
-    //     it('should throw when calling Store.config after a Feature Store was initialized', () => {
-    //         createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
-    //         expect(() => StoreCore.configureStore({})).toThrowError(
-    //             '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
-    //         );
-    //     });
+    it('should throw when calling Store.config after a Feature Store was initialized', () => {
+        createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
+        expect(() => configureStore({})).toThrowError(
+            '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+        );
+    });
 
     describe('Root Meta Reducers', () => {
         const nextStateSpy = jest.fn();
@@ -427,310 +431,332 @@ describe('Store Config', () => {
             );
         });
     });
+});
 
-    describe('Store', () => {
-        afterEach(() => {
-            resetStoreConfig();
-        });
+describe('Store', () => {
+    afterEach(() => {
+        resetStoreConfig();
+    });
 
-        it('should run the redux reducers when a new Feature state is added', () => {
-            const reducerSpy = jest.fn();
+    it('should run the redux reducers when a new Feature state is added', () => {
+        const reducerSpy = jest.fn();
 
-            function someReducer() {
-                reducerSpy();
-            }
+        function someReducer() {
+            reducerSpy();
+        }
 
-            setup(
-                { reducers: { user: userReducer } },
-                { key: 'oneMoreFeature', reducer: someReducer }
-            );
+        setup({ reducers: { user: userReducer } }, { key: 'oneMoreFeature', reducer: someReducer });
 
-            expect(reducerSpy).toHaveBeenCalledTimes(1);
-        });
+        expect(reducerSpy).toHaveBeenCalledTimes(1);
+    });
 
-        it('should throw when reusing feature name', () => {
-            expect(() => {
-                TestBed.configureTestingModule({
-                    imports: [
-                        StoreModule.forRoot({}),
-                        StoreModule.forFeature('alreadyExistingFeature', userReducer),
-                    ],
-                });
-
-                TestBed.configureTestingModule({
-                    imports: [StoreModule.forFeature('alreadyExistingFeature', userReducer)],
-                });
-
-                const store = TestBed.inject(Store); // inject Store to execute TestBed
-            }).toThrowError('@mini-rx: Feature "alreadyExistingFeature" already exists.');
-        });
-
-        it('should dispatch an initial action when adding a feature', () => {
-            const spy = jest.fn();
-            actions.subscribe(spy);
-
-            addFeature('oneMoreFeature3', (state) => state);
-
-            expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init' });
-        });
-
-        it('should update the Feature state', () => {
-            setup({ reducers: { user: userReducer } });
-
-            const user = {
-                firstName: 'Nicolas',
-                lastName: 'Cage',
-            };
-
-            store.dispatch({
-                type: 'updateUser',
-                payload: user,
+    it('should throw when reusing feature name', () => {
+        expect(() => {
+            TestBed.configureTestingModule({
+                imports: [
+                    StoreModule.forRoot({}),
+                    StoreModule.forFeature('alreadyExistingFeature', userReducer),
+                ],
             });
 
-            const firstName = store.select(getFirstName);
-            expect(firstName()).toEqual(user.firstName);
+            TestBed.configureTestingModule({
+                imports: [StoreModule.forFeature('alreadyExistingFeature', userReducer)],
+            });
+
+            const store = TestBed.inject(Store); // inject Store to execute TestBed
+        }).toThrowError('@mini-rx: Feature "alreadyExistingFeature" already exists.');
+    });
+
+    it('should dispatch an initial action when adding a feature', () => {
+        const spy = jest.fn();
+        actions.subscribe(spy);
+
+        addFeature('oneMoreFeature3', (state) => state);
+
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init' });
+    });
+
+    it('should update the Feature state', () => {
+        setup({ reducers: { user: userReducer } });
+
+        const user = {
+            firstName: 'Nicolas',
+            lastName: 'Cage',
+        };
+
+        store.dispatch({
+            type: 'updateUser',
+            payload: user,
         });
 
-        it('should update the Feature state', () => {
-            setup({ reducers: { user: userReducer } });
+        const firstName = store.select(getFirstName);
+        expect(firstName()).toEqual(user.firstName);
+    });
 
-            const age = store.select(getAge);
-            expect(age()).toBe(30);
+    it('should update the Feature state', () => {
+        setup({ reducers: { user: userReducer } });
 
-            store.dispatch({ type: 'incAge' });
-            expect(age()).toBe(31);
-        });
+        const age = store.select(getAge);
+        expect(age()).toBe(30);
 
-        it('should return undefined if feature does not exist yet', () => {
-            const featureSelector = createFeatureStateSelector('notExistingFeature');
-            const selectedState = store.select(featureSelector);
-            expect(selectedState()).toBe(undefined);
-        });
+        store.dispatch({ type: 'incAge' });
+        expect(age()).toBe(31);
+    });
 
-        xit('bla', () => {
-            setup({ reducers: { user: userReducer } });
+    it('should return undefined if feature does not exist yet', () => {
+        const featureSelector = createFeatureStateSelector('notExistingFeature');
+        const selectedState = store.select(featureSelector);
+        expect(selectedState()).toBe(undefined);
+    });
 
-            const selectedState = store.select(getUserFeatureState);
+    it('should create and execute an effect', () => {
+        const spy = jest.fn();
+        actions.subscribe(spy);
 
-            const test$ = new BehaviorSubject(5);
-
-            const statePerAction$ = actions.pipe(map(() => 1));
-
-            statePerAction$.subscribe(console.log);
-
-            store.dispatch({ type: 'resetUser' });
-
-            expect(actions).toBeObservable(
-                // hot('a-xb', { a: userInitialState, b: asyncUser, x: updatedAsyncUser })
-                hot('a', { a: userInitialState })
-            );
-        });
-
-        xit('should create and execute an effect', () => {
-            setup({ reducers: { user: userReducer } });
-
-            const selectedState = store.select(getUserFeatureState);
-
-            const statePerAction$ = actions.pipe(map(() => selectedState()));
-
-            store.dispatch({ type: 'resetUser' });
-
-            // expect(selectedState()).toEqual(userInitialState);
-
-            store.rxEffect(
-                actions.pipe(
-                    ofType('loadUser'),
-                    mergeMap(() =>
-                        fakeApiGet().pipe(
-                            map((user) => ({
-                                type: 'loadUserSuccess',
-                                payload: user,
-                            }))
-                        )
+        rxEffect(
+            actions.pipe(
+                ofType('loadUser'),
+                mergeMap(() =>
+                    of('someUseResponse').pipe(
+                        map((response) => ({
+                            type: 'loadUserSuccess',
+                            payload: response,
+                        }))
                     )
                 )
-            );
+            )
+        );
 
-            store.dispatch({ type: 'loadUser' });
+        store.dispatch({ type: 'loadUser' });
 
-            expect(selectedState()).toEqual(asyncUser);
+        expect(spy.mock.calls).toEqual([
+            [{ type: 'loadUser' }],
+            [
+                {
+                    payload: 'someUseResponse',
+                    type: 'loadUserSuccess',
+                },
+            ],
+        ]);
+    });
 
-            // Let's be crazy and add another effect while the other effect is busy
-            // cold('-a').subscribe(() => {
-            //     const effect = createRxEffect(
-            //         actions.pipe(
-            //             ofType('saveUser'),
-            //             mergeMap(() =>
-            //                 fakeApiUpdate().pipe(
-            //                     map((user) => ({
-            //                         type: 'saveUserSuccess',
-            //                         payload: user,
-            //                     }))
-            //                 )
-            //             )
-            //         )
-            //     );
-            //
-            //     store.rxEffect(effect);
-            //
-            //     store.dispatch({ type: 'saveUser' });
-            // });
-
-            expect(statePerAction$).toBeObservable(
-                // hot('a-xb', { a: userInitialState, b: asyncUser, x: updatedAsyncUser })
-                hot('a', { a: userInitialState })
-            );
+    xit('should create and execute an effect', () => {
+        setup({
+            reducers: { user: userReducer },
         });
 
-        it('should create and execute a non-dispatching effect', () => {
-            const action1 = { type: 'someAction' };
-            const action2 = { type: 'someAction2' };
+        rxEffect(
+            actions.pipe(
+                ofType('loadUser'),
+                tap(() => console.log('YEAH')),
+                mergeMap(() =>
+                    fakeApiGet().pipe(
+                        tap(() => {
+                            console.log('YEAH 2');
+                        }),
+                        map((user) => ({
+                            type: 'loadUserSuccess',
+                            payload: user,
+                        }))
+                    )
+                )
+            )
+        );
 
-            const effect = createRxEffect(
-                actions.pipe(
-                    ofType(action1.type),
-                    mergeMap(() => of(action2))
-                ),
-                { dispatch: false }
-            );
+        const selectedState = store.select(getUserFeatureState);
 
-            rxEffect(effect);
+        const bs = new BehaviorSubject<any>(undefined);
+        const sub = actions
+            .pipe(
+                tap((action) => console.log('action', action)),
+                map(() => selectedState()),
+                tap((state) => {
+                    bs.next(state);
+                    console.log('nexted', state);
+                })
+            )
+            .subscribe();
 
-            const spy = jest.fn();
-            actions.subscribe(spy);
+        store.dispatch({ type: 'resetUser' });
 
-            store.dispatch(action1);
+        store.dispatch({ type: 'loadUser' });
 
-            expect(spy).toHaveBeenCalledTimes(1);
-            expect(spy).toHaveBeenCalledWith(action1);
-            expect(spy).not.toHaveBeenCalledWith(action2);
-        });
-
-        //
-        //     it('should create and execute an effect and handle side effect error', () => {
-        //         store.dispatch({ type: 'resetUser' });
-        //
-        //         store.effect(
-        //             actions$.pipe(
-        //                 ofType('someAction'),
-        //                 mergeMap(() =>
-        //                     fakeApiWithError().pipe(
-        //                         map(() => ({
-        //                             type: 'whatever',
-        //                         })),
-        //                         catchError(() => of({ type: 'error', payload: 'error' }))
-        //                     )
+        // Let's be crazy and add another effect while the other effect is busy
+        // cold('-a').subscribe(() => {
+        //     const effect = createEffect(
+        //         actions.pipe(
+        //             ofType('saveUser'),
+        //             mergeMap(() =>
+        //                 fakeApiUpdate().pipe(
+        //                     map((user) => ({
+        //                         type: 'saveUserSuccess',
+        //                         payload: user,
+        //                     }))
         //                 )
         //             )
-        //         );
+        //         )
+        //     );
         //
-        //         store.dispatch({ type: 'someAction' });
+        //     rxEffect(effect);
         //
-        //         expect(store.select(getUserFeatureState)).toBeObservable(
-        //             hot('ab', { a: userInitialState, b: { ...userInitialState, err: 'error' } })
-        //         );
-        //     });
-        //
-        // TODO is this a good test? Log is tested in LoggerExtension spec?
-        it('should log', () => {
-            setup({ reducers: { user: userReducer } });
+        //     store.dispatch({ type: 'saveUser' });
+        // });
 
-            console.log = jest.fn(); // TODO restore log?
+        expect(bs).toBeObservable(hot('a--b', { a: userInitialState, b: asyncUser }));
 
-            const user: UserState = {
-                firstName: 'John',
-                lastName: 'Travolta',
-                age: 35,
-                err: undefined,
-            };
-
-            const newState = {
-                user,
-            };
-
-            const action: Action = {
-                type: 'updateUser',
-                payload: user,
-            };
-
-            addExtension(new LoggerExtension());
-
-            store.dispatch(action);
-
-            expect(console.log).toHaveBeenCalledWith(
-                expect.stringContaining('%cupdateUser'),
-                expect.stringContaining('color: #25c2a0'),
-                expect.stringContaining('Action:'),
-                action,
-                expect.stringContaining('State: '),
-                newState
-            );
-        });
-
-        it('should call the reducer before running the effect', () => {
-            const callOrder: string[] = [];
-            const someReducer = (state = { value: 0 }, action: Action) => {
-                switch (action.type) {
-                    case 'someAction2':
-                        callOrder.push('reducer');
-                        return {
-                            ...state,
-                            value: state.value + 1,
-                        };
-                    default:
-                        return state;
-                }
-            };
-
-            setup({
-                reducers: {
-                    someFeature: someReducer,
-                },
-            });
-
-            actions.subscribe(console.log);
-
-            const onEffectStarted = (): Observable<Action> => {
-                callOrder.push('effect');
-                return of({ type: 'whatever' });
-            };
-
-            const valueSpy = jest.fn();
-
-            rxEffect(
-                actions.pipe(
-                    ofType('someAction2'),
-                    mergeMap(() => {
-                        const selectedState = store.select((state) => state['someFeature'].value);
-                        valueSpy(selectedState());
-                        return onEffectStarted();
-                    })
-                )
-            );
-
-            store.dispatch({ type: 'someAction2' });
-
-            expect(callOrder).toEqual(['reducer', 'effect']);
-            expect(valueSpy).toHaveBeenCalledWith(1); // Effect can select the updated state immediately
-        });
+        sub.unsubscribe();
     });
+
+    // it('should create and execute a non-dispatching effect', () => {
+    //     const action1 = { type: 'someAction' };
+    //     const action2 = { type: 'someAction2' };
     //
-    //     it('should queue actions', () => {
-    //         const callLimit = 5000;
+    //     const effect = createRxEffect(
+    //         actions.pipe(
+    //             ofType(action1.type),
+    //             mergeMap(() => of(action2))
+    //         ),
+    //         { dispatch: false }
+    //     );
     //
-    //         store.feature<CounterState>('counter', counterReducer);
+    //     rxEffect(effect);
     //
-    //         const spy = jest.fn().mockImplementation(() => {
-    //             store.dispatch({ type: 'counter' });
-    //         });
+    //     const spy = jest.fn();
+    //     actions.subscribe(spy);
     //
-    //         const counter1$ = store.select(getCounter1);
+    //     store.dispatch(action1);
     //
-    //         counter1$.pipe(take(callLimit)).subscribe(spy);
+    //     expect(spy).toHaveBeenCalledTimes(1);
+    //     expect(spy).toHaveBeenCalledWith(action1);
+    //     expect(spy).not.toHaveBeenCalledWith(action2);
+    // });
+
     //
-    //         expect(spy).toHaveBeenCalledTimes(callLimit);
-    //         expect(spy).toHaveBeenNthCalledWith(callLimit, callLimit);
+    //     it('should create and execute an effect and handle side effect error', () => {
+    //         store.dispatch({ type: 'resetUser' });
+    //
+    //         store.effect(
+    //             actions$.pipe(
+    //                 ofType('someAction'),
+    //                 mergeMap(() =>
+    //                     fakeApiWithError().pipe(
+    //                         map(() => ({
+    //                             type: 'whatever',
+    //                         })),
+    //                         catchError(() => of({ type: 'error', payload: 'error' }))
+    //                     )
+    //                 )
+    //             )
+    //         );
+    //
+    //         store.dispatch({ type: 'someAction' });
+    //
+    //         expect(store.select(getUserFeatureState)).toBeObservable(
+    //             hot('ab', { a: userInitialState, b: { ...userInitialState, err: 'error' } })
+    //         );
     //     });
+    //
+    // TODO is this a good test? Log is tested in LoggerExtension spec?
+    it('should log', () => {
+        setup({ reducers: { user: userReducer } });
+
+        console.log = jest.fn(); // TODO restore log?
+
+        const user: UserState = {
+            firstName: 'John',
+            lastName: 'Travolta',
+            age: 35,
+            err: undefined,
+        };
+
+        const newState = {
+            user,
+        };
+
+        const action: Action = {
+            type: 'updateUser',
+            payload: user,
+        };
+
+        addExtension(new LoggerExtension());
+
+        store.dispatch(action);
+
+        expect(console.log).toHaveBeenCalledWith(
+            expect.stringContaining('%cupdateUser'),
+            expect.stringContaining('color: #25c2a0'),
+            expect.stringContaining('Action:'),
+            action,
+            expect.stringContaining('State: '),
+            newState
+        );
+    });
+
+    it('should call the reducer before running the effect', () => {
+        const callOrder: string[] = [];
+        const someReducer = (state = { value: 0 }, action: Action) => {
+            switch (action.type) {
+                case 'someAction2':
+                    callOrder.push('reducer');
+                    return {
+                        ...state,
+                        value: state.value + 1,
+                    };
+                default:
+                    return state;
+            }
+        };
+
+        setup({
+            reducers: {
+                someFeature: someReducer,
+            },
+        });
+
+        actions.subscribe(console.log);
+
+        const onEffectStarted = (): Observable<Action> => {
+            callOrder.push('effect');
+            return of({ type: 'whatever' });
+        };
+
+        const valueSpy = jest.fn();
+
+        rxEffect(
+            actions.pipe(
+                ofType('someAction2'),
+                mergeMap(() => {
+                    const selectedState = store.select((state) => state['someFeature'].value);
+                    valueSpy(selectedState());
+                    return onEffectStarted();
+                })
+            )
+        );
+
+        store.dispatch({ type: 'someAction2' });
+
+        expect(callOrder).toEqual(['reducer', 'effect']);
+        expect(valueSpy).toHaveBeenCalledWith(1); // Effect can select the updated state immediately
+    });
+
+    // it('should queue actions', () => {
+    //     const callLimit = 5000;
+    //
+    //     setup({reducers: {
+    //             counter: counterReducer
+    //         }})
+    //
+    //     const spy = jest.fn().mockImplementation(() => {
+    //         store.dispatch({ type: 'counter' });
+    //     });
+    //
+    //     const counter1$ = store.select(getCounter1);
+    //
+    //     counter1$.pipe(take(callLimit)).subscribe(spy);
+    //
+    //     expect(spy).toHaveBeenCalledTimes(callLimit);
+    //     expect(spy).toHaveBeenNthCalledWith(callLimit, callLimit);
+    // });
     //
     //     it('should queue effect actions', () => {
     //         const callLimit = 5000;
@@ -768,221 +794,216 @@ describe('Store Config', () => {
     //         expect(spy2).toHaveBeenNthCalledWith(callLimit, callLimit);
     //     });
     //
-    //     it('should select state from a Feature (which was created with `extends Feature)', () => {
-    //         const counterFeatureState = new CounterFeatureState();
-    //         counterFeatureState.increment();
-    //
-    //         const spy = jest.fn();
-    //         store.select(getCounter3).subscribe(spy);
-    //         expect(spy).toHaveBeenCalledWith(2);
-    //         expect(spy).toHaveBeenCalledTimes(1);
-    //     });
-    //
-    //     it('should overwrite reducers default state with a provided initialState', () => {
-    //         const featureKey = 'counterWithCustomInitialState';
-    //         const customInitialState: CounterState = {
-    //             counter: 2,
-    //         };
-    //
-    //         store.feature<CounterState>(featureKey, counterReducer, {
-    //             initialState: customInitialState,
-    //         });
-    //
-    //         const spy = jest.fn();
-    //         store.select((state) => state[featureKey]).subscribe(spy);
-    //         expect(spy).toHaveBeenCalledWith(customInitialState);
-    //     });
-    //
-    //     it('should resubscribe the effect 10 times (if side effect error is not handled)', () => {
-    //         const spy = jest.fn();
-    //         console.error = jest.fn();
-    //
-    //         function apiCallWithError() {
-    //             spy();
-    //             throw new Error();
-    //             return of('someValue');
-    //         }
-    //
-    //         store.effect(
-    //             actions$.pipe(
-    //                 ofType('someAction3'),
-    //                 mergeMap(() => {
-    //                     return apiCallWithError().pipe(mapTo({ type: 'someActionSuccess' }));
-    //                 })
-    //             )
-    //         );
-    //
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' });
-    //         store.dispatch({ type: 'someAction3' }); // #12 will not trigger the Api call anymore
-    //         store.dispatch({ type: 'someAction3' }); // #13 will not trigger the Api call anymore
-    //
-    //         expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
-    //
-    //         function getErrorMsg(times: number) {
-    //             return `@mini-rx: An error occurred in the Effect. MiniRx resubscribed the Effect automatically and will do so ${times} more times.`;
-    //         }
-    //
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(9)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(8)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(7)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(6)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(5)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(4)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(3)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(2)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(1)),
-    //             expect.any(Error)
-    //         );
-    //         expect(console.error).toHaveBeenCalledWith(
-    //             expect.stringContaining(getErrorMsg(0)),
-    //             expect.any(Error)
-    //         );
-    //
-    //         expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
-    //     });
-    //
-    //     it('should throw when creating store again with functional creation method', () => {
-    //         expect(() => configureStore({})).toThrow();
-    //     });
-    //
-    //     it('should not emit a new AppState when dispatching unknown Actions', () => {
-    //         const spy = jest.fn();
-    //         store.select((state) => state).subscribe(spy);
-    //         expect(spy).toHaveBeenCalledTimes(1);
-    //         spy.mockReset();
-    //
-    //         store.dispatch({ type: 'unknownAction' });
-    //         expect(spy).toHaveBeenCalledTimes(0);
-    //     });
-    //
-    //     it('should add and remove reducers', () => {
-    //         const featureKey = 'tempCounter';
-    //
-    //         const spy = jest.fn();
-    //         StoreCore.addFeature<CounterState>(featureKey, counterReducer);
-    //         store.select((state) => state).subscribe(spy);
-    //         expect(spy).toHaveBeenCalledWith(
-    //             expect.objectContaining({ tempCounter: counterInitialState })
-    //         );
-    //
-    //         StoreCore.removeFeature(featureKey);
-    //         expect(spy).toHaveBeenCalledWith(
-    //             expect.not.objectContaining({ tempCounter: counterInitialState })
-    //         );
-    //     });
-    // });
-    //
-    // describe('Store Feature MetaReducers', () => {
-    //     const getMetaTestFeature = createFeatureStateSelector<CounterStringState>('metaTestFeature2');
-    //     const getCount = createSelector(getMetaTestFeature, (state) => state.count);
-    //
-    //     interface CounterStringState {
-    //         count: string;
-    //     }
-    //
-    //     function aFeatureReducer(
-    //         state: CounterStringState = { count: '0' },
-    //         action: Action
-    //     ): CounterStringState {
-    //         switch (action.type) {
-    //             case 'metaTest2':
-    //                 return {
-    //                     ...state,
-    //                     count: state.count + '3',
-    //                 };
-    //             default:
-    //                 return state;
-    //         }
-    //     }
-    //
-    //     function featureMetaReducer1(reducer: Reducer<any>): Reducer<CounterStringState> {
-    //         return (state, action: Action) => {
-    //             if (action.type === 'metaTest2') {
-    //                 state = {
-    //                     ...state,
-    //                     count: state.count + '1',
-    //                 };
-    //             }
-    //
-    //             return reducer(state, action);
-    //         };
-    //     }
-    //
-    //     function featureMetaReducer2(reducer: Reducer<any>): Reducer<CounterStringState> {
-    //         return (state, action: Action) => {
-    //             if (action.type === 'metaTest2') {
-    //                 state = {
-    //                     ...state,
-    //                     count: state.count + '2',
-    //                 };
-    //             }
-    //
-    //             return reducer(state, action);
-    //         };
-    //     }
-    //
-    //     const nextStateSpy = jest.fn();
-    //
-    //     function inTheMiddleMetaReducer(reducer: Reducer<any>): Reducer<any> {
-    //         return (state, action) => {
-    //             const nextState = reducer(state, action);
-    //
-    //             nextStateSpy(nextState);
-    //
-    //             return reducer(state, action);
-    //         };
-    //     }
-    //
-    //     it('should run meta reducers first, then the normal reducer', () => {
-    //         StoreCore.addFeature<CounterStringState>('metaTestFeature2', aFeatureReducer, {
-    //             metaReducers: [featureMetaReducer1, inTheMiddleMetaReducer, featureMetaReducer2],
-    //         });
-    //
-    //         const spy = jest.fn();
-    //         StoreCore.appState.select(getCount).subscribe(spy);
-    //         StoreCore.dispatch({ type: 'metaTest2' });
-    //         expect(spy).toHaveBeenCalledWith('0');
-    //         expect(spy).toHaveBeenCalledWith('0123');
-    //     });
-    //
-    //     it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
-    //         expect(nextStateSpy).toHaveBeenCalledWith({ count: '0' });
-    //         expect(nextStateSpy).toHaveBeenCalledWith({ count: '0123' });
-    //         expect(nextStateSpy).toHaveBeenCalledTimes(2);
-    //     });
+    it('should select state from a Feature (which was created with `extends FeatureStore`)', () => {
+        const counterFeatureState = new CounterFeatureState();
+        counterFeatureState.increment();
+
+        const selectedState = store.select(getCounter3);
+        expect(selectedState()).toBe(2);
+    });
+
+    it('should overwrite reducers default state with a provided initialState', () => {
+        const featureKey = 'counterWithCustomInitialState';
+        const customInitialState: CounterState = {
+            counter: 2,
+        };
+
+        setup(
+            {},
+            {
+                key: featureKey,
+                reducer: counterReducer,
+                config: { initialState: customInitialState },
+            }
+        );
+
+        const selectedState = store.select((state) => state[featureKey]);
+        expect(selectedState()).toBe(customInitialState);
+    });
+
+    it('should resubscribe the effect 10 times (if side effect error is not handled)', () => {
+        const spy = jest.fn();
+        console.error = jest.fn();
+
+        function apiCallWithError() {
+            spy();
+            throw new Error();
+            return of('someValue');
+        }
+
+        rxEffect(
+            actions.pipe(
+                ofType('someAction3'),
+                mergeMap(() => {
+                    return apiCallWithError().pipe(mapTo({ type: 'someActionSuccess' }));
+                })
+            )
+        );
+
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' });
+        store.dispatch({ type: 'someAction3' }); // #12 will not trigger the Api call anymore
+        store.dispatch({ type: 'someAction3' }); // #13 will not trigger the Api call anymore
+
+        expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
+
+        function getErrorMsg(times: number) {
+            return `@mini-rx: An error occurred in the Effect. MiniRx resubscribed the Effect automatically and will do so ${times} more times.`;
+        }
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(9)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(8)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(7)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(6)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(5)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(4)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(3)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(2)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(1)),
+            expect.any(Error)
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining(getErrorMsg(0)),
+            expect.any(Error)
+        );
+
+        expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
+    });
+
+    it('should add and remove reducers', () => {
+        const featureKey = 'tempCounter';
+
+        addFeature<CounterState>(featureKey, counterReducer);
+        const selectedState = store.select((state) => state);
+        expect(selectedState()).toEqual({ tempCounter: counterInitialState });
+
+        removeFeature(featureKey);
+        expect(selectedState()).toEqual({});
+    });
+});
+
+describe('Store Feature MetaReducers', () => {
+    const getMetaTestFeature = createFeatureStateSelector<CounterStringState>('metaTestFeature2');
+    const getCount = createSelector(getMetaTestFeature, (state) => state.count);
+
+    interface CounterStringState {
+        count: string;
+    }
+
+    function aFeatureReducer(
+        state: CounterStringState = { count: '0' },
+        action: Action
+    ): CounterStringState {
+        switch (action.type) {
+            case 'metaTest2':
+                return {
+                    ...state,
+                    count: state.count + '3',
+                };
+            default:
+                return state;
+        }
+    }
+
+    function featureMetaReducer1(reducer: Reducer<any>): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === 'metaTest2') {
+                state = {
+                    ...state,
+                    count: state.count + '1',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    function featureMetaReducer2(reducer: Reducer<any>): Reducer<CounterStringState> {
+        return (state, action: Action) => {
+            if (action.type === 'metaTest2') {
+                state = {
+                    ...state,
+                    count: state.count + '2',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    const nextStateSpy = jest.fn();
+
+    function inTheMiddleMetaReducer(reducer: Reducer<any>): Reducer<any> {
+        return (state, action) => {
+            const nextState = reducer(state, action);
+
+            nextStateSpy(nextState);
+
+            return reducer(state, action);
+        };
+    }
+
+    it('should run meta reducers first, then the normal reducer', () => {
+        setup(
+            {},
+            {
+                key: 'metaTestFeature2',
+                reducer: aFeatureReducer,
+                config: {
+                    metaReducers: [
+                        featureMetaReducer1,
+                        inTheMiddleMetaReducer,
+                        featureMetaReducer2,
+                    ],
+                },
+            }
+        );
+
+        const selectedState = store.select(getCount);
+        expect(selectedState()).toBe('0');
+
+        store.dispatch({ type: 'metaTest2' });
+
+        expect(selectedState()).toBe('0123');
+    });
+
+    it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
+        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0' });
+        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0123' });
+        expect(nextStateSpy).toHaveBeenCalledTimes(2);
+    });
 });
