@@ -11,7 +11,7 @@ import {
     StoreExtension,
 } from '../models';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
-import { BehaviorSubject, mapTo, Observable, of } from 'rxjs';
+import { BehaviorSubject, mapTo, Observable, of, Subject } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
@@ -24,8 +24,9 @@ import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../ng-modules/store.module';
 import { addExtension, addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
 import { ofType } from '../utils';
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { LoggerExtension } from '../extensions/logger.extension';
+import { createRxEffect } from '@mini-rx/signal-store';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -509,17 +510,17 @@ describe('Store', () => {
         expect(selectedState()).toBe(undefined);
     });
 
-    it('should create and execute an effect', () => {
+    it('should create and execute an effect #1', () => {
         const spy = jest.fn();
         actions.subscribe(spy);
 
         rxEffect(
             actions.pipe(
-                ofType('loadUser'),
+                ofType('fetchApi'),
                 mergeMap(() =>
                     of('someUseResponse').pipe(
                         map((response) => ({
-                            type: 'loadUserSuccess',
+                            type: 'fetchApiSuccess',
                             payload: response,
                         }))
                     )
@@ -527,33 +528,25 @@ describe('Store', () => {
             )
         );
 
-        store.dispatch({ type: 'loadUser' });
+        store.dispatch({ type: 'fetchApi' });
 
         expect(spy.mock.calls).toEqual([
-            [{ type: 'loadUser' }],
+            [{ type: 'fetchApi' }],
             [
                 {
+                    type: 'fetchApiSuccess',
                     payload: 'someUseResponse',
-                    type: 'loadUserSuccess',
                 },
             ],
         ]);
     });
 
-    xit('should create and execute an effect', () => {
-        setup({
-            reducers: { user: userReducer },
-        });
-
+    it('should create and execute an effect #2', () => {
         rxEffect(
             actions.pipe(
                 ofType('loadUser'),
-                tap(() => console.log('YEAH')),
                 mergeMap(() =>
                     fakeApiGet().pipe(
-                        tap(() => {
-                            console.log('YEAH 2');
-                        }),
                         map((user) => ({
                             type: 'loadUserSuccess',
                             payload: user,
@@ -563,98 +556,100 @@ describe('Store', () => {
             )
         );
 
-        const selectedState = store.select(getUserFeatureState);
+        cold('-a').subscribe(() => {
+            store.dispatch({ type: 'loadUser' });
 
-        const bs = new BehaviorSubject<any>(undefined);
-        const sub = actions
-            .pipe(
-                tap((action) => console.log('action', action)),
-                map(() => selectedState()),
-                tap((state) => {
-                    bs.next(state);
-                    console.log('nexted', state);
-                })
-            )
-            .subscribe();
+            // Let's be crazy and add another effect while the other effect is busy
+            cold('-a').subscribe(() => {
+                rxEffect(
+                    actions.pipe(
+                        ofType('saveUser'),
+                        mergeMap(() =>
+                            fakeApiUpdate().pipe(
+                                map((user) => ({
+                                    type: 'saveUserSuccess',
+                                    payload: user,
+                                }))
+                            )
+                        )
+                    )
+                );
 
-        store.dispatch({ type: 'resetUser' });
+                store.dispatch({ type: 'saveUser' });
+            });
+        });
 
-        store.dispatch({ type: 'loadUser' });
-
-        // Let's be crazy and add another effect while the other effect is busy
-        // cold('-a').subscribe(() => {
-        //     const effect = createEffect(
-        //         actions.pipe(
-        //             ofType('saveUser'),
-        //             mergeMap(() =>
-        //                 fakeApiUpdate().pipe(
-        //                     map((user) => ({
-        //                         type: 'saveUserSuccess',
-        //                         payload: user,
-        //                     }))
-        //                 )
-        //             )
-        //         )
-        //     );
-        //
-        //     rxEffect(effect);
-        //
-        //     store.dispatch({ type: 'saveUser' });
-        // });
-
-        expect(bs).toBeObservable(hot('a--b', { a: userInitialState, b: asyncUser }));
-
-        sub.unsubscribe();
+        expect(actions).toBeObservable(
+            hot('-ayzb', {
+                a: { type: 'loadUser' },
+                y: { type: 'saveUser' },
+                z: { type: 'saveUserSuccess', payload: updatedAsyncUser },
+                b: {
+                    type: 'loadUserSuccess',
+                    payload: asyncUser,
+                },
+            })
+        );
     });
 
-    // it('should create and execute a non-dispatching effect', () => {
-    //     const action1 = { type: 'someAction' };
-    //     const action2 = { type: 'someAction2' };
-    //
-    //     const effect = createRxEffect(
-    //         actions.pipe(
-    //             ofType(action1.type),
-    //             mergeMap(() => of(action2))
-    //         ),
-    //         { dispatch: false }
-    //     );
-    //
-    //     rxEffect(effect);
-    //
-    //     const spy = jest.fn();
-    //     actions.subscribe(spy);
-    //
-    //     store.dispatch(action1);
-    //
-    //     expect(spy).toHaveBeenCalledTimes(1);
-    //     expect(spy).toHaveBeenCalledWith(action1);
-    //     expect(spy).not.toHaveBeenCalledWith(action2);
-    // });
+    it('should create and execute a non-dispatching effect', () => {
+        const action1 = { type: 'someAction' };
+        const action2 = { type: 'someAction2' };
 
-    //
-    //     it('should create and execute an effect and handle side effect error', () => {
-    //         store.dispatch({ type: 'resetUser' });
-    //
-    //         store.effect(
-    //             actions$.pipe(
-    //                 ofType('someAction'),
-    //                 mergeMap(() =>
-    //                     fakeApiWithError().pipe(
-    //                         map(() => ({
-    //                             type: 'whatever',
-    //                         })),
-    //                         catchError(() => of({ type: 'error', payload: 'error' }))
-    //                     )
-    //                 )
-    //             )
-    //         );
-    //
-    //         store.dispatch({ type: 'someAction' });
-    //
-    //         expect(store.select(getUserFeatureState)).toBeObservable(
-    //             hot('ab', { a: userInitialState, b: { ...userInitialState, err: 'error' } })
-    //         );
-    //     });
+        const effect = createRxEffect(
+            actions.pipe(
+                ofType(action1.type),
+                mergeMap(() => of(action2))
+            ),
+            { dispatch: false }
+        );
+
+        rxEffect(effect);
+
+        const spy = jest.fn();
+        actions.subscribe(spy);
+
+        store.dispatch(action1);
+
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith(action1);
+        expect(spy).not.toHaveBeenCalledWith(action2);
+    });
+
+    it('should create and execute an effect and handle side effect error', () => {
+        setup({ reducers: { user: userReducer } });
+
+        rxEffect(
+            actions.pipe(
+                ofType('fetchApiWithError'),
+                mergeMap(() =>
+                    fakeApiWithError().pipe(
+                        map(() => ({
+                            type: 'whatever',
+                        })),
+                        catchError(() => of({ type: 'error', payload: 'error' }))
+                    )
+                )
+            )
+        );
+
+        cold('-a').subscribe(() => {
+            store.dispatch({ type: 'fetchApiWithError' });
+        });
+
+        expect(actions).toBeObservable(
+            hot('-ab', { a: { type: 'fetchApiWithError' }, b: { type: 'error', payload: 'error' } })
+        );
+
+        // console.log('###', store.select()())
+        //
+        // expect(actions.pipe(
+        //     tap((action) => console.log('action: ', action, 'state: ', store.select()())),
+        //     map(() => store.select()())
+        // )).toBeObservable(
+        //     hot('-ab', { a: userInitialState, b: { ...userInitialState, err: 'error' }})
+        // );
+    });
     //
     // TODO is this a good test? Log is tested in LoggerExtension spec?
     it('should log', () => {
@@ -712,8 +707,6 @@ describe('Store', () => {
                 someFeature: someReducer,
             },
         });
-
-        actions.subscribe(console.log);
 
         const onEffectStarted = (): Observable<Action> => {
             callOrder.push('effect');
