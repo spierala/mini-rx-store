@@ -11,7 +11,7 @@ import {
     StoreExtension,
 } from '../models';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
-import { BehaviorSubject, mapTo, Observable, of, Subject } from 'rxjs';
+import { mapTo, Observable, of } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
@@ -24,9 +24,9 @@ import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../ng-modules/store.module';
 import { addExtension, addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import { LoggerExtension } from '../extensions/logger.extension';
-import { createRxEffect } from '@mini-rx/signal-store';
+import { createRxEffect } from '../create-rx-effect';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
