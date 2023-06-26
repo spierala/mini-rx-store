@@ -24,9 +24,10 @@ import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../ng-modules/store.module';
 import { addExtension, addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { createRxEffect } from '../create-rx-effect';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -95,11 +96,6 @@ function userReducer(state: UserState = userInitialState, action: ActionWithPayl
 const getUserFeatureState = createFeatureStateSelector<UserState>('user');
 const getFirstName = createSelector(getUserFeatureState, (user) => user.firstName);
 const getAge = createSelector(getUserFeatureState, (user) => user.age);
-
-const getCounterFeatureState = createFeatureStateSelector<CounterState>('counter');
-const getCounter1 = createSelector(getCounterFeatureState, (state) => state.counter);
-const getCounter2FeatureState = createFeatureStateSelector<CounterState>('counter2');
-const getCounter2 = createSelector(getCounter2FeatureState, (state) => state.counter);
 
 class CounterFeatureState extends FeatureStore<CounterState> {
     constructor() {
@@ -451,6 +447,7 @@ describe('Store', () => {
         expect(reducerSpy).toHaveBeenCalledTimes(1);
     });
 
+    // TODO
     it('should throw when reusing feature name', () => {
         expect(() => {
             TestBed.configureTestingModule({
