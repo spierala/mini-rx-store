@@ -141,6 +141,10 @@ export function createFeatureStateSelector(featureKey?: any): SignalSelector<any
     return addSignalSelectorKey(selector);
 }
 
+export function createComponentStateSelector<T>(): SignalSelector<T, T> {
+    return addSignalSelectorKey((state: Signal<T>) => state);
+}
+
 // Exported for testing
 export function addSignalSelectorKey<T, R>(s: Selector<T, R>): SignalSelector<T, R> {
     Object.defineProperty(s, SIGNAL_SELECTOR_KEY, {

@@ -9,7 +9,11 @@ export {
     createComponentStore,
     configureComponentStores,
 } from './lib/component-store';
-export { createSelector, createFeatureStateSelector } from './lib/signal-selector';
+export {
+    createSelector,
+    createFeatureStateSelector,
+    createComponentStateSelector,
+} from './lib/signal-selector';
 export {
     Action,
     Reducer,
