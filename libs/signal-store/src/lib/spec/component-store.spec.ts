@@ -12,6 +12,9 @@ import { ComponentStoreExtension, ExtensionId, StoreExtension } from '../models'
 import { LoggerExtension } from '../extensions/logger.extension';
 import { UndoExtension } from '../extensions/undo.extension';
 import { ImmutableStateExtension } from '../extensions/immutable-state.extension';
+import { TestBed } from '@angular/core/testing';
+import { Component, Injectable, runInInjectionContext, signal } from '@angular/core';
+import { Store } from '@mini-rx/signal-store';
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
@@ -63,6 +66,44 @@ describe('ComponentStore', () => {
 
         cs.update((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toBe(7);
+    });
+
+    it('bla', () => {
+        @Injectable({ providedIn: 'root' })
+        class MyComponentStore extends ComponentStore<object> {
+            constructor() {
+                super(counterInitialState);
+            }
+        }
+
+        @Component({
+            selector: 'mini-rx-my-comp',
+            template: '',
+        })
+        class WelcomeComponent {
+            counterSignal = signal({ counter: 2 });
+
+            constructor(public myCs: MyComponentStore) {}
+
+            useCounterSignal() {
+                this.myCs.update(this.counterSignal);
+            }
+        }
+
+        TestBed.configureTestingModule({
+            declarations: [WelcomeComponent],
+            providers: [MyComponentStore],
+        }).compileComponents();
+
+        const fixture = TestBed.createComponent(WelcomeComponent);
+        const component = fixture.componentInstance;
+        expect(component).toBeDefined();
+
+        const selectedState = component.myCs.select();
+        expect(selectedState()).toEqual({ counter: 1 });
+
+        component.useCounterSignal();
+        expect(selectedState()).toEqual({ counter: 2 });
     });
 
     it('should select state with memoized selectors', () => {
@@ -251,50 +292,7 @@ describe('ComponentStore', () => {
             )
         ).toThrowError('@mini-rx: Extension "MyExtension" is not supported by Component Store.');
     });
-    //
-    // it('should queue actions', () => {
-    //     const counter1Spy = jest.fn<void, [number]>();
-    //     const counter2Spy = jest.fn<void, [number]>();
-    //
-    //     class CounterStore extends ComponentStore<{
-    //         counter1: number;
-    //         counter2: number;
-    //     }> {
-    //         counter1$ = this.select((state) => state.counter1);
-    //         counter2$ = this.select((state) => state.counter2);
-    //
-    //         constructor() {
-    //             super({ counter1: 1, counter2: 10 });
-    //         }
-    //
-    //         updateCounter1(v: number): void {
-    //             this.setState({ counter1: v });
-    //         }
-    //
-    //         updateCounter2(v: number): void {
-    //             this.setState({ counter2: v });
-    //         }
-    //     }
-    //
-    //     // Situation: A state change is triggering another state change
-    //     const store = new CounterStore();
-    //
-    //     store.counter1$.subscribe((v) => {
-    //         counter1Spy(v);
-    //         store.updateCounter2(v);
-    //     });
-    //     store.counter2$.subscribe(counter2Spy);
-    //
-    //     // expect(counter1Spy.calls.allArgs()).toEqual([[1]]);
-    //     expect(counter1Spy.mock.calls).toEqual([[1]]);
-    //     expect(counter2Spy.mock.calls).toEqual([[1]]);
-    //
-    //     store.updateCounter1(2);
-    //
-    //     expect(counter1Spy.mock.calls).toEqual([[1], [2]]);
-    //     expect(counter1Spy.mock.calls).toEqual([[1], [2]]); // Without queuing the actions we would see here: [[1], [2], [1]]
-    // });
-    //
+
     describe('Extensions', () => {
         beforeEach(() => {
             _resetConfig();
