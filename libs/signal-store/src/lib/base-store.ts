@@ -24,7 +24,7 @@ export abstract class BaseStore<StateType extends object> {
         };
 
         const result = miniRxIsSignal(stateOrCallback)
-            ? (toObservable(stateOrCallback, { injector: this.injector! }) as Observable<
+            ? (toObservable(stateOrCallback, { injector: this.injector }) as Observable<
                   Partial<StateType>
               >)
             : stateOrCallback;
