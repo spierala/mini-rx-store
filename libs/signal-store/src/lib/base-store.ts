@@ -1,13 +1,15 @@
 import { isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { Action, SetStateParam, SetStateReturn, StateOrCallback } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { Injectable, Signal } from '@angular/core';
+import { EnvironmentInjector, inject, Injectable, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
 
 // BaseStore is extended by ComponentStore/FeatureStore
 @Injectable()
 export abstract class BaseStore<StateType extends object> {
+    injector = inject(EnvironmentInjector);
+
     /**
      * @internal Used by ComponentStore/FeatureStore
      */
@@ -22,7 +24,9 @@ export abstract class BaseStore<StateType extends object> {
         };
 
         const result = miniRxIsSignal(stateOrCallback)
-            ? (toObservable(stateOrCallback) as Observable<Partial<StateType>>)
+            ? (toObservable(stateOrCallback, { injector: this.injector! }) as Observable<
+                  Partial<StateType>
+              >)
             : stateOrCallback;
 
         return (

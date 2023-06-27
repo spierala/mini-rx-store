@@ -197,10 +197,12 @@ describe('Store Config', () => {
     });
 
     it('should throw when calling Store.config after a Feature Store was initialized', () => {
-        createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
-        expect(() => configureStore({})).toThrowError(
-            '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
-        );
+        TestBed.runInInjectionContext(() => {
+            createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
+            expect(() => configureStore({})).toThrowError(
+                '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+            );
+        });
     });
 
     describe('Root Meta Reducers', () => {
@@ -784,11 +786,13 @@ describe('Store', () => {
     //     });
     //
     it('should select state from a Feature (which was created with `extends FeatureStore`)', () => {
-        const counterFeatureState = new CounterFeatureState();
-        counterFeatureState.increment();
+        TestBed.runInInjectionContext(() => {
+            const counterFeatureState = new CounterFeatureState();
+            counterFeatureState.increment();
 
-        const selectedState = store.select(getCounter3);
-        expect(selectedState()).toBe(2);
+            const selectedState = store.select(getCounter3);
+            expect(selectedState()).toBe(2);
+        });
     });
 
     it('should overwrite reducers default state with a provided initialState', () => {

@@ -136,8 +136,10 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 }
 
-const userFeature: UserFeatureStore = new UserFeatureStore();
-const counterFeature: CounterFeatureStore = new CounterFeatureStore();
+const userFeature: UserFeatureStore = TestBed.runInInjectionContext(() => new UserFeatureStore());
+const counterFeature: CounterFeatureStore = TestBed.runInInjectionContext(
+    () => new CounterFeatureStore()
+);
 
 describe('FeatureStore', () => {
     it('should initialize the feature', () => {
@@ -238,7 +240,9 @@ describe('FeatureStore', () => {
             return of('someValue');
         }
 
-        const fs: FeatureStore<any> = createFeatureStore('fsWithFailingApi', {});
+        const fs: FeatureStore<any> = TestBed.runInInjectionContext(() =>
+            createFeatureStore('fsWithFailingApi', {})
+        );
 
         const load = fs.rxEffect<void>(
             mergeMap(() => apiCallWithError().pipe(tap(() => fs.update({}))))
@@ -344,9 +348,8 @@ describe('FeatureStore', () => {
     });
 
     it('should create a Feature Store with functional creation methods', () => {
-        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
-            'funcFeatureStore',
-            counterInitialState
+        const fs: FeatureStore<CounterState> = TestBed.runInInjectionContext(() =>
+            createFeatureStore<CounterState>('funcFeatureStore', counterInitialState)
         );
 
         const getFeatureState = createFeatureStateSelector<CounterState>();
@@ -370,9 +373,8 @@ describe('FeatureStore', () => {
     it('should remove the feature state when Feature Store is destroyed', () => {
         resetStoreConfig();
 
-        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
-            'tempFsState',
-            counterInitialState
+        const fs: FeatureStore<CounterState> = TestBed.runInInjectionContext(() =>
+            createFeatureStore<CounterState>('tempFsState', counterInitialState)
         );
 
         const selectedState = store.select((state) => state);
@@ -388,9 +390,8 @@ describe('FeatureStore', () => {
     });
 
     it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {
-        const fs: FeatureStore<CounterState> = createFeatureStore<CounterState>(
-            'tempFsState',
-            counterInitialState
+        const fs: FeatureStore<CounterState> = TestBed.runInInjectionContext(() =>
+            createFeatureStore<CounterState>('tempFsState', counterInitialState)
         );
 
         const spy = jest.spyOn(fs, 'destroy');
@@ -413,9 +414,11 @@ describe('FeatureStore', () => {
             }
         }
 
-        const fs1 = new Fs();
-        const fs2 = new Fs();
-        const fs3 = createFeatureStore(featureKey, counterInitialState, { multi: true }); // Functional creation method should also support multi: true
+        const fs1 = TestBed.runInInjectionContext(() => new Fs());
+        const fs2 = TestBed.runInInjectionContext(() => new Fs());
+        const fs3 = TestBed.runInInjectionContext(() =>
+            createFeatureStore(featureKey, counterInitialState, { multi: true })
+        );
 
         function incrementFs3(): void {
             fs3.update((state) => ({ counter: state.counter + 1 }));

@@ -8,24 +8,37 @@ import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
-import { ComponentStoreExtension, ExtensionId, StoreExtension } from '../models';
+import {
+    ComponentStoreConfig,
+    ComponentStoreExtension,
+    ExtensionId,
+    StoreExtension,
+} from '../models';
 import { LoggerExtension } from '../extensions/logger.extension';
 import { UndoExtension } from '../extensions/undo.extension';
 import { ImmutableStateExtension } from '../extensions/immutable-state.extension';
 import { TestBed } from '@angular/core/testing';
-import { Component, Injectable, runInInjectionContext, signal } from '@angular/core';
-import { Store } from '@mini-rx/signal-store';
+import { Component, Injectable, signal } from '@angular/core';
+
+function setup<T extends object>(
+    initialState: T,
+    config?: ComponentStoreConfig
+): ComponentStore<T> {
+    return TestBed.runInInjectionContext(() => {
+        return createComponentStore(initialState, config);
+    });
+}
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const selectedState = cs.select();
         expect(selectedState()).toBe(counterInitialState);
     });
 
     it('should update state', () => {
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const selectedState = cs.select();
         expect(selectedState()).toBe(counterInitialState);
@@ -35,7 +48,7 @@ describe('ComponentStore', () => {
     });
 
     it('should update state partially', () => {
-        const cs = createComponentStore(userState);
+        const cs = setup(userState);
 
         const selectedState = cs.select();
         expect(selectedState()).toBe(userState);
@@ -45,7 +58,7 @@ describe('ComponentStore', () => {
     });
 
     it('should update state using an Observable', () => {
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const counterState$: Observable<CounterState> = of(2, 3, 4, 5).pipe(
             map((v) => ({ counter: v }))
@@ -68,9 +81,9 @@ describe('ComponentStore', () => {
         expect(selectedState()).toBe(7);
     });
 
-    it('bla', () => {
+    it('should update state using a Signal', () => {
         @Injectable({ providedIn: 'root' })
-        class MyComponentStore extends ComponentStore<object> {
+        class MyComponentStore extends ComponentStore<CounterState> {
             constructor() {
                 super(counterInitialState);
             }
@@ -78,39 +91,48 @@ describe('ComponentStore', () => {
 
         @Component({
             selector: 'mini-rx-my-comp',
-            template: '',
+            template: `
+                <span>{{ selectedCounterState() }}</span>
+            `,
         })
         class WelcomeComponent {
             counterSignal = signal({ counter: 2 });
 
+            selectedCounterState = this.myCs.select((state) => state.counter);
+
             constructor(public myCs: MyComponentStore) {}
 
-            useCounterSignal() {
+            startUpdatingStateWithSignal() {
                 this.myCs.update(this.counterSignal);
             }
         }
 
         TestBed.configureTestingModule({
             declarations: [WelcomeComponent],
-            providers: [MyComponentStore],
         }).compileComponents();
 
         const fixture = TestBed.createComponent(WelcomeComponent);
         const component = fixture.componentInstance;
         expect(component).toBeDefined();
 
-        const selectedState = component.myCs.select();
-        expect(selectedState()).toEqual({ counter: 1 });
+        const compElement: HTMLElement = fixture.nativeElement;
+        fixture.detectChanges();
+        expect(compElement.textContent).toContain('1');
 
-        component.useCounterSignal();
-        expect(selectedState()).toEqual({ counter: 2 });
+        component.startUpdatingStateWithSignal();
+        fixture.detectChanges();
+        expect(compElement.textContent).toContain('2');
+
+        component.counterSignal.set({ counter: 3 });
+        fixture.detectChanges();
+        expect(compElement.textContent).toContain('3');
     });
 
     it('should select state with memoized selectors', () => {
         const getCounterSpy = jest.fn<void, [number]>();
         const getSquareCounterSpy = jest.fn<void, [number]>();
 
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const getComponentState = createComponentStateSelector<CounterState>();
         const getCounter = createSelector(getComponentState, (state) => {
@@ -140,7 +162,7 @@ describe('ComponentStore', () => {
     });
 
     it('should dispatch an Action when updating state', () => {
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const spy = jest.fn();
         cs['actionsOnQueue'].actions$.subscribe(spy);
@@ -193,7 +215,7 @@ describe('ComponentStore', () => {
 
     it('should dispatch an Action on destroy', () => {
         // With initial state
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const spy = jest.fn();
         cs['actionsOnQueue'].actions$.subscribe(spy);
@@ -210,14 +232,13 @@ describe('ComponentStore', () => {
     });
 
     it('should unsubscribe from setState Observable on destroy', () => {
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
 
         const counterSource = new Subject<number>();
         const counterState$: Observable<CounterState> = counterSource.pipe(
             map((v) => ({ counter: v }))
         );
 
-        const subscribeCallback = jest.fn<void, [number]>();
         const selectedState = cs.select((state) => state.counter);
 
         cs.update(counterState$);
@@ -238,7 +259,7 @@ describe('ComponentStore', () => {
     it('should unsubscribe an effect on destroy', () => {
         const effectCallback = jest.fn<void, [number]>();
 
-        const cs = createComponentStore(counterInitialState);
+        const cs = setup(counterInitialState);
         const myEffect = cs.rxEffect<number>(pipe(tap((v) => effectCallback(v))));
 
         const counterSource = new Subject<number>();
@@ -269,7 +290,7 @@ describe('ComponentStore', () => {
     });
 
     it('should throw when using undo without extension', () => {
-        const cs = createComponentStore({});
+        const cs = setup({});
 
         expect(() => cs.undo({ type: 'someType' })).toThrowError(
             '@mini-rx: ComponentStore has no UndoExtension yet.'
@@ -279,12 +300,13 @@ describe('ComponentStore', () => {
     it('should throw when a not supported extension is used', () => {
         class MyExtension extends StoreExtension {
             id: ExtensionId = ExtensionId.LOGGER;
+
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             init(): void {}
         }
 
         expect(() =>
-            createComponentStore(
+            setup(
                 {},
                 {
                     extensions: [new MyExtension() as ComponentStoreExtension],
@@ -300,7 +322,7 @@ describe('ComponentStore', () => {
 
         it('should be local', () => {
             const extensions = [new LoggerExtension(), new UndoExtension()];
-            const cs = createComponentStore({}, { extensions });
+            const cs = setup({}, { extensions });
 
             expect(cs['extensions']).toBe(extensions);
         });
@@ -309,7 +331,7 @@ describe('ComponentStore', () => {
             const extensions = [new LoggerExtension(), new UndoExtension()];
 
             configureComponentStores({ extensions });
-            const cs = createComponentStore({});
+            const cs = setup({});
 
             expect(cs['extensions']).toBe(extensions);
         });
@@ -319,7 +341,7 @@ describe('ComponentStore', () => {
             const localExtensions = [new UndoExtension()];
 
             configureComponentStores({ extensions: globalExtensions });
-            const cs = createComponentStore({}, { extensions: localExtensions });
+            const cs = setup({}, { extensions: localExtensions });
 
             expect(cs['extensions'][0]).toBe(localExtensions[0]);
             expect(cs['extensions'][1]).toBe(globalExtensions[0]);
@@ -331,7 +353,7 @@ describe('ComponentStore', () => {
             const localExtensions = [new LoggerExtension()];
 
             configureComponentStores({ extensions: globalExtensions });
-            const cs = createComponentStore({}, { extensions: localExtensions });
+            const cs = setup({}, { extensions: localExtensions });
 
             expect(cs['extensions'][0]).toBe(localExtensions[0]);
             expect(cs['extensions'][1]).toBe(globalExtensions[1]);
