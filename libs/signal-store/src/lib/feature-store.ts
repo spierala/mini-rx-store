@@ -36,6 +36,8 @@ export class FeatureStore<StateType extends object>
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
         super();
 
+        this._destroyRef.onDestroy(() => this.destroy());
+
         this.featureId = generateId();
         this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
 
@@ -66,8 +68,7 @@ export class FeatureStore<StateType extends object>
 
     select = this.selectableState.select.bind(this.selectableState);
 
-    override destroy() {
-        super.destroy();
+    private destroy() {
         removeFeature(this._featureKey);
     }
 }

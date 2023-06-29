@@ -11,7 +11,7 @@ import {
     StoreExtension,
 } from '../models';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
-import { mapTo, Observable, of } from 'rxjs';
+import { mapTo, Observable, of, take } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
@@ -22,10 +22,9 @@ import {
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../ng-modules/store.module';
-import { addExtension, addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
+import { addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
 import { ofType } from '../utils';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { LoggerExtension } from '../extensions/logger.extension';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { createRxEffect } from '../create-rx-effect';
 
 const asyncUser: Partial<UserState> = {
@@ -105,9 +104,6 @@ class CounterFeatureState extends FeatureStore<CounterState> {
         this.update((state) => ({ counter: state.counter + 1 }));
     }
 }
-
-const getCounter3FeatureState = createFeatureStateSelector<CounterState>('counter3');
-const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
 
 let store: Store;
 let actions: Actions;
@@ -448,7 +444,6 @@ describe('Store', () => {
         expect(reducerSpy).toHaveBeenCalledTimes(1);
     });
 
-    // TODO
     it('should throw when reusing feature name', () => {
         expect(() => {
             TestBed.configureTestingModule({
@@ -638,51 +633,6 @@ describe('Store', () => {
         expect(actions).toBeObservable(
             hot('-ab', { a: { type: 'fetchApiWithError' }, b: { type: 'error', payload: 'error' } })
         );
-
-        // console.log('###', store.select()())
-        //
-        // expect(actions.pipe(
-        //     tap((action) => console.log('action: ', action, 'state: ', store.select()())),
-        //     map(() => store.select()())
-        // )).toBeObservable(
-        //     hot('-ab', { a: userInitialState, b: { ...userInitialState, err: 'error' }})
-        // );
-    });
-    //
-    // TODO is this a good test? Log is tested in LoggerExtension spec?
-    it('should log', () => {
-        setup({ reducers: { user: userReducer } });
-
-        console.log = jest.fn(); // TODO restore log?
-
-        const user: UserState = {
-            firstName: 'John',
-            lastName: 'Travolta',
-            age: 35,
-            err: undefined,
-        };
-
-        const newState = {
-            user,
-        };
-
-        const action: Action = {
-            type: 'updateUser',
-            payload: user,
-        };
-
-        addExtension(new LoggerExtension());
-
-        store.dispatch(action);
-
-        expect(console.log).toHaveBeenCalledWith(
-            expect.stringContaining('%cupdateUser'),
-            expect.stringContaining('color: #25c2a0'),
-            expect.stringContaining('Action:'),
-            action,
-            expect.stringContaining('State: '),
-            newState
-        );
     });
 
     it('should call the reducer before running the effect', () => {
@@ -730,63 +680,68 @@ describe('Store', () => {
         expect(valueSpy).toHaveBeenCalledWith(1); // Effect can select the updated state immediately
     });
 
-    // it('should queue actions', () => {
-    //     const callLimit = 5000;
-    //
-    //     setup({reducers: {
-    //             counter: counterReducer
-    //         }})
-    //
-    //     const spy = jest.fn().mockImplementation(() => {
-    //         store.dispatch({ type: 'counter' });
-    //     });
-    //
-    //     const counter1$ = store.select(getCounter1);
-    //
-    //     counter1$.pipe(take(callLimit)).subscribe(spy);
-    //
-    //     expect(spy).toHaveBeenCalledTimes(callLimit);
-    //     expect(spy).toHaveBeenNthCalledWith(callLimit, callLimit);
-    // });
-    //
-    //     it('should queue effect actions', () => {
-    //         const callLimit = 5000;
-    //
-    //         function counter2Reducer(state: CounterState = counterInitialState, action: Action) {
-    //             switch (action.type) {
-    //                 case 'counterEffectSuccess':
-    //                     return {
-    //                         ...state,
-    //                         counter: state.counter + 1,
-    //                     };
-    //                 default:
-    //                     return state;
-    //             }
-    //         }
-    //
-    //         store.feature<CounterState>('counter2', counter2Reducer);
-    //
-    //         store.effect(
-    //             actions$.pipe(
-    //                 ofType('counterEffectStart'),
-    //                 mergeMap(() => of({ type: 'counterEffectSuccess' }))
-    //             )
-    //         );
-    //
-    //         const spy2 = jest.fn().mockImplementation(() => {
-    //             store.dispatch({ type: 'counterEffectStart' });
-    //         });
-    //
-    //         const counter2$ = store.select(getCounter2);
-    //
-    //         counter2$.pipe(take(callLimit)).subscribe(spy2);
-    //
-    //         expect(spy2).toHaveBeenCalledTimes(callLimit);
-    //         expect(spy2).toHaveBeenNthCalledWith(callLimit, callLimit);
-    //     });
-    //
+    it('should queue actions', () => {
+        const callLimit = 5000;
+        const spy = jest.fn();
+
+        setup({
+            reducers: {
+                counter: counterReducer,
+            },
+        });
+
+        const selectedState = store.select((state) => state['counter'].counter);
+
+        actions.pipe(take(callLimit), tap(spy), ofType('counter', 'counterStart')).subscribe(() => {
+            store.dispatch({ type: 'counter' });
+        });
+
+        store.dispatch({ type: 'counterStart' });
+
+        expect(spy).toHaveBeenCalledTimes(callLimit);
+        expect(selectedState()).toBe(callLimit + 1); // +1 because initialState counter is 1
+    });
+
+    it('should queue effect actions', () => {
+        const callLimit = 5000;
+        const spy = jest.fn();
+
+        setup({
+            reducers: {
+                counter2: counter2Reducer,
+            },
+        });
+
+        function counter2Reducer(state: CounterState = counterInitialState, action: Action) {
+            switch (action.type) {
+                case 'counterEffectSuccess':
+                    return {
+                        ...state,
+                        counter: state.counter + 1,
+                    };
+                default:
+                    return state;
+            }
+        }
+
+        store.rxEffect(
+            actions.pipe(
+                take(callLimit),
+                tap(spy),
+                ofType('counterEffectStart'),
+                mergeMap(() => of({ type: 'counterEffectStart' }))
+            )
+        );
+
+        store.dispatch({ type: 'counterEffectStart' });
+        expect(spy).toHaveBeenCalledTimes(callLimit);
+    });
+
     it('should select state from a Feature (which was created with `extends FeatureStore`)', () => {
         TestBed.runInInjectionContext(() => {
+            const getCounter3FeatureState = createFeatureStateSelector<CounterState>('counter3');
+            const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
+
             const counterFeatureState = new CounterFeatureState();
             counterFeatureState.increment();
 

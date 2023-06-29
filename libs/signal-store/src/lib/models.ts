@@ -106,5 +106,4 @@ export interface ComponentStoreLike<StateType> {
     state: Signal<StateType>;
     rxEffect(effectFn: (origin$: Observable<any>) => Observable<any>): () => void;
     undo(action: Action): void;
-    destroy(): void;
 }

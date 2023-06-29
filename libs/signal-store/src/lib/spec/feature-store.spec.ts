@@ -14,10 +14,11 @@ import {
 import { Action, Actions, FeatureConfig, Reducer, StoreConfig } from '../models';
 import { tapResponse } from '../tap-response';
 import { addMetaReducers } from '../store-core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '../ng-modules/store.module';
 import { Store } from '../store';
-import { Signal } from '@angular/core';
+import { Component, EnvironmentInjector, inject, Signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 let store: Store;
 let actions: Actions;
@@ -40,6 +41,16 @@ function setup(
 
     store = TestBed.inject(Store);
     actions = TestBed.inject(Actions);
+}
+
+@Component({
+    template: '',
+    standalone: true,
+})
+class MyComponent {}
+
+function getComponentFixture(): ComponentFixture<MyComponent> {
+    return TestBed.createComponent(MyComponent);
 }
 
 const initialState: UserState = userState;
@@ -70,11 +81,15 @@ setup({}, { key: 'someFeature', reducer: counterReducer });
 const getSomeFeatureSelector = createFeatureStateSelector<CounterState>('someFeature');
 
 class UserFeatureStore extends FeatureStore<UserState> {
-    firstName$ = this.select((state) => state.firstName);
-    lastName$ = this.select((state) => state.lastName);
-    country$ = this.select(getCountry);
-    city$ = store.select(getCity);
-    someFeatureState$ = store.select(getSomeFeatureSelector);
+    private injector = inject(EnvironmentInjector);
+
+    state$ = toObservable(this.state);
+    firstName = this.select((state) => state.firstName);
+    firstName$ = toObservable(this.firstName, { injector: this.injector });
+    lastName = this.select((state) => state.lastName);
+    country = this.select(getCountry);
+    city = store.select(getCity);
+    someFeatureState = store.select(getSomeFeatureSelector);
 
     loadFn = this.rxEffect((payload$) =>
         payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap((user) => this.update(user)))))
@@ -136,36 +151,47 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 }
 
-const userFeature: UserFeatureStore = TestBed.runInInjectionContext(() => new UserFeatureStore());
-const counterFeature: CounterFeatureStore = TestBed.runInInjectionContext(
-    () => new CounterFeatureStore()
-);
+let userFeature: UserFeatureStore;
+
+function setupUserFeature() {
+    userFeature = TestBed.runInInjectionContext(() => new UserFeatureStore());
+}
+
+let counterFeature: CounterFeatureStore;
+
+function setupCounterFeature(): void {
+    counterFeature = TestBed.runInInjectionContext(() => new CounterFeatureStore());
+}
 
 describe('FeatureStore', () => {
     it('should initialize the feature', () => {
-        const spy = jest.fn();
+        setupUserFeature();
         const selectedState = userFeature.select();
         expect(selectedState()).toBe(initialState);
     });
 
     it('should expose the feature key', () => {
+        setupUserFeature();
         expect(userFeature.featureKey).toBe('user2');
     });
 
     it('should update state', () => {
+        setupUserFeature();
         userFeature.updateFirstName('Nicolas');
-        expect(userFeature.firstName$()).toBe('Nicolas');
+        expect(userFeature.firstName()).toBe('Nicolas');
 
         userFeature.updateLastName('Cage');
-        expect(userFeature.lastName$()).toBe('Cage');
+        expect(userFeature.lastName()).toBe('Cage');
 
         userFeature.updateCountry('Belgium');
-        expect(userFeature.country$()).toBe('Belgium');
+        expect(userFeature.country()).toBe('Belgium');
 
         userFeature.resetState();
     });
 
     it('should update state using callback', () => {
+        setupCounterFeature();
+
         expect(counterFeature.counter$()).toBe(0);
         counterFeature.increment();
         expect(counterFeature.counter$()).toBe(1);
@@ -174,24 +200,55 @@ describe('FeatureStore', () => {
     });
 
     it('should select state from App State', () => {
-        expect(userFeature.city$()).toBe('LA');
+        setupUserFeature();
+        expect(userFeature.city()).toBe('LA');
     });
 
     it('should select state from Feature State', () => {
-        expect(userFeature.country$()).toBe('United States');
+        setupUserFeature();
+        expect(userFeature.country()).toBe('United States');
     });
 
     it('should select state from another Feature (created with Store.feature)', () => {
-        expect(userFeature.someFeatureState$()).toBe(counterInitialState);
+        setupUserFeature();
+        expect(userFeature.someFeatureState()).toBe(counterInitialState);
     });
 
-    //
-    // it('should create and execute an effect', () => {
-    //     userFeature.loadFn();
-    //     expect(userFeature.firstName$).toBeObservable(hot('a--b', { a: 'Bruce', b: 'Steven' }));
-    // });
-    //
+    it('should create and execute an effect', () => {
+        const fixture = getComponentFixture();
+        setupUserFeature();
+
+        fixture.detectChanges();
+
+        userFeature.loadFn();
+
+        cold('---a').subscribe(() => {
+            fixture.detectChanges();
+        });
+
+        expect(userFeature.firstName$).toBeObservable(hot('a--b', { a: 'Bruce', b: 'Steven' }));
+    });
+
+    it('should create and execute an effect and handle error', () => {
+        const fixture = getComponentFixture();
+        setupUserFeature();
+
+        fixture.detectChanges();
+
+        userFeature.loadFnWithError();
+
+        cold('-a').subscribe(() => {
+            fixture.detectChanges();
+        });
+
+        expect(userFeature.state$).toBeObservable(
+            hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
+        );
+    });
+
     it('should invoke effect via Observable or imperatively', () => {
+        setupUserFeature();
+
         const spy = jest.fn();
 
         function apiCall(param: number) {
@@ -221,15 +278,7 @@ describe('FeatureStore', () => {
 
         expect(spy.mock.calls).toEqual([[1], [2], [3], [4], [11], [12], [5]]);
     });
-    //
-    // it('should create and execute an effect and handle error', () => {
-    //     userFeature.resetState();
-    //     userFeature.loadFnWithError();
-    //     expect(userFeature.select()).toBeObservable(
-    //         hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
-    //     );
-    // });
-    //
+
     it('should resubscribe the effect 10 times (if side effect error is not handled)', () => {
         const spy = jest.fn();
         console.error = jest.fn();
@@ -313,6 +362,8 @@ describe('FeatureStore', () => {
     });
 
     it('should dispatch a set-state action', () => {
+        setupUserFeature();
+
         userFeature.resetState();
 
         const spy = jest.fn();
@@ -329,6 +380,9 @@ describe('FeatureStore', () => {
     });
 
     it('should run the meta reducers when state changes', () => {
+        setupUserFeature();
+        setupCounterFeature();
+
         const metaReducerSpy = jest.fn();
 
         function metaReducer(reducer: Reducer<any>): Reducer<any> {
@@ -383,19 +437,26 @@ describe('FeatureStore', () => {
         const actionSpy = jest.fn();
         actions.subscribe(actionSpy);
 
-        fs.destroy();
+        fs['destroy']();
         expect(selectedState()).toEqual({});
 
         expect(actionSpy).toHaveBeenCalledWith({ type: '@mini-rx/tempFsState/destroy' });
     });
 
-    it('should call FeatureStore.destroy when Angular ngOnDestroy is called', () => {
-        const fs: FeatureStore<CounterState> = TestBed.runInInjectionContext(() =>
-            createFeatureStore<CounterState>('tempFsState', counterInitialState)
-        );
+    it('should call FeatureStore.destroy when component is destroyed', () => {
+        @Component({
+            template: '',
+            standalone: true,
+        })
+        class MyComponent {
+            fs = createFeatureStore('tempFs', counterInitialState);
+        }
 
-        const spy = jest.spyOn(fs, 'destroy');
-        fs.ngOnDestroy();
+        const fixture = TestBed.createComponent(MyComponent);
+        const comp = fixture.componentInstance;
+
+        const spy = jest.spyOn(comp.fs as any, 'destroy');
+        fixture.componentRef.destroy();
         expect(spy).toHaveBeenCalled();
     });
 
@@ -457,7 +518,7 @@ describe('FeatureStore', () => {
         incrementFs3();
         expect(fs3Counter()).toBe(3);
 
-        fs1.destroy();
+        fs1['destroy']();
         expect(fs1Counter()).toBe(undefined);
 
         expect(fs1.featureKey).toContain('multi-counter-');

@@ -12,11 +12,9 @@ import {
     ComponentStoreConfig,
     ComponentStoreExtension,
     ExtensionId,
+    MetaReducer,
     StoreExtension,
 } from '../models';
-import { LoggerExtension } from '../extensions/logger.extension';
-import { UndoExtension } from '../extensions/undo.extension';
-import { ImmutableStateExtension } from '../extensions/immutable-state.extension';
 import { TestBed } from '@angular/core/testing';
 import { Component, Injectable, signal } from '@angular/core';
 
@@ -220,7 +218,7 @@ describe('ComponentStore', () => {
         const spy = jest.fn();
         cs['actionsOnQueue'].actions$.subscribe(spy);
 
-        cs.destroy();
+        cs['destroy']();
 
         expect(spy.mock.calls).toEqual([
             [
@@ -232,52 +230,95 @@ describe('ComponentStore', () => {
     });
 
     it('should unsubscribe from setState Observable on destroy', () => {
-        const cs = setup(counterInitialState);
+        @Component({
+            selector: 'mini-rx-my-comp',
+            template: ``,
+        })
+        class WelcomeComponent {
+            private cs = createComponentStore(counterInitialState);
+            private counterSource = new Subject<number>();
+            private counterState$: Observable<CounterState> = this.counterSource.pipe(
+                map((v) => ({ counter: v }))
+            );
+            selectedState = this.cs.select((state) => state.counter);
 
-        const counterSource = new Subject<number>();
-        const counterState$: Observable<CounterState> = counterSource.pipe(
-            map((v) => ({ counter: v }))
-        );
+            useObservableToUpdateState() {
+                this.cs.update(this.counterState$);
+            }
 
-        const selectedState = cs.select((state) => state.counter);
+            updateObservableValue(v: number) {
+                this.counterSource.next(v);
+            }
+        }
 
-        cs.update(counterState$);
+        TestBed.configureTestingModule({
+            declarations: [WelcomeComponent],
+        }).compileComponents();
 
-        expect(selectedState()).toBe(1);
+        const fixture = TestBed.createComponent(WelcomeComponent);
+        const component = fixture.componentInstance;
+        expect(component).toBeDefined();
 
-        counterSource.next(1);
-        expect(selectedState()).toBe(1);
-        counterSource.next(2);
-        expect(selectedState()).toBe(2);
+        component.useObservableToUpdateState();
 
-        cs.destroy();
+        expect(component.selectedState()).toBe(1);
 
-        counterSource.next(3);
-        expect(selectedState()).toBe(2);
+        component.updateObservableValue(1);
+        expect(component.selectedState()).toBe(1);
+        component.updateObservableValue(2);
+        expect(component.selectedState());
+
+        fixture.componentRef.destroy();
+
+        component.updateObservableValue(3);
+        expect(component.selectedState()).toBe(2);
     });
 
     it('should unsubscribe an effect on destroy', () => {
         const effectCallback = jest.fn<void, [number]>();
 
-        const cs = setup(counterInitialState);
-        const myEffect = cs.rxEffect<number>(pipe(tap((v) => effectCallback(v))));
+        @Component({
+            selector: 'mini-rx-my-comp',
+            template: ``,
+        })
+        class WelcomeComponent {
+            private cs = createComponentStore(counterInitialState);
+            private myEffect = this.cs.rxEffect<number>(pipe(tap((v) => effectCallback(v))));
+            private counterSource = new Subject<number>();
 
-        const counterSource = new Subject<number>();
+            constructor() {
+                // Trigger effect with the counterSource Subject
+                this.myEffect(this.counterSource);
+            }
 
-        // Trigger effect with the counterSource Subject
-        myEffect(counterSource);
+            updateObservableValue(v: number) {
+                this.counterSource.next(v);
+            }
 
-        counterSource.next(1);
-        counterSource.next(2);
+            updateEffectValueImperatively(v: number) {
+                this.myEffect(v);
+            }
+        }
+
+        TestBed.configureTestingModule({
+            declarations: [WelcomeComponent],
+        }).compileComponents();
+
+        const fixture = TestBed.createComponent(WelcomeComponent);
+        const component = fixture.componentInstance;
+        expect(component).toBeDefined();
+
+        component.updateObservableValue(1);
+        component.updateObservableValue(2);
 
         // Trigger effect imperatively (just to cover both ways to trigger an effect)
-        myEffect(3);
-        myEffect(4);
+        component.updateEffectValueImperatively(3);
+        component.updateEffectValueImperatively(4);
 
-        cs.destroy();
+        fixture.componentRef.destroy();
 
-        counterSource.next(5);
-        myEffect(6);
+        component.updateObservableValue(5);
+        component.updateEffectValueImperatively(6);
 
         expect(effectCallback.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
@@ -316,19 +357,49 @@ describe('ComponentStore', () => {
     });
 
     describe('Extensions', () => {
+        class MockLoggerExtension implements ComponentStoreExtension {
+            id = ExtensionId.LOGGER;
+            sortOrder = 1;
+            hasCsSupport = true as const;
+
+            init(): MetaReducer<any> {
+                return (v) => v;
+            }
+        }
+
+        class MockUndoExtension implements ComponentStoreExtension {
+            id = ExtensionId.UNDO;
+            sortOrder = 1;
+            hasCsSupport = true as const;
+
+            init(): MetaReducer<any> {
+                return (v) => v;
+            }
+        }
+
+        class MockImmutableStateExtension implements ComponentStoreExtension {
+            id = ExtensionId.IMMUTABLE_STATE;
+            sortOrder = 1;
+            hasCsSupport = true as const;
+
+            init(): MetaReducer<any> {
+                return (v) => v;
+            }
+        }
+
         beforeEach(() => {
             _resetConfig();
         });
 
         it('should be local', () => {
-            const extensions = [new LoggerExtension(), new UndoExtension()];
+            const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
             const cs = setup({}, { extensions });
 
             expect(cs['extensions']).toBe(extensions);
         });
 
         it('should be global', () => {
-            const extensions = [new LoggerExtension(), new UndoExtension()];
+            const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
 
             configureComponentStores({ extensions });
             const cs = setup({});
@@ -337,8 +408,8 @@ describe('ComponentStore', () => {
         });
 
         it('should be merged', () => {
-            const globalExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
-            const localExtensions = [new UndoExtension()];
+            const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
+            const localExtensions = [new MockUndoExtension()];
 
             configureComponentStores({ extensions: globalExtensions });
             const cs = setup({}, { extensions: localExtensions });
@@ -349,8 +420,8 @@ describe('ComponentStore', () => {
         });
 
         it('should be merged (use local if extension is used globally and locally)', () => {
-            const globalExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
-            const localExtensions = [new LoggerExtension()];
+            const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
+            const localExtensions = [new MockLoggerExtension()];
 
             configureComponentStores({ extensions: globalExtensions });
             const cs = setup({}, { extensions: localExtensions });

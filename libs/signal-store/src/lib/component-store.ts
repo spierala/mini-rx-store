@@ -22,6 +22,7 @@ import {
 import { ActionsOnQueue } from './actions-on-queue';
 import { SelectableSignalState } from './selectable-signal-state';
 import { signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -58,6 +59,8 @@ export class ComponentStore<StateType extends object>
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {
         super();
 
+        this._destroyRef.onDestroy(() => this.destroy());
+
         const metaReducers: MetaReducer<StateType>[] = [];
 
         if (config?.extensions) {
@@ -92,12 +95,10 @@ export class ComponentStore<StateType extends object>
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
         this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
 
-        this._sub.add(
-            this.actionsOnQueue.actions$.subscribe((action) => {
-                const newState: StateType = this.reducer(this._state(), action);
-                this._state.set(newState);
-            })
-        );
+        this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
+            const newState: StateType = this.reducer(this._state(), action);
+            this._state.set(newState);
+        });
     }
 
     /** @internal
@@ -125,11 +126,9 @@ export class ComponentStore<StateType extends object>
 
     select = this._selectableState.select.bind(this._selectableState);
 
-    override destroy() {
+    private destroy() {
         // Dispatch an action really just for logging via LoggerExtension
-        // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
         this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY, csFeatureKey));
-        super.destroy();
     }
 }
 
