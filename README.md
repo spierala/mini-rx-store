@@ -350,6 +350,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://www.braincrumbz.com"><img src="https://avatars.githubusercontent.com/u/3185573?v=4?s=100" width="100px;" alt="BrainCrumbz"/><br /><sub><b>BrainCrumbz</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=BrainCrumbz" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vangenechtenbert"><img src="https://avatars.githubusercontent.com/u/63012822?v=4?s=100" width="100px;" alt="vangenechtenbert"/><br /><sub><b>vangenechtenbert</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/pulls?q=is%3Apr+reviewed-by%3Avangenechtenbert" title="Reviewed Pull Requests">👀</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mvmiert"><img src="https://avatars.githubusercontent.com/u/93150090?v=4?s=100" width="100px;" alt="mvmiert"/><br /><sub><b>mvmiert</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/pulls?q=is%3Apr+reviewed-by%3Amvmiert" title="Reviewed Pull Requests">👀</a></td>
+    </tr>
   </tbody>
 </table>
 
