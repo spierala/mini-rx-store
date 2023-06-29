@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [5.1.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.1...mini-rx-store-5.1.0) (2023-06-29)
+
+
+### Features
+
+* **mini-rx-store:** selector with dictionary parameter ([b8bb5aa](https://github.com/spierala/mini-rx-store/commit/b8bb5aa724025f9c3bd9ef4fcccf16c405468c35))
+
 ### [5.0.1](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.0...mini-rx-store-5.0.1) (2023-04-18)
 
 ## [5.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.0-rc.0...mini-rx-store-5.0.0) (2023-04-17)
