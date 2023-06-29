@@ -4,7 +4,7 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-blue.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
