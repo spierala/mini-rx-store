@@ -8,6 +8,7 @@
         "start:angular-demo": "nx build mini-rx-store && nx build mini-rx-store-ng && nx serve mini-rx-angular-demo",
         "dev": "nx serveAppAndWatchLibs",
         "build:mini-rx-angular-demo": "nx build mini-rx-angular-demo",
+        "build:signal-store-angular-demo": "nx build signal-store-angular-demo",
         "build:mini-rx-store": "nx build mini-rx-store",
         "build:mini-rx-store-ng": "nx build mini-rx-store-ng",
         "build:all": "nx build mini-rx-store && nx build mini-rx-store-ng && nx build mini-rx-angular-demo",
