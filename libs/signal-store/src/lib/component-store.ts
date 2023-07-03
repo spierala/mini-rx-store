@@ -21,13 +21,12 @@ import {
 } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 import { SelectableSignalState } from './selectable-signal-state';
-import { signal } from '@angular/core';
+import { Signal, signal, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
-/** @internal
- * This function exists for testing purposes only
- */
+// This function exists for testing purposes only
 export function _resetConfig() {
     componentStoreConfig = undefined;
 }
@@ -47,9 +46,9 @@ export class ComponentStore<StateType extends object>
     implements ComponentStoreLike<StateType>
 {
     private actionsOnQueue = new ActionsOnQueue();
-    private _state = signal(this.initialState);
-    private _selectableState = new SelectableSignalState(this._state);
-    state = this._selectableState.select();
+    private _state: WritableSignal<StateType> = signal(this.initialState);
+    private selectableState = new SelectableSignalState(this._state);
+    state: Signal<StateType> = this.selectableState.select();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private readonly reducer: Reducer<StateType>;
     private hasUndoExtension = false;
@@ -57,6 +56,8 @@ export class ComponentStore<StateType extends object>
 
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {
         super();
+
+        this._destroyRef.onDestroy(() => this.destroy());
 
         const metaReducers: MetaReducer<StateType>[] = [];
 
@@ -92,12 +93,10 @@ export class ComponentStore<StateType extends object>
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
         this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
 
-        this._sub.add(
-            this.actionsOnQueue.actions$.subscribe((action) => {
-                const newState: StateType = this.reducer(this._state(), action);
-                this._state.set(newState);
-            })
-        );
+        this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
+            const newState: StateType = this.reducer(this.state(), action);
+            this._state.set(newState);
+        });
     }
 
     /** @internal
@@ -112,24 +111,22 @@ export class ComponentStore<StateType extends object>
         return action;
     }
 
-    private dispatch(action: Action) {
+    private dispatch(action: Action): void {
         this.actionsOnQueue.dispatch(action);
     }
 
     // Implementation of abstract method from BaseStore
-    undo(action: Action) {
+    undo(action: Action): void {
         this.hasUndoExtension
             ? this.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    select = this._selectableState.select.bind(this._selectableState);
+    select = this.selectableState.select.bind(this.selectableState);
 
-    override destroy() {
+    private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension
-        // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
         this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY, csFeatureKey));
-        super.destroy();
     }
 }
 

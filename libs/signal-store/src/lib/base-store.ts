@@ -1,17 +1,19 @@
-import { isObservable, Observable, Subject, Subscription } from 'rxjs';
+import { isObservable, Observable, Subject } from 'rxjs';
 import { Action, SetStateParam, SetStateReturn, StateOrCallback } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { Injectable, Signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { DestroyRef, EnvironmentInjector, inject, Injectable, Signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
 
 // BaseStore is extended by ComponentStore/FeatureStore
 @Injectable()
 export abstract class BaseStore<StateType extends object> {
-    /**
-     * @internal Used by ComponentStore/FeatureStore
+    private _injector = inject(EnvironmentInjector);
+
+    /** @internal
+     * Used here and by ComponentStore/FeatureStore
      */
-    protected _sub: Subscription = new Subscription();
+    protected _destroyRef = inject(DestroyRef);
 
     update<P extends SetStateParam<StateType>>(
         stateOrCallback: P,
@@ -22,12 +24,16 @@ export abstract class BaseStore<StateType extends object> {
         };
 
         const result = miniRxIsSignal(stateOrCallback)
-            ? (toObservable(stateOrCallback) as Observable<Partial<StateType>>)
+            ? (toObservable(stateOrCallback, { injector: this._injector }) as Observable<
+                  Partial<StateType>
+              >)
             : stateOrCallback;
 
         return (
             isObservable(result)
-                ? this._sub.add(result.subscribe((v) => dispatchFn(v, name)))
+                ? result
+                      .pipe(takeUntilDestroyed(this._destroyRef))
+                      .subscribe((v) => dispatchFn(v, name))
                 : dispatchFn(result as StateOrCallback<StateType>, name)
         ) as SetStateReturn<StateType, P>;
     }
@@ -64,7 +70,7 @@ export abstract class BaseStore<StateType extends object> {
         const effect$ = effectFn(subject as OriginType);
         const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(effect$);
 
-        this._sub.add(effectWithDefaultErrorHandler.subscribe());
+        effectWithDefaultErrorHandler.pipe(takeUntilDestroyed(this._destroyRef)).subscribe();
 
         return ((
             observableOrValue?: ObservableType | Observable<ObservableType> | Signal<ObservableType>
@@ -75,20 +81,10 @@ export abstract class BaseStore<StateType extends object> {
                 : observableOrValue;
 
             isObservable(observableOrValue)
-                ? this._sub.add(observableOrValue.subscribe((v) => subject.next(v)))
+                ? observableOrValue
+                      .pipe(takeUntilDestroyed(this._destroyRef))
+                      .subscribe((v) => subject.next(v))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
-    }
-
-    destroy() {
-        this._sub.unsubscribe();
-    }
-
-    /**
-     * @internal
-     * Can be called by Angular if ComponentStore/FeatureStore is provided in a component
-     */
-    ngOnDestroy() {
-        this.destroy();
     }
 }

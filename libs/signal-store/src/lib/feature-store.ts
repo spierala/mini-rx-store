@@ -36,6 +36,8 @@ export class FeatureStore<StateType extends object>
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
         super();
 
+        this._destroyRef.onDestroy(() => this.destroy());
+
         this.featureId = generateId();
         this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
 
@@ -66,8 +68,7 @@ export class FeatureStore<StateType extends object>
 
     select = this.selectableState.select.bind(this.selectableState);
 
-    override destroy() {
-        super.destroy();
+    private destroy(): void {
         removeFeature(this._featureKey);
     }
 }
@@ -102,7 +103,7 @@ function createSetStateAction<T>(
 
 // Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
 // This isn't a real GUID!
-function generateId() {
+function generateId(): string {
     return Math.random().toString(36).slice(2);
 }
 
