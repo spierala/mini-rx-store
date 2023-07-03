@@ -58,7 +58,7 @@ const getTodosNotDone = createSelector(getTodosFiltered, (todos) =>
     providedIn: 'root',
 })
 export class TodosStore extends FeatureStore<TodosState> {
-    // STATE OBSERVABLES
+    // STATE SIGNALS
     todosDone: Signal<Todo[]> = this.select(getTodosDone);
     todosNotDone: Signal<Todo[]> = this.select(getTodosNotDone);
     filter: Signal<TodoFilter> = this.select(getFilter);

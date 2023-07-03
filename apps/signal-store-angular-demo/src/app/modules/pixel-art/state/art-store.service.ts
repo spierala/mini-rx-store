@@ -12,7 +12,7 @@ const initialState: ArtState = {
 };
 
 @Injectable()
-export class ArtStoreService extends ComponentStore<ArtState> {
+export class ArtStore extends ComponentStore<ArtState> {
     opacity: Signal<number> = this.select((state) => state.opacity);
 
     constructor() {
