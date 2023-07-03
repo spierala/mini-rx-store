@@ -21,14 +21,12 @@ import {
 } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 import { SelectableSignalState } from './selectable-signal-state';
-import { signal } from '@angular/core';
+import { Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
-/** @internal
- * This function exists for testing purposes only
- */
+// This function exists for testing purposes only
 export function _resetConfig() {
     componentStoreConfig = undefined;
 }
@@ -48,9 +46,9 @@ export class ComponentStore<StateType extends object>
     implements ComponentStoreLike<StateType>
 {
     private actionsOnQueue = new ActionsOnQueue();
-    private _state = signal(this.initialState);
-    private _selectableState = new SelectableSignalState(this._state);
-    state = this._selectableState.select();
+    private _state: WritableSignal<StateType> = signal(this.initialState);
+    private selectableState = new SelectableSignalState(this._state);
+    state: Signal<StateType> = this.selectableState.select();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private readonly reducer: Reducer<StateType>;
     private hasUndoExtension = false;
@@ -96,7 +94,7 @@ export class ComponentStore<StateType extends object>
         this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
 
         this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
-            const newState: StateType = this.reducer(this._state(), action);
+            const newState: StateType = this.reducer(this.state(), action);
             this._state.set(newState);
         });
     }
@@ -113,20 +111,20 @@ export class ComponentStore<StateType extends object>
         return action;
     }
 
-    private dispatch(action: Action) {
+    private dispatch(action: Action): void {
         this.actionsOnQueue.dispatch(action);
     }
 
     // Implementation of abstract method from BaseStore
-    undo(action: Action) {
+    undo(action: Action): void {
         this.hasUndoExtension
             ? this.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    select = this._selectableState.select.bind(this._selectableState);
+    select = this.selectableState.select.bind(this.selectableState);
 
-    private destroy() {
+    private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension
         this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY, csFeatureKey));
     }

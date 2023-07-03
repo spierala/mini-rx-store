@@ -9,6 +9,10 @@ import { miniRxIsSignal } from './utils';
 @Injectable()
 export abstract class BaseStore<StateType extends object> {
     private _injector = inject(EnvironmentInjector);
+
+    /** @internal
+     * Used here and by ComponentStore/FeatureStore
+     */
     protected _destroyRef = inject(DestroyRef);
 
     update<P extends SetStateParam<StateType>>(

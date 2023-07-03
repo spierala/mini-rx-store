@@ -18,7 +18,7 @@ import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
-import { computed, signal, WritableSignal } from '@angular/core';
+import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import { SelectableSignalState } from './selectable-signal-state';
 
 export let hasUndoExtension = false;
@@ -34,7 +34,7 @@ export const reducerState: WritableSignal<{
     metaReducers: [],
 });
 
-const reducer = computed(() => {
+const reducer: Signal<Reducer<AppState>> = computed(() => {
     const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(
         reducerState().metaReducers
     );
@@ -46,15 +46,14 @@ function hasFeatureReducers(): boolean {
     return !!Object.keys(reducerState().featureReducers).length;
 }
 
-function checkFeatureExists(featureKey: string) {
+function checkFeatureExists(featureKey: string): void {
     if (reducerState().featureReducers.hasOwnProperty(featureKey)) {
         miniRxError(`Feature "${featureKey}" already exists.`);
     }
 }
 
-function addReducer(featureKey: string, reducer: Reducer<any>) {
+function addReducer(featureKey: string, reducer: Reducer<any>): void {
     initStore();
-
     checkFeatureExists(featureKey);
 
     reducerState.update((state) => ({
@@ -63,7 +62,7 @@ function addReducer(featureKey: string, reducer: Reducer<any>) {
     }));
 }
 
-function removeReducer(featureKey: string) {
+function removeReducer(featureKey: string): void {
     reducerState.update((state) => ({
         ...state,
         featureReducers: omit(state.featureReducers, featureKey) as ReducerDictionary<AppState>,
@@ -71,7 +70,7 @@ function removeReducer(featureKey: string) {
 }
 
 // exported for testing purposes
-export function addMetaReducers(...reducers: MetaReducer<AppState>[]) {
+export function addMetaReducers(...reducers: MetaReducer<AppState>[]): void {
     reducerState.update((state) => ({
         ...state,
         metaReducers: [...state.metaReducers, ...reducers],
@@ -83,14 +82,14 @@ const actionsOnQueue = new ActionsOnQueue();
 export const actions$: Actions = actionsOnQueue.actions$;
 
 // APP STATE
-const appState = signal({});
+const appState: WritableSignal<AppState> = signal({});
 export const selectableAppState: SelectableSignalState<AppState> = new SelectableSignalState(
     appState
 );
 
 // Wire up the Redux Store: Init reducer state, subscribe to the actions and reducer Observable
 // Called by `configureStore` and `addReducer`
-function initStore() {
+function initStore(): void {
     if (isStoreInitialized) {
         return;
     }
@@ -109,7 +108,7 @@ function initStore() {
     isStoreInitialized = true;
 }
 
-export function configureStore(config: StoreConfig<AppState> = {}) {
+export function configureStore(config: StoreConfig<AppState> = {}): void {
     initStore();
 
     if (hasFeatureReducers()) {
@@ -160,7 +159,7 @@ export function addFeature<StateType>(
     dispatch(createMiniRxAction(MiniRxActionType.INIT, featureKey));
 }
 
-export function removeFeature(featureKey: string) {
+export function removeFeature(featureKey: string): void {
     removeReducer(featureKey);
     dispatch(createMiniRxAction(MiniRxActionType.DESTROY, featureKey));
 }
@@ -183,7 +182,7 @@ export function rxEffect(effect$: any): void {
 }
 
 // exported for testing purposes
-export function addExtension(extension: StoreExtension) {
+export function addExtension(extension: StoreExtension): void {
     const metaReducer: MetaReducer<any> | void = extension.init();
 
     if (metaReducer) {
@@ -195,11 +194,11 @@ export function addExtension(extension: StoreExtension) {
     }
 }
 
-export function dispatch(action: Action) {
+export function dispatch(action: Action): void {
     actionsOnQueue.dispatch(action);
 }
 
-export function updateAppState(state: AppState) {
+export function updateAppState(state: AppState): void {
     appState.set(state);
 }
 
