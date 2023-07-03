@@ -20,7 +20,7 @@
                     "apps/signal-store-angular-demo/src/assets"
                 ],
                 "styles": [
-                    "apps/signal-store-angular-demo/src/styles.scss",
+                    "apps/signal-store-angular-demo/src/styles.css",
                     "node_modules/bootstrap/dist/css/bootstrap.css",
                     "node_modules/ngx-toastr/toastr.css"
                 ],
