@@ -6,7 +6,7 @@
         "ng": "nx",
         "postinstall": "node ./decorate-angular-cli.js",
         "start:angular-demo": "nx build mini-rx-store && nx build mini-rx-store-ng && nx serve mini-rx-angular-demo",
-        "start:signal-store-angular-demo": "nx build mini-rx-store && nx serve signal-store-angular-demo",
+        "start:signal-store-angular-demo": "nx build signal-store && nx serve signal-store-angular-demo",
         "dev": "nx serveAppAndWatchLibs",
         "build:mini-rx-angular-demo": "nx build mini-rx-angular-demo",
         "build:signal-store-angular-demo": "nx build signal-store-angular-demo",
