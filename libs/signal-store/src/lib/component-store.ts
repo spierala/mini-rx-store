@@ -91,12 +91,13 @@ export class ComponentStore<StateType extends object>
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
-        this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
 
         this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
             const newState: StateType = this.reducer(this.state(), action);
             this._state.set(newState);
         });
+
+        this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
     }
 
     /** @internal

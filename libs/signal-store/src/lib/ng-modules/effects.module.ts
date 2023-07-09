@@ -37,15 +37,14 @@ import {
     fromObjectsWithEffectsToEffects,
 } from './effects-mapper';
 import { StoreFeatureModule, StoreRootModule } from './store.module';
-import { Store } from '../store';
 import { Action } from '../models';
+import { rxEffect } from '../store-core';
 
 const OBJECTS_WITH_EFFECTS = new InjectionToken('@mini-rx/objectsWithEffects');
 
 @NgModule()
 export class EffectsModule {
     constructor(
-        private store: Store,
         @Inject(OBJECTS_WITH_EFFECTS) objectsWithEffects: any[],
         // Make sure effects can select state from store, also if EffectsModule is registered before Store.forFeature
         @Optional() storeRootModule: StoreRootModule,
@@ -53,7 +52,7 @@ export class EffectsModule {
     ) {
         const effects = fromObjectsWithEffectsToEffects(objectsWithEffects);
         effects.forEach((effect: Observable<Action>) => {
-            this.store.rxEffect(effect);
+            rxEffect(effect);
         });
     }
 

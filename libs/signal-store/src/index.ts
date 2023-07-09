@@ -39,3 +39,9 @@ export { undo } from './lib/actions';
 export { StoreRootModule, StoreModule, StoreFeatureModule } from './lib/ng-modules/store.module';
 export { EffectsModule } from './lib/ng-modules/effects.module';
 export { ComponentStoreModule } from './lib/ng-modules/component-store.module';
+export {
+    provideStore,
+    provideFeature,
+    provideEffects,
+    provideComponentStoreConfig,
+} from './lib/providers';
