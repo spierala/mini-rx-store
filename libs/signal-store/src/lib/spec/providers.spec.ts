@@ -1,10 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { Injectable, NgModule } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { StoreModule } from '../modules/store.module';
-import { EffectsModule } from '../modules/effects.module';
-import { ComponentStoreModule } from '../modules/component-store.module';
 import { Action, Actions, Reducer, StoreExtension } from '../models';
 import { ofType } from '../utils';
 import { createRxEffect } from '../create-rx-effect';
@@ -16,6 +13,12 @@ import {
     MockLoggerExtension,
     MockUndoExtension,
 } from './_spec-helpers';
+import {
+    provideComponentStoreConfig,
+    provideEffects,
+    provideFeature,
+    provideStore,
+} from '../providers';
 
 const loadAction: Action = {
     type: 'LOAD',
@@ -59,11 +62,6 @@ function counterReducer(state: CounterState = counterInitialState, action: Actio
     }
 }
 
-@NgModule({
-    imports: [StoreModule.forFeature<CounterState>('counter2', counterReducer)],
-})
-class Counter2Module {}
-
 const featureMetaReducerSpy = jest.fn();
 
 function featureMetaReducer(reducer: Reducer<any>): Reducer<any> {
@@ -72,18 +70,6 @@ function featureMetaReducer(reducer: Reducer<any>): Reducer<any> {
         return reducer(state, action);
     };
 }
-
-@NgModule({
-    imports: [
-        StoreModule.forFeature<CounterState>('counter3', counterReducer, {
-            initialState: {
-                counter: 555,
-            },
-            metaReducers: [featureMetaReducer],
-        }),
-    ],
-})
-class Counter3Module {}
 
 @Injectable()
 class TodoEffects {
@@ -135,7 +121,7 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
 
 const globalCsExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
 
-describe(`Ng Modules`, () => {
+describe(`Providers`, () => {
     let actions$: Actions;
     let store: Store;
 
@@ -160,10 +146,8 @@ describe(`Ng Modules`, () => {
 
     beforeAll(() => {
         TestBed.configureTestingModule({
-            imports: [
-                Counter2Module,
-                EffectsModule.register([TodoEffects, TodoEffectsNOK]),
-                StoreModule.forRoot({
+            providers: [
+                provideStore({
                     reducers: {
                         counter1: counterReducer,
                     },
@@ -173,8 +157,15 @@ describe(`Ng Modules`, () => {
                     metaReducers: [rootMetaReducer],
                     extensions: [new SomeExtension()],
                 }),
-                Counter3Module,
-                ComponentStoreModule.forRoot({
+                provideEffects(TodoEffects, TodoEffectsNOK),
+                provideFeature('counter2', counterReducer),
+                provideFeature('counter3', counterReducer, {
+                    initialState: {
+                        counter: 555,
+                    },
+                    metaReducers: [featureMetaReducer],
+                }),
+                provideComponentStoreConfig({
                     extensions: globalCsExtensions,
                 }),
             ],
@@ -271,7 +262,7 @@ describe(`Ng Modules`, () => {
     });
 
     describe(`ComponentStore`, () => {
-        // Just make sure that the global config is set via the ComponentStoreModule.forRoot static method
+        // Just make sure that the global config is set via provideComponentStoreConfig
         // For the other aspects of the config we can rely on the ComponentStore tests
 
         it('should merge global config with local config', () => {
