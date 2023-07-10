@@ -724,7 +724,7 @@ describe('Store', () => {
             }
         }
 
-        store.rxEffect(
+        rxEffect(
             actions.pipe(
                 take(callLimit),
                 tap(spy),

@@ -1,4 +1,4 @@
-import { Action, ActionWithPayload, Reducer } from '../models';
+import { Action, ActionWithPayload, ComponentStoreExtension, ExtensionId, MetaReducer, Reducer } from '../models';
 import { v4 as uuid } from 'uuid';
 import { dispatch, reducerState } from '../store-core';
 
@@ -87,5 +87,35 @@ export function counterStringReducer(
             };
         default:
             return state;
+    }
+}
+
+export class MockLoggerExtension implements ComponentStoreExtension {
+    id = ExtensionId.LOGGER;
+    sortOrder = 1;
+    hasCsSupport = true as const;
+
+    init(): MetaReducer<any> {
+        return (v) => v;
+    }
+}
+
+export class MockUndoExtension implements ComponentStoreExtension {
+    id = ExtensionId.UNDO;
+    sortOrder = 1;
+    hasCsSupport = true as const;
+
+    init(): MetaReducer<any> {
+        return (v) => v;
+    }
+}
+
+export class MockImmutableStateExtension implements ComponentStoreExtension {
+    id = ExtensionId.IMMUTABLE_STATE;
+    sortOrder = 1;
+    hasCsSupport = true as const;
+
+    init(): MetaReducer<any> {
+        return (v) => v;
     }
 }
