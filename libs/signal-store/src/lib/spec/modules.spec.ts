@@ -2,41 +2,39 @@ import { TestBed } from '@angular/core/testing';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { StoreModule } from '../ng-modules/store.module';
-import { EffectsModule } from '../ng-modules/effects.module';
-import { ComponentStoreModule } from '../ng-modules/component-store.module';
-import { Action, Actions, Reducer, StoreExtension } from '../models'
-import { ofType } from "../utils";
-import { createRxEffect } from "../create-rx-effect";
-import { FeatureStore } from "../feature-store";
-import { Store } from '../store'
-import { createComponentStore } from '../component-store'
-import { MockImmutableStateExtension, MockLoggerExtension, MockUndoExtension } from "./_spec-helpers";
+import { StoreModule } from '../modules/store.module';
+import { EffectsModule } from '../modules/effects.module';
+import { ComponentStoreModule } from '../modules/component-store.module';
+import { Action, Actions, Reducer, StoreExtension } from '../models';
+import { ofType } from '../utils';
+import { createRxEffect } from '../create-rx-effect';
+import { FeatureStore } from '../feature-store';
+import { Store } from '../store';
+import { createComponentStore } from '../component-store';
+import {
+    MockImmutableStateExtension,
+    MockLoggerExtension,
+    MockUndoExtension,
+} from './_spec-helpers';
 
 const loadAction: Action = {
     type: 'LOAD',
 };
-
 const loadAction2: Action = {
     type: 'LOAD_2',
 };
-
 const loadAction3: Action = {
     type: 'LOAD_3',
 };
-
 const loadSuccessAction: Action = {
     type: 'LOAD_SUCCESS',
 };
-
 const loadSuccessAction2: Action = {
     type: 'LOAD_SUCCESS_2',
 };
-
 const loadSuccessAction3: Action = {
     type: 'LOAD_SUCCESS_3',
 };
-
 const loadFailAction: Action = {
     type: 'LOAD_FAIL',
 };
@@ -62,7 +60,7 @@ function counterReducer(state: CounterState = counterInitialState, action: Actio
 }
 
 @NgModule({
-    imports: [StoreModule.forFeature<CounterState>('counter4', counterReducer)],
+    imports: [StoreModule.forFeature<CounterState>('counter2', counterReducer)],
 })
 class Counter4Module {}
 
@@ -77,7 +75,7 @@ function featureMetaReducer(reducer: Reducer<any>): Reducer<any> {
 
 @NgModule({
     imports: [
-        StoreModule.forFeature<CounterState>('counter5', counterReducer, {
+        StoreModule.forFeature<CounterState>('counter3', counterReducer, {
             initialState: {
                 counter: 555,
             },
@@ -194,8 +192,8 @@ describe(`Ng Modules`, () => {
         const selectedState = store.select((state) => state);
         expect(selectedState()).toEqual({
             counter1: { counter: 111 }, // Reducer initial state is overwritten by initial state from forRoot config
-            counter4: { counter: 1 },
-            counter5: { counter: 555 }, // forFeature config initial state
+            counter2: { counter: 1 },
+            counter3: { counter: 555 }, // forFeature config initial state
         });
 
         expect(rootMetaReducerSpy).toHaveBeenCalledTimes(3);
@@ -214,8 +212,8 @@ describe(`Ng Modules`, () => {
 
         expect(selectedState()).toEqual({
             counter1: { counter: 112 },
-            counter4: { counter: 2 },
-            counter5: { counter: 556 },
+            counter2: { counter: 2 },
+            counter3: { counter: 556 },
         });
 
         expect(rootMetaReducerSpy).toHaveBeenCalledTimes(4);
@@ -256,8 +254,10 @@ describe(`Ng Modules`, () => {
     describe(`FeatureStore`, () => {
         let fs: CounterFeatureStore;
         beforeAll(() => {
-            fs = TestBed.runInInjectionContext(() => { return new CounterFeatureStore()});
-        })
+            fs = TestBed.runInInjectionContext(() => {
+                return new CounterFeatureStore();
+            });
+        });
 
         it(`should add Feature Store`, () => {
             const selectedState = store.select((state) => state);
@@ -265,8 +265,8 @@ describe(`Ng Modules`, () => {
             expect(selectedState()).toEqual({
                 counter1: { counter: 112 },
                 counterFs: { counter: 1 },
-                counter4: { counter: 2 },
-                counter5: { counter: 556 },
+                counter2: { counter: 2 },
+                counter3: { counter: 556 },
             });
         });
     });

@@ -21,7 +21,7 @@ import {
     resetStoreConfig,
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
-import { StoreModule } from '../ng-modules/store.module';
+import { StoreModule } from '../modules/store.module';
 import { addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
 import { ofType } from '../utils';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';

@@ -1,3 +1,6 @@
+// TODO remove exports
+// TODO fix strange feature naming (should be counter1, counter2, counter3)
+
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
 import {

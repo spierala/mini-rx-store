@@ -36,9 +36,9 @@ export { mapResponse } from './lib/map-response';
 export { createRxEffect } from './lib/create-rx-effect';
 export { undo } from './lib/actions';
 
-export { StoreRootModule, StoreModule, StoreFeatureModule } from './lib/ng-modules/store.module';
-export { EffectsModule } from './lib/ng-modules/effects.module';
-export { ComponentStoreModule } from './lib/ng-modules/component-store.module';
+export { StoreRootModule, StoreModule, StoreFeatureModule } from './lib/modules/store.module';
+export { EffectsModule } from './lib/modules/effects.module';
+export { ComponentStoreModule } from './lib/modules/component-store.module';
 export {
     provideStore,
     provideFeature,
