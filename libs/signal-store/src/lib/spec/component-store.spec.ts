@@ -4,7 +4,14 @@ import {
     configureComponentStores,
     createComponentStore,
 } from '../component-store';
-import { counterInitialState, CounterState, userState } from './_spec-helpers';
+import {
+    counterInitialState,
+    CounterState,
+    MockImmutableStateExtension,
+    MockLoggerExtension,
+    MockUndoExtension,
+    userState
+} from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
@@ -357,35 +364,7 @@ describe('ComponentStore', () => {
     });
 
     describe('Extensions', () => {
-        class MockLoggerExtension implements ComponentStoreExtension {
-            id = ExtensionId.LOGGER;
-            sortOrder = 1;
-            hasCsSupport = true as const;
 
-            init(): MetaReducer<any> {
-                return (v) => v;
-            }
-        }
-
-        class MockUndoExtension implements ComponentStoreExtension {
-            id = ExtensionId.UNDO;
-            sortOrder = 1;
-            hasCsSupport = true as const;
-
-            init(): MetaReducer<any> {
-                return (v) => v;
-            }
-        }
-
-        class MockImmutableStateExtension implements ComponentStoreExtension {
-            id = ExtensionId.IMMUTABLE_STATE;
-            sortOrder = 1;
-            hasCsSupport = true as const;
-
-            init(): MetaReducer<any> {
-                return (v) => v;
-            }
-        }
 
         beforeEach(() => {
             _resetConfig();

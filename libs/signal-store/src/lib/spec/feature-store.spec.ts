@@ -15,7 +15,7 @@ import { Action, Actions, FeatureConfig, Reducer, StoreConfig } from '../models'
 import { tapResponse } from '../tap-response';
 import { addMetaReducers } from '../store-core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { StoreModule } from '../ng-modules/store.module';
+import { StoreModule } from '../modules/store.module';
 import { Store } from '../store';
 import { Component, EnvironmentInjector, inject, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
