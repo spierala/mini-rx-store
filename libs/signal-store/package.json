@@ -1,6 +1,27 @@
 {
     "name": "@mini-rx/signal-store",
     "version": "0.0.5",
+    "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
+    "license": "MIT",
+    "homepage": "https://github.com/spierala/mini-rx-store",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
+    "description": "Signal Store for Angular",
+    "keywords": [
+        "Angular",
+        "Signal",
+        "RxJS",
+        "Observable",
+        "Redux",
+        "Store",
+        "State Management"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/spierala/mini-rx-store.git"
+    },
+    "bugs": {
+        "url": "https://github.com/spierala/mini-rx-store/issues"
+    },
     "peerDependencies": {
         "@angular/common": "^16.0.0",
         "@angular/core": "^16.0.0",
