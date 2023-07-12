@@ -34,14 +34,6 @@ export const reducerState: WritableSignal<{
     metaReducers: [],
 });
 
-const reducer: Signal<Reducer<AppState>> = computed(() => {
-    const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(
-        reducerState().metaReducers
-    );
-    const combinedReducer: Reducer<AppState> = combineReducers(reducerState().featureReducers);
-    return combinedMetaReducer(combinedReducer);
-});
-
 function hasFeatureReducers(): boolean {
     return !!Object.keys(reducerState().featureReducers).length;
 }
@@ -94,9 +86,12 @@ function initStore(): void {
         return;
     }
 
-    reducerState.set({
-        featureReducers: {},
-        metaReducers: [],
+    const reducer: Signal<Reducer<AppState>> = computed(() => {
+        const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(
+            reducerState().metaReducers
+        );
+        const combinedReducer: Reducer<AppState> = combineReducers(reducerState().featureReducers);
+        return combinedMetaReducer(combinedReducer);
     });
 
     // Listen to the Actions stream and update state accordingly

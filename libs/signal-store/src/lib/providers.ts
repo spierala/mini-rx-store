@@ -17,7 +17,6 @@ import {
     Type,
 } from '@angular/core';
 import { actions$, addFeature, rxEffect } from './store-core';
-
 import { Store } from './store';
 import { Observable } from 'rxjs';
 import { hasEffectMetaData } from './utils';
@@ -39,7 +38,7 @@ const COMPONENT_STORE_CONFIG_PROVIDER = new InjectionToken<void>(
 );
 
 // Store
-export function storeFactory(config: StoreConfig<AppState>) {
+function storeFactory(config: StoreConfig<AppState>) {
     return new Store(config);
 }
 
