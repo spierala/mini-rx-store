@@ -1,14 +1,10 @@
 /*
- * Public API Surface of signal-store
+ * Public API Surface of Signal Store
  */
 
 export { Store } from './lib/store';
 export { FeatureStore, createFeatureStore } from './lib/feature-store';
-export {
-    ComponentStore,
-    createComponentStore,
-    configureComponentStores,
-} from './lib/component-store';
+export { ComponentStore, createComponentStore } from './lib/component-store';
 export {
     createSelector,
     createFeatureStateSelector,
@@ -20,6 +16,7 @@ export {
     Actions,
     StoreConfig,
     FeatureConfig,
+    FeatureStoreConfig,
     ComponentStoreConfig,
     StoreExtension,
 } from './lib/models';
