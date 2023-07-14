@@ -1,5 +1,5 @@
 import { isObservable, Observable, Subject } from 'rxjs';
-import { Action, SetStateParam, SetStateReturn, StateOrCallback } from './models';
+import { Action, UpdateStateParam, SetStateReturn, StateOrCallback } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { DestroyRef, EnvironmentInjector, inject, Injectable, Signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -15,19 +15,18 @@ export abstract class BaseStore<StateType extends object> {
      */
     protected _destroyRef = inject(DestroyRef);
 
-    update<P extends SetStateParam<StateType>>(
-        stateOrCallback: P,
+    update<P extends UpdateStateParam<StateType>>(
+        param: P, // state object or callback or Observable or Signal
         name?: string
     ): SetStateReturn<StateType, P> {
         const dispatchFn = (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
             return this._dispatchSetStateAction(stateOrCallback, name);
         };
 
-        const result = miniRxIsSignal(stateOrCallback)
-            ? (toObservable(stateOrCallback, { injector: this._injector }) as Observable<
-                  Partial<StateType>
-              >)
-            : stateOrCallback;
+        // If we detect a Signal: convert Signal to Observable
+        const result = miniRxIsSignal(param)
+            ? (toObservable(param, { injector: this._injector }) as Observable<Partial<StateType>>)
+            : param;
 
         return (
             isObservable(result)
