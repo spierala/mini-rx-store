@@ -1,0 +1,66 @@
+<div class="d-flex flex-column h-100" *ngIf="userStore.permissions()">
+    <nav class="navbar navbar-light bg-light mb-1">
+        <a class="navbar-brand">Products</a>
+        <div class="d-flex flex-grow-1 mb-2 justify-content-between mt-2">
+            <div>
+                <button
+                    *ngIf="userStore.permissions().canUpdateProducts"
+                    class="btn btn-primary btn-sm"
+                    (click)="productsStore.newProduct()"
+                >
+                    New
+                </button>
+            </div>
+            <app-product-filter
+                [search]="productsStore.search()"
+                (searchChanged)="productsStore.updateSearch($event)"
+            ></app-product-filter>
+        </div>
+    </nav>
+
+    <div class="m-3 alert alert-info d-flex align-items-center" role="alert">
+        <i class="info-icon bi bi-info-circle-fill"></i>
+        <div>
+            MiniRx
+            <strong>(Redux) Store</strong>
+            is used to manage the "products" state. The "products" state becomes part of the
+            <strong>global state</strong>
+            object.
+            <br />
+            <br />
+            You can edit the products if you enable "CanUpdateProducts" in the "John Doe" user
+            settings of this demo.
+            <br />
+            Press the ALT key while saving or deleting a product to simulate an API error.
+            <br />
+            Saving an existing product uses optimistic update (and undo in case of API error).
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <app-product-list
+                    [products]="productsStore.products()"
+                    [selectedProduct]="productsStore.selectedProduct()"
+                    [displayCode]="productsStore.displayCode()"
+                    [showCartBtn]="!userStore.permissions().canUpdateProducts"
+                    (productSelect)="productsStore.selectProduct($event)"
+                    (displayCodeChange)="productsStore.toggleProductCode($event)"
+                    (addToCart)="productsStore.addProductToCart($event)"
+                ></app-product-list>
+            </div>
+            <div class="col" *ngIf="productsStore.selectedProduct()">
+                <app-product-detail
+                    [product]="productsStore.selectedProduct()!"
+                    [detailTitle]="productsStore.detailTitle()"
+                    [permissions]="userStore.permissions()"
+                    (create)="productsStore.create($event)"
+                    (update)="productsStore.update($event)"
+                    (delete)="productsStore.delete($event)"
+                    (close)="productsStore.clearCurrentProduct()"
+                ></app-product-detail>
+            </div>
+        </div>
+    </div>
+</div>

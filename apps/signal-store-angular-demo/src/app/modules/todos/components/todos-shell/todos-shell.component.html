@@ -1,0 +1,63 @@
+<div class="d-flex flex-column h-100">
+    <nav class="navbar navbar-light bg-light mb-1">
+        <a class="navbar-brand">Todos</a>
+        <div class="d-flex flex-grow-1 mb-2 justify-content-between mt-2">
+            <button class="btn btn-primary btn-sm" (click)="todosState.initNewTodo()">New</button>
+            <app-filter
+                (filterUpdate)="todosState.updateFilter($event)"
+                [filter]="filter()"
+            ></app-filter>
+        </div>
+    </nav>
+
+    <div class="m-3 alert alert-info d-flex align-items-center" role="alert">
+        <i class="info-icon bi bi-info-circle-fill"></i>
+        <div>
+            MiniRx
+            <strong>Feature Store</strong>
+            is used to manage the "Todos" state.
+            <br />
+            <br />
+            The todos are updated optimistically. Press the ALT key while saving or deleting a todo
+            to simulate an API error: The optimistic update will be rolled back.
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <span>Todos</span>
+                    </div>
+                    <app-todo-list
+                        [todos]="todosNotDone()"
+                        [selectedTodo]="selectedTodo()"
+                        (selectTodo)="todosState.selectTodo($event)"
+                    ></app-todo-list>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <span>Todos Done</span>
+                    </div>
+                    <app-todo-list
+                        [todos]="todosDone()"
+                        [selectedTodo]="selectedTodo()"
+                        (selectTodo)="todosState.selectTodo($event)"
+                    ></app-todo-list>
+                </div>
+            </div>
+            <div class="col" *ngIf="selectedTodo()">
+                <app-todo-detail
+                    [todo]="selectedTodo()!"
+                    (create)="todosState.create($event)"
+                    (update)="todosState.updateTodo($event)"
+                    (delete)="todosState.delete($event)"
+                    (close)="todosState.clearSelectedTodo()"
+                ></app-todo-detail>
+            </div>
+        </div>
+    </div>
+</div>
