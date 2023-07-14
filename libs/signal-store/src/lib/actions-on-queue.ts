@@ -5,7 +5,6 @@ import { Action, Actions } from './models';
 export class ActionsOnQueue {
     private actionsSource = new Subject<Action>();
     actions$: Actions = this.actionsSource.asObservable().pipe(
-        // TODO check if queueScheduler is still needed
         observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
     );
 
