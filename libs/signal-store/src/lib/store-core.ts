@@ -39,7 +39,7 @@ function hasFeatureReducers(): boolean {
 }
 
 function checkFeatureExists(featureKey: string): void {
-    if (reducerState().featureReducers.hasOwnProperty(featureKey)) {
+    if (Object.hasOwn(reducerState().featureReducers, featureKey)) {
         miniRxError(`Feature "${featureKey}" already exists.`);
     }
 }

@@ -155,8 +155,7 @@ export function addSignalSelectorKey<T, R>(s: Selector<T, R>): SignalSelector<T,
 }
 
 export function isSignalSelector(v: any): v is SignalSelector<any, any> {
-    // eslint-disable-next-line no-prototype-builtins
-    return v.hasOwnProperty(SIGNAL_SELECTOR_KEY);
+    return Object.hasOwn(v, SIGNAL_SELECTOR_KEY);
 }
 
 function signalEquality(a: any, b: any) {

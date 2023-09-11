@@ -32,8 +32,7 @@ export function miniRxConsoleError(message: string, err: any): void {
 export function hasEffectMetaData(
     param: Observable<Action>
 ): param is Observable<Action> & HasEffectMetadata {
-    // eslint-disable-next-line no-prototype-builtins
-    return param.hasOwnProperty(EFFECT_METADATA_KEY);
+    return Object.hasOwn(param, EFFECT_METADATA_KEY);
 }
 
 // Only display type and payload in the LoggingExtension and Redux DevTools
