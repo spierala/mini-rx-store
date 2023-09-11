@@ -1,5 +1,6 @@
 import { computed, Signal } from '@angular/core';
 import { isSignalSelector, SignalSelector } from './signal-selector';
+import { defaultSignalEquality } from './utils';
 
 type StateSelector<T, R> = (state: T) => R;
 
@@ -18,8 +19,11 @@ export class SelectableSignalState<StateType extends object> {
             return mapFn(this.state);
         }
 
-        return computed(() => {
-            return mapFn(this.state());
-        });
+        return computed(
+            () => {
+                return mapFn(this.state());
+            },
+            { equal: defaultSignalEquality }
+        );
     }
 }

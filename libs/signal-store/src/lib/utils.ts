@@ -73,5 +73,9 @@ export function sortExtensions<T extends StoreExtension>(extensions: T[]): T[] {
 }
 
 export function miniRxIsSignal(v: any): v is Signal<any> {
-    return v?.constructor === Function && isSignal(v as Function);
+    return v?.constructor === Function && isSignal(v);
+}
+
+export function defaultSignalEquality(a: any, b: any) {
+    return a === b;
 }
