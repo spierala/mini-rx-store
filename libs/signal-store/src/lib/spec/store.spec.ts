@@ -192,15 +192,6 @@ describe('Store Config', () => {
         });
     });
 
-    it('should throw when calling Store.config after a Feature Store was initialized', () => {
-        TestBed.runInInjectionContext(() => {
-            createFeatureStore('tooEarlyInstantiatedFeatureStore', {});
-            expect(() => configureStore({})).toThrowError(
-                '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
-            );
-        });
-    });
-
     describe('Root Meta Reducers', () => {
         const nextStateSpy = jest.fn();
 

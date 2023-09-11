@@ -34,10 +34,6 @@ export const reducerState: WritableSignal<{
     metaReducers: [],
 });
 
-function hasFeatureReducers(): boolean {
-    return !!Object.keys(reducerState().featureReducers).length;
-}
-
 function checkFeatureExists(featureKey: string): void {
     if (Object.hasOwn(reducerState().featureReducers, featureKey)) {
         miniRxError(`Feature "${featureKey}" already exists.`);
@@ -47,26 +43,22 @@ function checkFeatureExists(featureKey: string): void {
 function addReducer(featureKey: string, reducer: Reducer<any>): void {
     initStore();
     checkFeatureExists(featureKey);
-
-    reducerState.update((state) => ({
-        ...state,
-        featureReducers: { ...state.featureReducers, [featureKey]: reducer },
-    }));
+    reducerState.mutate((state) => (state.featureReducers[featureKey] = reducer));
 }
 
 function removeReducer(featureKey: string): void {
-    reducerState.update((state) => ({
-        ...state,
-        featureReducers: omit(state.featureReducers, featureKey) as ReducerDictionary<AppState>,
-    }));
+    reducerState.mutate(
+        (state) =>
+            (state.featureReducers = omit(
+                state.featureReducers,
+                featureKey
+            ) as ReducerDictionary<AppState>)
+    );
 }
 
 // exported for testing purposes
 export function addMetaReducers(...reducers: MetaReducer<AppState>[]): void {
-    reducerState.update((state) => ({
-        ...state,
-        metaReducers: [...state.metaReducers, ...reducers],
-    }));
+    reducerState.mutate((state) => (state.metaReducers = [...state.metaReducers, ...reducers]));
 }
 
 // ACTIONS
@@ -106,12 +98,6 @@ function initStore(): void {
 export function configureStore(config: StoreConfig<AppState> = {}): void {
     initStore();
 
-    if (hasFeatureReducers()) {
-        miniRxError(
-            '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
-        );
-    }
-
     if (config.metaReducers?.length) {
         addMetaReducers(...config.metaReducers);
     }
@@ -122,9 +108,9 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
     }
 
     if (config.reducers) {
-        Object.keys(config.reducers).forEach((featureKey) => {
-            addReducer(featureKey, config.reducers![featureKey]); // config.reducers! (prevent TS2532: Object is possibly 'undefined')
-        });
+        for (const [featureKey, value] of Object.entries(config.reducers)) {
+            addReducer(featureKey, value);
+        }
     }
 
     if (config.initialState) {
@@ -134,7 +120,7 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
     dispatch(createMiniRxAction(MiniRxActionType.INIT));
 }
 
-export function addFeature<StateType>(
+export function addFeature<StateType extends object>(
     featureKey: string,
     reducer: Reducer<StateType>,
     config: {
@@ -146,7 +132,7 @@ export function addFeature<StateType>(
         ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
         : reducer;
 
-    if (typeof config.initialState !== 'undefined') {
+    if (config.initialState) {
         reducer = createReducerWithInitialState(reducer, config.initialState);
     }
 
@@ -197,7 +183,7 @@ export function updateAppState(state: AppState): void {
     appState.set(state);
 }
 
-function createReducerWithInitialState<StateType>(
+function createReducerWithInitialState<StateType extends object>(
     reducer: Reducer<StateType>,
     initialState: StateType
 ): Reducer<StateType> {
