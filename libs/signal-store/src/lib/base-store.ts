@@ -86,4 +86,25 @@ export abstract class BaseStore<StateType extends object> {
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
+
+    connect<K extends keyof StateType, ReactiveType = StateType[K]>(
+        dict: Record<K, Observable<ReactiveType> | Signal<ReactiveType>>
+    ): void {
+        const keys: K[] = Object.keys(dict) as K[];
+
+        keys.forEach((key) => {
+            const observableOrSignal: Observable<ReactiveType> | Signal<ReactiveType> = dict[key];
+            const obs$ = miniRxIsSignal(observableOrSignal)
+                ? toObservable(observableOrSignal)
+                : observableOrSignal;
+            obs$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((v) => {
+                this._dispatchSetStateAction(
+                    {
+                        [key]: v,
+                    } as unknown as Partial<StateType>,
+                    key as string
+                );
+            });
+        });
+    }
 }
