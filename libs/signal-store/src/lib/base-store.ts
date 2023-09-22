@@ -1,9 +1,10 @@
 import { isObservable, Observable, Subject } from 'rxjs';
-import { Action, UpdateStateParam, SetStateReturn, StateOrCallback } from './models';
+import { Action, StateOrCallback } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { DestroyRef, EnvironmentInjector, inject, Injectable, Signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
+import { OperationType, MiniRxAction } from './actions';
 
 // BaseStore is extended by ComponentStore/FeatureStore
 @Injectable()
@@ -15,26 +16,8 @@ export abstract class BaseStore<StateType extends object> {
      */
     protected _destroyRef = inject(DestroyRef);
 
-    update<P extends UpdateStateParam<StateType>>(
-        param: P, // state object or callback or Observable or Signal
-        name?: string
-    ): SetStateReturn<StateType, P> {
-        const dispatchFn = (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
-            return this._dispatchSetStateAction(stateOrCallback, name);
-        };
-
-        // If we detect a Signal: convert Signal to Observable
-        const result = miniRxIsSignal(param)
-            ? (toObservable(param, { injector: this._injector }) as Observable<Partial<StateType>>)
-            : param;
-
-        return (
-            isObservable(result)
-                ? result
-                      .pipe(takeUntilDestroyed(this._destroyRef))
-                      .subscribe((v) => dispatchFn(v, name))
-                : dispatchFn(result as StateOrCallback<StateType>, name)
-        ) as SetStateReturn<StateType, P>;
+    update(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+        return this._dispatchSetStateAction(stateOrCallback, OperationType.SET_STATE, name);
     }
 
     /** @internal
@@ -42,8 +25,9 @@ export abstract class BaseStore<StateType extends object> {
      */
     abstract _dispatchSetStateAction(
         stateOrCallback: StateOrCallback<StateType>,
+        actionType: OperationType,
         name?: string
-    ): Action;
+    ): MiniRxAction<StateType>;
 
     // Implemented by ComponentStore/FeatureStore
     abstract undo(action: Action): void;
@@ -95,13 +79,14 @@ export abstract class BaseStore<StateType extends object> {
         keys.forEach((key) => {
             const observableOrSignal: Observable<ReactiveType> | Signal<ReactiveType> = dict[key];
             const obs$ = miniRxIsSignal(observableOrSignal)
-                ? toObservable(observableOrSignal)
+                ? toObservable(observableOrSignal, { injector: this._injector })
                 : observableOrSignal;
             obs$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((v) => {
                 this._dispatchSetStateAction(
                     {
                         [key]: v,
                     } as unknown as Partial<StateType>,
+                    OperationType.CONNECTION,
                     key as string
                 );
             });

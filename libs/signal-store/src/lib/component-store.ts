@@ -11,12 +11,11 @@ import {
 } from './models';
 import { calcNewState, combineMetaReducers, miniRxError, sortExtensions } from './utils';
 import {
-    ComponentStoreSetStateAction,
-    createMiniRxAction,
     createMiniRxActionType,
-    isComponentStoreSetStateAction,
-    MiniRxActionType,
-    SetStateActionType,
+    isMiniRxAction,
+    OperationType,
+    MiniRxAction,
+    StoreType,
     undo,
 } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
@@ -97,7 +96,7 @@ export class ComponentStore<StateType extends object>
             this._state.set(newState);
         });
 
-        this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
+        this.dispatch({ type: createMiniRxActionType(OperationType.INIT, csFeatureKey) });
     }
 
     /** @internal
@@ -105,9 +104,14 @@ export class ComponentStore<StateType extends object>
      */
     _dispatchSetStateAction(
         stateOrCallback: StateOrCallback<StateType>,
+        actionType: OperationType,
         name: string | undefined
-    ): Action {
-        const action: Action = createSetStateAction(stateOrCallback, name);
+    ): MiniRxAction<StateType> {
+        const action: MiniRxAction<StateType> = {
+            storeType: StoreType.COMPONENT_STORE,
+            type: createMiniRxActionType(actionType, csFeatureKey, name),
+            stateOrCallback,
+        };
         this.dispatch(action);
         return action;
     }
@@ -127,25 +131,13 @@ export class ComponentStore<StateType extends object>
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension
-        this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY, csFeatureKey));
+        this.dispatch({ type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey) });
     }
-}
-
-function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    name?: string
-): ComponentStoreSetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
-    return {
-        setStateActionType: SetStateActionType.COMPONENT_STORE,
-        type: createMiniRxActionType(miniRxActionType, csFeatureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-    };
 }
 
 function createComponentStoreReducer<StateType>(initialState: StateType): Reducer<StateType> {
     return (state: StateType = initialState, action: Action) => {
-        if (isComponentStoreSetStateAction<StateType>(action)) {
+        if (isMiniRxAction<StateType>(action, StoreType.COMPONENT_STORE)) {
             return calcNewState(state, action.stateOrCallback);
         }
         return state;

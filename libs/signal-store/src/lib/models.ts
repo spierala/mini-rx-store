@@ -96,13 +96,8 @@ export interface HasEffectMetadata {
     [EFFECT_METADATA_KEY]: EffectConfig;
 }
 
-export type UpdateStateParam<T> = StateOrCallback<T> | Observable<Partial<T>> | Signal<T>;
-export type SetStateReturn<T, P extends UpdateStateParam<T>> = P extends Observable<Partial<T>>
-    ? void
-    : Action;
-
 export interface ComponentStoreLike<StateType> {
-    update(stateOrCallback: UpdateStateParam<StateType>, name?: string): void;
+    update(stateOrCallback: StateOrCallback<StateType>, name?: string): void;
     state: Signal<StateType>;
     rxEffect(effectFn: (origin$: Observable<any>) => Observable<any>): () => void;
     undo(action: Action): void;

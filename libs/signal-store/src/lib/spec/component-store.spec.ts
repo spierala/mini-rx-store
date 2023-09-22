@@ -10,7 +10,7 @@ import {
     MockImmutableStateExtension,
     MockLoggerExtension,
     MockUndoExtension,
-    userState
+    userState,
 } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -62,19 +62,17 @@ describe('ComponentStore', () => {
         expect(selectedState()).toEqual({ ...userState, firstName: 'Nicolas' });
     });
 
-    it('should update state using an Observable', () => {
+    it('should connect state with an Observable', () => {
         const cs = setup(counterInitialState);
 
-        const counterState$: Observable<CounterState> = of(2, 3, 4, 5).pipe(
-            map((v) => ({ counter: v }))
-        );
+        const counterState$: Observable<number> = of(2, 3, 4, 5);
 
         const selectedState = cs.select((state) => state.counter);
 
         expect(selectedState()).toBe(1);
 
         // setState with Observable
-        cs.update(counterState$);
+        cs.connect({ counter: counterState$ });
 
         expect(selectedState()).toBe(5);
 
@@ -101,14 +99,14 @@ describe('ComponentStore', () => {
             `,
         })
         class WelcomeComponent {
-            counterSignal = signal({ counter: 2 });
+            counterSignal = signal(2);
 
             selectedCounterState = this.myCs.select((state) => state.counter);
 
             constructor(public myCs: MyComponentStore) {}
 
             startUpdatingStateWithSignal() {
-                this.myCs.update(this.counterSignal);
+                this.myCs.connect({ counter: this.counterSignal });
             }
         }
 
@@ -128,7 +126,7 @@ describe('ComponentStore', () => {
         fixture.detectChanges();
         expect(compElement.textContent).toContain('2');
 
-        component.counterSignal.set({ counter: 3 });
+        component.counterSignal.set(3);
         fixture.detectChanges();
         expect(compElement.textContent).toContain('3');
     });
@@ -175,7 +173,7 @@ describe('ComponentStore', () => {
         const setStateCallback = (state: CounterState) => ({ counter: state.counter + 1 });
         cs.update(setStateCallback);
         expect(spy).toHaveBeenCalledWith({
-            setStateActionType: '@mini-rx/component-store',
+            storeType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state',
             stateOrCallback: setStateCallback,
         });
@@ -186,7 +184,7 @@ describe('ComponentStore', () => {
         // With setState name
         cs.update(setStateCallback, 'increment');
         expect(spy).toHaveBeenCalledWith({
-            setStateActionType: '@mini-rx/component-store',
+            storeType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state/increment',
             stateOrCallback: setStateCallback,
         });
@@ -195,12 +193,12 @@ describe('ComponentStore', () => {
         spy.mockReset();
 
         // With setState name (when passing an Observable to setState)
-        cs.update(of(1, 2).pipe(map((v) => ({ counter: v }))), 'updateCounterFromObservable');
+        cs.connect({ counter: of(1, 2) });
         expect(spy.mock.calls).toEqual([
             [
                 {
-                    setStateActionType: '@mini-rx/component-store',
-                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    storeType: '@mini-rx/component-store',
+                    type: '@mini-rx/component-store/connection/counter',
                     stateOrCallback: {
                         counter: 1,
                     },
@@ -208,8 +206,8 @@ describe('ComponentStore', () => {
             ],
             [
                 {
-                    setStateActionType: '@mini-rx/component-store',
-                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    storeType: '@mini-rx/component-store',
+                    type: '@mini-rx/component-store/connection/counter',
                     stateOrCallback: {
                         counter: 2,
                     },
@@ -244,13 +242,10 @@ describe('ComponentStore', () => {
         class WelcomeComponent {
             private cs = createComponentStore(counterInitialState);
             private counterSource = new Subject<number>();
-            private counterState$: Observable<CounterState> = this.counterSource.pipe(
-                map((v) => ({ counter: v }))
-            );
             selectedState = this.cs.select((state) => state.counter);
 
             useObservableToUpdateState() {
-                this.cs.update(this.counterState$);
+                this.cs.connect({ counter: this.counterSource });
             }
 
             updateObservableValue(v: number) {
@@ -364,8 +359,6 @@ describe('ComponentStore', () => {
     });
 
     describe('Extensions', () => {
-
-
         beforeEach(() => {
             _resetConfig();
         });

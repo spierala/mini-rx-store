@@ -2,10 +2,10 @@ import { Action, ComponentStoreLike, FeatureStoreConfig, Reducer, StateOrCallbac
 import { calcNewState, miniRxError } from './utils';
 import {
     createMiniRxActionType,
-    FeatureStoreSetStateAction,
-    isFeatureStoreSetStateAction,
-    MiniRxActionType,
-    SetStateActionType,
+    isMiniRxAction,
+    OperationType,
+    MiniRxAction,
+    StoreType,
     undo,
 } from './actions';
 import { BaseStore } from './base-store';
@@ -52,9 +52,16 @@ export class FeatureStore<StateType extends object>
      */
     _dispatchSetStateAction(
         stateOrCallback: StateOrCallback<StateType>,
+        actionType: OperationType,
         name: string | undefined
-    ): Action {
-        const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
+    ): MiniRxAction<StateType> {
+        // const action = createSetStateAction(StoreType.FEATURE_STORE, actionType, stateOrCallback, name, this.featureKey, this.featureId );
+        const action: MiniRxAction<StateType> = {
+            storeType: StoreType.FEATURE_STORE,
+            type: createMiniRxActionType(actionType, this.featureKey, name),
+            stateOrCallback,
+            featureId: this.featureId,
+        };
         dispatch(action);
         return action;
     }
@@ -78,26 +85,13 @@ function createFeatureStoreReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action): StateType => {
-        if (isFeatureStoreSetStateAction<StateType>(action) && action.featureId === featureId) {
+        if (
+            isMiniRxAction<StateType>(action, StoreType.FEATURE_STORE) &&
+            action.featureId === featureId
+        ) {
             return calcNewState(state, action.stateOrCallback);
         }
         return state;
-    };
-}
-
-function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    featureId: string,
-    featureKey: string,
-    name?: string
-): FeatureStoreSetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
-    return {
-        setStateActionType: SetStateActionType.FEATURE_STORE,
-        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-        featureId,
-        featureKey,
     };
 }
 

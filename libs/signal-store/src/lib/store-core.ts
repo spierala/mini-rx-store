@@ -16,7 +16,7 @@ import {
 import { combineMetaReducers, hasEffectMetaData, miniRxError, sortExtensions } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers } from './combine-reducers';
-import { createMiniRxAction, MiniRxActionType } from './actions';
+import { createMiniRxActionType, OperationType } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import { SelectableSignalState } from './selectable-signal-state';
@@ -117,7 +117,7 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
         appState.set(config.initialState);
     }
 
-    dispatch(createMiniRxAction(MiniRxActionType.INIT));
+    dispatch({ type: createMiniRxActionType(OperationType.INIT) });
 }
 
 export function addFeature<StateType extends object>(
@@ -137,12 +137,12 @@ export function addFeature<StateType extends object>(
     }
 
     addReducer(featureKey, reducer);
-    dispatch(createMiniRxAction(MiniRxActionType.INIT, featureKey));
+    dispatch({ type: createMiniRxActionType(OperationType.INIT, featureKey) });
 }
 
 export function removeFeature(featureKey: string): void {
     removeReducer(featureKey);
-    dispatch(createMiniRxAction(MiniRxActionType.DESTROY, featureKey));
+    dispatch({ type: createMiniRxActionType(OperationType.DESTROY, featureKey) });
 }
 
 export function rxEffect(effect$: Observable<any> & HasEffectMetadata): void;

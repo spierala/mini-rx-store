@@ -9,7 +9,7 @@ import {
     StateOrCallback,
     StoreExtension,
 } from './models';
-import { isComponentStoreSetStateAction, isFeatureStoreSetStateAction } from './actions';
+import { isMiniRxAction, MiniRxAction, StoreType } from './actions';
 import { miniRxNameSpace } from './constants';
 import { isSignal, Signal } from '@angular/core';
 
@@ -36,8 +36,11 @@ export function hasEffectMetaData(
 }
 
 // Only display type and payload in the LoggingExtension and Redux DevTools
-export function beautifyActionForLogging(action: Action, state: object): Action {
-    if (isFeatureStoreSetStateAction(action) || isComponentStoreSetStateAction(action)) {
+export function beautifyActionForLogging(action: Action | MiniRxAction<any>): Action {
+    if (
+        isMiniRxAction(action, StoreType.FEATURE_STORE) ||
+        isMiniRxAction(action, StoreType.COMPONENT_STORE)
+    ) {
         return {
             type: action.type,
             payload: action.stateOrCallback,
