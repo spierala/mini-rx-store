@@ -52,12 +52,8 @@ export class ReduxDevtoolsExtension extends StoreExtension {
                 .pipe(
                     tap((action) => {
                         const signalState = selectableAppState.select();
-                        const unwrappedState = signalState();
-                        const actionForDevTools: Action = beautifyActionForLogging(
-                            action,
-                            unwrappedState
-                        );
-                        this.devtoolsConnection.send(actionForDevTools, unwrappedState);
+                        const actionForDevTools: Action = beautifyActionForLogging(action);
+                        this.devtoolsConnection.send(actionForDevTools, signalState());
                     })
                 )
                 .subscribe();

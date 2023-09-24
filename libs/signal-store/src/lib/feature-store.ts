@@ -50,7 +50,7 @@ export class FeatureStore<StateType extends object>
     /** @internal
      * Implementation of abstract method from BaseStore
      */
-    _dispatchSetStateAction(
+    _dispatchMiniRxAction(
         stateOrCallback: StateOrCallback<StateType>,
         actionType: OperationType,
         name: string | undefined

@@ -19,7 +19,7 @@ export class LoggerExtension extends StoreExtension implements HasComponentStore
 
 function loggerMetaReducer(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
-        const actionToLog: Action = beautifyActionForLogging(action, state);
+        const actionToLog: Action = beautifyActionForLogging(action);
 
         const nextState = reducer(state, action);
 

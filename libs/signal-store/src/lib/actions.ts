@@ -14,9 +14,9 @@ export const enum StoreType {
 }
 
 export type MiniRxAction<T> = {
-    storeType: StoreType; // Used for type predicate `isFeatureStoreSetStateAction`
-    stateOrCallback: StateOrCallback<T>; // Used in feature reducer to calc new state
-    type: string; // The action type visible in DevTools / Logging Extension (really only for logging!)
+    storeType: StoreType; // Used for type predicate `isMiniRxAction`
+    stateOrCallback: StateOrCallback<T>; // Used in FeatureStore/ComponentStore reducer to calc new state
+    type: string; // The action type visible in DevTools / Logging Extension
     featureId?: string; // Links the feature reducer to its corresponding FeatureStore
 };
 

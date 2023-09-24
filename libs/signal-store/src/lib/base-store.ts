@@ -17,13 +17,13 @@ export abstract class BaseStore<StateType extends object> {
     protected _destroyRef = inject(DestroyRef);
 
     update(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        return this._dispatchSetStateAction(stateOrCallback, OperationType.SET_STATE, name);
+        return this._dispatchMiniRxAction(stateOrCallback, OperationType.SET_STATE, name);
     }
 
     /** @internal
      * Implemented by ComponentStore/FeatureStore
      */
-    abstract _dispatchSetStateAction(
+    abstract _dispatchMiniRxAction(
         stateOrCallback: StateOrCallback<StateType>,
         actionType: OperationType,
         name?: string
@@ -82,7 +82,7 @@ export abstract class BaseStore<StateType extends object> {
                 ? toObservable(observableOrSignal, { injector: this._injector })
                 : observableOrSignal;
             obs$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((v) => {
-                this._dispatchSetStateAction(
+                this._dispatchMiniRxAction(
                     {
                         [key]: v,
                     } as unknown as Partial<StateType>,
