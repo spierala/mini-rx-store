@@ -6,14 +6,15 @@ import {
     ExtensionId,
     FeatureConfig,
     MetaReducer,
+    ofType,
     Reducer,
     StoreConfig,
     StoreExtension,
-} from '../models';
+} from '@mini-rx/common';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
 import { mapTo, Observable, of, take } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
-import { createFeatureStore, FeatureStore } from '../feature-store';
+import { FeatureStore } from '../feature-store';
 import {
     counterInitialState,
     counterReducer,
@@ -22,10 +23,9 @@ import {
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
-import { addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
-import { ofType } from '../utils';
+import { addFeature, removeFeature, rxEffect } from '../store-core';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { createRxEffect } from '../create-rx-effect';
+import { createRxEffect } from '@mini-rx/common';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',

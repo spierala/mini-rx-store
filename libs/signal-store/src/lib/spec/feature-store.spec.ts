@@ -11,8 +11,7 @@ import {
     userState,
     UserState,
 } from './_spec-helpers';
-import { Action, Actions, FeatureConfig, Reducer, StoreConfig } from '../models';
-import { tapResponse } from '../tap-response';
+import { Action, Actions, FeatureConfig, Reducer, StoreConfig, tapResponse } from '@mini-rx/common';
 import { addMetaReducers } from '../store-core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';

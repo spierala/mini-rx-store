@@ -1,6 +1,5 @@
-import { EMPTY, from, Observable, of } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { Action } from './models';
+import { EMPTY, from, Observable, of, catchError, map, mergeMap } from 'rxjs';
+import { Action } from '../lib/models';
 
 export function mapResponse<R1 extends Action, R2 extends Action, T>(
     mapFn: (next: T) => R1 | R1[],

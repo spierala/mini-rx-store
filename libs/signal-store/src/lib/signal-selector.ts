@@ -25,7 +25,7 @@
 // SOFTWARE.
 
 import { computed, Signal } from '@angular/core';
-import { AppState } from './models';
+import { AppState } from '@mini-rx/common';
 import { defaultSignalEquality } from './utils';
 
 export const SIGNAL_SELECTOR_KEY = '@mini-rx/signalSelector';

@@ -24,14 +24,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, catchError } from 'rxjs';
 import { miniRxConsoleError } from './utils';
 
 // Prevent effect to unsubscribe from the actions stream
 export function defaultEffectsErrorHandler<T>(
     observable$: Observable<T>,
-    retryAttemptLeft: number = 10
+    retryAttemptLeft = 10
 ): Observable<T> {
     return observable$.pipe(
         catchError((error) => {

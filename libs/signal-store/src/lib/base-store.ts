@@ -1,10 +1,14 @@
 import { isObservable, Observable, Subject } from 'rxjs';
-import { Action, StateOrCallback } from './models';
-import { defaultEffectsErrorHandler } from './default-effects-error-handler';
+import {
+    Action,
+    MiniRxAction,
+    OperationType,
+    StateOrCallback,
+    defaultEffectsErrorHandler,
+} from '@mini-rx/common';
 import { DestroyRef, EnvironmentInjector, inject, Injectable, Signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
-import { OperationType, MiniRxAction } from './actions';
 
 // BaseStore is extended by ComponentStore/FeatureStore
 @Injectable()

@@ -1,5 +1,11 @@
-import { Action, ComponentStoreLike, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
-import { calcNewState, miniRxError } from './utils';
+import {
+    Action,
+    calcNewState,
+    FeatureStoreConfig,
+    miniRxError,
+    Reducer,
+    StateOrCallback,
+} from '@mini-rx/common';
 import {
     createMiniRxActionType,
     isMiniRxAction,
@@ -7,7 +13,7 @@ import {
     MiniRxAction,
     StoreType,
     undo,
-} from './actions';
+} from '@mini-rx/common';
 import { BaseStore } from './base-store';
 import {
     addFeature,
@@ -18,6 +24,7 @@ import {
 } from './store-core';
 import { Signal } from '@angular/core';
 import { SelectableSignalState } from './selectable-signal-state';
+import { ComponentStoreLike } from './models';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>

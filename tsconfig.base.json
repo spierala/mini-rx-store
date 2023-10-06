@@ -8,13 +8,14 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "importHelpers": true,
-        "target": "es2015",
+        "target": "ES2022",
         "module": "esnext",
-        "lib": ["es2017", "dom"],
+        "lib": ["es2022", "dom"],
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
+            "@mini-rx/common": ["libs/common/src/index.ts"],
             "@mini-rx/signal-store": ["libs/signal-store/src/index.ts"],
             "mini-rx-store": ["libs/mini-rx-store/src/index.ts"],
             "mini-rx-store-ng": ["libs/mini-rx-store-ng/src/index.ts"]

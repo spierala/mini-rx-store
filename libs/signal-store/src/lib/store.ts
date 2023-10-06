@@ -1,4 +1,4 @@
-import { AppState, StoreConfig } from './models';
+import { AppState, StoreConfig } from '@mini-rx/common';
 import { configureStore, dispatch, selectableAppState } from './store-core';
 
 export class Store {

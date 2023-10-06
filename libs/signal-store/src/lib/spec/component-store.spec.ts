@@ -19,9 +19,8 @@ import {
     ComponentStoreConfig,
     ComponentStoreExtension,
     ExtensionId,
-    MetaReducer,
     StoreExtension,
-} from '../models';
+} from '@mini-rx/common';
 import { TestBed } from '@angular/core/testing';
 import { Component, Injectable, signal } from '@angular/core';
 

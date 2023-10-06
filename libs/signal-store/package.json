@@ -25,6 +25,7 @@
     "peerDependencies": {
         "@angular/common": "^16.0.0",
         "@angular/core": "^16.0.0",
+        "@mini-rx/common": "^0.0.1",
         "rxjs": "^6.4.0 || ^7.0.0"
     },
     "dependencies": {

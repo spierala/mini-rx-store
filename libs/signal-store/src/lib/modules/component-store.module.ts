@@ -1,5 +1,5 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { ComponentStoreConfig } from '../models';
+import { ComponentStoreConfig } from '@mini-rx/common';
 import { configureComponentStores } from '../component-store';
 
 @NgModule()

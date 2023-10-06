@@ -4,9 +4,10 @@ import {
     AppState,
     ComponentStoreConfig,
     FeatureConfig,
+    hasEffectMetaData,
     Reducer,
     StoreConfig,
-} from './models';
+} from '@mini-rx/common';
 import {
     ClassProvider,
     ENVIRONMENT_INITIALIZER,
@@ -19,7 +20,6 @@ import {
 import { actions$, addFeature, rxEffect } from './store-core';
 import { Store } from './store';
 import { Observable } from 'rxjs';
-import { hasEffectMetaData } from './utils';
 import { configureComponentStores } from './component-store';
 
 const STORE_PROVIDER = new InjectionToken<void>('@mini-rx/store-provider');

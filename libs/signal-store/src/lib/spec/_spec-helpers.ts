@@ -1,4 +1,11 @@
-import { Action, ActionWithPayload, ComponentStoreExtension, ExtensionId, MetaReducer, Reducer } from '../models';
+import {
+    Action,
+    ActionWithPayload,
+    ComponentStoreExtension,
+    ExtensionId,
+    MetaReducer,
+    Reducer,
+} from '@mini-rx/common';
 import { v4 as uuid } from 'uuid';
 import { dispatch, reducerState } from '../store-core';
 

@@ -23,8 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { EMPTY, identity, Observable } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { EMPTY, identity, Observable, catchError, finalize, tap } from 'rxjs';
 import { miniRxConsoleError } from './utils';
 
 type TapResponseObj<T> = {

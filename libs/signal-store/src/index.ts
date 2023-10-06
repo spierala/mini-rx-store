@@ -19,19 +19,16 @@ export {
     FeatureStoreConfig,
     ComponentStoreConfig,
     StoreExtension,
-} from './lib/models';
-export { ofType } from './lib/utils';
-export {
-    ReduxDevtoolsExtension,
+    undo,
+    tapResponse,
+    createRxEffect,
+    LoggerExtension,
+    ImmutableStateExtension,
+    UndoExtension,
+    mapResponse,
     ReduxDevtoolsOptions,
-} from './lib/extensions/redux-devtools.extension';
-export { LoggerExtension } from './lib/extensions/logger.extension';
-export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
-export { UndoExtension } from './lib/extensions/undo.extension';
-export { tapResponse } from './lib/tap-response';
-export { mapResponse } from './lib/map-response';
-export { createRxEffect } from './lib/create-rx-effect';
-export { undo } from './lib/actions';
+} from '@mini-rx/common';
+export { ReduxDevtoolsExtension } from './lib/extensions/redux-devtools.extension';
 
 export { StoreRootModule, StoreModule, StoreFeatureModule } from './lib/modules/store.module';
 export { EffectsModule } from './lib/modules/effects.module';
