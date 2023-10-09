@@ -33,7 +33,7 @@ import {
     Reducer,
     StoreExtension,
 } from '../models';
-import { UNDO_ACTION } from '../actions';
+import { UNDO_ACTION } from '../undo';
 
 const defaultBufferSize = 100;
 

@@ -14,12 +14,6 @@ export { defaultEffectsErrorHandler } from './lib/default-effects-error-handler'
 export { mapResponse } from './lib/map-response';
 export { tapResponse } from './lib/tap-response';
 export * from './lib/utils';
-export {
-    MiniRxAction,
-    createMiniRxActionType,
-    OperationType,
-    undo,
-    UNDO_ACTION,
-    isMiniRxAction,
-    StoreType,
-} from './lib/actions';
+export { undo, UNDO_ACTION } from './lib/undo';
+export { createMiniRxActionType, OperationType } from './lib/create-mini-rx-action-type';
+export { isMiniRxAction } from './lib/is-mini-rx-action';

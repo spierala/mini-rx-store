@@ -4,12 +4,14 @@ import {
     EFFECT_METADATA_KEY,
     HasEffectMetadata,
     MetaReducer,
+    MiniRxAction,
     Reducer,
     StateOrCallback,
     StoreExtension,
+    StoreType,
 } from '../lib/models';
-import { isMiniRxAction, MiniRxAction, StoreType } from '../lib/actions';
 import { miniRxNameSpace } from '../lib/constants';
+import { isMiniRxAction } from './is-mini-rx-action';
 
 export function ofType(...allowedTypes: string[]): OperatorFunction<Action, Action> {
     return filter((action: Action) =>

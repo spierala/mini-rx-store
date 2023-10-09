@@ -94,3 +94,15 @@ export interface EffectConfig {
 export interface HasEffectMetadata {
     [EFFECT_METADATA_KEY]: EffectConfig;
 }
+
+export const enum StoreType {
+    FEATURE_STORE = '@mini-rx/feature-store',
+    COMPONENT_STORE = '@mini-rx/component-store',
+}
+
+export type MiniRxAction<T> = {
+    storeType: StoreType; // Used for type predicate `isMiniRxAction`
+    stateOrCallback: StateOrCallback<T>; // Used in FeatureStore/ComponentStore reducer to calc new state
+    type: string; // The action type visible in DevTools / Logging Extension
+    featureId?: string; // Links the feature reducer to its corresponding FeatureStore
+};
