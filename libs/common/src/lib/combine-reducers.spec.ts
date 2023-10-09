@@ -13,7 +13,7 @@ const action3: Action = {
     type: 'showProductCode3',
 };
 
-function reducer(state: any, action: Action): any {
+function reducer1(state: any, action: Action): any {
     switch (action.type) {
         case action1.type:
             return {
@@ -50,11 +50,9 @@ function reducer3(state: any, action: Action): any {
 }
 
 describe('combine Reducers', () => {
-    let combinedReducer: Reducer<any>;
-
     it('should combine reducers', () => {
-        combinedReducer = combineReducers({
-            feature1: reducer,
+        const combinedReducer: Reducer<any> = combineReducers({
+            feature1: reducer1,
             feature2: reducer2,
         });
 
@@ -68,7 +66,7 @@ describe('combine Reducers', () => {
         });
 
         const combinedReducer2 = combineReducers({
-            feature1: reducer,
+            feature1: reducer1,
             feature2: reducer2,
             feature3: reducer3,
         });
@@ -83,6 +81,11 @@ describe('combine Reducers', () => {
     });
 
     it('should remove keys from state which are not present in the reducer map', () => {
+        const combinedReducer: Reducer<any> = combineReducers({
+            feature1: reducer1,
+            feature2: reducer2,
+        });
+
         const newState = combinedReducer(
             {
                 feature1: { showProductCode: true },
@@ -96,5 +99,13 @@ describe('combine Reducers', () => {
             feature1: { showProductCode: true },
             feature2: { showProductCode2: false },
         });
+    });
+
+    it('should fallback to an empty object as initial state', () => {
+        const combinedReducer: Reducer<any> = combineReducers({});
+
+        const newState = combinedReducer(undefined, { type: 'someAction' });
+
+        expect(newState).toEqual({});
     });
 });
