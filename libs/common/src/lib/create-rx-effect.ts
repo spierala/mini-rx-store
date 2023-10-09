@@ -42,12 +42,12 @@ export function createRxEffect<
     OT extends ObservableType<DT, OT>,
     R extends EffectType<OT>
 >(v: R, config?: C): R & HasEffectMetadata {
-    const value: EffectConfig = {
+    const metaData: EffectConfig = {
         ...DEFAULT_EFFECT_CONFIG,
         ...config,
     };
     Object.defineProperty(v, EFFECT_METADATA_KEY, {
-        value,
+        value: metaData,
     });
     return v as typeof v & HasEffectMetadata;
 }
