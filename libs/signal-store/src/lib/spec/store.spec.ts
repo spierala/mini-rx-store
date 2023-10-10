@@ -2,7 +2,6 @@ import { Store } from '../store';
 import {
     Action,
     Actions,
-    ActionWithPayload,
     ExtensionId,
     FeatureConfig,
     MetaReducer,
@@ -26,6 +25,10 @@ import { StoreModule } from '../modules/store.module';
 import { addFeature, removeFeature, rxEffect } from '../store-core';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { createRxEffect } from '@mini-rx/common';
+
+interface ActionWithPayload extends Action {
+    payload?: any;
+}
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',

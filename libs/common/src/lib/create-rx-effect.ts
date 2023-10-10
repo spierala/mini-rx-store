@@ -26,9 +26,9 @@
 import { Observable } from 'rxjs';
 import { Action } from './models';
 
-const EFFECT_METADATA_KEY = '@mini-rx/effectMetaData';
+export const EFFECT_METADATA_KEY = '@mini-rx/effectMetaData';
 
-interface EffectConfig {
+export interface EffectConfig {
     /**
      * Determines if the action emitted by the effect is dispatched to the store.
      * If false, effect does not need to return type `Observable<Action>`.
@@ -36,7 +36,7 @@ interface EffectConfig {
     dispatch?: boolean;
 }
 
-interface HasEffectMetadata {
+export interface HasEffectMetadata {
     [EFFECT_METADATA_KEY]: EffectConfig;
 }
 

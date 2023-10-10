@@ -1,6 +1,7 @@
 import { tap } from 'rxjs/operators';
 import { Action, AppState, StoreExtension } from '../models';
-import { beautifyAction, miniRxError } from '../utils';
+import { beautifyAction } from '../beautify-action';
+import { miniRxError } from '../mini-rx-error';
 import { Observable } from 'rxjs';
 import { ExtensionId } from '../enums';
 

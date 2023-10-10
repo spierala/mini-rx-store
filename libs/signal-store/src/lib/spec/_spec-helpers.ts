@@ -1,6 +1,5 @@
 import {
     Action,
-    ActionWithPayload,
     ComponentStoreExtension,
     ExtensionId,
     MetaReducer,
@@ -8,6 +7,10 @@ import {
 } from '@mini-rx/common';
 import { v4 as uuid } from 'uuid';
 import { dispatch, reducerState } from '../store-core';
+
+interface ActionWithPayload extends Action {
+    payload?: any;
+}
 
 export function resetStoreConfig() {
     reducerState.set({
