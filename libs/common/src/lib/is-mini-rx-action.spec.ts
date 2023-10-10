@@ -1,5 +1,6 @@
 import { isMiniRxAction } from './is-mini-rx-action';
-import { Action, MiniRxAction, StoreType } from './models';
+import { Action, MiniRxAction } from './models';
+import { StoreType } from './enums';
 
 describe('isMiniRxAction', () => {
     it('should detect MiniRx action for StoreType (ComponentStore/FeatureStore)', () => {

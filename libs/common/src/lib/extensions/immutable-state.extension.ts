@@ -23,15 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import {
-    Action,
-    ExtensionId,
-    HasComponentStoreSupport,
-    MetaReducer,
-    Reducer,
-    StoreExtension,
-} from '../models';
+import { Action, HasComponentStoreSupport, MetaReducer, Reducer, StoreExtension } from '../models';
 import { deepFreeze } from '../deep-freeze';
+import { ExtensionId } from '../enums';
 
 export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.IMMUTABLE_STATE;

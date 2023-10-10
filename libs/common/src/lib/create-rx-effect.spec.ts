@@ -1,6 +1,6 @@
-import { createRxEffect } from './create-rx-effect';
+import { createRxEffect, hasEffectMetaData } from './create-rx-effect';
 import { Observable, of } from 'rxjs';
-import { Action, EFFECT_METADATA_KEY, EffectConfig, HasEffectMetadata } from './models';
+import { Action } from './models';
 
 describe('createRxEffect', () => {
     it('should dispatch by default', () => {
@@ -29,5 +29,11 @@ describe('createRxEffect', () => {
         expect(effect['@mini-rx/effectMetaData']).toEqual(
             expect.objectContaining({ dispatch: false })
         );
+    });
+});
+
+describe('hasEffectMetaData', () => {
+    it('should detect ', () => {
+        expect(hasEffectMetaData(of({ type: 'someAction' }))).toBe(false);
     });
 });

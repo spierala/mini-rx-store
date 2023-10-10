@@ -2,7 +2,7 @@ import { BaseStore } from './base-store';
 import {
     Action,
     ActionsOnQueue,
-    calcNewState,
+    calcNextState,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
@@ -139,7 +139,7 @@ export class ComponentStore<StateType extends object>
 function createComponentStoreReducer<StateType>(initialState: StateType): Reducer<StateType> {
     return (state: StateType = initialState, action: Action) => {
         if (isMiniRxAction<StateType>(action, StoreType.COMPONENT_STORE)) {
-            return calcNewState(state, action.stateOrCallback);
+            return calcNextState(state, action.stateOrCallback);
         }
         return state;
     };

@@ -1,21 +1,7 @@
 import { Observable } from 'rxjs';
-
-export const enum ExtensionSortOrder {
-    DEFAULT = 0,
-    // The Undo Extension Meta Reducer should be the last one to be executed before "normal" reducers (for performance)
-    // Reason: The Undo Extension Meta Reducers may send many Actions through all following Reducers to undo an Action
-    // Also, we want to prevent that the replay of Actions shows up e.g. in the LoggerExtension Meta Reducer
-    UNDO_EXTENSION = 1,
-}
+import { ExtensionId, ExtensionSortOrder, StoreType } from './enums';
 
 export type AppState = Record<string, any>;
-
-export const enum ExtensionId {
-    IMMUTABLE_STATE,
-    UNDO,
-    LOGGER,
-    REDUX_DEVTOOLS,
-}
 
 export abstract class StoreExtension {
     abstract id: ExtensionId;
@@ -40,10 +26,6 @@ export interface Action {
     type: string;
     // Allows any extra properties to be defined in an action.
     [x: string]: any;
-}
-
-export interface ActionWithPayload extends Action {
-    payload?: any;
 }
 
 export interface StoreConfig<T> {
@@ -80,25 +62,6 @@ export type CombineReducersFn<T> = (reducers: ReducerDictionary<T>) => Reducer<T
 export type StateOrCallback<StateType> =
     | Partial<StateType>
     | ((state: StateType) => Partial<StateType>);
-
-export const EFFECT_METADATA_KEY = '@mini-rx/effectMetaData';
-
-export interface EffectConfig {
-    /**
-     * Determines if the action emitted by the effect is dispatched to the store.
-     * If false, effect does not need to return type `Observable<Action>`.
-     */
-    dispatch?: boolean;
-}
-
-export interface HasEffectMetadata {
-    [EFFECT_METADATA_KEY]: EffectConfig;
-}
-
-export const enum StoreType {
-    FEATURE_STORE = '@mini-rx/feature-store',
-    COMPONENT_STORE = '@mini-rx/component-store',
-}
 
 export type MiniRxAction<T> = {
     storeType: StoreType; // Used for type predicate `isMiniRxAction`

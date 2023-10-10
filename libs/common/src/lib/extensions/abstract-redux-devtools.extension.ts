@@ -1,7 +1,8 @@
 import { tap } from 'rxjs/operators';
-import { Action, AppState, ExtensionId, StoreExtension } from '../models';
-import { beautifyActionForLogging, miniRxError } from '../utils';
+import { Action, AppState, StoreExtension } from '../models';
+import { beautifyAction, miniRxError } from '../utils';
 import { Observable } from 'rxjs';
+import { ExtensionId } from '../enums';
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux DevTools',
@@ -52,7 +53,7 @@ export abstract class AbstractReduxDevtoolsExtension extends StoreExtension {
                 .pipe(
                     tap((action) => {
                         const appState = this.readState();
-                        const actionForDevTools: Action = beautifyActionForLogging(action);
+                        const actionForDevTools: Action = beautifyAction(action);
                         this.devtoolsConnection.send(actionForDevTools, appState);
                     })
                 )

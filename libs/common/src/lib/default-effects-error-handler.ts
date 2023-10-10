@@ -25,7 +25,7 @@
 // SOFTWARE.
 
 import { Observable, catchError } from 'rxjs';
-import { miniRxConsoleError } from './utils';
+import { miniRxConsoleError } from './mini-rx-console-error';
 
 // Prevent effect to unsubscribe from the actions stream
 export function defaultEffectsErrorHandler<T>(

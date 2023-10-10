@@ -1,4 +1,4 @@
-export * from './lib/models';
+export { Action, FeatureStoreConfig, Reducer, StateOrCallback, MiniRxAction } from './lib/models';
 export { miniRxNameSpace } from './lib/constants';
 export { ActionsOnQueue } from './lib/actions-on-queue';
 export { combineReducers } from './lib/combine-reducers';
@@ -13,7 +13,11 @@ export {
 export { defaultEffectsErrorHandler } from './lib/default-effects-error-handler';
 export { mapResponse } from './lib/map-response';
 export { tapResponse } from './lib/tap-response';
-export * from './lib/utils';
 export { undo, UNDO_ACTION } from './lib/undo';
 export { createMiniRxActionType, OperationType } from './lib/create-mini-rx-action-type';
 export { isMiniRxAction } from './lib/is-mini-rx-action';
+export { combineMetaReducers } from './lib/combine-meta-reducers';
+export { calcNextState } from './lib/calc-next-state';
+export { miniRxError } from './lib/mini-rx-error';
+export { sortExtensions } from './lib/sort-extensions';
+export { StoreType } from './lib/enums';

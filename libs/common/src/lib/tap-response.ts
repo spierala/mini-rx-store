@@ -24,7 +24,7 @@
 // SOFTWARE.
 
 import { EMPTY, identity, Observable, catchError, finalize, tap } from 'rxjs';
-import { miniRxConsoleError } from './utils';
+import { miniRxConsoleError } from './mini-rx-console-error';
 
 type TapResponseObj<T> = {
     next?: (next: T) => void;

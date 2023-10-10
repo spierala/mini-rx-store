@@ -1,4 +1,5 @@
-import { Action, MiniRxAction, StoreType } from './models';
+import { Action, MiniRxAction } from './models';
+import { StoreType } from './enums';
 
 const storeTypeKey: keyof MiniRxAction<any> = 'storeType';
 

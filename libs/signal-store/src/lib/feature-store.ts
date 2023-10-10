@@ -1,16 +1,14 @@
 import {
     Action,
-    calcNewState,
+    calcNextState,
+    createMiniRxActionType,
     FeatureStoreConfig,
+    isMiniRxAction,
+    MiniRxAction,
     miniRxError,
+    OperationType,
     Reducer,
     StateOrCallback,
-} from '@mini-rx/common';
-import {
-    createMiniRxActionType,
-    isMiniRxAction,
-    OperationType,
-    MiniRxAction,
     StoreType,
     undo,
 } from '@mini-rx/common';
@@ -62,7 +60,6 @@ export class FeatureStore<StateType extends object>
         actionType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> {
-        // const action = createSetStateAction(StoreType.FEATURE_STORE, actionType, stateOrCallback, name, this.featureKey, this.featureId );
         const action: MiniRxAction<StateType> = {
             storeType: StoreType.FEATURE_STORE,
             type: createMiniRxActionType(actionType, this.featureKey, name),
@@ -96,7 +93,7 @@ function createFeatureStoreReducer<StateType>(
             isMiniRxAction<StateType>(action, StoreType.FEATURE_STORE) &&
             action.featureId === featureId
         ) {
-            return calcNewState(state, action.stateOrCallback);
+            return calcNextState(state, action.stateOrCallback);
         }
         return state;
     };

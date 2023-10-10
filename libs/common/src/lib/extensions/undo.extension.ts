@@ -24,16 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import {
-    Action,
-    ExtensionId,
-    ExtensionSortOrder,
-    HasComponentStoreSupport,
-    MetaReducer,
-    Reducer,
-    StoreExtension,
-} from '../models';
+import { Action, HasComponentStoreSupport, MetaReducer, Reducer, StoreExtension } from '../models';
 import { UNDO_ACTION } from '../undo';
+import { ExtensionId, ExtensionSortOrder } from '../enums';
 
 const defaultBufferSize = 100;
 

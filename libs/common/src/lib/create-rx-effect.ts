@@ -24,7 +24,21 @@
 // SOFTWARE.
 
 import { Observable } from 'rxjs';
-import { Action, EFFECT_METADATA_KEY, EffectConfig, HasEffectMetadata } from './models';
+import { Action } from './models';
+
+const EFFECT_METADATA_KEY = '@mini-rx/effectMetaData';
+
+interface EffectConfig {
+    /**
+     * Determines if the action emitted by the effect is dispatched to the store.
+     * If false, effect does not need to return type `Observable<Action>`.
+     */
+    dispatch?: boolean;
+}
+
+interface HasEffectMetadata {
+    [EFFECT_METADATA_KEY]: EffectConfig;
+}
 
 const DEFAULT_EFFECT_CONFIG: Readonly<Required<EffectConfig>> = {
     dispatch: true,
@@ -50,4 +64,10 @@ export function createRxEffect<
         value: metaData,
     });
     return v as typeof v & HasEffectMetadata;
+}
+
+export function hasEffectMetaData(
+    param: Observable<Action>
+): param is Observable<Action> & HasEffectMetadata {
+    return Object.hasOwn(param, EFFECT_METADATA_KEY);
 }
