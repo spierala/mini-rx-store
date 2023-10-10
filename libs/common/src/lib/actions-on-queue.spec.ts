@@ -1,5 +1,5 @@
 import { ActionsOnQueue } from './actions-on-queue';
-import { take } from 'rxjs/operators';
+import { take } from 'rxjs';
 
 describe('ActionsOnQueue', () => {
     it('should dispatch actions', () => {

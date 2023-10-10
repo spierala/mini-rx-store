@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, Reducer, ReducerDictionary } from '../lib/models';
+import { Action, Reducer, ReducerDictionary } from './models';
 
 export function combineReducers<T>(reducers: ReducerDictionary<T>): Reducer<T>;
 export function combineReducers(reducers: ReducerDictionary<any>): Reducer<any> {

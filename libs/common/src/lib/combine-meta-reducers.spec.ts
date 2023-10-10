@@ -1,6 +1,5 @@
-import { Reducer } from 'mini-rx-store';
+import { AppState, Reducer } from './models';
 import { combineMetaReducers } from './combine-meta-reducers';
-import { AppState } from './models';
 
 describe('combineMetaReducers', () => {
     it('should combine meta reducers', () => {

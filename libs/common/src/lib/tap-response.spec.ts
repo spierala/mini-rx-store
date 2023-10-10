@@ -23,8 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { EMPTY, noop, Observable, of, throwError } from 'rxjs';
-import { concatMap, finalize } from 'rxjs/operators';
+import { concatMap, EMPTY, finalize, noop, Observable, of, throwError } from 'rxjs';
 import { tapResponse } from './tap-response';
 
 describe('tapResponse', () => {

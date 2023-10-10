@@ -1,5 +1,4 @@
-import { noop, Observable, of, throwError } from 'rxjs';
-import { concatMap, finalize } from 'rxjs/operators';
+import { concatMap, finalize, noop, Observable, of, throwError } from 'rxjs';
 import { Action } from './models';
 import { mapResponse } from './map-response';
 
