@@ -152,7 +152,7 @@ export function removeFeature(featureKey: string): void {
 export function rxEffect(effect$: Observable<any> & HasEffectMetadata): void;
 export function rxEffect(effect$: Observable<Action>): void;
 export function rxEffect(effect$: any): void {
-    const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
+    const effectWithErrorHandler$: Observable<Action | any> = defaultEffectsErrorHandler(effect$);
     effectWithErrorHandler$.subscribe((action) => {
         let shouldDispatch = true;
         if (hasEffectMetaData(effect$)) {

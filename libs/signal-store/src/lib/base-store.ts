@@ -55,9 +55,7 @@ export abstract class BaseStore<StateType extends object> {
     >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
         const subject = new Subject<ObservableType>();
         const effect$ = effectFn(subject as OriginType);
-        const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(effect$);
-
-        effectWithDefaultErrorHandler.pipe(takeUntilDestroyed(this._destroyRef)).subscribe();
+        effect$.pipe(defaultEffectsErrorHandler, takeUntilDestroyed(this._destroyRef)).subscribe();
 
         return ((
             observableOrValue?: ObservableType | Observable<ObservableType> | Signal<ObservableType>
