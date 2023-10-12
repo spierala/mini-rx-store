@@ -1,6 +1,6 @@
-import { Action, HasComponentStoreSupport, MetaReducer, Reducer, StoreExtension } from '../models';
-import { beautifyAction } from '../beautify-action';
+import { HasComponentStoreSupport, MetaReducer, StoreExtension } from '../models';
 import { ExtensionId } from '../enums';
+import { loggerMetaReducer } from './logger-meta-reducer';
 
 export class LoggerExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.LOGGER;
@@ -9,23 +9,4 @@ export class LoggerExtension extends StoreExtension implements HasComponentStore
     init(): MetaReducer<any> {
         return loggerMetaReducer;
     }
-}
-
-function loggerMetaReducer(reducer: Reducer<any>): Reducer<any> {
-    return (state, action) => {
-        const actionToLog: Action = beautifyAction(action);
-
-        const nextState = reducer(state, action);
-
-        console.log(
-            '%c' + action.type,
-            'color: #25c2a0',
-            '\nAction:',
-            actionToLog,
-            '\nState: ',
-            nextState
-        );
-
-        return nextState;
-    };
 }
