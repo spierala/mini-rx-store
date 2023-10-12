@@ -23,26 +23,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, HasComponentStoreSupport, MetaReducer, Reducer, StoreExtension } from '../models';
-import { deepFreeze } from '../deep-freeze';
-import { ExtensionId } from '../enums';
+import { HasComponentStoreSupport, MetaReducer, StoreExtension } from '../../models';
+import { ExtensionId } from '../../enums';
+import { immutableStateMetaReducer } from './immutable-state-meta-reducer';
 
 export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
     id = ExtensionId.IMMUTABLE_STATE;
     hasCsSupport = true as const;
 
     init(): MetaReducer<any> {
-        return storeFreeze;
+        return immutableStateMetaReducer;
     }
-}
-
-function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return (state, action: Action) => {
-        if (state) {
-            deepFreeze(state);
-        }
-        const nextState = reducer(state, action);
-        deepFreeze(nextState);
-        return nextState;
-    };
 }

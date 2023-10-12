@@ -24,9 +24,9 @@ export {
     EffectConfig,
     EFFECT_METADATA_KEY,
 } from './lib/create-rx-effect';
-export { LoggerExtension } from './lib/extensions/logger.extension';
+export { LoggerExtension } from './lib/extensions/logger/logger.extension';
 export { UndoExtension } from './lib/extensions/undo.extension';
-export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
+export { ImmutableStateExtension } from './lib/extensions/immutable-state/immutable-state.extension';
 export {
     AbstractReduxDevtoolsExtension,
     ReduxDevtoolsOptions,

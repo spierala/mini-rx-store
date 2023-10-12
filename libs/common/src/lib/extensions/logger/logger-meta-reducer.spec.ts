@@ -1,4 +1,4 @@
-import { Reducer } from '../models';
+import { Reducer } from '../../models';
 import { loggerMetaReducer } from './logger-meta-reducer';
 
 describe('loggerMetaReducer', () => {

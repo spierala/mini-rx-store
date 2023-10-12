@@ -1,5 +1,5 @@
-import { Action, Reducer } from '../models';
-import { beautifyAction } from '../beautify-action';
+import { Action, Reducer } from '../../models';
+import { beautifyAction } from '../../beautify-action';
 
 export function loggerMetaReducer(reducer: Reducer<any>): Reducer<any> {
     return (state, action) => {
