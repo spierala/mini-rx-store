@@ -2,69 +2,32 @@ import { Observable } from 'rxjs';
 import {
     Action,
     Actions,
+    ActionsOnQueue,
     AppState,
     createMiniRxActionType,
+    createReducerManager,
+    defaultEffectsErrorHandler,
     EFFECT_METADATA_KEY,
     EffectConfig,
     ExtensionId,
     HasEffectMetadata,
+    hasEffectMetaData,
     MetaReducer,
     OperationType,
     Reducer,
-    ReducerDictionary,
+    sortExtensions,
     StoreConfig,
     StoreExtension,
-    ActionsOnQueue,
-    combineReducers,
-    defaultEffectsErrorHandler,
-    combineMetaReducers,
-    hasEffectMetaData,
-    miniRxError,
-    sortExtensions,
 } from '@mini-rx/common';
-import { computed, Signal, signal, WritableSignal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { SelectableSignalState } from './selectable-signal-state';
 
 export let hasUndoExtension = false;
 let isStoreInitialized = false;
 
-// REDUCER STATE
+// REDUCER MANAGER
 // exported for testing purposes
-export const reducerState: WritableSignal<{
-    featureReducers: ReducerDictionary<AppState>;
-    metaReducers: MetaReducer<AppState>[];
-}> = signal({
-    featureReducers: {},
-    metaReducers: [],
-});
-
-// TODO move to @mini-rx/common
-function checkFeatureExists(featureKey: string): void {
-    if (Object.hasOwn(reducerState().featureReducers, featureKey)) {
-        miniRxError(`Feature "${featureKey}" already exists.`);
-    }
-}
-
-function addReducer(featureKey: string, reducer: Reducer<any>): void {
-    initStore();
-    checkFeatureExists(featureKey);
-    reducerState.mutate((state) => (state.featureReducers[featureKey] = reducer));
-}
-
-function removeReducer(featureKey: string): void {
-    reducerState.mutate(
-        (state) =>
-            (state.featureReducers = omit(
-                state.featureReducers,
-                featureKey
-            ) as ReducerDictionary<AppState>)
-    );
-}
-
-// exported for testing purposes
-export function addMetaReducers(...reducers: MetaReducer<AppState>[]): void {
-    reducerState.mutate((state) => (state.metaReducers = [...state.metaReducers, ...reducers]));
-}
+export const reducerManager = createReducerManager();
 
 // ACTIONS
 const actionsOnQueue = new ActionsOnQueue();
@@ -76,25 +39,17 @@ export const selectableAppState: SelectableSignalState<AppState> = new Selectabl
     appState
 );
 
-// Wire up the Redux Store: Init reducer state, subscribe to the actions and reducer Observable
+// Wire up the Redux Store: Init reducer state, subscribe to the actions, calc next state for every action
 // Called by `configureStore` and `addReducer`
 function initStore(): void {
     if (isStoreInitialized) {
         return;
     }
 
-    const reducer: Signal<Reducer<AppState>> = computed(() => {
-        const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(
-            reducerState().metaReducers
-        );
-        const combinedReducer: Reducer<AppState> = combineReducers(reducerState().featureReducers);
-        return combinedMetaReducer(combinedReducer);
-    });
-
     // Listen to the Actions stream and update state accordingly
     actionsOnQueue.actions$.subscribe((action) => {
-        const newState: AppState = reducer()(appState(), action);
-        appState.set(newState);
+        const nextState: AppState = reducerManager.getReducer()(appState(), action);
+        appState.set(nextState);
     });
 
     isStoreInitialized = true;
@@ -103,19 +58,16 @@ function initStore(): void {
 export function configureStore(config: StoreConfig<AppState> = {}): void {
     initStore();
 
-    if (config.metaReducers?.length) {
-        addMetaReducers(...config.metaReducers);
+    if (config.metaReducers) {
+        reducerManager.addMetaReducers(...config.metaReducers);
     }
 
-    if (config.extensions?.length) {
-        const sortedExtensions: StoreExtension[] = sortExtensions(config.extensions);
-        sortedExtensions.forEach((extension) => addExtension(extension));
+    if (config.extensions) {
+        sortExtensions(config.extensions).forEach((extension) => addExtension(extension));
     }
 
     if (config.reducers) {
-        for (const [featureKey, value] of Object.entries(config.reducers)) {
-            addReducer(featureKey, value);
-        }
+        reducerManager.setFeatureReducers(config.reducers);
     }
 
     if (config.initialState) {
@@ -133,20 +85,13 @@ export function addFeature<StateType extends object>(
         initialState?: StateType;
     } = {}
 ): void {
-    reducer = config.metaReducers?.length
-        ? combineMetaReducers<StateType>(config.metaReducers)(reducer)
-        : reducer;
-
-    if (config.initialState) {
-        reducer = createReducerWithInitialState(reducer, config.initialState);
-    }
-
-    addReducer(featureKey, reducer);
+    initStore();
+    reducerManager.addFeatureReducer(featureKey, reducer, config.metaReducers, config.initialState);
     dispatch({ type: createMiniRxActionType(OperationType.INIT, featureKey) });
 }
 
 export function removeFeature(featureKey: string): void {
-    removeReducer(featureKey);
+    reducerManager.removeFeatureReducer(featureKey);
     dispatch({ type: createMiniRxActionType(OperationType.DESTROY, featureKey) });
 }
 
@@ -172,7 +117,7 @@ export function addExtension(extension: StoreExtension): void {
     const metaReducer: MetaReducer<any> | void = extension.init();
 
     if (metaReducer) {
-        addMetaReducers(metaReducer);
+        reducerManager.addMetaReducers(metaReducer);
     }
 
     if (extension.id === ExtensionId.UNDO) {
@@ -186,24 +131,4 @@ export function dispatch(action: Action): void {
 
 export function updateAppState(state: AppState): void {
     appState.set(state);
-}
-
-// TODO move to @mini-rx/common
-function createReducerWithInitialState<StateType extends object>(
-    reducer: Reducer<StateType>,
-    initialState: StateType
-): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action): StateType => {
-        return reducer(state, action);
-    };
-}
-
-// TODO move to @mini-rx/common
-function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {
-    return Object.keys(object)
-        .filter((key) => key !== keyToOmit)
-        .reduce<Partial<T>>((prevValue, key: keyof T) => {
-            prevValue[key] = object[key];
-            return prevValue;
-        }, {});
 }
