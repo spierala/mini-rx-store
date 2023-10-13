@@ -15,7 +15,7 @@ export {
     ReducerDictionary,
 } from './lib/models';
 export { miniRxNameSpace } from './lib/constants';
-export { ActionsOnQueue } from './lib/actions-on-queue';
+export { createActionsOnQueue } from './lib/actions-on-queue';
 export { combineReducers } from './lib/combine-reducers';
 export {
     createRxEffect,

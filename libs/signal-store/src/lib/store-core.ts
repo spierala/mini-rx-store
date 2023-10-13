@@ -2,8 +2,8 @@ import { Observable } from 'rxjs';
 import {
     Action,
     Actions,
-    ActionsOnQueue,
     AppState,
+    createActionsOnQueue,
     createMiniRxActionType,
     createReducerManager,
     defaultEffectsErrorHandler,
@@ -30,7 +30,7 @@ let isStoreInitialized = false;
 export const reducerManager = createReducerManager();
 
 // ACTIONS
-const actionsOnQueue = new ActionsOnQueue();
+const actionsOnQueue = createActionsOnQueue();
 export const actions$: Actions = actionsOnQueue.actions$;
 
 // APP STATE

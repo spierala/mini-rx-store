@@ -1,11 +1,11 @@
 import { BaseStore } from './base-store';
 import {
     Action,
-    ActionsOnQueue,
     calculateExtensions,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
+    createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
     ExtensionId,
@@ -44,7 +44,7 @@ export class ComponentStore<StateType extends object>
     extends BaseStore<StateType>
     implements ComponentStoreLike<StateType>
 {
-    private actionsOnQueue = new ActionsOnQueue();
+    private actionsOnQueue = createActionsOnQueue();
     private _state: WritableSignal<StateType> = signal(this.initialState);
     private selectableState = new SelectableSignalState(this._state);
     state: Signal<StateType> = this.selectableState.select();
