@@ -18,7 +18,7 @@ import {
     StoreType,
     undo,
 } from '@mini-rx/common';
-import { SelectableSignalState } from './selectable-signal-state';
+import { createSelectableSignalState } from './selectable-signal-state';
 import { Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentStoreLike } from './models';
@@ -46,7 +46,7 @@ export class ComponentStore<StateType extends object>
 {
     private actionsOnQueue = createActionsOnQueue();
     private _state: WritableSignal<StateType> = signal(this.initialState);
-    private selectableState = new SelectableSignalState(this._state);
+    private selectableState = createSelectableSignalState(this._state);
     state: Signal<StateType> = this.selectableState.select();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private readonly reducer: Reducer<StateType>;

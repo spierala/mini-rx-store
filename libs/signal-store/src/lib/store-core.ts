@@ -20,7 +20,7 @@ import {
     StoreExtension,
 } from '@mini-rx/common';
 import { signal, WritableSignal } from '@angular/core';
-import { SelectableSignalState } from './selectable-signal-state';
+import { createSelectableSignalState } from './selectable-signal-state';
 
 export let hasUndoExtension = false;
 let isStoreInitialized = false;
@@ -35,9 +35,7 @@ export const actions$: Actions = actionsOnQueue.actions$;
 
 // APP STATE
 const appState: WritableSignal<AppState> = signal({});
-export const selectableAppState: SelectableSignalState<AppState> = new SelectableSignalState(
-    appState
-);
+export const selectableAppState = createSelectableSignalState(appState);
 
 // Wire up the Redux Store: Init reducer state, subscribe to the actions, calc next state for every action
 // Called by `configureStore` and `addReducer`

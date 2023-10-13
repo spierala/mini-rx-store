@@ -20,7 +20,7 @@ import {
     selectableAppState,
 } from './store-core';
 import { Signal } from '@angular/core';
-import { SelectableSignalState } from './selectable-signal-state';
+import { createSelectableSignalState } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
 
 export class FeatureStore<StateType extends object>
@@ -33,7 +33,7 @@ export class FeatureStore<StateType extends object>
     }
 
     state: Signal<StateType> = selectableAppState.select((state) => state[this.featureKey]);
-    private selectableState = new SelectableSignalState(this.state);
+    private selectableState = createSelectableSignalState(this.state);
 
     private readonly featureId: string;
 
