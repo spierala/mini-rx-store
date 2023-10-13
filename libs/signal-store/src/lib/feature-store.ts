@@ -11,7 +11,7 @@ import {
     StoreType,
     undo,
 } from '@mini-rx/common';
-import { BaseStore } from './base-store';
+import { createBaseStore } from './base-store';
 import {
     addFeature,
     dispatch,
@@ -19,14 +19,11 @@ import {
     removeFeature,
     selectableAppState,
 } from './store-core';
-import { Signal } from '@angular/core';
+import { DestroyRef, inject, Signal } from '@angular/core';
 import { createSelectableSignalState } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
 
-export class FeatureStore<StateType extends object>
-    extends BaseStore<StateType>
-    implements ComponentStoreLike<StateType>
-{
+export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly _featureKey: string;
     get featureKey(): string {
         return this._featureKey;
@@ -37,10 +34,26 @@ export class FeatureStore<StateType extends object>
 
     private readonly featureId: string;
 
-    constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
-        super();
+    private dispatcher = (
+        stateOrCallback: StateOrCallback<StateType>,
+        operationType: OperationType,
+        name: string | undefined
+    ): MiniRxAction<StateType> => {
+        const action: MiniRxAction<StateType> = {
+            storeType: StoreType.FEATURE_STORE,
+            type: createMiniRxActionType(operationType, this.featureKey, name),
+            stateOrCallback,
+            featureId: this.featureId,
+        };
+        dispatch(action);
+        return action;
+    };
 
-        this._destroyRef.onDestroy(() => this.destroy());
+    private baseStore = createBaseStore(this.dispatcher);
+    private destroyRef = inject(DestroyRef);
+
+    constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
+        this.destroyRef.onDestroy(() => this.destroy());
 
         this.featureId = generateId();
         this._featureKey = config.multi ? featureKey + '-' + this.featureId : featureKey;
@@ -51,32 +64,16 @@ export class FeatureStore<StateType extends object>
         );
     }
 
-    /** @internal
-     * Implementation of abstract method from BaseStore
-     */
-    _dispatchMiniRxAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        actionType: OperationType,
-        name: string | undefined
-    ): MiniRxAction<StateType> {
-        const action: MiniRxAction<StateType> = {
-            storeType: StoreType.FEATURE_STORE,
-            type: createMiniRxActionType(actionType, this.featureKey, name),
-            stateOrCallback,
-            featureId: this.featureId,
-        };
-        dispatch(action);
-        return action;
-    }
-
-    // Implementation of abstract method from BaseStore
     undo(action: Action): void {
         hasUndoExtension
             ? dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
 
-    select = this.selectableState.select.bind(this.selectableState);
+    select = this.selectableState.select;
+    update = this.baseStore.update;
+    rxEffect = this.baseStore.rxEffect;
+    connect = this.baseStore.connect;
 
     private destroy(): void {
         removeFeature(this._featureKey);

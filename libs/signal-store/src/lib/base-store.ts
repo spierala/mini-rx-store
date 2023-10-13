@@ -1,42 +1,51 @@
 import { isObservable, Observable, Subject } from 'rxjs';
 import {
     Action,
-    MiniRxAction,
+    defaultEffectsErrorHandler,
     OperationType,
     StateOrCallback,
-    defaultEffectsErrorHandler,
 } from '@mini-rx/common';
-import { DestroyRef, EnvironmentInjector, inject, Injectable, Signal } from '@angular/core';
+import { DestroyRef, EnvironmentInjector, inject, Signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
 
-// BaseStore is extended by ComponentStore/FeatureStore
-@Injectable()
-export abstract class BaseStore<StateType extends object> {
-    private _injector = inject(EnvironmentInjector);
+export function createBaseStore<StateType>(
+    dispatch: (
+        stateOrCallback: StateOrCallback<StateType>,
+        operationType: OperationType,
+        name: string | undefined
+    ) => Action
+) {
+    const injector = inject(EnvironmentInjector);
+    const destroyRef = inject(DestroyRef);
 
-    /** @internal
-     * Used here and by ComponentStore/FeatureStore
-     */
-    protected _destroyRef = inject(DestroyRef);
-
-    update(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        return this._dispatchMiniRxAction(stateOrCallback, OperationType.SET_STATE, name);
+    function update(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+        return dispatch(stateOrCallback, OperationType.SET_STATE, name);
     }
 
-    /** @internal
-     * Implemented by ComponentStore/FeatureStore
-     */
-    abstract _dispatchMiniRxAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        actionType: OperationType,
-        name?: string
-    ): MiniRxAction<StateType>;
+    function connect<K extends keyof StateType, ReactiveType = StateType[K]>(
+        dict: Record<K, Observable<ReactiveType> | Signal<ReactiveType>>
+    ): void {
+        const keys: K[] = Object.keys(dict) as K[];
 
-    // Implemented by ComponentStore/FeatureStore
-    abstract undo(action: Action): void;
+        keys.forEach((key) => {
+            const observableOrSignal: Observable<ReactiveType> | Signal<ReactiveType> = dict[key];
+            const obs$ = miniRxIsSignal(observableOrSignal)
+                ? toObservable(observableOrSignal, { injector })
+                : observableOrSignal;
+            obs$.pipe(takeUntilDestroyed(destroyRef)).subscribe((v) => {
+                dispatch(
+                    {
+                        [key]: v,
+                    } as unknown as Partial<StateType>,
+                    OperationType.CONNECTION,
+                    key as string
+                );
+            });
+        });
+    }
 
-    rxEffect<
+    function rxEffect<
         // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
         ProvidedType = void,
         // The actual origin$ type, which could be unknown, when not specified
@@ -55,7 +64,7 @@ export abstract class BaseStore<StateType extends object> {
     >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
         const subject = new Subject<ObservableType>();
         const effect$ = effectFn(subject as OriginType);
-        effect$.pipe(defaultEffectsErrorHandler, takeUntilDestroyed(this._destroyRef)).subscribe();
+        effect$.pipe(defaultEffectsErrorHandler, takeUntilDestroyed(destroyRef)).subscribe();
 
         return ((
             observableOrValue?: ObservableType | Observable<ObservableType> | Signal<ObservableType>
@@ -67,31 +76,15 @@ export abstract class BaseStore<StateType extends object> {
 
             isObservable(observableOrValue)
                 ? observableOrValue
-                      .pipe(takeUntilDestroyed(this._destroyRef))
+                      .pipe(takeUntilDestroyed(destroyRef))
                       .subscribe((v) => subject.next(v))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
 
-    connect<K extends keyof StateType, ReactiveType = StateType[K]>(
-        dict: Record<K, Observable<ReactiveType> | Signal<ReactiveType>>
-    ): void {
-        const keys: K[] = Object.keys(dict) as K[];
-
-        keys.forEach((key) => {
-            const observableOrSignal: Observable<ReactiveType> | Signal<ReactiveType> = dict[key];
-            const obs$ = miniRxIsSignal(observableOrSignal)
-                ? toObservable(observableOrSignal, { injector: this._injector })
-                : observableOrSignal;
-            obs$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((v) => {
-                this._dispatchMiniRxAction(
-                    {
-                        [key]: v,
-                    } as unknown as Partial<StateType>,
-                    OperationType.CONNECTION,
-                    key as string
-                );
-            });
-        });
-    }
+    return {
+        update,
+        connect,
+        rxEffect,
+    };
 }

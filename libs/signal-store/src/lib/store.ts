@@ -3,7 +3,7 @@ import { configureStore, dispatch, selectableAppState } from './store-core';
 
 export class Store {
     dispatch = dispatch;
-    select = selectableAppState.select.bind(selectableAppState);
+    select = selectableAppState.select;
 
     constructor(config: StoreConfig<AppState>) {
         configureStore(config);

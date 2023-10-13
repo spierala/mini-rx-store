@@ -1,11 +1,11 @@
-import { ActionsOnQueue } from './actions-on-queue';
+import { createActionsOnQueue } from './actions-on-queue';
 import { take } from 'rxjs';
 
 describe('ActionsOnQueue', () => {
     it('should dispatch actions', () => {
         const spy = jest.fn();
 
-        const actionsOnQueue = new ActionsOnQueue();
+        const actionsOnQueue = createActionsOnQueue();
         actionsOnQueue.actions$.subscribe(spy);
 
         const action = { type: 'someAction' };
@@ -18,7 +18,7 @@ describe('ActionsOnQueue', () => {
 
             const callLimit = 5000;
 
-            const actionsOnQueue = new ActionsOnQueue();
+            const actionsOnQueue = createActionsOnQueue();
 
             const spy = jest.fn().mockImplementation(() => {
                 // Every received action dispatches another action

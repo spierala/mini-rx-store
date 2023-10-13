@@ -1,4 +1,4 @@
-import { BaseStore } from './base-store';
+import { createBaseStore } from './base-store';
 import {
     Action,
     calculateExtensions,
@@ -19,7 +19,7 @@ import {
     undo,
 } from '@mini-rx/common';
 import { createSelectableSignalState } from './selectable-signal-state';
-import { Signal, signal, WritableSignal } from '@angular/core';
+import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentStoreLike } from './models';
 
@@ -40,10 +40,7 @@ export function configureComponentStores(config: ComponentStoreConfig) {
 
 const csFeatureKey = 'component-store';
 
-export class ComponentStore<StateType extends object>
-    extends BaseStore<StateType>
-    implements ComponentStoreLike<StateType>
-{
+export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private actionsOnQueue = createActionsOnQueue();
     private _state: WritableSignal<StateType> = signal(this.initialState);
     private selectableState = createSelectableSignalState(this._state);
@@ -53,10 +50,25 @@ export class ComponentStore<StateType extends object>
     private hasUndoExtension = false;
     private extensions: ComponentStoreExtension[] = []; // This is a class property just for testing purposes
 
-    constructor(private initialState: StateType, config?: ComponentStoreConfig) {
-        super();
+    private dispatcher(
+        stateOrCallback: StateOrCallback<StateType>,
+        operationType: OperationType,
+        name: string | undefined
+    ): MiniRxAction<StateType> {
+        const action: MiniRxAction<StateType> = {
+            storeType: StoreType.COMPONENT_STORE,
+            type: createMiniRxActionType(operationType, csFeatureKey, name),
+            stateOrCallback,
+        };
+        this.dispatch(action);
+        return action;
+    }
 
-        this._destroyRef.onDestroy(() => this.destroy());
+    private baseStore = createBaseStore(this.dispatcher.bind(this));
+    private destroyRef = inject(DestroyRef);
+
+    constructor(private initialState: StateType, config?: ComponentStoreConfig) {
+        this.destroyRef.onDestroy(() => this.destroy());
 
         const metaReducers: MetaReducer<StateType>[] = [];
         this.extensions = calculateExtensions(config, componentStoreConfig);
@@ -79,35 +91,20 @@ export class ComponentStore<StateType extends object>
         this.dispatch({ type: createMiniRxActionType(OperationType.INIT, csFeatureKey) });
     }
 
-    /** @internal
-     * Implementation of abstract method from BaseStore
-     */
-    _dispatchMiniRxAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        actionType: OperationType,
-        name: string | undefined
-    ): MiniRxAction<StateType> {
-        const action: MiniRxAction<StateType> = {
-            storeType: StoreType.COMPONENT_STORE,
-            type: createMiniRxActionType(actionType, csFeatureKey, name),
-            stateOrCallback,
-        };
-        this.dispatch(action);
-        return action;
-    }
-
     private dispatch(action: Action): void {
         this.actionsOnQueue.dispatch(action);
     }
 
-    // Implementation of abstract method from BaseStore
     undo(action: Action): void {
         this.hasUndoExtension
             ? this.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    select = this.selectableState.select.bind(this.selectableState);
+    select = this.selectableState.select;
+    update = this.baseStore.update;
+    rxEffect = this.baseStore.rxEffect;
+    connect = this.baseStore.connect;
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension
