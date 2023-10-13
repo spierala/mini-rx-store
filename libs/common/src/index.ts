@@ -25,7 +25,7 @@ export {
     EFFECT_METADATA_KEY,
 } from './lib/create-rx-effect';
 export { LoggerExtension } from './lib/extensions/logger/logger.extension';
-export { UndoExtension } from './lib/extensions/undo.extension';
+export { UndoExtension } from './lib/extensions/undo/undo-extension';
 export { ImmutableStateExtension } from './lib/extensions/immutable-state/immutable-state.extension';
 export {
     AbstractReduxDevtoolsExtension,
@@ -34,7 +34,7 @@ export {
 export { defaultEffectsErrorHandler } from './lib/default-effects-error-handler';
 export { mapResponse } from './lib/map-response';
 export { tapResponse } from './lib/tap-response';
-export { undo, UNDO_ACTION } from './lib/undo';
+export { undo, UNDO_ACTION } from './lib/extensions/undo/undo';
 export { createMiniRxActionType, OperationType } from './lib/create-mini-rx-action-type';
 export { isMiniRxAction } from './lib/is-mini-rx-action';
 export { combineMetaReducers } from './lib/combine-meta-reducers';

@@ -1,19 +1,19 @@
-import { ImmutableStateExtension } from './immutable-state.extension';
+import { UndoExtension } from './undo-extension';
 import { ExtensionId } from '../../enums';
 
-describe('ImmutableStateExtension', () => {
-    const instance = new ImmutableStateExtension();
+describe('UndoExtension', () => {
+    const instance = new UndoExtension();
 
     it('should support ComponentStore', () => {
         expect(instance.hasCsSupport).toBe(true);
     });
 
     it('should have sort order', () => {
-        expect(instance.sortOrder).toBe(0);
+        expect(instance.sortOrder).toBe(1);
     });
 
     it('should have id', () => {
-        expect(instance.id).toBe(ExtensionId.IMMUTABLE_STATE);
+        expect(instance.id).toBe(ExtensionId.UNDO);
     });
 
     it('should have an init method which returns a function', () => {

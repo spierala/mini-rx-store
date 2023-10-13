@@ -1,5 +1,5 @@
-import { miniRxNameSpace } from './constants';
-import { Action } from './models';
+import { miniRxNameSpace } from '../../constants';
+import { Action } from '../../models';
 
 export const UNDO_ACTION = miniRxNameSpace + '/undo';
 

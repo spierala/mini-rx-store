@@ -1,5 +1,5 @@
 import { undo } from './undo';
-import { Action } from './models';
+import { Action } from '../../models';
 
 describe('undo', () => {
     it('should create an undo action', () => {
