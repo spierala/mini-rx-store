@@ -30,7 +30,7 @@ export { ImmutableStateExtension } from './lib/extensions/immutable-state/immuta
 export {
     AbstractReduxDevtoolsExtension,
     ReduxDevtoolsOptions,
-} from './lib/extensions/abstract-redux-devtools.extension';
+} from './lib/extensions/redux-devtools/abstract-redux-devtools-extension';
 export { defaultEffectsErrorHandler } from './lib/default-effects-error-handler';
 export { mapResponse } from './lib/map-response';
 export { tapResponse } from './lib/tap-response';

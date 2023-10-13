@@ -1,9 +1,14 @@
-import { tap } from 'rxjs/operators';
-import { Action, AppState, StoreExtension } from '../models';
-import { beautifyAction } from '../beautify-action';
-import { miniRxError } from '../mini-rx-error';
-import { Observable } from 'rxjs';
-import { ExtensionId } from '../enums';
+import { Action, AppState, StoreExtension } from '../../models';
+import { beautifyAction } from '../../beautify-action';
+import { miniRxError } from '../../mini-rx-error';
+import { Observable, tap } from 'rxjs';
+import { ExtensionId } from '../../enums';
+
+const enum DevToolActions {
+    DISPATCH = 'DISPATCH',
+    JUMP_TO_STATE = 'JUMP_TO_STATE',
+    JUMP_TO_ACTION = 'JUMP_TO_ACTION',
+}
 
 const defaultOptions: Partial<ReduxDevtoolsOptions> = {
     name: 'MiniRx - Redux DevTools',
@@ -25,6 +30,9 @@ export abstract class AbstractReduxDevtoolsExtension extends StoreExtension {
     private devtoolsConnection: any;
     private readonly _optionsForNgExtension: Partial<ReduxDevtoolsOptions>;
 
+    // sounds to much like Angular ;)
+    // Used only in mini-rx-store-ng
+    // TODO create a normal getter for options: get options()
     get optionsForNgExtension(): Partial<ReduxDevtoolsOptions> {
         return this._optionsForNgExtension;
     }
@@ -79,10 +87,4 @@ export abstract class AbstractReduxDevtoolsExtension extends StoreExtension {
     abstract readState(): AppState;
 
     abstract get actions$(): Observable<Action>;
-}
-
-const enum DevToolActions {
-    DISPATCH = 'DISPATCH',
-    JUMP_TO_STATE = 'JUMP_TO_STATE',
-    JUMP_TO_ACTION = 'JUMP_TO_ACTION',
 }
