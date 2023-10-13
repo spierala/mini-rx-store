@@ -24,13 +24,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { HasComponentStoreSupport, MetaReducer, StoreExtension } from '../../models';
+import { ComponentStoreExtension, MetaReducer, StoreExtension } from '../../models';
 import { ExtensionId, ExtensionSortOrder } from '../../enums';
 import { createUndoMetaReducer } from './undo-meta-reducer';
 
 const defaultBufferSize = 100;
 
-export class UndoExtension extends StoreExtension implements HasComponentStoreSupport {
+export class UndoExtension extends StoreExtension implements ComponentStoreExtension {
     id = ExtensionId.UNDO;
     override sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
     hasCsSupport = true as const;

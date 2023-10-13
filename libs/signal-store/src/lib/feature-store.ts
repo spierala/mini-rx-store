@@ -1,13 +1,12 @@
 import {
     Action,
-    calcNextState,
+    createFeatureStoreReducer,
     createMiniRxActionType,
     FeatureStoreConfig,
-    isMiniRxAction,
+    generateId,
     MiniRxAction,
     miniRxError,
     OperationType,
-    Reducer,
     StateOrCallback,
     StoreType,
     undo,
@@ -44,7 +43,7 @@ export class FeatureStore<StateType extends object>
         this._destroyRef.onDestroy(() => this.destroy());
 
         this.featureId = generateId();
-        this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
+        this._featureKey = config.multi ? featureKey + '-' + this.featureId : featureKey;
 
         addFeature<StateType>(
             this._featureKey,
@@ -82,27 +81,6 @@ export class FeatureStore<StateType extends object>
     private destroy(): void {
         removeFeature(this._featureKey);
     }
-}
-
-function createFeatureStoreReducer<StateType>(
-    featureId: string,
-    initialState: StateType
-): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action): StateType => {
-        if (
-            isMiniRxAction<StateType>(action, StoreType.FEATURE_STORE) &&
-            action.featureId === featureId
-        ) {
-            return calcNextState(state, action.stateOrCallback);
-        }
-        return state;
-    };
-}
-
-// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
-// This isn't a real GUID!
-function generateId(): string {
-    return Math.random().toString(36).slice(2);
 }
 
 export function createFeatureStore<T extends object>(

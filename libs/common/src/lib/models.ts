@@ -10,13 +10,9 @@ export abstract class StoreExtension {
     abstract init(): MetaReducer<any> | void;
 }
 
-export interface HasComponentStoreSupport {
-    hasCsSupport: true;
-
+export interface ComponentStoreExtension extends StoreExtension {
     init(): MetaReducer<any>;
 }
-
-export type ComponentStoreExtension = StoreExtension & HasComponentStoreSupport;
 
 export interface ComponentStoreConfig {
     extensions: ComponentStoreExtension[];

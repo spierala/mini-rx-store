@@ -13,14 +13,9 @@ import {
     userState,
 } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
-import {
-    ComponentStoreConfig,
-    ComponentStoreExtension,
-    ExtensionId,
-    StoreExtension,
-} from '@mini-rx/common';
+import { ComponentStoreConfig } from '@mini-rx/common';
 import { TestBed } from '@angular/core/testing';
 import { Component, Injectable, signal } from '@angular/core';
 
@@ -339,24 +334,6 @@ describe('ComponentStore', () => {
         );
     });
 
-    it('should throw when a not supported extension is used', () => {
-        class MyExtension extends StoreExtension {
-            id: ExtensionId = ExtensionId.LOGGER;
-
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            init(): void {}
-        }
-
-        expect(() =>
-            setup(
-                {},
-                {
-                    extensions: [new MyExtension() as ComponentStoreExtension],
-                }
-            )
-        ).toThrowError('@mini-rx: Extension "MyExtension" is not supported by Component Store.');
-    });
-
     describe('Extensions', () => {
         beforeEach(() => {
             _resetConfig();
@@ -366,7 +343,7 @@ describe('ComponentStore', () => {
             const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
             const cs = setup({}, { extensions });
 
-            expect(cs['extensions']).toBe(extensions);
+            expect(cs['extensions']).toStrictEqual(extensions);
         });
 
         it('should be global', () => {
@@ -375,7 +352,7 @@ describe('ComponentStore', () => {
             configureComponentStores({ extensions });
             const cs = setup({});
 
-            expect(cs['extensions']).toBe(extensions);
+            expect(cs['extensions']).toStrictEqual(extensions);
         });
 
         it('should be merged', () => {

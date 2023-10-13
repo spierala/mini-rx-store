@@ -43,3 +43,7 @@ export { miniRxError } from './lib/mini-rx-error';
 export { sortExtensions } from './lib/sort-extensions';
 export { StoreType, ExtensionId } from './lib/enums';
 export { ofType } from './lib/of-type';
+export { createFeatureStoreReducer } from './lib/create-feature-store-reducer';
+export { createComponentStoreReducer } from './lib/create-component-store-reducer';
+export { generateId } from './lib/generate-id';
+export { calculateExtensions } from './lib/calculate-extensions';

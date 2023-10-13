@@ -38,6 +38,7 @@ export const reducerState: WritableSignal<{
     metaReducers: [],
 });
 
+// TODO move to @mini-rx/common
 function checkFeatureExists(featureKey: string): void {
     if (Object.hasOwn(reducerState().featureReducers, featureKey)) {
         miniRxError(`Feature "${featureKey}" already exists.`);
@@ -187,6 +188,7 @@ export function updateAppState(state: AppState): void {
     appState.set(state);
 }
 
+// TODO move to @mini-rx/common
 function createReducerWithInitialState<StateType extends object>(
     reducer: Reducer<StateType>,
     initialState: StateType
@@ -196,6 +198,7 @@ function createReducerWithInitialState<StateType extends object>(
     };
 }
 
+// TODO move to @mini-rx/common
 function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Partial<T> {
     return Object.keys(object)
         .filter((key) => key !== keyToOmit)

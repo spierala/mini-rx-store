@@ -23,11 +23,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { HasComponentStoreSupport, MetaReducer, StoreExtension } from '../../models';
+import { ComponentStoreExtension, MetaReducer, StoreExtension } from '../../models';
 import { ExtensionId } from '../../enums';
 import { immutableStateMetaReducer } from './immutable-state-meta-reducer';
 
-export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
+export class ImmutableStateExtension extends StoreExtension implements ComponentStoreExtension {
     id = ExtensionId.IMMUTABLE_STATE;
     hasCsSupport = true as const;
 

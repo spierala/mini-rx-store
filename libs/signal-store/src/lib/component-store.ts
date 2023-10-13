@@ -2,19 +2,18 @@ import { BaseStore } from './base-store';
 import {
     Action,
     ActionsOnQueue,
-    calcNextState,
+    calculateExtensions,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
+    createComponentStoreReducer,
     createMiniRxActionType,
     ExtensionId,
-    isMiniRxAction,
     MetaReducer,
     MiniRxAction,
     miniRxError,
     OperationType,
     Reducer,
-    sortExtensions,
     StateOrCallback,
     StoreType,
     undo,
@@ -60,28 +59,9 @@ export class ComponentStore<StateType extends object>
         this._destroyRef.onDestroy(() => this.destroy());
 
         const metaReducers: MetaReducer<StateType>[] = [];
-
-        if (config?.extensions) {
-            if (config.extensions && componentStoreConfig?.extensions) {
-                this.extensions = mergeExtensions(
-                    componentStoreConfig.extensions,
-                    config.extensions
-                );
-            } else {
-                this.extensions = config.extensions;
-            }
-        } else if (componentStoreConfig?.extensions) {
-            this.extensions = componentStoreConfig.extensions;
-        }
-
-        sortExtensions(this.extensions).forEach((ext) => {
-            if (!ext.hasCsSupport) {
-                miniRxError(
-                    `Extension "${ext.constructor.name}" is not supported by Component Store.`
-                );
-            }
-
-            metaReducers.push(ext.init()!); // Non-null assertion: Here we know for sure: init will return a MetaReducer
+        this.extensions = calculateExtensions(config, componentStoreConfig);
+        this.extensions.forEach((ext) => {
+            metaReducers.push(ext.init()); // Non-null assertion: Here we know for sure: init will return a MetaReducer
 
             if (ext.id === ExtensionId.UNDO) {
                 this.hasUndoExtension = true;
@@ -89,7 +69,6 @@ export class ComponentStore<StateType extends object>
         });
 
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
-
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
 
         this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
@@ -134,46 +113,6 @@ export class ComponentStore<StateType extends object>
         // Dispatch an action really just for logging via LoggerExtension
         this.dispatch({ type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey) });
     }
-}
-
-function createComponentStoreReducer<StateType>(initialState: StateType): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action) => {
-        if (isMiniRxAction<StateType>(action, StoreType.COMPONENT_STORE)) {
-            return calcNextState(state, action.stateOrCallback);
-        }
-        return state;
-    };
-}
-
-function mergeExtensions(
-    global: ComponentStoreExtension[],
-    local: ComponentStoreExtension[]
-): ComponentStoreExtension[] {
-    // Local extensions overwrite the global extensions
-    // If extension is global and local => use local
-    // If extension is only global => use global
-    // If extension is only local => use local
-
-    const extensions: ComponentStoreExtension[] = [];
-    let globalCopy = [...global];
-    let localCopy = [...local];
-
-    global.forEach((globalExt) => {
-        local.forEach((localExt) => {
-            if (localExt.id === globalExt.id) {
-                // Found extension which is global and local
-                extensions.push(localExt); // Use local!
-                localCopy = localCopy.filter((item) => item.id !== localExt.id); // Remove found extension from local
-                globalCopy = globalCopy.filter((item) => item.id !== globalExt.id); // Remove found extension from global
-            }
-        });
-    });
-
-    return [
-        ...extensions, // Extensions which are global and local, but use local
-        ...localCopy, // Local only
-        ...globalCopy, // Global only
-    ];
 }
 
 export function createComponentStore<T extends object>(
