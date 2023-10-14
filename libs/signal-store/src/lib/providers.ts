@@ -18,7 +18,7 @@ import {
 import { actions$, addFeature, rxEffect } from './store-core';
 import { Store } from './store';
 import { Observable } from 'rxjs';
-import { configureComponentStores } from './component-store';
+import { globalCsConfig } from './component-store';
 import {
     fromClassesWithEffectsToClassProviders,
     fromObjectsWithEffectsToEffects,
@@ -134,7 +134,7 @@ export function provideComponentStoreConfig(config: ComponentStoreConfig) {
     return makeEnvironmentProviders([
         {
             provide: COMPONENT_STORE_CONFIG_PROVIDER,
-            useFactory: () => configureComponentStores(config),
+            useFactory: () => globalCsConfig.set(config),
         },
         {
             provide: ENVIRONMENT_INITIALIZER,

@@ -1,9 +1,4 @@
-import {
-    _resetConfig,
-    ComponentStore,
-    configureComponentStores,
-    createComponentStore,
-} from '../component-store';
+import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
 import {
     counterInitialState,
     CounterState,
@@ -320,8 +315,8 @@ describe('ComponentStore', () => {
     });
 
     it('should throw when calling `configureComponentStores` more than once', () => {
-        configureComponentStores({ extensions: [] });
-        expect(() => configureComponentStores({ extensions: [] })).toThrowError(
+        globalCsConfig.set({ extensions: [] });
+        expect(() => globalCsConfig.set({ extensions: [] })).toThrowError(
             '@mini-rx: `configureComponentStores` was called multiple times.'
         );
     });
@@ -336,7 +331,7 @@ describe('ComponentStore', () => {
 
     describe('Extensions', () => {
         beforeEach(() => {
-            _resetConfig();
+            globalCsConfig._resetConfig();
         });
 
         it('should be local', () => {
@@ -349,7 +344,7 @@ describe('ComponentStore', () => {
         it('should be global', () => {
             const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
 
-            configureComponentStores({ extensions });
+            globalCsConfig.set({ extensions });
             const cs = setup({});
 
             expect(cs['extensions']).toStrictEqual(extensions);
@@ -359,7 +354,7 @@ describe('ComponentStore', () => {
             const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
             const localExtensions = [new MockUndoExtension()];
 
-            configureComponentStores({ extensions: globalExtensions });
+            globalCsConfig.set({ extensions: globalExtensions });
             const cs = setup({}, { extensions: localExtensions });
 
             expect(cs['extensions'][0]).toBe(localExtensions[0]);
@@ -371,7 +366,7 @@ describe('ComponentStore', () => {
             const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
             const localExtensions = [new MockLoggerExtension()];
 
-            configureComponentStores({ extensions: globalExtensions });
+            globalCsConfig.set({ extensions: globalExtensions });
             const cs = setup({}, { extensions: localExtensions });
 
             expect(cs['extensions'][0]).toBe(localExtensions[0]);

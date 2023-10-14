@@ -1,8 +1,8 @@
-import { createBaseStore } from './base-store';
 import {
     Action,
     calculateExtensions,
     combineMetaReducers,
+    componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
     createActionsOnQueue,
@@ -13,7 +13,6 @@ import {
     MiniRxAction,
     miniRxError,
     OperationType,
-    Reducer,
     StateOrCallback,
     StoreType,
     undo,
@@ -22,31 +21,18 @@ import { createSelectableSignalState } from './selectable-signal-state';
 import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentStoreLike } from './models';
-
-let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
-
-// This function exists for testing purposes only
-export function _resetConfig() {
-    componentStoreConfig = undefined;
-}
-
-export function configureComponentStores(config: ComponentStoreConfig) {
-    if (!componentStoreConfig) {
-        componentStoreConfig = config;
-        return;
-    }
-    miniRxError('`configureComponentStores` was called multiple times.');
-}
+import { createRxEffectFn } from './rx-effect';
+import { createConnectFn } from './connect';
+import { createUpdateFn } from './update';
 
 const csFeatureKey = 'component-store';
+export const globalCsConfig = componentStoreConfig();
 
 export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private actionsOnQueue = createActionsOnQueue();
     private _state: WritableSignal<StateType> = signal(this.initialState);
     private selectableState = createSelectableSignalState(this._state);
     state: Signal<StateType> = this.selectableState.select();
-    private readonly combinedMetaReducer: MetaReducer<StateType>;
-    private readonly reducer: Reducer<StateType>;
     private hasUndoExtension = false;
     private extensions: ComponentStoreExtension[] = []; // This is a class property just for testing purposes
 
@@ -64,14 +50,13 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         return action;
     }
 
-    private baseStore = createBaseStore(this.dispatcher.bind(this));
     private destroyRef = inject(DestroyRef);
 
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {
         this.destroyRef.onDestroy(() => this.destroy());
 
         const metaReducers: MetaReducer<StateType>[] = [];
-        this.extensions = calculateExtensions(config, componentStoreConfig);
+        this.extensions = calculateExtensions(config, globalCsConfig.get());
         this.extensions.forEach((ext) => {
             metaReducers.push(ext.init()); // Non-null assertion: Here we know for sure: init will return a MetaReducer
 
@@ -80,11 +65,11 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             }
         });
 
-        this.combinedMetaReducer = combineMetaReducers(metaReducers);
-        this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
+        const combinedMetaReducer = combineMetaReducers(metaReducers);
+        const reducer = combinedMetaReducer(createComponentStoreReducer(initialState));
 
         this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
-            const newState: StateType = this.reducer(this.state(), action);
+            const newState: StateType = reducer(this.state(), action);
             this._state.set(newState);
         });
 
@@ -102,9 +87,9 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     }
 
     select = this.selectableState.select;
-    update = this.baseStore.update;
-    rxEffect = this.baseStore.rxEffect;
-    connect = this.baseStore.connect;
+    update = createUpdateFn(this.dispatcher.bind(this));
+    connect = createConnectFn(this.dispatcher.bind(this));
+    rxEffect = createRxEffectFn();
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension

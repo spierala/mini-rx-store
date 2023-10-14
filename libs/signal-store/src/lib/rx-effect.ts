@@ -1,49 +1,11 @@
 import { isObservable, Observable, Subject } from 'rxjs';
-import {
-    Action,
-    defaultEffectsErrorHandler,
-    OperationType,
-    StateOrCallback,
-} from '@mini-rx/common';
-import { DestroyRef, EnvironmentInjector, inject, Signal } from '@angular/core';
+import { DestroyRef, inject, Signal } from '@angular/core';
+import { defaultEffectsErrorHandler } from '@mini-rx/common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
 
-export function createBaseStore<StateType>(
-    dispatch: (
-        stateOrCallback: StateOrCallback<StateType>,
-        operationType: OperationType,
-        name: string | undefined
-    ) => Action
-) {
-    const injector = inject(EnvironmentInjector);
+export function createRxEffectFn() {
     const destroyRef = inject(DestroyRef);
-
-    function update(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
-        return dispatch(stateOrCallback, OperationType.SET_STATE, name);
-    }
-
-    function connect<K extends keyof StateType, ReactiveType = StateType[K]>(
-        dict: Record<K, Observable<ReactiveType> | Signal<ReactiveType>>
-    ): void {
-        const keys: K[] = Object.keys(dict) as K[];
-
-        keys.forEach((key) => {
-            const observableOrSignal: Observable<ReactiveType> | Signal<ReactiveType> = dict[key];
-            const obs$ = miniRxIsSignal(observableOrSignal)
-                ? toObservable(observableOrSignal, { injector })
-                : observableOrSignal;
-            obs$.pipe(takeUntilDestroyed(destroyRef)).subscribe((v) => {
-                dispatch(
-                    {
-                        [key]: v,
-                    } as unknown as Partial<StateType>,
-                    OperationType.CONNECTION,
-                    key as string
-                );
-            });
-        });
-    }
 
     function rxEffect<
         // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
@@ -82,9 +44,5 @@ export function createBaseStore<StateType>(
         }) as unknown as ReturnType;
     }
 
-    return {
-        update,
-        connect,
-        rxEffect,
-    };
+    return rxEffect;
 }

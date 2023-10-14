@@ -11,7 +11,6 @@ import {
     StoreType,
     undo,
 } from '@mini-rx/common';
-import { createBaseStore } from './base-store';
 import {
     addFeature,
     dispatch,
@@ -22,6 +21,9 @@ import {
 import { DestroyRef, inject, Signal } from '@angular/core';
 import { createSelectableSignalState } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
+import { createRxEffectFn } from './rx-effect';
+import { createConnectFn } from './connect';
+import { createUpdateFn } from './update';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly _featureKey: string;
@@ -49,7 +51,6 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return action;
     };
 
-    private baseStore = createBaseStore(this.dispatcher);
     private destroyRef = inject(DestroyRef);
 
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
@@ -71,9 +72,9 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     }
 
     select = this.selectableState.select;
-    update = this.baseStore.update;
-    rxEffect = this.baseStore.rxEffect;
-    connect = this.baseStore.connect;
+    update = createUpdateFn(this.dispatcher);
+    connect = createConnectFn(this.dispatcher);
+    rxEffect = createRxEffectFn();
 
     private destroy(): void {
         removeFeature(this._featureKey);

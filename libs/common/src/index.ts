@@ -48,3 +48,4 @@ export { createComponentStoreReducer } from './lib/create-component-store-reduce
 export { generateId } from './lib/generate-id';
 export { calculateExtensions } from './lib/calculate-extensions';
 export { createReducerManager } from './lib/reducer-manager';
+export { componentStoreConfig } from './lib/component-store-config';
