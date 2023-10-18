@@ -10,6 +10,18 @@ export {
     createFeatureStateSelector,
     createComponentStateSelector,
 } from './lib/signal-selector';
+export { ReduxDevtoolsExtension } from './lib/extensions/redux-devtools.extension';
+export { StoreRootModule, StoreModule, StoreFeatureModule } from './lib/modules/store.module';
+export { EffectsModule } from './lib/modules/effects.module';
+export { ComponentStoreModule } from './lib/modules/component-store.module';
+export {
+    provideStore,
+    provideFeature,
+    provideEffects,
+    provideComponentStoreConfig,
+} from './lib/providers';
+
+// Re-export from @mini-rx/common
 export {
     Action,
     Reducer,
@@ -28,14 +40,3 @@ export {
     mapResponse,
     ReduxDevtoolsOptions,
 } from '@mini-rx/common';
-export { ReduxDevtoolsExtension } from './lib/extensions/redux-devtools.extension';
-
-export { StoreRootModule, StoreModule, StoreFeatureModule } from './lib/modules/store.module';
-export { EffectsModule } from './lib/modules/effects.module';
-export { ComponentStoreModule } from './lib/modules/component-store.module';
-export {
-    provideStore,
-    provideFeature,
-    provideEffects,
-    provideComponentStoreConfig,
-} from './lib/providers';
