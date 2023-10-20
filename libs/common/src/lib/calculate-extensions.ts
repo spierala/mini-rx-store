@@ -33,16 +33,19 @@ function mergeComponentStoreExtensions(
 }
 
 export function calculateExtensions(
-    config?: ComponentStoreConfig,
+    localConfig?: ComponentStoreConfig,
     globalConfig?: ComponentStoreConfig
 ): ComponentStoreExtension[] {
     let extensions: ComponentStoreExtension[] = [];
 
-    if (config?.extensions) {
-        if (config.extensions && globalConfig?.extensions) {
-            extensions = mergeComponentStoreExtensions(globalConfig.extensions, config.extensions);
+    if (localConfig?.extensions) {
+        if (localConfig.extensions && globalConfig?.extensions) {
+            extensions = mergeComponentStoreExtensions(
+                globalConfig.extensions,
+                localConfig.extensions
+            );
         } else {
-            extensions = config.extensions;
+            extensions = localConfig.extensions;
         }
     } else if (globalConfig?.extensions) {
         extensions = globalConfig.extensions;

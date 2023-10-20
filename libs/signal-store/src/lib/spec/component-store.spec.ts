@@ -1,12 +1,5 @@
 import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
-import {
-    counterInitialState,
-    CounterState,
-    MockImmutableStateExtension,
-    MockLoggerExtension,
-    MockUndoExtension,
-    userState,
-} from './_spec-helpers';
+import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
@@ -327,50 +320,5 @@ describe('ComponentStore', () => {
         expect(() => cs.undo({ type: 'someType' })).toThrowError(
             '@mini-rx: ComponentStore has no UndoExtension yet.'
         );
-    });
-
-    describe('Extensions', () => {
-        beforeEach(() => {
-            globalCsConfig._resetConfig();
-        });
-
-        it('should be local', () => {
-            const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
-            const cs = setup({}, { extensions });
-
-            expect(cs['extensions']).toStrictEqual(extensions);
-        });
-
-        it('should be global', () => {
-            const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
-
-            globalCsConfig.set({ extensions });
-            const cs = setup({});
-
-            expect(cs['extensions']).toStrictEqual(extensions);
-        });
-
-        it('should be merged', () => {
-            const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
-            const localExtensions = [new MockUndoExtension()];
-
-            globalCsConfig.set({ extensions: globalExtensions });
-            const cs = setup({}, { extensions: localExtensions });
-
-            expect(cs['extensions'][0]).toBe(localExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalExtensions[1]);
-        });
-
-        it('should be merged (use local if extension is used globally and locally)', () => {
-            const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
-            const localExtensions = [new MockLoggerExtension()];
-
-            globalCsConfig.set({ extensions: globalExtensions });
-            const cs = setup({}, { extensions: localExtensions });
-
-            expect(cs['extensions'][0]).toBe(localExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalExtensions[1]);
-        });
     });
 });

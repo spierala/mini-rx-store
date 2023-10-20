@@ -2,7 +2,7 @@ import {
     AbstractReduxDevtoolsExtension,
     ReduxDevtoolsOptions,
 } from './abstract-redux-devtools-extension';
-import { ExtensionId, StoreType } from '../../enums';
+import { ExtensionId } from '../../enums';
 import { Observable, Subject } from 'rxjs';
 import { Action, AppState } from '../../models';
 import { createMiniRxActionType, OperationType } from '../../create-mini-rx-action-type';
@@ -125,7 +125,6 @@ describe('AbstractReduxDevtoolsExtension', () => {
         actions$.next({
             type: createMiniRxActionType(OperationType.SET_STATE, 'user'),
             stateOrCallback,
-            storeType: StoreType.FEATURE_STORE,
             featureId: 'abc',
         });
 

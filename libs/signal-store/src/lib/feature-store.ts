@@ -1,3 +1,4 @@
+import { DestroyRef, inject, Signal } from '@angular/core';
 import {
     Action,
     createFeatureStoreReducer,
@@ -8,7 +9,6 @@ import {
     miniRxError,
     OperationType,
     StateOrCallback,
-    StoreType,
     undo,
 } from '@mini-rx/common';
 import {
@@ -18,7 +18,6 @@ import {
     removeFeature,
     selectableAppState,
 } from './store-core';
-import { DestroyRef, inject, Signal } from '@angular/core';
 import { createSelectableSignalState } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
@@ -26,6 +25,7 @@ import { createConnectFn } from './connect';
 import { createUpdateFn } from './update';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
+    private readonly featureId: string;
     private readonly _featureKey: string;
     get featureKey(): string {
         return this._featureKey;
@@ -34,15 +34,12 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     state: Signal<StateType> = selectableAppState.select((state) => state[this.featureKey]);
     private selectableState = createSelectableSignalState(this.state);
 
-    private readonly featureId: string;
-
     private dispatcher = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
         const action: MiniRxAction<StateType> = {
-            storeType: StoreType.FEATURE_STORE,
             type: createMiniRxActionType(operationType, this.featureKey, name),
             stateOrCallback,
             featureId: this.featureId,
@@ -51,11 +48,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return action;
     };
 
-    private destroyRef = inject(DestroyRef);
-
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
-        this.destroyRef.onDestroy(() => this.destroy());
-
         this.featureId = generateId();
         this._featureKey = config.multi ? featureKey + '-' + this.featureId : featureKey;
 
@@ -63,6 +56,8 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
             this._featureKey,
             createFeatureStoreReducer(this.featureId, initialState)
         );
+
+        inject(DestroyRef).onDestroy(() => this.destroy());
     }
 
     undo(action: Action): void {

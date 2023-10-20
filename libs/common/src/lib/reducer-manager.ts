@@ -1,7 +1,8 @@
-import { AppState, MetaReducer, Reducer, ReducerDictionary, Action } from './models';
-import { combineReducers } from './combine-reducers';
+import { BehaviorSubject, map } from 'rxjs';
+import { AppState, MetaReducer, Reducer, ReducerDictionary, Action, ReducerState } from './models';
 import { combineMetaReducers } from './combine-meta-reducers';
 import { miniRxError } from './mini-rx-error';
+import { combineReducers } from './combine-reducers';
 
 function createReducerWithInitialState<StateType extends object>(
     reducer: Reducer<StateType>,
@@ -22,58 +23,61 @@ function omit<T extends Record<string, any>>(object: T, keyToOmit: keyof T): Par
 }
 
 export function createReducerManager() {
-    let featureReducers: ReducerDictionary<AppState> = {};
-    let metaReducers: MetaReducer<AppState>[] = [];
-    let reducer: Reducer<any> | undefined = undefined;
+    const _reducerStateSource: BehaviorSubject<ReducerState> = new BehaviorSubject<ReducerState>({
+        featureReducers: {},
+        metaReducers: [],
+    });
 
-    function recalculateReducer(): void {
-        const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(metaReducers);
-        const combinedReducer: Reducer<AppState> = combineReducers(featureReducers);
-        reducer = combinedMetaReducer(combinedReducer);
+    function updateReducerState(v: Partial<ReducerState>): void {
+        _reducerStateSource.next({
+            ..._reducerStateSource.getValue(),
+            ...v,
+        });
     }
 
-    function setFeatureReducers(v: ReducerDictionary<AppState>) {
-        featureReducers = v;
-        recalculateReducer();
+    function setFeatureReducers(featureReducers: ReducerDictionary<AppState>) {
+        updateReducerState({ featureReducers });
     }
 
-    function addFeatureReducer(
+    function addFeatureReducer<StateType extends object>(
         featureKey: string,
-        reducer: Reducer<any>,
-        metaReducers?: MetaReducer<any>[],
-        initialState?: any
+        reducer: Reducer<StateType>,
+        metaReducers?: MetaReducer<StateType>[],
+        initialState?: StateType
     ): void {
-        if (Object.hasOwn(featureReducers, featureKey)) {
+        if (Object.hasOwn(_reducerStateSource.value.featureReducers, featureKey)) {
             miniRxError(`Feature "${featureKey}" already exists.`);
         }
 
-        reducer = metaReducers?.length ? combineMetaReducers(metaReducers)(reducer) : reducer;
+        reducer = metaReducers?.length
+            ? combineMetaReducers<StateType>(metaReducers)(reducer)
+            : reducer;
 
         if (initialState) {
             reducer = createReducerWithInitialState(reducer, initialState);
         }
 
-        featureReducers[featureKey] = reducer;
-
-        recalculateReducer();
+        updateReducerState({
+            featureReducers: {
+                ..._reducerStateSource.value.featureReducers,
+                [featureKey]: reducer,
+            },
+        });
     }
 
     function removeFeatureReducer(featureKey: string): void {
-        featureReducers = omit(featureReducers, featureKey) as ReducerDictionary<AppState>;
-
-        recalculateReducer();
+        updateReducerState({
+            featureReducers: omit(
+                _reducerStateSource.value.featureReducers,
+                featureKey
+            ) as ReducerDictionary<AppState>,
+        });
     }
 
     function addMetaReducers(...reducers: MetaReducer<AppState>[]): void {
-        metaReducers = [...metaReducers, ...reducers];
-        recalculateReducer();
-    }
-
-    function getReducer(): Reducer<any> {
-        if (!reducer) {
-            throw new Error();
-        }
-        return reducer;
+        updateReducerState({
+            metaReducers: [..._reducerStateSource.value.metaReducers, ...reducers],
+        });
     }
 
     return {
@@ -81,10 +85,18 @@ export function createReducerManager() {
         addFeatureReducer,
         removeFeatureReducer,
         addMetaReducers,
-        getReducer,
-        _reset: () => {
-            metaReducers = [];
-            featureReducers = {};
+        getReducerObservable: () => {
+            return _reducerStateSource.pipe(
+                map((v) => {
+                    const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(
+                        v.metaReducers
+                    );
+                    const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
+                    return combinedMetaReducer(combinedReducer);
+                })
+            );
         },
+        // Exported for testing
+        _reducerStateSource,
     };
 }

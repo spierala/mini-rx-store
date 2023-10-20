@@ -1,29 +1,19 @@
 import { isMiniRxAction } from './is-mini-rx-action';
 import { Action, MiniRxAction } from './models';
-import { StoreType } from './enums';
 
 describe('isMiniRxAction', () => {
-    it('should detect MiniRx action for StoreType (ComponentStore/FeatureStore)', () => {
+    it('should detect MiniRx action', () => {
         const action: MiniRxAction<any> = {
             type: '',
-            storeType: StoreType.FEATURE_STORE,
             stateOrCallback: {},
         };
 
-        expect(isMiniRxAction(action, StoreType.FEATURE_STORE)).toBe(true);
-        expect(isMiniRxAction(action, StoreType.COMPONENT_STORE)).toBe(false);
+        expect(isMiniRxAction(action)).toBe(true);
 
-        const action2: MiniRxAction<any> = {
-            type: '',
-            storeType: StoreType.COMPONENT_STORE,
-            stateOrCallback: {},
+        const action2: Action = {
+            type: 'abc',
         };
 
-        expect(isMiniRxAction(action2, StoreType.COMPONENT_STORE)).toBe(true);
-        expect(isMiniRxAction(action2, StoreType.FEATURE_STORE)).toBe(false);
-
-        const someAction: Action = { type: 'someAction' };
-        expect(isMiniRxAction(someAction, StoreType.FEATURE_STORE)).toBe(false);
-        expect(isMiniRxAction(someAction, StoreType.COMPONENT_STORE)).toBe(false);
+        expect(isMiniRxAction(action2)).toBe(false);
     });
 });

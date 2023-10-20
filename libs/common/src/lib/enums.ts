@@ -12,8 +12,3 @@ export const enum ExtensionId {
     LOGGER,
     REDUX_DEVTOOLS,
 }
-
-export const enum StoreType {
-    FEATURE_STORE = '@mini-rx/feature-store',
-    COMPONENT_STORE = '@mini-rx/component-store',
-}

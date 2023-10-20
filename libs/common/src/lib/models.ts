@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { ExtensionId, ExtensionSortOrder, StoreType } from './enums';
+import { ExtensionId, ExtensionSortOrder } from './enums';
 
 export type AppState = Record<string, any>;
 
@@ -60,8 +60,12 @@ export type StateOrCallback<StateType> =
     | ((state: StateType) => Partial<StateType>);
 
 export type MiniRxAction<T> = {
-    storeType: StoreType; // Used for type predicate `isMiniRxAction`
     stateOrCallback: StateOrCallback<T>; // Used in FeatureStore/ComponentStore reducer to calc new state
     type: string; // The action type visible in DevTools / Logging Extension
     featureId?: string; // Links the feature reducer to its corresponding FeatureStore
 };
+
+export interface ReducerState {
+    featureReducers: ReducerDictionary<AppState>;
+    metaReducers: MetaReducer<AppState>[];
+}

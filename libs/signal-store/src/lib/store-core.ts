@@ -1,3 +1,4 @@
+import { signal, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
     Action,
@@ -19,7 +20,6 @@ import {
     StoreConfig,
     StoreExtension,
 } from '@mini-rx/common';
-import { signal, WritableSignal } from '@angular/core';
 import { createSelectableSignalState } from './selectable-signal-state';
 
 export let hasUndoExtension = false;
@@ -44,9 +44,13 @@ function initStore(): void {
         return;
     }
 
+    let reducer: Reducer<AppState>;
+    // 👇 We could use `withLatestFrom` inside actionsOnQueue.actions$.pipe, but fewer operators = less bundle-size :)
+    reducerManager.getReducerObservable().subscribe((v) => (reducer = v));
+
     // Listen to the Actions stream and update state accordingly
     actionsOnQueue.actions$.subscribe((action) => {
-        const nextState: AppState = reducerManager.getReducer()(appState(), action);
+        const nextState: AppState = reducer(appState(), action);
         appState.set(nextState);
     });
 

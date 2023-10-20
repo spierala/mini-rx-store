@@ -6,7 +6,7 @@ import { Action, Actions, Reducer, StoreExtension } from '@mini-rx/common';
 import { createRxEffect, ofType } from '@mini-rx/common';
 import { FeatureStore } from '../feature-store';
 import { Store } from '../store';
-import { createComponentStore } from '../component-store';
+import { createComponentStore, globalCsConfig } from '../component-store';
 import {
     MockImmutableStateExtension,
     MockLoggerExtension,
@@ -262,17 +262,12 @@ describe(`Providers`, () => {
 
     describe(`ComponentStore`, () => {
         // Just make sure that the global config is set via provideComponentStoreConfig
-        // For the other aspects of the config we can rely on the ComponentStore tests
 
-        it('should merge global config with local config', () => {
-            const localCsExtensions = [new MockUndoExtension()];
-            const cs = TestBed.runInInjectionContext(() => {
-                return createComponentStore({}, { extensions: localCsExtensions });
-            });
+        it('should set global component store config', () => {
+            const globalExtensions = globalCsConfig.get()?.extensions ?? [];
 
-            expect(cs['extensions'][0]).toBe(localCsExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalCsExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalCsExtensions[1]);
+            expect(globalExtensions[0]).toBe(globalCsExtensions[0]);
+            expect(globalExtensions[1]).toBe(globalCsExtensions[1]);
         });
     });
 });

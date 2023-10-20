@@ -1,12 +1,8 @@
 import { Action, MiniRxAction } from './models';
-import { StoreType } from './enums';
 
-const storeTypeKey: keyof MiniRxAction<any> = 'storeType';
+const stateOrCallbackKey: keyof MiniRxAction<any> = 'stateOrCallback';
 
 // Type predicate
-export function isMiniRxAction<StateType>(
-    action: Action,
-    storeType: StoreType
-): action is MiniRxAction<StateType> {
-    return action[storeTypeKey] === storeType;
+export function isMiniRxAction<StateType>(action: Action): action is MiniRxAction<StateType> {
+    return Object.hasOwn(action, stateOrCallbackKey);
 }

@@ -2,8 +2,7 @@ import { Action, ComponentStoreExtension, ExtensionId, MetaReducer } from '@mini
 import { dispatch, reducerManager } from '../store-core';
 
 export function resetStoreConfig() {
-    reducerManager._reset();
-
+    reducerManager._reducerStateSource.next({ featureReducers: {}, metaReducers: [] });
     dispatch({ type: 'resetStoreConfig' }); // Trigger action to recalculate state
 }
 
