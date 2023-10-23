@@ -155,7 +155,6 @@ describe('ComponentStore', () => {
         const setStateCallback = (state: CounterState) => ({ counter: state.counter + 1 });
         cs.update(setStateCallback);
         expect(spy).toHaveBeenCalledWith({
-            storeType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state',
             stateOrCallback: setStateCallback,
         });
@@ -166,7 +165,6 @@ describe('ComponentStore', () => {
         // With setState name
         cs.update(setStateCallback, 'increment');
         expect(spy).toHaveBeenCalledWith({
-            storeType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state/increment',
             stateOrCallback: setStateCallback,
         });
@@ -179,7 +177,6 @@ describe('ComponentStore', () => {
         expect(spy.mock.calls).toEqual([
             [
                 {
-                    storeType: '@mini-rx/component-store',
                     type: '@mini-rx/component-store/connection/counter',
                     stateOrCallback: {
                         counter: 1,
@@ -188,7 +185,6 @@ describe('ComponentStore', () => {
             ],
             [
                 {
-                    storeType: '@mini-rx/component-store',
                     type: '@mini-rx/component-store/connection/counter',
                     stateOrCallback: {
                         counter: 2,
