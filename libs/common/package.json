@@ -1,6 +1,6 @@
 {
     "name": "@mini-rx/common",
-    "version": "0.0.2",
+    "version": "0.0.4",
     "peerDependencies": {
         "rxjs": "^6.4.0 || ^7.0.0"
     },

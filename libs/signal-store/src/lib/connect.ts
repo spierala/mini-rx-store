@@ -1,8 +1,8 @@
 import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
 import { DestroyRef, EnvironmentInjector, inject, Signal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { miniRxIsSignal } from './utils';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 export function createConnectFn<StateType>(
     dispatch: (
@@ -12,7 +12,8 @@ export function createConnectFn<StateType>(
     ) => Action
 ) {
     const injector = inject(EnvironmentInjector);
-    const destroyRef = inject(DestroyRef);
+    const subs: Subscription = new Subscription();
+    inject(DestroyRef).onDestroy(() => subs.unsubscribe());
 
     function connect<K extends keyof StateType, ValueType = StateType[K]>(
         dict: Record<K, Observable<ValueType> | Signal<ValueType>>
@@ -24,15 +25,17 @@ export function createConnectFn<StateType>(
             const obs$ = miniRxIsSignal(observableOrSignal)
                 ? toObservable(observableOrSignal, { injector })
                 : observableOrSignal;
-            obs$.pipe(takeUntilDestroyed(destroyRef)).subscribe((v) => {
-                dispatch(
-                    {
-                        [key]: v,
-                    } as unknown as Partial<StateType>,
-                    OperationType.CONNECTION,
-                    key as string
-                );
-            });
+            subs.add(
+                obs$.subscribe((v) => {
+                    dispatch(
+                        {
+                            [key]: v,
+                        } as unknown as Partial<StateType>,
+                        OperationType.CONNECTION,
+                        key as string
+                    );
+                })
+            );
         });
     }
 

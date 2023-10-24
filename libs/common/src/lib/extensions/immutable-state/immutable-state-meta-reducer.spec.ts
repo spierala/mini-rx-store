@@ -1,4 +1,4 @@
-import { Action, Reducer } from 'mini-rx-store';
+import { Action, Reducer } from '../../models';
 import { immutableStateMetaReducer } from './immutable-state-meta-reducer';
 
 describe('immutableStateMetaReducer', () => {
