@@ -1,11 +1,12 @@
-import { isObservable, Observable, Subject } from 'rxjs';
+import { isObservable, Observable, Subject, Subscription } from 'rxjs';
 import { DestroyRef, inject, Signal } from '@angular/core';
 import { defaultEffectsErrorHandler } from '@mini-rx/common';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { miniRxIsSignal } from './utils';
 
 export function createRxEffectFn() {
-    const destroyRef = inject(DestroyRef);
+    const subs: Subscription = new Subscription();
+    inject(DestroyRef).onDestroy(() => subs.unsubscribe());
 
     function rxEffect<
         // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
@@ -26,7 +27,7 @@ export function createRxEffectFn() {
     >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
         const subject = new Subject<ObservableType>();
         const effect$ = effectFn(subject as OriginType);
-        effect$.pipe(defaultEffectsErrorHandler, takeUntilDestroyed(destroyRef)).subscribe();
+        subs.add(effect$.pipe(defaultEffectsErrorHandler).subscribe());
 
         return ((
             observableOrValue?: ObservableType | Observable<ObservableType> | Signal<ObservableType>
@@ -37,9 +38,7 @@ export function createRxEffectFn() {
                 : observableOrValue;
 
             isObservable(observableOrValue)
-                ? observableOrValue
-                      .pipe(takeUntilDestroyed(destroyRef))
-                      .subscribe((v) => subject.next(v))
+                ? subs.add(observableOrValue.subscribe((v) => subject.next(v)))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }
