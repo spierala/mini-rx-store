@@ -30,7 +30,7 @@ describe('ComponentStore', () => {
         const selectedState = cs.select();
         expect(selectedState()).toBe(counterInitialState);
 
-        cs.update((state) => ({ counter: state.counter + 1 }));
+        cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toEqual({ counter: 2 });
     });
 
@@ -40,7 +40,7 @@ describe('ComponentStore', () => {
         const selectedState = cs.select();
         expect(selectedState()).toBe(userState);
 
-        cs.update(() => ({ firstName: 'Nicolas' }));
+        cs.setState(() => ({ firstName: 'Nicolas' }));
         expect(selectedState()).toEqual({ ...userState, firstName: 'Nicolas' });
     });
 
@@ -59,10 +59,10 @@ describe('ComponentStore', () => {
         expect(selectedState()).toBe(5);
 
         // "normal" setState
-        cs.update((state) => ({ counter: state.counter + 1 }));
+        cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toBe(6);
 
-        cs.update((state) => ({ counter: state.counter + 1 }));
+        cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toBe(7);
     });
 
@@ -131,15 +131,15 @@ describe('ComponentStore', () => {
 
         const selectedState = cs.select(getSquareCounter);
         selectedState();
-        cs.update({ counter: 2 });
+        cs.setState({ counter: 2 });
         selectedState();
-        cs.update({ counter: 2 });
+        cs.setState({ counter: 2 });
         selectedState();
-        cs.update({ counter: 3 });
+        cs.setState({ counter: 3 });
         selectedState();
-        cs.update({ counter: 3 });
+        cs.setState({ counter: 3 });
         selectedState();
-        cs.update({ counter: 4 });
+        cs.setState({ counter: 4 });
         selectedState();
 
         expect(getCounterSpy.mock.calls).toEqual([[1], [2], [2], [3], [3], [4]]); // No memoization: because a new state object is created for every call of `update`
@@ -153,7 +153,7 @@ describe('ComponentStore', () => {
         cs['actionsOnQueue'].actions$.subscribe(spy);
 
         const setStateCallback = (state: CounterState) => ({ counter: state.counter + 1 });
-        cs.update(setStateCallback);
+        cs.setState(setStateCallback);
         expect(spy).toHaveBeenCalledWith({
             type: '@mini-rx/component-store/set-state',
             stateOrCallback: setStateCallback,
@@ -163,7 +163,7 @@ describe('ComponentStore', () => {
         spy.mockReset();
 
         // With setState name
-        cs.update(setStateCallback, 'increment');
+        cs.setState(setStateCallback, 'increment');
         expect(spy).toHaveBeenCalledWith({
             type: '@mini-rx/component-store/set-state/increment',
             stateOrCallback: setStateCallback,

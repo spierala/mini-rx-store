@@ -59,10 +59,10 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
             : miniRxError('UndoExtension is not initialized.');
     }
 
-    select = createSelectableSignalState(this.state).select;
-    update = createUpdateFn(this.dispatcher);
+    setState = createUpdateFn(this.dispatcher);
     connect = createConnectFn(this.dispatcher);
     rxEffect = createRxEffectFn();
+    select = createSelectableSignalState(this.state).select;
 
     private destroy(): void {
         removeFeature(this._featureKey);

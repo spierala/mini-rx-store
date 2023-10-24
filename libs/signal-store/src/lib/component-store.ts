@@ -78,10 +78,10 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    select = this.selectableState.select;
-    update = createUpdateFn(this.dispatcher.bind(this));
+    setState = createUpdateFn(this.dispatcher.bind(this));
     connect = createConnectFn(this.dispatcher.bind(this));
     rxEffect = createRxEffectFn();
+    select = this.selectableState.select;
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension

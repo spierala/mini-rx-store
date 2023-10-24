@@ -91,7 +91,7 @@ class UserFeatureStore extends FeatureStore<UserState> {
     someFeatureState = store.select(getSomeFeatureSelector);
 
     loadFn = this.rxEffect((payload$) =>
-        payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap((user) => this.update(user)))))
+        payload$.pipe(mergeMap(() => fakeApiGet().pipe(tap((user) => this.setState(user)))))
     );
 
     loadFnWithError = this.rxEffect((payload$) =>
@@ -99,9 +99,9 @@ class UserFeatureStore extends FeatureStore<UserState> {
             mergeMap(() =>
                 fakeApiWithError().pipe(
                     tapResponse(
-                        (user) => this.update(user),
+                        (user) => this.setState(user),
                         (err) => {
-                            this.update({ err: 'error' });
+                            this.setState({ err: 'error' });
                         }
                     )
                 )
@@ -114,26 +114,26 @@ class UserFeatureStore extends FeatureStore<UserState> {
     }
 
     updateFirstName(firstName: string) {
-        this.update({ firstName });
+        this.setState({ firstName });
     }
 
     updateLastName(lastName: string) {
-        this.update({ lastName });
+        this.setState({ lastName });
     }
 
     updateCity(city: string) {
-        this.update({ city }, 'updateCity');
+        this.setState({ city }, 'updateCity');
     }
 
     updateCountry(country: string) {
-        this.update({
+        this.setState({
             ...this.state, // Test updating state using `this.state`
             country,
         });
     }
 
     resetState() {
-        this.update(initialState);
+        this.setState(initialState);
     }
 }
 
@@ -146,7 +146,7 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
 
     increment() {
         // Update state using callback
-        this.update((state) => ({ counter: state.counter + 1 }));
+        this.setState((state) => ({ counter: state.counter + 1 }));
     }
 }
 
@@ -293,7 +293,7 @@ describe('FeatureStore', () => {
         );
 
         const load = fs.rxEffect<void>(
-            mergeMap(() => apiCallWithError().pipe(tap(() => fs.update({}))))
+            mergeMap(() => apiCallWithError().pipe(tap(() => fs.setState({}))))
         );
 
         load();
@@ -410,7 +410,7 @@ describe('FeatureStore', () => {
         const counter$: Signal<number> = fs.select(getCounter);
 
         function inc() {
-            fs.update((state) => ({
+            fs.setState((state) => ({
                 counter: state.counter + 1,
             }));
         }
@@ -467,7 +467,7 @@ describe('FeatureStore', () => {
             }
 
             increment(): Action {
-                return this.update((state) => ({
+                return this.setState((state) => ({
                     counter: state.counter + 1,
                 }));
             }
@@ -480,7 +480,7 @@ describe('FeatureStore', () => {
         );
 
         function incrementFs3(): void {
-            fs3.update((state) => ({ counter: state.counter + 1 }));
+            fs3.setState((state) => ({ counter: state.counter + 1 }));
         }
 
         const fs1FeatureKey = fs1.featureKey;

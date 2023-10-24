@@ -126,7 +126,7 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 
     inc() {
-        this.update((state) => ({
+        this.setState((state) => ({
             counter: state.counter + 1,
         }));
     }

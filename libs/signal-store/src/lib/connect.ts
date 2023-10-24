@@ -14,13 +14,13 @@ export function createConnectFn<StateType>(
     const injector = inject(EnvironmentInjector);
     const destroyRef = inject(DestroyRef);
 
-    function connect<K extends keyof StateType, ReactiveType = StateType[K]>(
-        dict: Record<K, Observable<ReactiveType> | Signal<ReactiveType>>
+    function connect<K extends keyof StateType, ValueType = StateType[K]>(
+        dict: Record<K, Observable<ValueType> | Signal<ValueType>>
     ): void {
         const keys: K[] = Object.keys(dict) as K[];
 
         keys.forEach((key) => {
-            const observableOrSignal: Observable<ReactiveType> | Signal<ReactiveType> = dict[key];
+            const observableOrSignal: Observable<ValueType> | Signal<ValueType> = dict[key];
             const obs$ = miniRxIsSignal(observableOrSignal)
                 ? toObservable(observableOrSignal, { injector })
                 : observableOrSignal;
