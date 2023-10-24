@@ -1,9 +1,9 @@
-import { AppState, StoreConfig } from './models';
-import { configureStore, dispatch, selectableAppState } from './store-core';
+import { AppState, StoreConfig } from '@mini-rx/common';
+import { configureStore, dispatch, select } from './store-core';
 
 export class Store {
     dispatch = dispatch;
-    select = selectableAppState.select.bind(selectableAppState);
+    select = select;
 
     constructor(config: StoreConfig<AppState>) {
         configureStore(config);

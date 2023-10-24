@@ -1,13 +1,8 @@
-import { Action, ActionWithPayload, ComponentStoreExtension, ExtensionId, MetaReducer, Reducer } from '../models';
-import { v4 as uuid } from 'uuid';
-import { dispatch, reducerState } from '../store-core';
+import { Action, ComponentStoreExtension, ExtensionId, MetaReducer } from '@mini-rx/common';
+import { dispatch, getReducerManager } from '../store-core';
 
 export function resetStoreConfig() {
-    reducerState.set({
-        metaReducers: [],
-        featureReducers: {},
-    });
-
+    getReducerManager()._updateStateAndReducer({ featureReducers: {}, metaReducers: [] });
     dispatch({ type: 'resetStoreConfig' }); // Trigger action to recalculate state
 }
 
@@ -45,45 +40,6 @@ export function counterReducer(
             return {
                 ...state,
                 counter: state.counter + 1,
-            };
-        default:
-            return state;
-    }
-}
-
-export function createUniqueCounterReducerWithAction(): [Reducer<CounterState>, Action] {
-    const incrementCase = uuid();
-    const reducer = (state: CounterState = counterInitialState, action: Action) => {
-        switch (action.type) {
-            case incrementCase:
-                return {
-                    ...state,
-                    counter: state.counter + 1,
-                };
-            default:
-                return state;
-        }
-    };
-    return [reducer, { type: incrementCase }];
-}
-
-export interface CounterStringState {
-    counter: string;
-}
-
-export const counterStringInitialState: CounterStringState = {
-    counter: '1',
-};
-
-export function counterStringReducer(
-    state: CounterStringState = counterStringInitialState,
-    action: ActionWithPayload
-) {
-    switch (action.type) {
-        case 'counterString':
-            return {
-                ...state,
-                counter: state.counter + action.payload,
             };
         default:
             return state;

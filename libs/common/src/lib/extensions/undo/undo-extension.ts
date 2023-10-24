@@ -1,9 +1,10 @@
-// Credits go to Brandon Roberts
-// Copied from with small modifications: https://github.com/brandonroberts/ngrx-store-freeze/blob/v0.2.4/src/index.ts
+// Credits go to Brecht Billiet
+// Copied from: https://github.com/brechtbilliet/ngrx-undo/blob/master/src/handleUndo.ts
+// Code has been modified to work with MiniRx
 
-// The MIT License (MIT)
+// MIT License
 //
-// Copyright (c) 2017 Brandon Roberts
+// Copyright (c) 2016 Brecht Billiet
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import {
-    Action,
-    ExtensionId,
-    HasComponentStoreSupport,
-    MetaReducer,
-    Reducer,
-    StoreExtension,
-} from '../models';
-import { deepFreeze } from '../deep-freeze';
+import { ComponentStoreExtension, MetaReducer, StoreExtension } from '../../models';
+import { ExtensionId, ExtensionSortOrder } from '../../enums';
+import { createUndoMetaReducer } from './undo-meta-reducer';
 
-export class ImmutableStateExtension extends StoreExtension implements HasComponentStoreSupport {
-    id = ExtensionId.IMMUTABLE_STATE;
+const defaultBufferSize = 100;
+
+export class UndoExtension extends StoreExtension implements ComponentStoreExtension {
+    id = ExtensionId.UNDO;
+    override sortOrder = ExtensionSortOrder.UNDO_EXTENSION;
     hasCsSupport = true as const;
 
-    init(): MetaReducer<any> {
-        return storeFreeze;
+    constructor(private config: { bufferSize: number } = { bufferSize: defaultBufferSize }) {
+        super();
     }
-}
 
-function storeFreeze(reducer: Reducer<any>): Reducer<any> {
-    return (state, action: Action) => {
-        if (state) {
-            deepFreeze(state);
-        }
-        const nextState = reducer(state, action);
-        deepFreeze(nextState);
-        return nextState;
-    };
+    init(): MetaReducer<any> {
+        return createUndoMetaReducer(this.config.bufferSize);
+    }
 }

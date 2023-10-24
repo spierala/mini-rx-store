@@ -1,5 +1,5 @@
 import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
-import { Actions, AppState, FeatureConfig, Reducer, StoreConfig } from '../models';
+import { Actions, AppState, FeatureConfig, Reducer, StoreConfig } from '@mini-rx/common';
 import { Store } from '../store';
 import { actions$, addFeature } from '../store-core';
 

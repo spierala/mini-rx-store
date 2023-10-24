@@ -1,9 +1,9 @@
-// Credits go to NgRx
-// Copied from with small modifications: https://github.com/ngrx/platform/blob/14.3.0/modules/effects/src/effect_creator.ts
+// Credits go to Brandon Roberts
+// Copied from with small modifications: https://github.com/brandonroberts/ngrx-store-freeze/blob/v0.2.4/src/index.ts
 
 // The MIT License (MIT)
 //
-// Copyright (c) 2017-2022 Brandon Roberts, Mike Ryan, Victor Savkin, Rob Wormald
+// Copyright (c) 2017 Brandon Roberts
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Observable } from 'rxjs';
-import { Action, EFFECT_METADATA_KEY, EffectConfig, HasEffectMetadata } from './models';
+import { ComponentStoreExtension, MetaReducer, StoreExtension } from '../../models';
+import { ExtensionId } from '../../enums';
+import { immutableStateMetaReducer } from './immutable-state-meta-reducer';
 
-const DEFAULT_EFFECT_CONFIG: Readonly<Required<EffectConfig>> = {
-    dispatch: true,
-};
+export class ImmutableStateExtension extends StoreExtension implements ComponentStoreExtension {
+    id = ExtensionId.IMMUTABLE_STATE;
+    hasCsSupport = true as const;
 
-type DispatchType<T> = T extends { dispatch: infer U } ? U : true;
-type ObservableType<DispatchType, OriginalType> = DispatchType extends false
-    ? OriginalType
-    : Action;
-type EffectType<OT> = Observable<OT>;
-
-export function createRxEffect<
-    C extends EffectConfig,
-    DT extends DispatchType<C>,
-    OT extends ObservableType<DT, OT>,
-    R extends EffectType<OT>
->(v: R, config?: C): R & HasEffectMetadata {
-    const value: EffectConfig = {
-        ...DEFAULT_EFFECT_CONFIG,
-        ...config,
-    };
-    Object.defineProperty(v, EFFECT_METADATA_KEY, {
-        value,
-    });
-    return v as typeof v & HasEffectMetadata;
+    init(): MetaReducer<any> {
+        return immutableStateMetaReducer;
+    }
 }

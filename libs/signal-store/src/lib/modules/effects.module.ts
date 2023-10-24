@@ -35,9 +35,9 @@ import { Observable } from 'rxjs';
 import {
     fromClassesWithEffectsToClassProviders,
     fromObjectsWithEffectsToEffects,
-} from './effects-mapper';
+} from '../effects-mapper';
 import { StoreFeatureModule, StoreRootModule } from './store.module';
-import { Action } from '../models';
+import { Action } from '@mini-rx/common';
 import { rxEffect } from '../store-core';
 
 const OBJECTS_WITH_EFFECTS = new InjectionToken('@mini-rx/objectsWithEffects');

@@ -25,7 +25,7 @@
 
 import { ClassProvider, InjectionToken, Type } from '@angular/core';
 import { Observable } from 'rxjs';
-import { hasEffectMetaData } from '../utils';
+import { hasEffectMetaData } from '@mini-rx/common';
 
 export const fromClassesWithEffectsToClassProviders = (
     injectionToken: InjectionToken<any>,

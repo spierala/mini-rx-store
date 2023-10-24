@@ -2,18 +2,18 @@ import { Store } from '../store';
 import {
     Action,
     Actions,
-    ActionWithPayload,
     ExtensionId,
     FeatureConfig,
     MetaReducer,
+    ofType,
     Reducer,
     StoreConfig,
     StoreExtension,
-} from '../models';
+} from '@mini-rx/common';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
 import { mapTo, Observable, of, take } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
-import { createFeatureStore, FeatureStore } from '../feature-store';
+import { FeatureStore } from '../feature-store';
 import {
     counterInitialState,
     counterReducer,
@@ -22,10 +22,13 @@ import {
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
-import { addFeature, configureStore, removeFeature, rxEffect } from '../store-core';
-import { ofType } from '../utils';
+import { addFeature, removeFeature, rxEffect } from '../store-core';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { createRxEffect } from '../create-rx-effect';
+import { createRxEffect } from '@mini-rx/common';
+
+interface ActionWithPayload extends Action {
+    payload?: any;
+}
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -101,7 +104,7 @@ class CounterFeatureState extends FeatureStore<CounterState> {
     }
 
     increment() {
-        this.update((state) => ({ counter: state.counter + 1 }));
+        this.setState((state) => ({ counter: state.counter + 1 }));
     }
 }
 

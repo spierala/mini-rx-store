@@ -6,9 +6,8 @@ import {
     FeatureConfig,
     Reducer,
     StoreConfig,
-} from './models';
+} from '@mini-rx/common';
 import {
-    ClassProvider,
     ENVIRONMENT_INITIALIZER,
     EnvironmentProviders,
     inject,
@@ -19,8 +18,11 @@ import {
 import { actions$, addFeature, rxEffect } from './store-core';
 import { Store } from './store';
 import { Observable } from 'rxjs';
-import { hasEffectMetaData } from './utils';
-import { configureComponentStores } from './component-store';
+import { globalCsConfig } from './component-store';
+import {
+    fromClassesWithEffectsToClassProviders,
+    fromObjectsWithEffectsToEffects,
+} from './effects-mapper';
 
 const STORE_PROVIDER = new InjectionToken<void>('@mini-rx/store-provider');
 const STORE_CONFIG = new InjectionToken<StoreConfig<any>>('@mini-rx/store-config');
@@ -127,38 +129,12 @@ export function provideEffects(...classesWithEffects: any[]): EnvironmentProvide
     ]);
 }
 
-// Todo: move to @mini-rx/common lib
-const fromClassesWithEffectsToClassProviders = (
-    injectionToken: InjectionToken<any>,
-    classesWithEffects: Type<any>[]
-): ClassProvider[] =>
-    classesWithEffects.map((classWithEffects) => ({
-        provide: injectionToken,
-        useClass: classWithEffects,
-        multi: true,
-    }));
-
-// Todo: move to @mini-rx/common lib
-const fromObjectsWithEffectsToEffects = (objectsWithEffects: any[]): Observable<any>[] =>
-    objectsWithEffects.reduce((acc, objectWithEffects) => {
-        const effectsFromCurrentObject = Object.getOwnPropertyNames(objectWithEffects).reduce<
-            Array<Observable<any>>
-        >((acc, prop) => {
-            const effect = objectWithEffects[prop];
-            if (hasEffectMetaData(effect)) {
-                acc.push(effect);
-            }
-            return acc;
-        }, []);
-        return [...acc, ...effectsFromCurrentObject];
-    }, []);
-
 // Component Store config
 export function provideComponentStoreConfig(config: ComponentStoreConfig) {
     return makeEnvironmentProviders([
         {
             provide: COMPONENT_STORE_CONFIG_PROVIDER,
-            useFactory: () => configureComponentStores(config),
+            useFactory: () => globalCsConfig.set(config),
         },
         {
             provide: ENVIRONMENT_INITIALIZER,
