@@ -1,4 +1,5 @@
 import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
     Action,
     calculateExtensions,
@@ -22,7 +23,6 @@ import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';
 import { createUpdateFn } from './update';
-import { Subscription } from 'rxjs';
 
 const csFeatureKey = 'component-store';
 export const globalCsConfig = componentStoreConfig();
@@ -35,8 +35,6 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     private _state: WritableSignal<StateType> = signal(this.initialState);
     private selectableState = createSelectableSignalState(this._state);
     state: Signal<StateType> = this.selectableState.select();
-
-    private sub: Subscription;
 
     private dispatcher(
         stateOrCallback: StateOrCallback<StateType>,
@@ -62,7 +60,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         const combinedMetaReducer = combineMetaReducers(metaReducers);
         const reducer = combinedMetaReducer(createComponentStoreReducer(initialState));
 
-        this.sub = this.actionsOnQueue.actions$.subscribe((action) => {
+        this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
             const newState: StateType = reducer(this.state(), action);
             this._state.set(newState);
         });
@@ -90,8 +88,6 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
         });
-
-        this.sub.unsubscribe();
     }
 }
 
