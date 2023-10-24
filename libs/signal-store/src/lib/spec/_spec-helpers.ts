@@ -1,8 +1,8 @@
 import { Action, ComponentStoreExtension, ExtensionId, MetaReducer } from '@mini-rx/common';
-import { dispatch, reducerManager } from '../store-core';
+import { dispatch, getReducerManager } from '../store-core';
 
 export function resetStoreConfig() {
-    reducerManager._reducerStateSource.next({ featureReducers: {}, metaReducers: [] });
+    getReducerManager()._updateStateAndReducer({ featureReducers: {}, metaReducers: [] });
     dispatch({ type: 'resetStoreConfig' }); // Trigger action to recalculate state
 }
 

@@ -40,7 +40,6 @@ describe('createReducerManager', () => {
     it('should set feature reducers', () => {
         const manager = createReducerManager();
         let nextState: AppState;
-        let reducer: Reducer<AppState>;
 
         manager.setFeatureReducers({
             feature1: counterReducer,
@@ -48,18 +47,16 @@ describe('createReducerManager', () => {
             feature3: counterReducer,
         });
 
-        manager.getReducerObservable().subscribe((v) => {
-            reducer = v;
-        });
+        const reducer: Reducer<AppState> = manager.getReducer();
 
-        nextState = reducer!({}, { type: 'init' });
+        nextState = reducer({}, { type: 'init' });
         expect(nextState).toEqual({
             feature1: { counter: 1 },
             feature2: { counter: 1 },
             feature3: { counter: 1 },
         });
 
-        nextState = reducer!({}, { type: 'inc' });
+        nextState = reducer({}, { type: 'inc' });
         expect(nextState).toEqual({
             feature1: { counter: 2 },
             feature2: { counter: 2 },
@@ -70,22 +67,19 @@ describe('createReducerManager', () => {
     it('should add feature reducers', () => {
         const manager = createReducerManager();
         let nextState: AppState;
-        let reducer: Reducer<AppState>;
 
         manager.addFeatureReducer('feature1', counterReducer);
         manager.addFeatureReducer('feature2', counterReducer);
 
-        manager.getReducerObservable().subscribe((v) => {
-            reducer = v;
-        });
+        const reducer: Reducer<AppState> = manager.getReducer();
 
-        nextState = reducer!({}, { type: 'init' });
+        nextState = reducer({}, { type: 'init' });
         expect(nextState).toEqual({
             feature1: { counter: 1 },
             feature2: { counter: 1 },
         });
 
-        nextState = reducer!({}, { type: 'inc' });
+        nextState = reducer({}, { type: 'inc' });
         expect(nextState).toEqual({
             feature1: { counter: 2 },
             feature2: { counter: 2 },
@@ -95,7 +89,6 @@ describe('createReducerManager', () => {
     it('should remove feature reducers', () => {
         const manager = createReducerManager();
         let nextState: AppState;
-        let reducer: Reducer<AppState>;
 
         manager.setFeatureReducers({
             feature1: counterReducer,
@@ -103,11 +96,9 @@ describe('createReducerManager', () => {
             feature3: counterReducer,
         });
 
-        manager.getReducerObservable().subscribe((v) => {
-            reducer = v;
-        });
+        let reducer: Reducer<AppState> = manager.getReducer();
 
-        nextState = reducer!({}, { type: 'init' });
+        nextState = reducer({}, { type: 'init' });
         expect(nextState).toEqual({
             feature1: { counter: 1 },
             feature2: { counter: 1 },
@@ -116,7 +107,9 @@ describe('createReducerManager', () => {
 
         manager.removeFeatureReducer('feature2');
 
-        nextState = reducer!({}, { type: 'abc' }); // Any action triggers the recalculation of state
+        reducer = manager.getReducer();
+
+        nextState = reducer({}, { type: 'abc' }); // Any action triggers the recalculation of state
         expect(nextState).toEqual({
             feature1: { counter: 1 },
             feature3: { counter: 1 },
@@ -156,15 +149,11 @@ describe('createReducerManager', () => {
         manager.addFeatureReducer('feature1', counterStringReducer, [metaReducerForFeature]);
         manager.addMetaReducers(metaReducer);
 
-        let reducer: Reducer<AppState>;
+        const reducer: Reducer<AppState> = manager.getReducer();
         let nextState: AppState;
 
-        manager.getReducerObservable().subscribe((v) => {
-            reducer = v;
-        });
-
-        nextState = reducer!({}, { type: 'init' });
-        nextState = reducer!(nextState, { type: 'inc', payload: '4' });
+        nextState = reducer({}, { type: 'init' });
+        nextState = reducer(nextState, { type: 'inc', payload: '4' });
 
         expect(nextState).toEqual({
             feature1: {
@@ -196,13 +185,8 @@ describe('createReducerManager', () => {
             counter: 1,
         });
 
-        let reducer: Reducer<AppState>;
-
-        manager.getReducerObservable().subscribe((v) => {
-            reducer = v;
-        });
-
-        const nextState = reducer!({}, { type: 'init' });
+        const reducer: Reducer<AppState> = manager.getReducer();
+        const nextState = reducer({}, { type: 'init' });
 
         expect(nextState).toEqual({
             feature1: {

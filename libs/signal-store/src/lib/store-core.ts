@@ -2,7 +2,6 @@ import { signal, WritableSignal } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
     Action,
-    Actions,
     AppState,
     createActionsOnQueue,
     createMiniRxActionType,
@@ -16,6 +15,7 @@ import {
     MetaReducer,
     OperationType,
     Reducer,
+    ReducerManager,
     sortExtensions,
     StoreConfig,
     StoreExtension,
@@ -26,31 +26,33 @@ export let hasUndoExtension = false;
 let isStoreInitialized = false;
 
 // REDUCER MANAGER
+let reducerManager: ReducerManager | undefined;
+
 // exported for testing purposes
-export const reducerManager = createReducerManager();
+export function getReducerManager(): ReducerManager {
+    if (!reducerManager) {
+        reducerManager = createReducerManager();
+    }
+    return reducerManager;
+}
 
 // ACTIONS
-const actionsOnQueue = createActionsOnQueue();
-export const actions$: Actions = actionsOnQueue.actions$;
+export const { actions$, dispatch } = createActionsOnQueue();
 
 // APP STATE
 const appState: WritableSignal<AppState> = signal({});
-export const selectableAppState = createSelectableSignalState(appState);
+export const { select } = createSelectableSignalState(appState);
 
-// Wire up the Redux Store: Init reducer state, subscribe to the actions, calc next state for every action
+// Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
 // Called by `configureStore` and `addReducer`
 function initStore(): void {
     if (isStoreInitialized) {
         return;
     }
 
-    let reducer: Reducer<AppState>;
-    // 👇 We could use `withLatestFrom` inside actionsOnQueue.actions$.pipe, but fewer operators = less bundle-size :)
-    reducerManager.getReducerObservable().subscribe((v) => (reducer = v));
-
-    // Listen to the Actions stream and update state accordingly
-    actionsOnQueue.actions$.subscribe((action) => {
-        const nextState: AppState = reducer(appState(), action);
+    // Listen to the Actions stream and update state
+    actions$.subscribe((action) => {
+        const nextState: AppState = getReducerManager().getReducer()(appState(), action);
         appState.set(nextState);
     });
 
@@ -61,7 +63,7 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
     initStore();
 
     if (config.metaReducers) {
-        reducerManager.addMetaReducers(...config.metaReducers);
+        getReducerManager().addMetaReducers(...config.metaReducers);
     }
 
     if (config.extensions) {
@@ -69,7 +71,7 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
     }
 
     if (config.reducers) {
-        reducerManager.setFeatureReducers(config.reducers);
+        getReducerManager().setFeatureReducers(config.reducers);
     }
 
     if (config.initialState) {
@@ -88,12 +90,17 @@ export function addFeature<StateType extends object>(
     } = {}
 ): void {
     initStore();
-    reducerManager.addFeatureReducer(featureKey, reducer, config.metaReducers, config.initialState);
+    getReducerManager().addFeatureReducer(
+        featureKey,
+        reducer,
+        config.metaReducers,
+        config.initialState
+    );
     dispatch({ type: createMiniRxActionType(OperationType.INIT, featureKey) });
 }
 
 export function removeFeature(featureKey: string): void {
-    reducerManager.removeFeatureReducer(featureKey);
+    getReducerManager().removeFeatureReducer(featureKey);
     dispatch({ type: createMiniRxActionType(OperationType.DESTROY, featureKey) });
 }
 
@@ -119,16 +126,12 @@ export function addExtension(extension: StoreExtension): void {
     const metaReducer: MetaReducer<any> | void = extension.init();
 
     if (metaReducer) {
-        reducerManager.addMetaReducers(metaReducer);
+        getReducerManager().addMetaReducers(metaReducer);
     }
 
     if (extension.id === ExtensionId.UNDO) {
         hasUndoExtension = true;
     }
-}
-
-export function dispatch(action: Action): void {
-    actionsOnQueue.dispatch(action);
 }
 
 export function updateAppState(state: AppState): void {

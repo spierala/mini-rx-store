@@ -17,7 +17,7 @@ import { StoreModule } from '../modules/store.module';
 import { Store } from '../store';
 import { Component, EnvironmentInjector, inject, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { reducerManager } from '../store-core';
+import { getReducerManager } from '../store-core';
 
 let store: Store;
 let actions: Actions;
@@ -391,7 +391,7 @@ describe('FeatureStore', () => {
             };
         }
 
-        reducerManager.addMetaReducers(metaReducer);
+        getReducerManager().addMetaReducers(metaReducer);
 
         userFeature.updateCity('NY');
         counterFeature.increment();

@@ -29,7 +29,7 @@ export { createFeatureStoreReducer } from './lib/create-feature-store-reducer';
 export { createComponentStoreReducer } from './lib/create-component-store-reducer';
 export { generateId } from './lib/generate-id';
 export { calculateExtensions } from './lib/calculate-extensions';
-export { createReducerManager } from './lib/reducer-manager';
+export { createReducerManager, ReducerManager } from './lib/reducer-manager';
 export { componentStoreConfig } from './lib/component-store-config';
 
 export { ExtensionId } from './lib/enums';
