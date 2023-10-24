@@ -29,7 +29,6 @@ export interface StoreConfig<T> {
     initialState?: T;
     metaReducers?: MetaReducer<AppState>[];
     extensions?: StoreExtension[];
-    combineReducersFn?: CombineReducersFn<AppState>;
 }
 
 // Used for the Redux API: Store.feature / StoreModule.forFeature
@@ -52,8 +51,6 @@ export type MetaReducer<StateType> = (reducer: Reducer<StateType>) => Reducer<St
 export type ReducerDictionary<T> = {
     [p in keyof T]: Reducer<T[p]>;
 };
-
-export type CombineReducersFn<T> = (reducers: ReducerDictionary<T>) => Reducer<T>;
 
 export type StateOrCallback<StateType> =
     | Partial<StateType>

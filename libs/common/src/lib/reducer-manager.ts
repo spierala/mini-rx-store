@@ -29,7 +29,7 @@ export function createReducerManager() {
         metaReducers: [],
     };
 
-    let _reducer: Reducer<AppState>;
+    let reducer: Reducer<AppState>;
 
     function _updateStateAndReducer(v: Partial<ReducerState>): void {
         state = {
@@ -39,7 +39,7 @@ export function createReducerManager() {
 
         const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(state.metaReducers);
         const combinedReducer: Reducer<AppState> = combineReducers(state.featureReducers);
-        _reducer = combinedMetaReducer(combinedReducer);
+        reducer = combinedMetaReducer(combinedReducer);
     }
 
     function setFeatureReducers(featureReducers: ReducerDictionary<AppState>) {
@@ -89,7 +89,7 @@ export function createReducerManager() {
         addFeatureReducer,
         removeFeatureReducer,
         addMetaReducers,
-        getReducer: () => _reducer,
+        getReducer: () => reducer,
         // Exported for testing
         _updateStateAndReducer,
     };
