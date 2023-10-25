@@ -1,8 +1,9 @@
 import { DestroyRef, EnvironmentInjector, inject, Signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';
 import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
 import { miniRxIsSignal } from './utils';
+import { miniRxToObservable } from './mini-rx-to-observable';
 
 export function createConnectFn<StateType>(
     dispatch: (
@@ -22,7 +23,7 @@ export function createConnectFn<StateType>(
         keys.forEach((key) => {
             const observableOrSignal: Observable<ValueType> | Signal<ValueType> = dict[key];
             const obs$ = miniRxIsSignal(observableOrSignal)
-                ? toObservable(observableOrSignal, { injector })
+                ? miniRxToObservable(observableOrSignal, { injector })
                 : observableOrSignal;
             obs$.pipe(takeUntilDestroyed(destroyRef)).subscribe((v) => {
                 dispatch(
