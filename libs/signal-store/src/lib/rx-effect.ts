@@ -1,7 +1,7 @@
-import { isObservable, Observable, Subject } from 'rxjs';
 import { DestroyRef, inject, Signal } from '@angular/core';
-import { defaultEffectsErrorHandler } from '@mini-rx/common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { isObservable, Observable, Subject } from 'rxjs';
+import { defaultEffectsErrorHandler } from '@mini-rx/common';
 import { miniRxIsSignal } from './utils';
 
 export function createRxEffectFn() {

@@ -1,7 +1,6 @@
 import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
-import { Observable, of, pipe, Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
 import { ComponentStoreConfig } from '@mini-rx/common';
 import { TestBed } from '@angular/core/testing';

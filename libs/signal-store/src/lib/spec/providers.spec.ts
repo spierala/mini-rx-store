@@ -1,17 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { Injectable } from '@angular/core';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { Action, Actions, Reducer, StoreExtension } from '@mini-rx/common';
-import { createRxEffect, ofType } from '@mini-rx/common';
+import { catchError, map, mergeMap, of } from 'rxjs';
+import { Action, Actions, createRxEffect, ofType, Reducer, StoreExtension } from '@mini-rx/common';
 import { FeatureStore } from '../feature-store';
 import { Store } from '../store';
-import { createComponentStore, globalCsConfig } from '../component-store';
-import {
-    MockImmutableStateExtension,
-    MockLoggerExtension,
-    MockUndoExtension,
-} from './_spec-helpers';
+import { globalCsConfig } from '../component-store';
+import { MockImmutableStateExtension, MockLoggerExtension } from './_spec-helpers';
 import {
     provideComponentStoreConfig,
     provideEffects,

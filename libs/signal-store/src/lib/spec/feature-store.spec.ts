@@ -1,6 +1,5 @@
 import { createFeatureStore, FeatureStore } from '../feature-store';
-import { mergeMap, tap } from 'rxjs/operators';
-import { Observable, of, Subject } from 'rxjs';
+import { mergeMap, Observable, of, Subject, tap } from 'rxjs';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
 import { cold, hot } from 'jest-marbles';
 import {

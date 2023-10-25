@@ -2,6 +2,7 @@ import { Store } from '../store';
 import {
     Action,
     Actions,
+    createRxEffect,
     ExtensionId,
     FeatureConfig,
     MetaReducer,
@@ -11,7 +12,7 @@ import {
     StoreExtension,
 } from '@mini-rx/common';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
-import { mapTo, Observable, of, take } from 'rxjs';
+import { catchError, map, mapTo, mergeMap, Observable, of, take, tap } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
 import {
@@ -23,8 +24,6 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
 import { addFeature, removeFeature, rxEffect } from '../store-core';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { createRxEffect } from '@mini-rx/common';
 
 interface ActionWithPayload extends Action {
     payload?: any;

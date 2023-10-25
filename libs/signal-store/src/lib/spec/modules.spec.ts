@@ -1,20 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Injectable, NgModule } from '@angular/core';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, map, mergeMap, of } from 'rxjs';
 import { StoreModule } from '../modules/store.module';
 import { EffectsModule } from '../modules/effects.module';
 import { ComponentStoreModule } from '../modules/component-store.module';
-import { Action, Actions, ofType, Reducer, StoreExtension } from '@mini-rx/common';
-import { createRxEffect } from '@mini-rx/common';
+import { Action, Actions, createRxEffect, ofType, Reducer, StoreExtension } from '@mini-rx/common';
 import { FeatureStore } from '../feature-store';
 import { Store } from '../store';
-import { createComponentStore, globalCsConfig } from '../component-store';
-import {
-    MockImmutableStateExtension,
-    MockLoggerExtension,
-    MockUndoExtension,
-} from './_spec-helpers';
+import { globalCsConfig } from '../component-store';
+import { MockImmutableStateExtension, MockLoggerExtension } from './_spec-helpers';
 
 const loadAction: Action = {
     type: 'LOAD',

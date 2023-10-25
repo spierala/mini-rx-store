@@ -27,7 +27,6 @@ let isStoreInitialized = false;
 
 // REDUCER MANAGER
 let reducerManager: ReducerManager | undefined;
-
 // exported for testing purposes
 export function getReducerManager(): ReducerManager {
     if (!reducerManager) {
@@ -65,15 +64,12 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
     if (config.metaReducers) {
         getReducerManager().addMetaReducers(...config.metaReducers);
     }
-
     if (config.extensions) {
         sortExtensions(config.extensions).forEach((extension) => addExtension(extension));
     }
-
     if (config.reducers) {
         getReducerManager().setFeatureReducers(config.reducers);
     }
-
     if (config.initialState) {
         appState.set(config.initialState);
     }
@@ -114,21 +110,18 @@ export function rxEffect(effect$: any): void {
             const metaData: EffectConfig = effect$[EFFECT_METADATA_KEY];
             shouldDispatch = !!metaData.dispatch;
         }
-
         if (shouldDispatch) {
             dispatch(action);
         }
     });
 }
 
-// exported for testing purposes
-export function addExtension(extension: StoreExtension): void {
+function addExtension(extension: StoreExtension): void {
     const metaReducer: MetaReducer<any> | void = extension.init();
 
     if (metaReducer) {
         getReducerManager().addMetaReducers(metaReducer);
     }
-
     if (extension.id === ExtensionId.UNDO) {
         hasUndoExtension = true;
     }

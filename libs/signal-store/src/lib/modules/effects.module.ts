@@ -32,12 +32,12 @@ import {
     Type,
 } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Action } from '@mini-rx/common';
 import {
     fromClassesWithEffectsToClassProviders,
     fromObjectsWithEffectsToEffects,
 } from '../effects-mapper';
 import { StoreFeatureModule, StoreRootModule } from './store.module';
-import { Action } from '@mini-rx/common';
 import { rxEffect } from '../store-core';
 
 const OBJECTS_WITH_EFFECTS = new InjectionToken('@mini-rx/objectsWithEffects');

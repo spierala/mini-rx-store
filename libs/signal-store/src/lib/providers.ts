@@ -1,4 +1,13 @@
 import {
+    ENVIRONMENT_INITIALIZER,
+    EnvironmentProviders,
+    inject,
+    InjectionToken,
+    makeEnvironmentProviders,
+    Type,
+} from '@angular/core';
+import { Observable } from 'rxjs';
+import {
     Action,
     Actions,
     AppState,
@@ -7,17 +16,8 @@ import {
     Reducer,
     StoreConfig,
 } from '@mini-rx/common';
-import {
-    ENVIRONMENT_INITIALIZER,
-    EnvironmentProviders,
-    inject,
-    InjectionToken,
-    makeEnvironmentProviders,
-    Type,
-} from '@angular/core';
 import { actions$, addFeature, rxEffect } from './store-core';
 import { Store } from './store';
-import { Observable } from 'rxjs';
 import { globalCsConfig } from './component-store';
 import {
     fromClassesWithEffectsToClassProviders,

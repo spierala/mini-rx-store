@@ -1,8 +1,8 @@
-import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
 import { DestroyRef, EnvironmentInjector, inject, Signal } from '@angular/core';
-import { Observable } from 'rxjs';
-import { miniRxIsSignal } from './utils';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
+import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
+import { miniRxIsSignal } from './utils';
 
 export function createConnectFn<StateType>(
     dispatch: (
