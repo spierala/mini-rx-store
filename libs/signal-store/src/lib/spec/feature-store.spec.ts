@@ -42,8 +42,7 @@ function setup(
 }
 
 @Component({
-    template: '',
-    standalone: true,
+    template: undefined,
 })
 class MyComponent {}
 
@@ -442,8 +441,7 @@ describe('FeatureStore', () => {
 
     it('should call FeatureStore.destroy when component is destroyed', () => {
         @Component({
-            template: '',
-            standalone: true,
+            template: undefined,
         })
         class MyComponent {
             fs = createFeatureStore('tempFs', counterInitialState);

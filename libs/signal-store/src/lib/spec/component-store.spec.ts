@@ -141,7 +141,7 @@ describe('ComponentStore', () => {
         cs.setState({ counter: 4 });
         selectedState();
 
-        expect(getCounterSpy.mock.calls).toEqual([[1], [2], [2], [3], [3], [4]]); // No memoization: because a new state object is created for every call of `update`
+        expect(getCounterSpy.mock.calls).toEqual([[1], [2], [2], [3], [3], [4]]); // No memoization: because a new state object is created for every call of `setState`
         expect(getSquareCounterSpy.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
 
@@ -194,13 +194,25 @@ describe('ComponentStore', () => {
     });
 
     it('should dispatch an Action on destroy', () => {
-        // With initial state
-        const cs = setup(counterInitialState);
+        @Component({
+            template: undefined,
+        })
+        class SomeComponent {
+            public cs = createComponentStore({});
+        }
+
+        TestBed.configureTestingModule({
+            declarations: [SomeComponent],
+        }).compileComponents();
+
+        const fixture = TestBed.createComponent(SomeComponent);
+        const component = fixture.componentInstance;
+        expect(component).toBeDefined();
 
         const spy = jest.fn();
-        cs['actionsOnQueue'].actions$.subscribe(spy);
+        component.cs['actionsOnQueue'].actions$.subscribe(spy);
 
-        cs['destroy']();
+        fixture.componentRef.destroy();
 
         expect(spy.mock.calls).toEqual([
             [
@@ -211,7 +223,7 @@ describe('ComponentStore', () => {
         ]);
     });
 
-    it('should unsubscribe from setState Observable on destroy', () => {
+    it('should unsubscribe from connected Observable on destroy', () => {
         @Component({
             selector: 'mini-rx-my-comp',
             template: ``,

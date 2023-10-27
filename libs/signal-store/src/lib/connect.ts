@@ -1,9 +1,9 @@
-import { DestroyRef, EnvironmentInjector, inject, Signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EnvironmentInjector, inject, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
 import { miniRxIsSignal } from './utils';
 import { miniRxToObservable } from './mini-rx-to-observable';
+import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 export function createConnectFn<StateType>(
     dispatch: (
@@ -12,8 +12,8 @@ export function createConnectFn<StateType>(
         name: string | undefined
     ) => Action
 ) {
+    const subSink = createSignalStoreSubSink();
     const injector = inject(EnvironmentInjector);
-    const destroyRef = inject(DestroyRef);
 
     function connect<K extends keyof StateType, ValueType = StateType[K]>(
         dict: Record<K, Observable<ValueType> | Signal<ValueType>>
@@ -25,7 +25,7 @@ export function createConnectFn<StateType>(
             const obs$ = miniRxIsSignal(observableOrSignal)
                 ? miniRxToObservable(observableOrSignal, { injector })
                 : observableOrSignal;
-            obs$.pipe(takeUntilDestroyed(destroyRef)).subscribe((v) => {
+            subSink.sink = obs$.subscribe((v) => {
                 dispatch(
                     {
                         [key]: v,

@@ -1,12 +1,12 @@
-import { DestroyRef, inject, Signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Signal } from '@angular/core';
 import { isObservable, Observable, Subject } from 'rxjs';
 import { defaultEffectsErrorHandler } from '@mini-rx/common';
 import { miniRxIsSignal } from './utils';
 import { miniRxToObservable } from './mini-rx-to-observable';
+import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 export function createRxEffectFn() {
-    const destroyRef = inject(DestroyRef);
+    const subSink = createSignalStoreSubSink();
 
     function rxEffect<
         // Credits for the typings go to NgRx (Component Store): https://github.com/ngrx/platform/blob/13.1.0/modules/component-store/src/component-store.ts#L279-L291
@@ -27,7 +27,7 @@ export function createRxEffectFn() {
     >(effectFn: (origin$: OriginType) => Observable<unknown>): ReturnType {
         const subject = new Subject<ObservableType>();
         const effect$ = effectFn(subject as OriginType);
-        effect$.pipe(defaultEffectsErrorHandler, takeUntilDestroyed(destroyRef)).subscribe();
+        subSink.sink = effect$.pipe(defaultEffectsErrorHandler).subscribe();
 
         return ((
             observableOrValue?: ObservableType | Observable<ObservableType> | Signal<ObservableType>
@@ -38,9 +38,7 @@ export function createRxEffectFn() {
                 : observableOrValue;
 
             isObservable(observableOrValue)
-                ? observableOrValue
-                      .pipe(takeUntilDestroyed(destroyRef))
-                      .subscribe((v) => subject.next(v))
+                ? (subSink.sink = observableOrValue.subscribe((v) => subject.next(v)))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }

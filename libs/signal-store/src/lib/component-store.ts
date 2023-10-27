@@ -1,5 +1,4 @@
 import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
     Action,
     calculateExtensions,
@@ -23,6 +22,7 @@ import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';
 import { createUpdateFn } from './update';
+import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 const csFeatureKey = 'component-store';
 export const globalCsConfig = componentStoreConfig();
@@ -50,6 +50,8 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     }
 
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {
+        inject(DestroyRef).onDestroy(() => this.destroy());
+
         const extensions: ComponentStoreExtension[] = calculateExtensions(
             config,
             globalCsConfig.get()
@@ -60,7 +62,8 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         const combinedMetaReducer = combineMetaReducers(metaReducers);
         const reducer = combinedMetaReducer(createComponentStoreReducer(initialState));
 
-        this.actionsOnQueue.actions$.pipe(takeUntilDestroyed()).subscribe((action) => {
+        const subSink = createSignalStoreSubSink();
+        subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
             const newState: StateType = reducer(this.state(), action);
             this._state.set(newState);
         });
@@ -68,8 +71,6 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
         });
-
-        inject(DestroyRef).onDestroy(() => this.destroy());
     }
 
     undo(action: Action): void {
