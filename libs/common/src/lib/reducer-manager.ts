@@ -89,8 +89,8 @@ export function createReducerManager() {
         addFeatureReducer,
         removeFeatureReducer,
         addMetaReducers,
-        getReducer: () => reducer,
-        // Exported for testing
-        _updateStateAndReducer,
+        get reducer(): Reducer<AppState> {
+            return reducer;
+        },
     };
 }

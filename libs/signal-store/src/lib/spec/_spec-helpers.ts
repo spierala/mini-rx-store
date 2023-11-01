@@ -1,9 +1,9 @@
 import { Action, ComponentStoreExtension, ExtensionId, MetaReducer } from '@mini-rx/common';
-import { dispatch, getReducerManager } from '../store-core';
+import { destroy } from '../store-core';
+import { v4 as uuid } from 'uuid';
 
-export function resetStoreConfig() {
-    getReducerManager()._updateStateAndReducer({ featureReducers: {}, metaReducers: [] });
-    dispatch({ type: 'resetStoreConfig' }); // Trigger action to recalculate state
+export function destroyStore() {
+    destroy();
 }
 
 export interface UserState {
@@ -74,4 +74,10 @@ export class MockImmutableStateExtension implements ComponentStoreExtension {
     init(): MetaReducer<any> {
         return (v) => v;
     }
+}
+
+export function createUniqueAction(): Action {
+    return {
+        type: uuid(),
+    };
 }

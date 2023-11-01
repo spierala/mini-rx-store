@@ -23,6 +23,7 @@
         "test:mini-rx-store-ng:coverage": "nx test mini-rx-store-ng --codeCoverage",
         "test:signal-store": "nx test signal-store",
         "test:signal-store:watch": "nx test signal-store --watch",
+        "test:signal-store:coverage": "nx test signal-store --codeCoverage",
         "test:common": "nx test common",
         "test:common:watch": "nx test common --watch",
         "test:common:coverage": "nx test common --codeCoverage",

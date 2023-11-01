@@ -47,7 +47,7 @@ describe('createReducerManager', () => {
             feature3: counterReducer,
         });
 
-        const reducer: Reducer<AppState> = manager.getReducer();
+        const reducer: Reducer<AppState> = manager.reducer;
 
         nextState = reducer({}, { type: 'init' });
         expect(nextState).toEqual({
@@ -71,7 +71,7 @@ describe('createReducerManager', () => {
         manager.addFeatureReducer('feature1', counterReducer);
         manager.addFeatureReducer('feature2', counterReducer);
 
-        const reducer: Reducer<AppState> = manager.getReducer();
+        const reducer: Reducer<AppState> = manager.reducer;
 
         nextState = reducer({}, { type: 'init' });
         expect(nextState).toEqual({
@@ -96,7 +96,7 @@ describe('createReducerManager', () => {
             feature3: counterReducer,
         });
 
-        let reducer: Reducer<AppState> = manager.getReducer();
+        let reducer: Reducer<AppState> = manager.reducer;
 
         nextState = reducer({}, { type: 'init' });
         expect(nextState).toEqual({
@@ -107,7 +107,7 @@ describe('createReducerManager', () => {
 
         manager.removeFeatureReducer('feature2');
 
-        reducer = manager.getReducer();
+        reducer = manager.reducer;
 
         nextState = reducer({}, { type: 'abc' }); // Any action triggers the recalculation of state
         expect(nextState).toEqual({
@@ -149,7 +149,7 @@ describe('createReducerManager', () => {
         manager.addFeatureReducer('feature1', counterStringReducer, [metaReducerForFeature]);
         manager.addMetaReducers(metaReducer);
 
-        const reducer: Reducer<AppState> = manager.getReducer();
+        const reducer: Reducer<AppState> = manager.reducer;
         let nextState: AppState;
 
         nextState = reducer({}, { type: 'init' });
@@ -185,7 +185,7 @@ describe('createReducerManager', () => {
             counter: 1,
         });
 
-        const reducer: Reducer<AppState> = manager.getReducer();
+        const reducer: Reducer<AppState> = manager.reducer;
         const nextState = reducer({}, { type: 'init' });
 
         expect(nextState).toEqual({

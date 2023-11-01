@@ -4,7 +4,7 @@ import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
 import { ComponentStoreConfig } from '@mini-rx/common';
 import { TestBed } from '@angular/core/testing';
-import { Component, Injectable, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 function setup<T extends object>(
     initialState: T,
@@ -52,12 +52,11 @@ describe('ComponentStore', () => {
 
         expect(selectedState()).toBe(1);
 
-        // setState with Observable
+        // connect with Observable
         cs.connect({ counter: counterState$ });
 
         expect(selectedState()).toBe(5);
 
-        // "normal" setState
         cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toBe(6);
 
@@ -65,16 +64,8 @@ describe('ComponentStore', () => {
         expect(selectedState()).toBe(7);
     });
 
-    it('should update state using a Signal', () => {
-        @Injectable({ providedIn: 'root' })
-        class MyComponentStore extends ComponentStore<CounterState> {
-            constructor() {
-                super(counterInitialState);
-            }
-        }
-
+    it('should connect state with a Signal', () => {
         @Component({
-            selector: 'mini-rx-my-comp',
             template: `
                 <span>{{ selectedCounterState() }}</span>
             `,
@@ -82,12 +73,11 @@ describe('ComponentStore', () => {
         class WelcomeComponent {
             counterSignal = signal(2);
 
-            selectedCounterState = this.myCs.select((state) => state.counter);
-
-            constructor(public myCs: MyComponentStore) {}
+            private cs = createComponentStore(counterInitialState);
+            selectedCounterState = this.cs.select((state) => state.counter);
 
             startUpdatingStateWithSignal() {
-                this.myCs.connect({ counter: this.counterSignal });
+                this.cs.connect({ counter: this.counterSignal });
             }
         }
 
@@ -101,15 +91,15 @@ describe('ComponentStore', () => {
 
         const compElement: HTMLElement = fixture.nativeElement;
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('1');
+        expect(compElement.textContent).toContain('1'); // From store initial state
 
         component.startUpdatingStateWithSignal();
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('2');
+        expect(compElement.textContent).toContain('2'); // From signal initial state
 
         component.counterSignal.set(3);
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('3');
+        expect(compElement.textContent).toContain('3'); // From signal.set
     });
 
     it('should select state with memoized selectors', () => {
@@ -171,8 +161,10 @@ describe('ComponentStore', () => {
 
         spy.mockReset();
 
-        // With setState name (when passing an Observable to setState)
-        cs.connect({ counter: of(1, 2) });
+        // With connection name (when passing an Observable to connect)
+        cs.connect({
+            counter: of(1, 2),
+        });
         expect(spy.mock.calls).toEqual([
             [
                 {
@@ -224,9 +216,10 @@ describe('ComponentStore', () => {
     });
 
     it('should unsubscribe from connected Observable on destroy', () => {
+        const spy = jest.fn();
+
         @Component({
-            selector: 'mini-rx-my-comp',
-            template: ``,
+            template: undefined,
         })
         class WelcomeComponent {
             private cs = createComponentStore(counterInitialState);
@@ -234,7 +227,7 @@ describe('ComponentStore', () => {
             selectedState = this.cs.select((state) => state.counter);
 
             useObservableToUpdateState() {
-                this.cs.connect({ counter: this.counterSource });
+                this.cs.connect({ counter: this.counterSource.pipe(tap((v) => spy(v))) });
             }
 
             updateObservableValue(v: number) {
@@ -251,7 +244,6 @@ describe('ComponentStore', () => {
         expect(component).toBeDefined();
 
         component.useObservableToUpdateState();
-
         expect(component.selectedState()).toBe(1);
 
         component.updateObservableValue(1);
@@ -269,7 +261,6 @@ describe('ComponentStore', () => {
         const effectCallback = jest.fn<void, [number]>();
 
         @Component({
-            selector: 'mini-rx-my-comp',
             template: ``,
         })
         class WelcomeComponent {
@@ -285,10 +276,6 @@ describe('ComponentStore', () => {
             updateObservableValue(v: number) {
                 this.counterSource.next(v);
             }
-
-            updateEffectValueImperatively(v: number) {
-                this.myEffect(v);
-            }
         }
 
         TestBed.configureTestingModule({
@@ -302,16 +289,11 @@ describe('ComponentStore', () => {
         component.updateObservableValue(1);
         component.updateObservableValue(2);
 
-        // Trigger effect imperatively (just to cover both ways to trigger an effect)
-        component.updateEffectValueImperatively(3);
-        component.updateEffectValueImperatively(4);
-
         fixture.componentRef.destroy();
 
-        component.updateObservableValue(5);
-        component.updateEffectValueImperatively(6);
+        component.updateObservableValue(3);
 
-        expect(effectCallback.mock.calls).toEqual([[1], [2], [3], [4]]);
+        expect(effectCallback.mock.calls).toEqual([[1], [2]]);
     });
 
     it('should throw when calling `configureComponentStores` more than once', () => {

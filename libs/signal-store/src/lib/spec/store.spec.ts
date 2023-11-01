@@ -2,6 +2,7 @@ import { Store } from '../store';
 import {
     Action,
     Actions,
+    AppState,
     createRxEffect,
     ExtensionId,
     FeatureConfig,
@@ -19,7 +20,8 @@ import {
     counterInitialState,
     counterReducer,
     CounterState,
-    resetStoreConfig,
+    createUniqueAction,
+    destroyStore,
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
@@ -76,8 +78,6 @@ function userReducer(state: UserState = userInitialState, action: ActionWithPayl
                 ...state,
                 ...action.payload,
             };
-        case 'resetUser':
-            return userInitialState;
         case 'incAge':
             return {
                 ...state,
@@ -97,9 +97,9 @@ const getUserFeatureState = createFeatureStateSelector<UserState>('user');
 const getFirstName = createSelector(getUserFeatureState, (user) => user.firstName);
 const getAge = createSelector(getUserFeatureState, (user) => user.age);
 
-class CounterFeatureState extends FeatureStore<CounterState> {
+class CounterFeatureStore extends FeatureStore<CounterState> {
     constructor() {
-        super('counter3', counterInitialState);
+        super('counterFs', counterInitialState);
     }
 
     increment() {
@@ -111,10 +111,10 @@ let store: Store;
 let actions: Actions;
 
 function setup(
-    config: StoreConfig<any> = {},
+    storeConfig: StoreConfig<AppState> = {},
     feature?: { key: string; reducer: Reducer<any>; config?: Partial<FeatureConfig<any>> }
-) {
-    let moduleImports: any[] = [StoreModule.forRoot(config)];
+): void {
+    let moduleImports: any[] = [StoreModule.forRoot(storeConfig)];
     if (feature) {
         moduleImports = [
             ...moduleImports,
@@ -132,7 +132,7 @@ function setup(
 
 describe('Store Config', () => {
     afterEach(() => {
-        resetStoreConfig();
+        destroyStore();
     });
 
     it('should initialize the store with an empty object', () => {
@@ -185,7 +185,6 @@ describe('Store Config', () => {
             },
         });
 
-        const spy = jest.fn();
         const selectedState = store.select((state) => state);
 
         expect(selectedState()).toEqual({
@@ -203,7 +202,7 @@ describe('Store Config', () => {
                 user: {},
             };
 
-            function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducer1(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     rootMetaReducerSpy(state);
                     return reducer(state, action);
@@ -221,14 +220,14 @@ describe('Store Config', () => {
         it('should call root meta reducers from left to right', () => {
             const callOrder: string[] = [];
 
-            function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducer1(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta1');
                     return reducer(state, action);
                 };
             }
 
-            function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducer2(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta2');
                     return reducer(state, action);
@@ -245,7 +244,7 @@ describe('Store Config', () => {
         it('should call root meta reducers from extensions depending on sortOrder', () => {
             const callOrder: string[] = [];
 
-            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta1');
                     return reducer(state, action);
@@ -256,12 +255,12 @@ describe('Store Config', () => {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
                 override sortOrder = 3;
 
-                init(): MetaReducer<any> {
+                init(): MetaReducer<AppState> {
                     return rootMetaReducerForExtension;
                 }
             }
 
-            function rootMetaReducerForExtension2(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension2(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta2');
                     return reducer(state, action);
@@ -272,12 +271,12 @@ describe('Store Config', () => {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
                 override sortOrder = 2;
 
-                init(): MetaReducer<any> {
+                init(): MetaReducer<AppState> {
                     return rootMetaReducerForExtension2;
                 }
             }
 
-            function rootMetaReducerForExtension3(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension3(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta3');
                     return reducer(state, action);
@@ -288,7 +287,7 @@ describe('Store Config', () => {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
                 override sortOrder = 1;
 
-                init(): MetaReducer<any> {
+                init(): MetaReducer<AppState> {
                     return rootMetaReducerForExtension3;
                 }
             }
@@ -307,12 +306,16 @@ describe('Store Config', () => {
                 '3.) feature meta reducers, ' +
                 '4.) feature reducer',
             () => {
-                function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+                const metaTestAction = createUniqueAction();
+
+                function rootMetaReducerForExtension(
+                    reducer: Reducer<AppState>
+                ): Reducer<AppState> {
                     return (state, action) => {
-                        if (action.type === 'metaTest') {
+                        if (action.type === metaTestAction.type) {
                             state = {
                                 ...state,
-                                metaTestFeature: state.metaTestFeature + 'x',
+                                metaTestFeature: state['metaTestFeature'] + 'x',
                             };
                         }
 
@@ -323,26 +326,26 @@ describe('Store Config', () => {
                 class Extension extends StoreExtension {
                     id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                    init(): MetaReducer<any> {
+                    init(): MetaReducer<AppState> {
                         return rootMetaReducerForExtension;
                     }
                 }
 
                 function aFeatureReducer(state = 'a', action: Action): string {
                     switch (action.type) {
-                        case 'metaTest':
+                        case metaTestAction.type:
                             return state + 'e';
                         default:
                             return state;
                     }
                 }
 
-                function rootMetaReducer1(reducer: Reducer<any>): Reducer<any> {
+                function rootMetaReducer1(reducer: Reducer<AppState>): Reducer<AppState> {
                     return (state, action) => {
-                        if (action.type === 'metaTest') {
+                        if (action.type === metaTestAction.type) {
                             state = {
                                 ...state,
-                                metaTestFeature: state.metaTestFeature + 'b',
+                                metaTestFeature: state['metaTestFeature'] + 'b',
                             };
                         }
 
@@ -350,12 +353,12 @@ describe('Store Config', () => {
                     };
                 }
 
-                function rootMetaReducer2(reducer: Reducer<any>): Reducer<any> {
+                function rootMetaReducer2(reducer: Reducer<AppState>): Reducer<AppState> {
                     return (state, action) => {
-                        if (action.type === 'metaTest') {
+                        if (action.type === metaTestAction.type) {
                             state = {
                                 ...state,
-                                metaTestFeature: state.metaTestFeature + 'c',
+                                metaTestFeature: state['metaTestFeature'] + 'c',
                             };
                         }
 
@@ -363,7 +366,7 @@ describe('Store Config', () => {
                     };
                 }
 
-                function inTheMiddleRootMetaReducer(reducer: Reducer<any>): Reducer<any> {
+                function inTheMiddleRootMetaReducer(reducer: Reducer<AppState>): Reducer<AppState> {
                     return (state, action) => {
                         const nextState = reducer(state, action);
 
@@ -375,7 +378,7 @@ describe('Store Config', () => {
 
                 function featureMetaReducer(reducer: Reducer<string>): Reducer<string> {
                     return (state, action) => {
-                        if (action.type === 'metaTest') {
+                        if (action.type === metaTestAction.type) {
                             state = state + 'd';
                         }
 
@@ -404,35 +407,34 @@ describe('Store Config', () => {
                 );
 
                 const selectedState = store.select(getMetaTestFeature);
-                store.dispatch({ type: 'metaTest' });
+                store.dispatch(metaTestAction);
                 expect(selectedState()).toEqual('abcxde');
             }
         );
 
         it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
-            expect(nextStateSpy).toHaveBeenCalledWith(
-                expect.objectContaining({ metaTestFeature: 'abcxde' })
-            );
-            expect(nextStateSpy).toHaveBeenCalledWith(
-                expect.objectContaining({ metaTestFeature: 'abcxde' })
-            );
+            expect(nextStateSpy.mock.calls).toEqual([
+                [{}],
+                [{ metaTestFeature: 'a' }],
+                [{ metaTestFeature: 'abcxde' }],
+            ]);
         });
     });
 });
 
 describe('Store', () => {
     afterEach(() => {
-        resetStoreConfig();
+        destroyStore();
     });
 
-    it('should run the redux reducers when a new Feature state is added', () => {
+    it('should run the Redux reducers when a new feature is added', () => {
         const reducerSpy = jest.fn();
 
         function someReducer() {
             reducerSpy();
         }
 
-        setup({ reducers: { user: userReducer } }, { key: 'oneMoreFeature', reducer: someReducer });
+        setup({}, { key: 'oneMoreFeature', reducer: someReducer });
 
         expect(reducerSpy).toHaveBeenCalledTimes(1);
     });
@@ -450,7 +452,7 @@ describe('Store', () => {
                 imports: [StoreModule.forFeature('alreadyExistingFeature', userReducer)],
             });
 
-            const store = TestBed.inject(Store); // inject Store to execute TestBed
+            TestBed.inject(Store); // inject Store to execute TestBed
         }).toThrowError('@mini-rx: Feature "alreadyExistingFeature" already exists.');
     });
 
@@ -458,9 +460,9 @@ describe('Store', () => {
         const spy = jest.fn();
         actions.subscribe(spy);
 
-        addFeature('oneMoreFeature3', (state) => state);
+        addFeature('products', (state) => state);
 
-        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/oneMoreFeature3/init' });
+        expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/products/init' });
     });
 
     it('should update the Feature state', () => {
@@ -630,9 +632,10 @@ describe('Store', () => {
 
     it('should call the reducer before running the effect', () => {
         const callOrder: string[] = [];
+        const someAction = createUniqueAction();
         const someReducer = (state = { value: 0 }, action: Action) => {
             switch (action.type) {
-                case 'someAction2':
+                case someAction.type:
                     callOrder.push('reducer');
                     return {
                         ...state,
@@ -658,7 +661,7 @@ describe('Store', () => {
 
         rxEffect(
             actions.pipe(
-                ofType('someAction2'),
+                ofType(someAction.type),
                 mergeMap(() => {
                     const selectedState = store.select((state) => state['someFeature'].value);
                     valueSpy(selectedState());
@@ -667,7 +670,7 @@ describe('Store', () => {
             )
         );
 
-        store.dispatch({ type: 'someAction2' });
+        store.dispatch(someAction);
 
         expect(callOrder).toEqual(['reducer', 'effect']);
         expect(valueSpy).toHaveBeenCalledWith(1); // Effect can select the updated state immediately
@@ -699,52 +702,34 @@ describe('Store', () => {
         const callLimit = 5000;
         const spy = jest.fn();
 
-        setup({
-            reducers: {
-                counter2: counter2Reducer,
-            },
-        });
-
-        function counter2Reducer(state: CounterState = counterInitialState, action: Action) {
-            switch (action.type) {
-                case 'counterEffectSuccess':
-                    return {
-                        ...state,
-                        counter: state.counter + 1,
-                    };
-                default:
-                    return state;
-            }
-        }
-
         rxEffect(
             actions.pipe(
                 take(callLimit),
                 tap(spy),
-                ofType('counterEffectStart'),
-                mergeMap(() => of({ type: 'counterEffectStart' }))
+                ofType('counter', 'counterStart'),
+                mergeMap(() => of({ type: 'counter' }))
             )
         );
 
-        store.dispatch({ type: 'counterEffectStart' });
+        store.dispatch({ type: 'counterStart' });
         expect(spy).toHaveBeenCalledTimes(callLimit);
     });
 
-    it('should select state from a Feature (which was created with `extends FeatureStore`)', () => {
+    it('should select Feature Store via Store.select', () => {
         TestBed.runInInjectionContext(() => {
-            const getCounter3FeatureState = createFeatureStateSelector<CounterState>('counter3');
-            const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.counter);
+            const getCounterFeatureState = createFeatureStateSelector<CounterState>('counterFs');
+            const getCounter = createSelector(getCounterFeatureState, (state) => state.counter);
 
-            const counterFeatureState = new CounterFeatureState();
+            const counterFeatureState = new CounterFeatureStore();
             counterFeatureState.increment();
 
-            const selectedState = store.select(getCounter3);
+            const selectedState = store.select(getCounter);
             expect(selectedState()).toBe(2);
         });
     });
 
     it('should overwrite reducers default state with a provided initialState', () => {
-        const featureKey = 'counterWithCustomInitialState';
+        const featureKey = 'counter';
         const customInitialState: CounterState = {
             counter: 2,
         };
@@ -774,26 +759,26 @@ describe('Store', () => {
 
         rxEffect(
             actions.pipe(
-                ofType('someAction3'),
+                ofType('someAction'),
                 mergeMap(() => {
                     return apiCallWithError().pipe(mapTo({ type: 'someActionSuccess' }));
                 })
             )
         );
 
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' });
-        store.dispatch({ type: 'someAction3' }); // #12 will not trigger the Api call anymore
-        store.dispatch({ type: 'someAction3' }); // #13 will not trigger the Api call anymore
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' });
+        store.dispatch({ type: 'someAction' }); // #12 will not trigger the Api call anymore
+        store.dispatch({ type: 'someAction' }); // #13 will not trigger the Api call anymore
 
         expect(spy).toHaveBeenCalledTimes(11); // Api call is performed 11 Times. First time + 10 re-subscriptions
 
@@ -801,46 +786,12 @@ describe('Store', () => {
             return `@mini-rx: An error occurred in the Effect. MiniRx resubscribed the Effect automatically and will do so ${times} more times.`;
         }
 
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(9)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(8)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(7)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(6)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(5)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(4)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(3)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(2)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(1)),
-            expect.any(Error)
-        );
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(getErrorMsg(0)),
-            expect.any(Error)
-        );
+        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].forEach((times) => {
+            expect(console.error).toHaveBeenCalledWith(
+                expect.stringContaining(getErrorMsg(times)),
+                expect.any(Error)
+            );
+        });
 
         expect(console.error).toHaveBeenCalledTimes(10); // Re-subscription with error logging stopped after 10 times
     });
@@ -857,9 +808,14 @@ describe('Store', () => {
     });
 });
 
-describe('Store Feature MetaReducers', () => {
-    const getMetaTestFeature = createFeatureStateSelector<CounterStringState>('metaTestFeature2');
-    const getCount = createSelector(getMetaTestFeature, (state) => state.count);
+describe('StoreModule.forFeature MetaReducers', () => {
+    const featureKey = 'someFeature';
+    const getFeatureState = createFeatureStateSelector<CounterStringState>(featureKey);
+    const getCount = createSelector(getFeatureState, (state) => state.count);
+
+    const metaTestAction: Action = {
+        type: 'someAction',
+    };
 
     interface CounterStringState {
         count: string;
@@ -870,7 +826,7 @@ describe('Store Feature MetaReducers', () => {
         action: Action
     ): CounterStringState {
         switch (action.type) {
-            case 'metaTest2':
+            case metaTestAction.type:
                 return {
                     ...state,
                     count: state.count + '3',
@@ -882,7 +838,7 @@ describe('Store Feature MetaReducers', () => {
 
     function featureMetaReducer1(reducer: Reducer<any>): Reducer<CounterStringState> {
         return (state, action: Action) => {
-            if (action.type === 'metaTest2') {
+            if (action.type === metaTestAction.type) {
                 state = {
                     ...state,
                     count: state.count + '1',
@@ -895,7 +851,7 @@ describe('Store Feature MetaReducers', () => {
 
     function featureMetaReducer2(reducer: Reducer<any>): Reducer<CounterStringState> {
         return (state, action: Action) => {
-            if (action.type === 'metaTest2') {
+            if (action.type === metaTestAction.type) {
                 state = {
                     ...state,
                     count: state.count + '2',
@@ -922,7 +878,7 @@ describe('Store Feature MetaReducers', () => {
         setup(
             {},
             {
-                key: 'metaTestFeature2',
+                key: featureKey,
                 reducer: aFeatureReducer,
                 config: {
                     metaReducers: [
@@ -937,14 +893,12 @@ describe('Store Feature MetaReducers', () => {
         const selectedState = store.select(getCount);
         expect(selectedState()).toBe('0');
 
-        store.dispatch({ type: 'metaTest2' });
+        store.dispatch(metaTestAction);
 
         expect(selectedState()).toBe('0123');
     });
 
     it('should calculate nextState also if nextState is calculated by a metaReducer in the "middle"', () => {
-        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0' });
-        expect(nextStateSpy).toHaveBeenCalledWith({ count: '0123' });
-        expect(nextStateSpy).toHaveBeenCalledTimes(2);
+        expect(nextStateSpy.mock.calls).toEqual([[{ count: '0' }], [{ count: '0123' }]]);
     });
 });

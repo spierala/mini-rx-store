@@ -1,5 +1,5 @@
 import { signal, WritableSignal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import {
     Action,
     AppState,
@@ -23,12 +23,11 @@ import {
 import { createSelectableSignalState } from './selectable-signal-state';
 
 export let hasUndoExtension = false;
-let isStoreInitialized = false;
+let actionSubscription: Subscription | undefined;
 
 // REDUCER MANAGER
 let reducerManager: ReducerManager | undefined;
-// exported for testing purposes
-export function getReducerManager(): ReducerManager {
+function getReducerManager(): ReducerManager {
     if (!reducerManager) {
         reducerManager = createReducerManager();
     }
@@ -45,17 +44,15 @@ export const { select } = createSelectableSignalState(appState);
 // Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
 // Called by `configureStore` and `addReducer`
 function initStore(): void {
-    if (isStoreInitialized) {
+    if (actionSubscription) {
         return;
     }
 
     // Listen to the Actions stream and update state
-    actions$.subscribe((action) => {
-        const nextState: AppState = getReducerManager().getReducer()(appState(), action);
+    actionSubscription = actions$.subscribe((action) => {
+        const nextState: AppState = getReducerManager().reducer(appState(), action);
         appState.set(nextState);
     });
-
-    isStoreInitialized = true;
 }
 
 export function configureStore(config: StoreConfig<AppState> = {}): void {
@@ -117,16 +114,22 @@ export function rxEffect(effect$: any): void {
 }
 
 function addExtension(extension: StoreExtension): void {
-    const metaReducer: MetaReducer<any> | void = extension.init();
+    const metaReducer: MetaReducer<AppState> | void = extension.init();
 
     if (metaReducer) {
         getReducerManager().addMetaReducers(metaReducer);
     }
-    if (extension.id === ExtensionId.UNDO) {
-        hasUndoExtension = true;
-    }
+
+    hasUndoExtension = extension.id === ExtensionId.UNDO;
 }
 
 export function updateAppState(state: AppState): void {
     appState.set(state);
+}
+
+// Used for testing
+export function destroy(): void {
+    actionSubscription?.unsubscribe();
+    actionSubscription = undefined;
+    reducerManager = undefined;
 }
