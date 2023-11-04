@@ -1,5 +1,5 @@
 import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
-import { counterInitialState, CounterState, userState } from './_spec-helpers';
+import { counterInitialState, CounterState, MockUndoExtension, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
 import { ComponentStoreConfig } from '@mini-rx/common';
@@ -70,7 +70,7 @@ describe('ComponentStore', () => {
                 <span>{{ selectedCounterState() }}</span>
             `,
         })
-        class WelcomeComponent {
+        class MyComponent {
             counterSignal = signal(2);
 
             private cs = createComponentStore(counterInitialState);
@@ -82,24 +82,23 @@ describe('ComponentStore', () => {
         }
 
         TestBed.configureTestingModule({
-            declarations: [WelcomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(WelcomeComponent);
+        const fixture = TestBed.createComponent(MyComponent);
         const component = fixture.componentInstance;
         expect(component).toBeDefined();
 
-        const compElement: HTMLElement = fixture.nativeElement;
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('1'); // From store initial state
+        expect(component.selectedCounterState()).toBe(1); // From store initial state
 
         component.startUpdatingStateWithSignal();
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('2'); // From signal initial state
+        expect(component.selectedCounterState()).toBe(2); // From signal initial state
 
         component.counterSignal.set(3);
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('3'); // From signal.set
+        expect(component.selectedCounterState()).toBe(3); // From signal.set
     });
 
     it('should select state with memoized selectors', () => {
@@ -189,15 +188,15 @@ describe('ComponentStore', () => {
         @Component({
             template: undefined,
         })
-        class SomeComponent {
-            public cs = createComponentStore({});
+        class MyComponent {
+            cs = createComponentStore({});
         }
 
         TestBed.configureTestingModule({
-            declarations: [SomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(SomeComponent);
+        const fixture = TestBed.createComponent(MyComponent);
         const component = fixture.componentInstance;
         expect(component).toBeDefined();
 
@@ -221,7 +220,7 @@ describe('ComponentStore', () => {
         @Component({
             template: undefined,
         })
-        class WelcomeComponent {
+        class MyComponent {
             private cs = createComponentStore(counterInitialState);
             private counterSource = new Subject<number>();
             selectedState = this.cs.select((state) => state.counter);
@@ -236,11 +235,11 @@ describe('ComponentStore', () => {
         }
 
         TestBed.configureTestingModule({
-            declarations: [WelcomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(WelcomeComponent);
-        const component = fixture.componentInstance;
+        const fixture = TestBed.createComponent(MyComponent);
+        const component: MyComponent = fixture.componentInstance;
         expect(component).toBeDefined();
 
         component.useObservableToUpdateState();
@@ -263,7 +262,7 @@ describe('ComponentStore', () => {
         @Component({
             template: ``,
         })
-        class WelcomeComponent {
+        class MyComponent {
             private cs = createComponentStore(counterInitialState);
             private myEffect = this.cs.rxEffect<number>(pipe(tap((v) => effectCallback(v))));
             private counterSource = new Subject<number>();
@@ -279,11 +278,11 @@ describe('ComponentStore', () => {
         }
 
         TestBed.configureTestingModule({
-            declarations: [WelcomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(WelcomeComponent);
-        const component = fixture.componentInstance;
+        const fixture = TestBed.createComponent(MyComponent);
+        const component: MyComponent = fixture.componentInstance;
         expect(component).toBeDefined();
 
         component.updateObservableValue(1);
@@ -309,5 +308,21 @@ describe('ComponentStore', () => {
         expect(() => cs.undo({ type: 'someType' })).toThrowError(
             '@mini-rx: ComponentStore has no UndoExtension yet.'
         );
+    });
+
+    it('should dispatch an undo action with the Undo Extension', () => {
+        const cs = setup({}, { extensions: [new MockUndoExtension()] });
+
+        const action = cs.setState({});
+
+        const spy = jest.fn();
+        cs['actionsOnQueue'].actions$.subscribe(spy);
+
+        cs.undo(action);
+
+        expect(spy).toHaveBeenCalledWith({
+            type: '@mini-rx/undo',
+            payload: action,
+        });
     });
 });
