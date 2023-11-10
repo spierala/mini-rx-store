@@ -9,13 +9,21 @@ import {
     userState,
     UserState,
 } from './_spec-helpers';
-import { Action, Actions, FeatureConfig, Reducer, StoreConfig, tapResponse } from '@mini-rx/common';
+import {
+    Action,
+    Actions,
+    FeatureConfig,
+    Reducer,
+    StoreConfig,
+    tapResponse,
+    UndoExtension,
+} from '@mini-rx/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
 import { Store } from '../store';
 import { Component, EnvironmentInjector, inject, signal, Signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { createComponentStore } from '@mini-rx/signal-store';
+import { createComponentStore } from '../component-store';
 
 let store: Store;
 let actions: Actions;
@@ -130,7 +138,7 @@ class UserFeatureStore extends FeatureStore<UserState> {
 }
 
 class CounterFeatureStore extends FeatureStore<CounterState> {
-    counter$: Signal<number> = this.select((state) => state.counter);
+    counterState: Signal<number> = this.select((state) => state.counter);
 
     constructor() {
         super('counter', { counter: 0 });
@@ -179,11 +187,11 @@ describe('FeatureStore', () => {
     it('should update state using callback', () => {
         setupCounterFeatureStore();
 
-        expect(counterFeatureStore.counter$()).toBe(0);
+        expect(counterFeatureStore.counterState()).toBe(0);
         counterFeatureStore.increment();
-        expect(counterFeatureStore.counter$()).toBe(1);
+        expect(counterFeatureStore.counterState()).toBe(1);
         counterFeatureStore.increment();
-        expect(counterFeatureStore.counter$()).toBe(2);
+        expect(counterFeatureStore.counterState()).toBe(2);
     });
 
     it('should select state via Store.select', () => {
@@ -527,5 +535,31 @@ describe('FeatureStore', () => {
         expect(fs1.featureKey).toContain('multi-counter-');
         expect(fs2.featureKey).toContain('multi-counter-');
         expect(fs3.featureKey).toContain('multi-counter-');
+    });
+
+    it('should throw when using undo without extension', () => {
+        setupStore();
+        setupCounterFeatureStore();
+
+        expect(() => counterFeatureStore.undo({ type: 'someType' })).toThrowError(
+            '@mini-rx: UndoExtension is not initialized.'
+        );
+    });
+
+    it('should undo state changes', () => {
+        setupStore({ extensions: [new UndoExtension()] });
+        setupCounterFeatureStore();
+
+        const incremented = counterFeatureStore.setState((state) => ({
+            counter: state.counter + 1,
+        }));
+
+        const selectedState = counterFeatureStore.select((state) => state.counter);
+
+        expect(selectedState()).toBe(1);
+
+        counterFeatureStore.undo(incremented);
+
+        expect(selectedState()).toBe(0);
     });
 });

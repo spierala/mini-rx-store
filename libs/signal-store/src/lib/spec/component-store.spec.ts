@@ -2,7 +2,7 @@ import { ComponentStore, createComponentStore, globalCsConfig } from '../compone
 import { counterInitialState, CounterState, MockUndoExtension, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
-import { ComponentStoreConfig } from '@mini-rx/common';
+import { ComponentStoreConfig, UndoExtension } from '@mini-rx/common';
 import { TestBed } from '@angular/core/testing';
 import { Component, signal } from '@angular/core';
 
@@ -324,5 +324,19 @@ describe('ComponentStore', () => {
             type: '@mini-rx/undo',
             payload: action,
         });
+    });
+
+    it('should undo state changes', () => {
+        const cs = setup({ counter: 1 }, { extensions: [new UndoExtension()] });
+
+        const incremented = cs.setState((state) => ({ counter: state.counter + 1 }));
+
+        const selectedState = cs.select((state) => state.counter);
+
+        expect(selectedState()).toBe(2);
+
+        cs.undo(incremented);
+
+        expect(selectedState()).toBe(1);
     });
 });
