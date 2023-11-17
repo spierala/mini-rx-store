@@ -17,25 +17,28 @@ describe('deepFreeze', () => {
         deepFreeze(obj2);
         expect(Object.isFrozen(obj2.nestedCounter)).toBe(true);
         expect(() => (obj2.nestedCounter.count = 2)).toThrow();
-    }),
-        it('should freeze a function object', () => {
-            const fn = (): number => {
-                return 42;
-            };
-            expect(() => deepFreeze(fn)).not.toThrow();
-            // Test that the function object is frozen
-            expect(Object.isFrozen(fn)).toBe(true);
-        }),
-        it('should handle circular references', () => {
-            const circularObj: {
-                prop1: number;
-                circularRef: any;
-            } = { prop1: 42, circularRef: undefined };
-            circularObj.circularRef = circularObj;
-            expect(() => deepFreeze(circularObj)).not.toThrow();
-            // Ensure circular references do not result in infinite loops
-            expect(Object.isFrozen(circularObj)).toBe(true);
-        });
+    });
+
+    it('should freeze a function object', () => {
+        const fn = (): number => {
+            return 42;
+        };
+        expect(() => deepFreeze(fn)).not.toThrow();
+        // Test that the function object is frozen
+        expect(Object.isFrozen(fn)).toBe(true);
+    });
+
+    it('should handle circular references', () => {
+        const circularObj: {
+            prop1: number;
+            circularRef: any;
+        } = { prop1: 42, circularRef: undefined };
+        circularObj.circularRef = circularObj;
+        expect(() => deepFreeze(circularObj)).not.toThrow();
+        // Ensure circular references do not result in infinite loops
+        expect(Object.isFrozen(circularObj)).toBe(true);
+    });
+
     // Arrays
     it('should freeze an array and its elements', () => {
         const arr = [1, 2, 3];

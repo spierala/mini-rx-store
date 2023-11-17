@@ -24,10 +24,10 @@ describe('beautifyAction', () => {
             type: '@mini-rx/todos/set-state',
             payload: {},
         });
-    }),
-        it('should not touch other normal Actions', () => {
-            const action = { type: 'someAction' };
+    });
+    it('should not touch other normal Actions', () => {
+        const action = { type: 'someAction' };
 
-            expect(beautifyAction(action)).toBe(action);
-        });
+        expect(beautifyAction(action)).toBe(action);
+    });
 });
