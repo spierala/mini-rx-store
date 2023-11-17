@@ -30,6 +30,8 @@ _FYI_ Feature Store and Component Store share the same API (just their internal 
 
 In the examples below we look at Component Store, but you can expect the same API changes for Feature Store.
 
+All code examples can be found back in [this StackBlitz](https://stackblitz.com/edit/stackblitz-starters-6mbywk?file=src%2Fmain.ts).
+
 ### select
 `select` is used to select state from your Component Store. 
 
@@ -347,7 +349,7 @@ StackBlitz demo: [ImmutableDemoComponent](https://stackblitz.com/edit/stackblitz
 
 ## Store (Redux)
 
-Let's have a quick look at the API changes of the Redux (Store) API...
+Let's have a quick look at the API changes of the Store (Redux) API...
 
 ### select
 `select` is used to select state from your store. The `select` method returns an Angular Signal.
