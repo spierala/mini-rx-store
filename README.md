@@ -8,6 +8,8 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
+> New Blogpost: [**MiniRx Signal Store for Angular - API Preview**](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
+
 > New Discussion: [**Angular Signal Store RFC**](https://github.com/spierala/mini-rx-store/discussions/188)
 
 # MiniRx Store 5
