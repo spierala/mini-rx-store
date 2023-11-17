@@ -14,10 +14,10 @@ MiniRx **Signal Store** is in the making...
     * Manage **local** component state with **Component Stores**
     * MiniRx always tries to find the sweet spot between powerful, simple and [lightweight](https://github.com/spierala/angular-state-management-comparison)
 * Signal Store implements and promotes new **Angular best practices**:
-  * **Signals** are used for (synchronous) **state**
+  * **Signals** are used for **(synchronous) state**
   * **RxJS** is used for events and **asynchronous tasks**
 * Signal Store helps to streamline your usage of [RxJS](https://rxjs.dev/) and [Signals](https://angular.io/guide/signals): e.g. `connect` and `rxEffect` understand both Signals and Observables
-* Simple refactor: If you used MiniRx Store before, refactor to Signal Store will be pretty straight-forward: change the TypeScript imports, remove the Angular async pipes (and ugly non-null assertions (`!`) from the template
+* Simple refactor: If you used MiniRx Store before, refactor to Signal Store will be pretty straight-forward: change the TypeScript imports, remove the Angular async pipes (and ugly non-null assertions (`!`)) from the template
 
 # API Preview
 Let's have a closer look at the Signal Store API.
