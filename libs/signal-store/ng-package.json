@@ -3,5 +3,6 @@
     "dest": "../../dist/libs/signal-store",
     "lib": {
         "entryFile": "src/index.ts"
-    }
+    },
+    "allowedNonPeerDependencies": ["@mini-rx/common"]
 }
