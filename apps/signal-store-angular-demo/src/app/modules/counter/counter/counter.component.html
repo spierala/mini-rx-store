@@ -1,9 +1,15 @@
 <div class="w-100 d-flex flex-column align-items-center justify-content-center">
-    <h1 class="display-1">{{ counter() }}</h1>
+    <h1 class="display-1">{{ counterStore.count() }}</h1>
     <div>
-        <button type="button" class="btn btn-outline-secondary mr-2" (click)="decrement()">
+        <button
+            type="button"
+            class="btn btn-outline-secondary mr-2"
+            (click)="counterStore.decrement()"
+        >
             Less
         </button>
-        <button type="button" class="btn btn-outline-primary" (click)="increment()">More</button>
+        <button type="button" class="btn btn-outline-primary" (click)="counterStore.increment()">
+            More
+        </button>
     </div>
 </div>

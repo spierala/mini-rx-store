@@ -16,9 +16,9 @@ export class ChildComponent {
     constructor(private store: Store) {
         this.store.dispatch({ type: 'fxStart' });
 
-        const action = this.cs.update((state) => ({ count: state.count + 1 }), 'inc');
+        const action = this.cs.setState((state) => ({ count: state.count + 1 }), 'inc');
         this.cs.undo(action);
 
-        this.cs.update(timer(5000).pipe(map((v) => ({ count: 42 }))));
+        this.cs.connect({ count: timer(5000).pipe(map(() => 42)) });
     }
 }
