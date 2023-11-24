@@ -25,7 +25,8 @@
 // SOFTWARE.
 
 import { computed, Signal } from '@angular/core';
-import { AppState } from './models';
+import { AppState } from '@mini-rx/common';
+import { defaultSignalEquality } from './utils';
 
 export const SIGNAL_SELECTOR_KEY = '@mini-rx/signalSelector';
 
@@ -119,7 +120,7 @@ export function createSelector(...args: any[]): SignalSelector<any, any> {
                 const results: any[] = signalsFromSelectors.map((aSignal) => aSignal());
                 return projector(...results);
             },
-            { equal: signalEquality } // Notify about changes only if there is a new primitive / object reference
+            { equal: defaultSignalEquality } // Notify about changes only if there is a new primitive / object reference
         );
     };
 
@@ -155,10 +156,5 @@ export function addSignalSelectorKey<T, R>(s: Selector<T, R>): SignalSelector<T,
 }
 
 export function isSignalSelector(v: any): v is SignalSelector<any, any> {
-    // eslint-disable-next-line no-prototype-builtins
-    return v.hasOwnProperty(SIGNAL_SELECTOR_KEY);
-}
-
-function signalEquality(a: any, b: any) {
-    return a === b;
+    return Object.hasOwn(v, SIGNAL_SELECTOR_KEY);
 }

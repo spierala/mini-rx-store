@@ -1,14 +1,9 @@
-import { Action, ActionWithPayload, ComponentStoreExtension, ExtensionId, MetaReducer, Reducer } from '../models';
+import { Action, ComponentStoreExtension, ExtensionId, MetaReducer } from '@mini-rx/common';
+import { destroy } from '../store-core';
 import { v4 as uuid } from 'uuid';
-import { dispatch, reducerState } from '../store-core';
 
-export function resetStoreConfig() {
-    reducerState.set({
-        metaReducers: [],
-        featureReducers: {},
-    });
-
-    dispatch({ type: 'resetStoreConfig' }); // Trigger action to recalculate state
+export function destroyStore() {
+    destroy();
 }
 
 export interface UserState {
@@ -51,45 +46,6 @@ export function counterReducer(
     }
 }
 
-export function createUniqueCounterReducerWithAction(): [Reducer<CounterState>, Action] {
-    const incrementCase = uuid();
-    const reducer = (state: CounterState = counterInitialState, action: Action) => {
-        switch (action.type) {
-            case incrementCase:
-                return {
-                    ...state,
-                    counter: state.counter + 1,
-                };
-            default:
-                return state;
-        }
-    };
-    return [reducer, { type: incrementCase }];
-}
-
-export interface CounterStringState {
-    counter: string;
-}
-
-export const counterStringInitialState: CounterStringState = {
-    counter: '1',
-};
-
-export function counterStringReducer(
-    state: CounterStringState = counterStringInitialState,
-    action: ActionWithPayload
-) {
-    switch (action.type) {
-        case 'counterString':
-            return {
-                ...state,
-                counter: state.counter + action.payload,
-            };
-        default:
-            return state;
-    }
-}
-
 export class MockLoggerExtension implements ComponentStoreExtension {
     id = ExtensionId.LOGGER;
     sortOrder = 1;
@@ -118,4 +74,10 @@ export class MockImmutableStateExtension implements ComponentStoreExtension {
     init(): MetaReducer<any> {
         return (v) => v;
     }
+}
+
+export function createUniqueAction(): Action {
+    return {
+        type: uuid(),
+    };
 }

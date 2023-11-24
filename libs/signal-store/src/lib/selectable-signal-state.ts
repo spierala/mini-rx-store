@@ -1,25 +1,31 @@
 import { computed, Signal } from '@angular/core';
 import { isSignalSelector, SignalSelector } from './signal-selector';
+import { defaultSignalEquality } from './utils';
 
 type StateSelector<T, R> = (state: T) => R;
 
-export class SelectableSignalState<StateType extends object> {
-    constructor(private state: Signal<StateType>) {}
-
-    select(): Signal<StateType>;
-    select<R>(mapFn: SignalSelector<StateType, R>): Signal<R>;
-    select<R>(mapFn: StateSelector<StateType, R>): Signal<R>;
-    select(mapFn?: any): Signal<any> {
+export function createSelectableSignalState<StateType extends object>(state: Signal<StateType>) {
+    function select(): Signal<StateType>;
+    function select<R>(mapFn: SignalSelector<StateType, R>): Signal<R>;
+    function select<R>(mapFn: StateSelector<StateType, R>): Signal<R>;
+    function select(mapFn?: any): Signal<any> {
         if (!mapFn) {
-            return this.state;
+            return state;
         }
 
         if (isSignalSelector(mapFn)) {
-            return mapFn(this.state);
+            return mapFn(state);
         }
 
-        return computed(() => {
-            return mapFn(this.state());
-        });
+        return computed(
+            () => {
+                return mapFn(state());
+            },
+            { equal: defaultSignalEquality }
+        );
     }
+
+    return {
+        select,
+    };
 }

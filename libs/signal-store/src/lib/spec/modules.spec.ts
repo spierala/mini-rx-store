@@ -1,21 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { Injectable, NgModule } from '@angular/core';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, map, mergeMap, of } from 'rxjs';
 import { StoreModule } from '../modules/store.module';
 import { EffectsModule } from '../modules/effects.module';
 import { ComponentStoreModule } from '../modules/component-store.module';
-import { Action, Actions, Reducer, StoreExtension } from '../models';
-import { ofType } from '../utils';
-import { createRxEffect } from '../create-rx-effect';
+import { Action, Actions, createRxEffect, ofType, Reducer, StoreExtension } from '@mini-rx/common';
 import { FeatureStore } from '../feature-store';
 import { Store } from '../store';
-import { createComponentStore } from '../component-store';
-import {
-    MockImmutableStateExtension,
-    MockLoggerExtension,
-    MockUndoExtension,
-} from './_spec-helpers';
+import { globalCsConfig } from '../component-store';
+import { MockImmutableStateExtension, MockLoggerExtension } from './_spec-helpers';
 
 const loadAction: Action = {
     type: 'LOAD',
@@ -127,7 +120,7 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 
     inc() {
-        this.update((state) => ({
+        this.setState((state) => ({
             counter: state.counter + 1,
         }));
     }
@@ -272,17 +265,12 @@ describe(`Ng Modules`, () => {
 
     describe(`ComponentStore`, () => {
         // Just make sure that the global config is set via the ComponentStoreModule.forRoot static method
-        // For the other aspects of the config we can rely on the ComponentStore tests
 
-        it('should merge global config with local config', () => {
-            const localCsExtensions = [new MockUndoExtension()];
-            const cs = TestBed.runInInjectionContext(() => {
-                return createComponentStore({}, { extensions: localCsExtensions });
-            });
+        it('should set global component store config', () => {
+            const globalExtensions = globalCsConfig.get()?.extensions ?? [];
 
-            expect(cs['extensions'][0]).toBe(localCsExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalCsExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalCsExtensions[1]);
+            expect(globalExtensions[0]).toBe(globalCsExtensions[0]);
+            expect(globalExtensions[1]).toBe(globalCsExtensions[1]);
         });
     });
 });

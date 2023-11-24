@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2022",
+        "lib": ["es2022", "dom"],
         "useDefineForClassFields": false,
         "forceConsistentCasingInFileNames": true,
         "strict": true,

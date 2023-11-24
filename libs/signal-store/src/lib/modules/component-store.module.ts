@@ -1,11 +1,11 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { ComponentStoreConfig } from '../models';
-import { configureComponentStores } from '../component-store';
+import { ComponentStoreConfig } from '@mini-rx/common';
+import { globalCsConfig } from '../component-store';
 
 @NgModule()
 export class ComponentStoreModule {
     static forRoot(config: ComponentStoreConfig): ModuleWithProviders<ComponentStoreModule> {
-        configureComponentStores(config);
+        globalCsConfig.set(config);
 
         return {
             ngModule: ComponentStoreModule,

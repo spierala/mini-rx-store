@@ -1,29 +1,10 @@
-import {
-    _resetConfig,
-    ComponentStore,
-    configureComponentStores,
-    createComponentStore,
-} from '../component-store';
-import {
-    counterInitialState,
-    CounterState,
-    MockImmutableStateExtension,
-    MockLoggerExtension,
-    MockUndoExtension,
-    userState
-} from './_spec-helpers';
-import { Observable, of, pipe, Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
+import { counterInitialState, CounterState, MockUndoExtension, userState } from './_spec-helpers';
+import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
-import {
-    ComponentStoreConfig,
-    ComponentStoreExtension,
-    ExtensionId,
-    MetaReducer,
-    StoreExtension,
-} from '../models';
+import { ComponentStoreConfig, UndoExtension } from '@mini-rx/common';
 import { TestBed } from '@angular/core/testing';
-import { Component, Injectable, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 function setup<T extends object>(
     initialState: T,
@@ -48,7 +29,7 @@ describe('ComponentStore', () => {
         const selectedState = cs.select();
         expect(selectedState()).toBe(counterInitialState);
 
-        cs.update((state) => ({ counter: state.counter + 1 }));
+        cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toEqual({ counter: 2 });
     });
 
@@ -58,79 +39,66 @@ describe('ComponentStore', () => {
         const selectedState = cs.select();
         expect(selectedState()).toBe(userState);
 
-        cs.update(() => ({ firstName: 'Nicolas' }));
+        cs.setState(() => ({ firstName: 'Nicolas' }));
         expect(selectedState()).toEqual({ ...userState, firstName: 'Nicolas' });
     });
 
-    it('should update state using an Observable', () => {
+    it('should connect state with an Observable', () => {
         const cs = setup(counterInitialState);
 
-        const counterState$: Observable<CounterState> = of(2, 3, 4, 5).pipe(
-            map((v) => ({ counter: v }))
-        );
+        const counterState$: Observable<number> = of(2, 3, 4, 5);
 
         const selectedState = cs.select((state) => state.counter);
 
         expect(selectedState()).toBe(1);
 
-        // setState with Observable
-        cs.update(counterState$);
+        // connect with Observable
+        cs.connect({ counter: counterState$ });
 
         expect(selectedState()).toBe(5);
 
-        // "normal" setState
-        cs.update((state) => ({ counter: state.counter + 1 }));
+        cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toBe(6);
 
-        cs.update((state) => ({ counter: state.counter + 1 }));
+        cs.setState((state) => ({ counter: state.counter + 1 }));
         expect(selectedState()).toBe(7);
     });
 
-    it('should update state using a Signal', () => {
-        @Injectable({ providedIn: 'root' })
-        class MyComponentStore extends ComponentStore<CounterState> {
-            constructor() {
-                super(counterInitialState);
-            }
-        }
-
+    it('should connect state with a Signal', () => {
         @Component({
-            selector: 'mini-rx-my-comp',
             template: `
                 <span>{{ selectedCounterState() }}</span>
             `,
         })
-        class WelcomeComponent {
-            counterSignal = signal({ counter: 2 });
+        class MyComponent {
+            counterSignal = signal(2);
 
-            selectedCounterState = this.myCs.select((state) => state.counter);
-
-            constructor(public myCs: MyComponentStore) {}
+            private cs = createComponentStore(counterInitialState);
+            selectedCounterState = this.cs.select((state) => state.counter);
 
             startUpdatingStateWithSignal() {
-                this.myCs.update(this.counterSignal);
+                this.cs.connect({ counter: this.counterSignal });
             }
         }
 
         TestBed.configureTestingModule({
-            declarations: [WelcomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(WelcomeComponent);
+        const fixture = TestBed.createComponent(MyComponent);
         const component = fixture.componentInstance;
         expect(component).toBeDefined();
 
-        const compElement: HTMLElement = fixture.nativeElement;
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('1');
+        expect(component.selectedCounterState()).toBe(1); // From store initial state
 
         component.startUpdatingStateWithSignal();
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('2');
+        expect(component.selectedCounterState()).toBe(2); // From signal initial state
 
-        component.counterSignal.set({ counter: 3 });
+        component.counterSignal.set(3);
         fixture.detectChanges();
-        expect(compElement.textContent).toContain('3');
+        expect(component.selectedCounterState()).toBe(3); // From signal.set
     });
 
     it('should select state with memoized selectors', () => {
@@ -151,18 +119,18 @@ describe('ComponentStore', () => {
 
         const selectedState = cs.select(getSquareCounter);
         selectedState();
-        cs.update({ counter: 2 });
+        cs.setState({ counter: 2 });
         selectedState();
-        cs.update({ counter: 2 });
+        cs.setState({ counter: 2 });
         selectedState();
-        cs.update({ counter: 3 });
+        cs.setState({ counter: 3 });
         selectedState();
-        cs.update({ counter: 3 });
+        cs.setState({ counter: 3 });
         selectedState();
-        cs.update({ counter: 4 });
+        cs.setState({ counter: 4 });
         selectedState();
 
-        expect(getCounterSpy.mock.calls).toEqual([[1], [2], [2], [3], [3], [4]]); // No memoization: because a new state object is created for every call of `update`
+        expect(getCounterSpy.mock.calls).toEqual([[1], [2], [2], [3], [3], [4]]); // No memoization: because a new state object is created for every call of `setState`
         expect(getSquareCounterSpy.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
 
@@ -173,9 +141,8 @@ describe('ComponentStore', () => {
         cs['actionsOnQueue'].actions$.subscribe(spy);
 
         const setStateCallback = (state: CounterState) => ({ counter: state.counter + 1 });
-        cs.update(setStateCallback);
+        cs.setState(setStateCallback);
         expect(spy).toHaveBeenCalledWith({
-            setStateActionType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state',
             stateOrCallback: setStateCallback,
         });
@@ -184,9 +151,8 @@ describe('ComponentStore', () => {
         spy.mockReset();
 
         // With setState name
-        cs.update(setStateCallback, 'increment');
+        cs.setState(setStateCallback, 'increment');
         expect(spy).toHaveBeenCalledWith({
-            setStateActionType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state/increment',
             stateOrCallback: setStateCallback,
         });
@@ -194,13 +160,14 @@ describe('ComponentStore', () => {
 
         spy.mockReset();
 
-        // With setState name (when passing an Observable to setState)
-        cs.update(of(1, 2).pipe(map((v) => ({ counter: v }))), 'updateCounterFromObservable');
+        // With connection name (when passing an Observable to connect)
+        cs.connect({
+            counter: of(1, 2),
+        });
         expect(spy.mock.calls).toEqual([
             [
                 {
-                    setStateActionType: '@mini-rx/component-store',
-                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    type: '@mini-rx/component-store/connection/counter',
                     stateOrCallback: {
                         counter: 1,
                     },
@@ -208,8 +175,7 @@ describe('ComponentStore', () => {
             ],
             [
                 {
-                    setStateActionType: '@mini-rx/component-store',
-                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
+                    type: '@mini-rx/component-store/connection/counter',
                     stateOrCallback: {
                         counter: 2,
                     },
@@ -219,13 +185,25 @@ describe('ComponentStore', () => {
     });
 
     it('should dispatch an Action on destroy', () => {
-        // With initial state
-        const cs = setup(counterInitialState);
+        @Component({
+            template: undefined,
+        })
+        class MyComponent {
+            cs = createComponentStore({});
+        }
+
+        TestBed.configureTestingModule({
+            declarations: [MyComponent],
+        }).compileComponents();
+
+        const fixture = TestBed.createComponent(MyComponent);
+        const component = fixture.componentInstance;
+        expect(component).toBeDefined();
 
         const spy = jest.fn();
-        cs['actionsOnQueue'].actions$.subscribe(spy);
+        component.cs['actionsOnQueue'].actions$.subscribe(spy);
 
-        cs['destroy']();
+        fixture.componentRef.destroy();
 
         expect(spy.mock.calls).toEqual([
             [
@@ -236,21 +214,19 @@ describe('ComponentStore', () => {
         ]);
     });
 
-    it('should unsubscribe from setState Observable on destroy', () => {
+    it('should unsubscribe from connected Observable on destroy', () => {
+        const spy = jest.fn();
+
         @Component({
-            selector: 'mini-rx-my-comp',
-            template: ``,
+            template: undefined,
         })
-        class WelcomeComponent {
+        class MyComponent {
             private cs = createComponentStore(counterInitialState);
             private counterSource = new Subject<number>();
-            private counterState$: Observable<CounterState> = this.counterSource.pipe(
-                map((v) => ({ counter: v }))
-            );
             selectedState = this.cs.select((state) => state.counter);
 
             useObservableToUpdateState() {
-                this.cs.update(this.counterState$);
+                this.cs.connect({ counter: this.counterSource.pipe(tap((v) => spy(v))) });
             }
 
             updateObservableValue(v: number) {
@@ -259,15 +235,14 @@ describe('ComponentStore', () => {
         }
 
         TestBed.configureTestingModule({
-            declarations: [WelcomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(WelcomeComponent);
-        const component = fixture.componentInstance;
+        const fixture = TestBed.createComponent(MyComponent);
+        const component: MyComponent = fixture.componentInstance;
         expect(component).toBeDefined();
 
         component.useObservableToUpdateState();
-
         expect(component.selectedState()).toBe(1);
 
         component.updateObservableValue(1);
@@ -285,10 +260,9 @@ describe('ComponentStore', () => {
         const effectCallback = jest.fn<void, [number]>();
 
         @Component({
-            selector: 'mini-rx-my-comp',
             template: ``,
         })
-        class WelcomeComponent {
+        class MyComponent {
             private cs = createComponentStore(counterInitialState);
             private myEffect = this.cs.rxEffect<number>(pipe(tap((v) => effectCallback(v))));
             private counterSource = new Subject<number>();
@@ -301,38 +275,29 @@ describe('ComponentStore', () => {
             updateObservableValue(v: number) {
                 this.counterSource.next(v);
             }
-
-            updateEffectValueImperatively(v: number) {
-                this.myEffect(v);
-            }
         }
 
         TestBed.configureTestingModule({
-            declarations: [WelcomeComponent],
+            declarations: [MyComponent],
         }).compileComponents();
 
-        const fixture = TestBed.createComponent(WelcomeComponent);
-        const component = fixture.componentInstance;
+        const fixture = TestBed.createComponent(MyComponent);
+        const component: MyComponent = fixture.componentInstance;
         expect(component).toBeDefined();
 
         component.updateObservableValue(1);
         component.updateObservableValue(2);
 
-        // Trigger effect imperatively (just to cover both ways to trigger an effect)
-        component.updateEffectValueImperatively(3);
-        component.updateEffectValueImperatively(4);
-
         fixture.componentRef.destroy();
 
-        component.updateObservableValue(5);
-        component.updateEffectValueImperatively(6);
+        component.updateObservableValue(3);
 
-        expect(effectCallback.mock.calls).toEqual([[1], [2], [3], [4]]);
+        expect(effectCallback.mock.calls).toEqual([[1], [2]]);
     });
 
     it('should throw when calling `configureComponentStores` more than once', () => {
-        configureComponentStores({ extensions: [] });
-        expect(() => configureComponentStores({ extensions: [] })).toThrowError(
+        globalCsConfig.set({ extensions: [] });
+        expect(() => globalCsConfig.set({ extensions: [] })).toThrowError(
             '@mini-rx: `configureComponentStores` was called multiple times.'
         );
     });
@@ -345,68 +310,33 @@ describe('ComponentStore', () => {
         );
     });
 
-    it('should throw when a not supported extension is used', () => {
-        class MyExtension extends StoreExtension {
-            id: ExtensionId = ExtensionId.LOGGER;
+    it('should dispatch an undo action with the Undo Extension', () => {
+        const cs = setup({}, { extensions: [new MockUndoExtension()] });
 
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            init(): void {}
-        }
+        const action = cs.setState({});
 
-        expect(() =>
-            setup(
-                {},
-                {
-                    extensions: [new MyExtension() as ComponentStoreExtension],
-                }
-            )
-        ).toThrowError('@mini-rx: Extension "MyExtension" is not supported by Component Store.');
+        const spy = jest.fn();
+        cs['actionsOnQueue'].actions$.subscribe(spy);
+
+        cs.undo(action);
+
+        expect(spy).toHaveBeenCalledWith({
+            type: '@mini-rx/undo',
+            payload: action,
+        });
     });
 
-    describe('Extensions', () => {
+    it('should undo state changes', () => {
+        const cs = setup({ counter: 1 }, { extensions: [new UndoExtension()] });
 
+        const incremented = cs.setState((state) => ({ counter: state.counter + 1 }));
 
-        beforeEach(() => {
-            _resetConfig();
-        });
+        const selectedState = cs.select((state) => state.counter);
 
-        it('should be local', () => {
-            const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
-            const cs = setup({}, { extensions });
+        expect(selectedState()).toBe(2);
 
-            expect(cs['extensions']).toBe(extensions);
-        });
+        cs.undo(incremented);
 
-        it('should be global', () => {
-            const extensions = [new MockLoggerExtension(), new MockUndoExtension()];
-
-            configureComponentStores({ extensions });
-            const cs = setup({});
-
-            expect(cs['extensions']).toBe(extensions);
-        });
-
-        it('should be merged', () => {
-            const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
-            const localExtensions = [new MockUndoExtension()];
-
-            configureComponentStores({ extensions: globalExtensions });
-            const cs = setup({}, { extensions: localExtensions });
-
-            expect(cs['extensions'][0]).toBe(localExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalExtensions[1]);
-        });
-
-        it('should be merged (use local if extension is used globally and locally)', () => {
-            const globalExtensions = [new MockLoggerExtension(), new MockImmutableStateExtension()];
-            const localExtensions = [new MockLoggerExtension()];
-
-            configureComponentStores({ extensions: globalExtensions });
-            const cs = setup({}, { extensions: localExtensions });
-
-            expect(cs['extensions'][0]).toBe(localExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalExtensions[1]);
-        });
+        expect(selectedState()).toBe(1);
     });
 });
