@@ -1,6 +1,6 @@
 {
     "name": "@mini-rx/signal-store",
-    "version": "0.0.21",
+    "version": "0.0.23",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
@@ -27,7 +27,7 @@
         "rxjs": "^7.0.0"
     },
     "dependencies": {
-        "@mini-rx/common": "^0.0.6",
+        "@mini-rx/common": "^0.0.7",
         "tslib": "^2.3.0"
     },
     "sideEffects": false
