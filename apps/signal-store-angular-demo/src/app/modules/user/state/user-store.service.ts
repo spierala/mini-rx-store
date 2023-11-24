@@ -46,7 +46,7 @@ export class UserStore extends FeatureStore<UserState> {
     }
 
     toggleCanUpdateProducts() {
-        this.update((state) => ({
+        this.setState((state) => ({
             permissions: {
                 ...state.permissions,
                 canUpdateProducts: !state.permissions.canUpdateProducts,
@@ -55,7 +55,7 @@ export class UserStore extends FeatureStore<UserState> {
     }
 
     updateUser(user: Partial<User>) {
-        this.update((state) => ({
+        this.setState((state) => ({
             user: {
                 ...state.user,
                 ...user,

@@ -1,5 +1,5 @@
 import { Injectable, Signal } from '@angular/core';
-import { FeatureStore } from '@mini-rx/signal-store';
+import { createFeatureStore } from '@mini-rx/signal-store';
 
 interface CounterState {
     count: number;
@@ -10,18 +10,16 @@ const initialState: CounterState = {
 };
 
 @Injectable()
-export class CounterStore extends FeatureStore<CounterState> {
-    count: Signal<number> = this.select((state) => state.count);
+export class CounterStore {
+    private fs = createFeatureStore('counter', initialState, { multi: true });
 
-    constructor() {
-        super('counter', initialState, { multi: true });
-    }
+    count: Signal<number> = this.fs.select((state) => state.count);
 
     increment() {
-        this.update((state) => ({ count: state.count + 1 }), 'increment');
+        this.fs.setState(({ count }) => ({ count: count + 1 }), 'increment');
     }
 
     decrement() {
-        this.update((state) => ({ count: state.count - 1 }), 'decrement');
+        this.fs.setState(({ count }) => ({ count: count - 1 }), 'decrement');
     }
 }

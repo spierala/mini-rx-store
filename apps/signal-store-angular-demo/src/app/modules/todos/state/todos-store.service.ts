@@ -72,17 +72,17 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     // UPDATE STATE
     selectTodo(todo: Todo) {
-        this.update({ selectedTodo: todo }, 'selectTodo');
+        this.setState({ selectedTodo: todo }, 'selectTodo');
     }
 
     initNewTodo() {
         const newTodo = new Todo();
         newTodo.tempId = uuid();
-        this.update({ selectedTodo: newTodo }, 'initNewTodo');
+        this.setState({ selectedTodo: newTodo }, 'initNewTodo');
     }
 
     clearSelectedTodo() {
-        this.update(
+        this.setState(
             {
                 selectedTodo: undefined,
             },
@@ -91,7 +91,7 @@ export class TodosStore extends FeatureStore<TodosState> {
     }
 
     updateFilter(filter: TodoFilter) {
-        this.update(
+        this.setState(
             (state) => ({
                 filter: {
                     ...state.filter,
@@ -109,7 +109,7 @@ export class TodosStore extends FeatureStore<TodosState> {
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
                     tapResponse(
-                        (todos) => this.update({ todos }, 'loadSuccess'),
+                        (todos) => this.setState({ todos }, 'loadSuccess'),
                         (err) => {
                             console.error(err);
                         }
@@ -123,7 +123,7 @@ export class TodosStore extends FeatureStore<TodosState> {
     // We can skip the standalone pipe when using just one RxJS operator
     create = this.rxEffect<Todo>(
         mergeMap((todo) => {
-            const optimisticUpdate: Action = this.update((state) => {
+            const optimisticUpdate: Action = this.setState((state) => {
                 // Create a new Todo object to prevent the Immutable Extension from making the current form model immutable
                 // This is only a concern if the create call fails (A successful create call would return a new Todo object)
                 const newTodo: Todo = { ...todo };
@@ -135,7 +135,7 @@ export class TodosStore extends FeatureStore<TodosState> {
             return this.apiService.createTodo(todo).pipe(
                 tapResponse(
                     (createdTodo) => {
-                        this.update(
+                        this.setState(
                             (state) => ({
                                 todos: state.todos.map((item) =>
                                     item.tempId === todo.tempId ? createdTodo : item
@@ -156,7 +156,7 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     // Classic subscribe + optimistic update / undo
     updateTodo(todo: Todo) {
-        const optimisticUpdate: Action = this.update(
+        const optimisticUpdate: Action = this.setState(
             (state) => ({
                 todos: updateTodoInList(state.todos, todo),
             }),
@@ -165,7 +165,7 @@ export class TodosStore extends FeatureStore<TodosState> {
 
         this.apiService.updateTodo(todo).subscribe({
             next: (updatedTodo) => {
-                this.update(
+                this.setState(
                     (state) => ({
                         todos: updateTodoInList(state.todos, updatedTodo),
                     }),
@@ -181,7 +181,7 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     // Classic subscribe + optimistic update / undo
     delete(todo: Todo) {
-        const optimisticUpdate: Action = this.update(
+        const optimisticUpdate: Action = this.setState(
             (state) => ({
                 selectedTodo: undefined,
                 todos: state.todos.filter((item) => item.id !== todo.id),

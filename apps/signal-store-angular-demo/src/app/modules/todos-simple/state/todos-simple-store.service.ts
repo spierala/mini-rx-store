@@ -48,22 +48,22 @@ export class TodosSimpleStore extends FeatureStore<TodosState> {
 
     // UPDATE STATE
     selectTodo(todo: Todo) {
-        this.update({ selectedTodo: todo });
+        this.setState({ selectedTodo: todo });
     }
 
     initNewTodo() {
         const newTodo = new Todo();
-        this.update({ selectedTodo: newTodo });
+        this.setState({ selectedTodo: newTodo });
     }
 
     clearSelectedTodo() {
-        this.update({
+        this.setState({
             selectedTodo: undefined,
         });
     }
 
     updateFilter(filter: TodoFilter) {
-        this.update((state) => ({
+        this.setState((state) => ({
             filter: {
                 ...state.filter,
                 ...filter,
@@ -73,12 +73,12 @@ export class TodosSimpleStore extends FeatureStore<TodosState> {
 
     // API CALLS
     load(): void {
-        this.apiService.getTodos().subscribe((todos) => this.update({ todos }));
+        this.apiService.getTodos().subscribe((todos) => this.setState({ todos }));
     }
 
     create(todo: Todo): void {
         this.apiService.createTodo(todo).subscribe((createdTodo) =>
-            this.update((state) => ({
+            this.setState((state) => ({
                 todos: [...state.todos, createdTodo],
                 selectedTodo: createdTodo,
             }))
@@ -87,7 +87,7 @@ export class TodosSimpleStore extends FeatureStore<TodosState> {
 
     updateTodo(todo: Todo): void {
         this.apiService.updateTodo(todo).subscribe((updatedTodo) =>
-            this.update((state) => ({
+            this.setState((state) => ({
                 todos: updateTodoInList(state.todos, updatedTodo),
             }))
         );
@@ -95,7 +95,7 @@ export class TodosSimpleStore extends FeatureStore<TodosState> {
 
     delete(todo: Todo): void {
         this.apiService.deleteTodo(todo).subscribe(() =>
-            this.update((state) => ({
+            this.setState((state) => ({
                 selectedTodo: undefined,
                 todos: state.todos.filter((item) => item.id !== todo.id),
             }))
