@@ -27,19 +27,9 @@ export function calculateExtensions(
     localConfig?: ComponentStoreConfig,
     globalConfig?: ComponentStoreConfig
 ): ComponentStoreExtension[] {
-    let extensions: ComponentStoreExtension[] = [];
-
-    if (localConfig?.extensions) {
-        if (localConfig.extensions && globalConfig?.extensions) {
-            extensions = mergeComponentStoreExtensions(
-                globalConfig.extensions,
-                localConfig.extensions
-            );
-        } else {
-            extensions = localConfig.extensions;
-        }
-    } else if (globalConfig?.extensions) {
-        extensions = globalConfig.extensions;
-    }
+    const extensions: ComponentStoreExtension[] = mergeComponentStoreExtensions(
+        globalConfig?.extensions ?? [],
+        localConfig?.extensions ?? []
+    );
     return sortExtensions(extensions);
 }

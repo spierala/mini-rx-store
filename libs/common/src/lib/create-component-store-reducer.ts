@@ -6,9 +6,8 @@ export function createComponentStoreReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action) => {
-        if (isMiniRxAction<StateType>(action)) {
-            return calcNextState(state, action.stateOrCallback);
-        }
-        return state;
+        return isMiniRxAction<StateType>(action)
+            ? calcNextState(state, action.stateOrCallback)
+            : state;
     };
 }
