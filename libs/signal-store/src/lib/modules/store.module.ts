@@ -1,14 +1,13 @@
-import { Inject, InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
+import { inject, ModuleWithProviders, NgModule } from '@angular/core';
 import { Actions, AppState, FeatureConfig, Reducer, StoreConfig } from '@mini-rx/common';
 import { Store } from '../store';
 import { actions$, addFeature } from '../store-core';
-
-export const STORE_CONFIG = new InjectionToken<StoreConfig<any>>('@mini-rx/store-config');
-export const FEATURE_NAMES = new InjectionToken<string[]>('@mini-rx/feature-name');
-export const FEATURE_REDUCERS = new InjectionToken<Reducer<any>[]>('@mini-rx/feature-reducer');
-export const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>(
-    '@mini-rx/feature-store-config'
-);
+import {
+    FEATURE_CONFIGS,
+    FEATURE_NAMES,
+    FEATURE_REDUCERS,
+    STORE_CONFIG,
+} from '../injection-tokens';
 
 export function storeFactory(config: StoreConfig<AppState>) {
     return new Store(config);
@@ -16,19 +15,17 @@ export function storeFactory(config: StoreConfig<AppState>) {
 
 @NgModule()
 export class StoreRootModule {
-    constructor(
-        private store: Store // Make sure store is initialized also if it is NOT injected in other services/components
-    ) {}
+    private store = inject(Store); // Make sure store is initialized also if it is NOT injected in other services/components
 }
 
 @NgModule()
 export class StoreFeatureModule {
-    constructor(
-        root: StoreRootModule, // Prevent feature states to be initialized before root state
-        @Inject(FEATURE_NAMES) featureNames: string[],
-        @Inject(FEATURE_REDUCERS) reducers: Reducer<any>[],
-        @Inject(FEATURE_CONFIGS) configs: FeatureConfig<any>[]
-    ) {
+    constructor() {
+        const storeRootModule = inject(StoreRootModule); // Prevent feature states to be initialized before root state
+        const featureNames: string[] = inject(FEATURE_NAMES);
+        const reducers: Reducer<any>[] = inject(FEATURE_REDUCERS);
+        const configs: FeatureConfig<any>[] = inject(FEATURE_CONFIGS);
+
         featureNames.forEach((featureName, index) => {
             addFeature(featureName, reducers[index], configs[index]);
         });

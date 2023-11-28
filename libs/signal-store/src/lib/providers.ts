@@ -2,7 +2,6 @@ import {
     ENVIRONMENT_INITIALIZER,
     EnvironmentProviders,
     inject,
-    InjectionToken,
     makeEnvironmentProviders,
     Type,
 } from '@angular/core';
@@ -23,21 +22,17 @@ import {
     fromClassesWithEffectsToClassProviders,
     fromObjectsWithEffectsToEffects,
 } from './effects-mapper';
-
-const STORE_PROVIDER = new InjectionToken<void>('@mini-rx/store-provider');
-const STORE_CONFIG = new InjectionToken<StoreConfig<any>>('@mini-rx/store-config');
-
-const FEATURE_PROVIDER = new InjectionToken<void>('@mini-rx/feature-provider');
-const FEATURE_NAMES = new InjectionToken<string[]>('@mini-rx/feature-names');
-const FEATURE_REDUCERS = new InjectionToken<Reducer<any>[]>('@mini-rx/feature-reducers');
-const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>('@mini-rx/feature-configs');
-
-const OBJECTS_WITH_EFFECTS = new InjectionToken<object[]>('@mini-rx/objectsWithEffects');
-const EFFECTS_PROVIDER = new InjectionToken<void>('@mini-rx/effects-provider');
-
-const COMPONENT_STORE_CONFIG_PROVIDER = new InjectionToken<void>(
-    '@mini-rx/component-store-config-provider'
-);
+import {
+    COMPONENT_STORE_CONFIG_PROVIDER,
+    EFFECTS_PROVIDER,
+    FEATURE_CONFIGS,
+    FEATURE_NAMES,
+    FEATURE_PROVIDER,
+    FEATURE_REDUCERS,
+    OBJECTS_WITH_EFFECTS,
+    STORE_CONFIG,
+    STORE_PROVIDER,
+} from './injection-tokens';
 
 // Store
 function storeFactory(config: StoreConfig<AppState>) {
