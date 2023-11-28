@@ -8,10 +8,12 @@
 //
 // https://developer.mozilla.org/en-US/docs/Project:Copyrights
 
+import { isFunction } from './is-function';
+
 export function deepFreeze(o: any) {
     Object.freeze(o);
 
-    const oIsFunction = typeof o === 'function';
+    const oIsFunction = isFunction(o);
     const hasOwnProp = Object.prototype.hasOwnProperty;
 
     Object.getOwnPropertyNames(o).forEach(function (prop) {
@@ -19,7 +21,7 @@ export function deepFreeze(o: any) {
             hasOwnProp.call(o, prop) &&
             (oIsFunction ? prop !== 'caller' && prop !== 'callee' && prop !== 'arguments' : true) &&
             o[prop] !== null &&
-            (typeof o[prop] === 'object' || typeof o[prop] === 'function') &&
+            (typeof o[prop] === 'object' || isFunction(o[prop])) &&
             !Object.isFrozen(o[prop])
         ) {
             deepFreeze(o[prop]);

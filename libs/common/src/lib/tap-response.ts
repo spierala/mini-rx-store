@@ -25,6 +25,7 @@
 
 import { EMPTY, identity, Observable, catchError, finalize, tap } from 'rxjs';
 import { miniRxConsoleError } from './mini-rx-console-error';
+import { isFunction } from './is-function';
 
 type TapResponseObj<T> = {
     next?: (next: T) => void;
@@ -40,14 +41,13 @@ export function tapResponse<T>(
 ): (source: Observable<T>) => Observable<T>;
 export function tapResponse<T>(fn1OrObject: any, fn2?: any, fn3?: any): any {
     return (source: Observable<T>) => {
-        const tapResponseObj: TapResponseObj<T> =
-            typeof fn1OrObject === 'function'
-                ? {
-                      next: fn1OrObject,
-                      error: fn2,
-                      finalize: fn3,
-                  }
-                : fn1OrObject;
+        const tapResponseObj: TapResponseObj<T> = isFunction(fn1OrObject)
+            ? {
+                  next: fn1OrObject,
+                  error: fn2,
+                  finalize: fn3,
+              }
+            : fn1OrObject;
 
         return source.pipe(
             tap({
