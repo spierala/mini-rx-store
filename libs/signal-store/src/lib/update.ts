@@ -7,9 +7,7 @@ export function createUpdateFn<StateType>(
         name: string | undefined
     ) => Action
 ) {
-    function update(stateOrCallback: StateOrCallback<StateType>, name?: string): Action {
+    return (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
         return dispatch(stateOrCallback, OperationType.SET_STATE, name);
-    }
-
-    return update;
+    };
 }

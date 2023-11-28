@@ -15,9 +15,9 @@ export function createConnectFn<StateType>(
     const subSink = createSignalStoreSubSink();
     const injector = inject(EnvironmentInjector);
 
-    function connect<K extends keyof StateType, ValueType = StateType[K]>(
+    return <K extends keyof StateType, ValueType = StateType[K]>(
         dict: Record<K, Observable<ValueType> | Signal<ValueType>>
-    ): void {
+    ) => {
         const keys: K[] = Object.keys(dict) as K[];
 
         keys.forEach((key) => {
@@ -35,7 +35,5 @@ export function createConnectFn<StateType>(
                 );
             });
         });
-    }
-
-    return connect;
+    };
 }

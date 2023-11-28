@@ -5,5 +5,5 @@ export function defaultSignalEquality(a: any, b: any) {
 }
 
 export function miniRxIsSignal(v: any): v is Signal<any> {
-    return v?.constructor === Function && isSignal(v);
+    return isSignal(v);
 }

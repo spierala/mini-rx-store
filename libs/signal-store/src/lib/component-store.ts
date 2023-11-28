@@ -41,12 +41,10 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> {
-        const action: MiniRxAction<StateType> = {
+        return this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(operationType, csFeatureKey, name),
             stateOrCallback,
-        };
-        this.actionsOnQueue.dispatch(action);
-        return action;
+        });
     }
 
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {

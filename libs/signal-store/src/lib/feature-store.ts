@@ -32,13 +32,11 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
-        const action: MiniRxAction<StateType> = {
+        return dispatch({
             type: createMiniRxActionType(operationType, this.featureKey, name),
             stateOrCallback,
             featureId: this.featureId,
-        };
-        dispatch(action);
-        return action;
+        });
     };
 
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
