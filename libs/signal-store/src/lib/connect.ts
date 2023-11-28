@@ -6,7 +6,7 @@ import { miniRxToObservable } from './mini-rx-to-observable';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 export function createConnectFn<StateType>(
-    dispatch: (
+    updateStateCallback: (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
@@ -26,7 +26,7 @@ export function createConnectFn<StateType>(
                 ? miniRxToObservable(observableOrSignal, { injector })
                 : observableOrSignal;
             subSink.sink = obs$.subscribe((v) => {
-                dispatch(
+                updateStateCallback(
                     {
                         [key]: v,
                     } as unknown as Partial<StateType>,

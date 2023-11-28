@@ -27,7 +27,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
 
     state: Signal<StateType> = select((state) => state[this.featureKey]);
 
-    private dispatcher = (
+    private updateState = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
@@ -57,8 +57,8 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
             : miniRxError('UndoExtension is not initialized.');
     }
 
-    setState = createUpdateFn(this.dispatcher);
-    connect = createConnectFn(this.dispatcher);
+    setState = createUpdateFn(this.updateState);
+    connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
     select = createSelectableSignalState(this.state).select;
 
