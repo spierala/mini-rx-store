@@ -19,7 +19,11 @@
                     "apps/signal-store-angular-demo-standalone/src/favicon.ico",
                     "apps/signal-store-angular-demo-standalone/src/assets"
                 ],
-                "styles": ["apps/signal-store-angular-demo-standalone/src/styles.scss"],
+                "styles": [
+                    "apps/signal-store-angular-demo-standalone/src/styles.scss",
+                    "node_modules/bootstrap/scss/bootstrap.scss",
+                    "node_modules/ngx-toastr/toastr.css"
+                ],
                 "scripts": []
             },
             "configurations": {

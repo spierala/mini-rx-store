@@ -1,25 +1,53 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
 import { appRoutes } from './app.routes';
 import {
+    ImmutableStateExtension,
     LoggerExtension,
     provideComponentStoreConfig,
+    provideEffects,
     provideStore,
     ReduxDevtoolsExtension,
     UndoExtension,
 } from '@mini-rx/signal-store';
-import { counterReducer } from './state';
+import { provideHttpClient } from '@angular/common/http';
+import { provideToastr } from 'ngx-toastr';
+import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { DbService } from './api/db.service';
+import { productsReducer } from './products/state/products.reducer';
+import { ProductsEffects } from './products/state/products.effects';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
     providers: [
+        provideHttpClient(),
         provideRouter(appRoutes, withEnabledBlockingInitialNavigation()),
+        provideAnimations(),
+        provideToastr(),
+        importProvidersFrom(
+            HttpClientInMemoryWebApiModule.forRoot(DbService, {
+                delay: 500,
+                put204: false,
+            })
+        ),
         provideStore({
             reducers: {
-                counter: counterReducer,
+                products: productsReducer,
             },
-            extensions: [new LoggerExtension(), new ReduxDevtoolsExtension({})],
+            extensions: [
+                new ImmutableStateExtension(),
+                new UndoExtension(),
+                new LoggerExtension(),
+                new ReduxDevtoolsExtension({
+                    name: 'MiniRx Angular Demo',
+                    maxAge: 25,
+                    latency: 250,
+                    trace: true,
+                    traceLimit: 25,
+                }),
+            ],
         }),
-        provideComponentStoreConfig({ extensions: [new LoggerExtension(), new UndoExtension()] }),
-        // provideEffects([TodoEffects])
+        provideEffects(ProductsEffects),
+        provideComponentStoreConfig({ extensions: [] }),
     ],
 };

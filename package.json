@@ -48,7 +48,7 @@
         "bootstrap": "^4.4.1",
         "bootstrap-icons": "^1.4.0",
         "lodash-es": "^4.17.21",
-        "ngx-toastr": "^16.2.0",
+        "ngx-toastr": "^17.0.2",
         "rxjs": "7.8.0",
         "ts-action": "^11.0.0",
         "ts-action-operators": "^9.1.1",

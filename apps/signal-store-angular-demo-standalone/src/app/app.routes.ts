@@ -1,18 +1,46 @@
 import { Route } from '@angular/router';
-import { ChildComponent } from './child/child.component';
-import { provideEffects, provideFeature } from '@mini-rx/signal-store';
-import { NxWelcomeComponent } from './nx-welcome.component';
-import { counterReducer } from './state';
-import { TodoEffects } from './todo.effects';
 
 export const appRoutes: Route[] = [
     {
-        path: '',
-        component: NxWelcomeComponent,
+        path: 'todos-simple',
+        loadChildren: () =>
+            import('./todos-simple/todos-simple-routes').then(({ routes }) => routes),
     },
     {
-        path: 'counter',
-        component: ChildComponent,
-        providers: [provideEffects(TodoEffects), provideFeature('counterFs', counterReducer)],
+        path: 'todos',
+        loadChildren: () => import('./todos/todos-routes').then(({ routes }) => routes),
     },
+    {
+        path: 'products',
+        loadChildren: () => import('./products/product-routes').then(({ routes }) => routes),
+    },
+    {
+        path: 'counters',
+        loadComponent: () =>
+            import('./counters/counter-shell/counter-shell.component').then(
+                (v) => v.CounterShellComponent
+            ),
+    },
+    {
+        path: 'art',
+        loadComponent: () =>
+            import('./pixel-art/components/pixel-art-shell/pixel-art-shell.component').then(
+                (v) => v.PixelArtShellComponent
+            ),
+    },
+    {
+        path: 'user',
+        loadComponent: () =>
+            import('./user/components/user-shell/user-shell.component').then(
+                (v) => v.UserShellComponent
+            ),
+    },
+    {
+        path: 'cart',
+        loadComponent: () =>
+            import('./cart/components/cart-shell/cart-shell.component').then(
+                (v) => v.CartShellComponent
+            ),
+    },
+    { path: '', redirectTo: 'todos-simple', pathMatch: 'full' },
 ];

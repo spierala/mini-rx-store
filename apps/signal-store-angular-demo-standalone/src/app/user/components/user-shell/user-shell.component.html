@@ -1,0 +1,57 @@
+<div class="d-flex flex-column h-100">
+    <nav class="navbar navbar-light bg-light mb-4">
+        <a class="navbar-brand">User Profile</a>
+    </nav>
+
+    <div class="container">
+        <ng-container *ngIf="userFacade.user()">
+            <div class="form-group">
+                <label for="firstName">First name</label>
+                <input
+                    class="form-control"
+                    type="text"
+                    [ngModel]="userFacade.user().firstName"
+                    (ngModelChange)="userFacade.updateUser({ firstName: $event })"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="First name"
+                />
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last name</label>
+                <input
+                    class="form-control"
+                    type="text"
+                    [ngModel]="userFacade.user().lastName"
+                    (ngModelChange)="userFacade.updateUser({ lastName: $event })"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Last name"
+                />
+            </div>
+        </ng-container>
+
+        <div class="card">
+            <div class="card-header d-flex">
+                <span class="flex-grow-1">Permissions</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group" *ngIf="userFacade.permissions()">
+                    <div class="custom-control custom-switch">
+                        <input
+                            type="checkbox"
+                            class="custom-control-input"
+                            id="canUpdateProducts"
+                            name="canUpdateProducts"
+                            [ngModel]="userFacade.permissions().canUpdateProducts"
+                            (ngModelChange)="userFacade.toggleCanUpdateProducts()"
+                        />
+                        <label class="custom-control-label" for="canUpdateProducts">
+                            CanUpdateProducts
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
