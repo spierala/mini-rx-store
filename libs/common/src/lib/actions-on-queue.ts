@@ -8,8 +8,9 @@ export function createActionsOnQueue() {
         actions$: actionsSource.asObservable().pipe(
             observeOn(queueScheduler) // Prevent stack overflow: https://blog.cloudboost.io/so-how-does-rx-js-queuescheduler-actually-work-188c1b46526e
         ),
-        dispatch: (action: Action) => {
+        dispatch: <T extends Action>(action: T): T => {
             actionsSource.next(action);
+            return action;
         },
     };
 }

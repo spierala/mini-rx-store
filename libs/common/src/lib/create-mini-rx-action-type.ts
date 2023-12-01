@@ -12,11 +12,7 @@ export function createMiniRxActionType(
     featureKey?: string,
     name?: string
 ): string {
-    return (
-        miniRxNameSpace +
-        (featureKey ? '/' + featureKey : '') +
-        '/' +
-        operationType +
-        (name ? '/' + name : '')
-    );
+    return `${miniRxNameSpace}${featureKey ? '/' + featureKey : ''}/${operationType}${
+        name ? '/' + name : ''
+    }`;
 }

@@ -37,6 +37,15 @@ const counterStringReducer: Reducer<CounterStringState> = (
 };
 
 describe('createReducerManager', () => {
+    it('should have a default reducer', () => {
+        const manager = createReducerManager();
+        const reducer: Reducer<AppState> = manager.reducer;
+        const state = {};
+        const nextState = reducer(state, { type: 'init' });
+
+        expect(nextState).toBe(state);
+    });
+
     it('should set feature reducers', () => {
         const manager = createReducerManager();
         let nextState: AppState;

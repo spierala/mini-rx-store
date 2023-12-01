@@ -1,3 +1,4 @@
+export { miniRxNameSpace } from './lib/constants';
 export { createSubSink } from './lib/sub-sink';
 export { createMiniRxActionType, OperationType } from './lib/create-mini-rx-action-type';
 export { combineMetaReducers } from './lib/combine-meta-reducers';

@@ -36,17 +36,15 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     private selectableState = createSelectableSignalState(this._state);
     state: Signal<StateType> = this.selectableState.select();
 
-    private dispatcher(
+    private updateState(
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> {
-        const action: MiniRxAction<StateType> = {
+        return this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(operationType, csFeatureKey, name),
             stateOrCallback,
-        };
-        this.actionsOnQueue.dispatch(action);
-        return action;
+        });
     }
 
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {
@@ -79,8 +77,8 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    setState = createUpdateFn(this.dispatcher.bind(this));
-    connect = createConnectFn(this.dispatcher.bind(this));
+    setState = createUpdateFn(this.updateState.bind(this));
+    connect = createConnectFn(this.updateState.bind(this));
     rxEffect = createRxEffectFn();
     select = this.selectableState.select;
 

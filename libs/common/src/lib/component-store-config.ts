@@ -9,7 +9,7 @@ export function componentStoreConfig() {
             componentStoreConfig = config;
             return;
         }
-        miniRxError('`configureComponentStores` was called multiple times.');
+        miniRxError('ComponentStore config was set multiple times.');
     }
 
     function get(): ComponentStoreConfig | undefined {

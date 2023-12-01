@@ -6,7 +6,7 @@ import { miniRxToObservable } from './mini-rx-to-observable';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 export function createConnectFn<StateType>(
-    dispatch: (
+    updateStateCallback: (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
@@ -15,9 +15,9 @@ export function createConnectFn<StateType>(
     const subSink = createSignalStoreSubSink();
     const injector = inject(EnvironmentInjector);
 
-    function connect<K extends keyof StateType, ValueType = StateType[K]>(
+    return <K extends keyof StateType, ValueType = StateType[K]>(
         dict: Record<K, Observable<ValueType> | Signal<ValueType>>
-    ): void {
+    ) => {
         const keys: K[] = Object.keys(dict) as K[];
 
         keys.forEach((key) => {
@@ -26,7 +26,7 @@ export function createConnectFn<StateType>(
                 ? miniRxToObservable(observableOrSignal, { injector })
                 : observableOrSignal;
             subSink.sink = obs$.subscribe((v) => {
-                dispatch(
+                updateStateCallback(
                     {
                         [key]: v,
                     } as unknown as Partial<StateType>,
@@ -35,7 +35,5 @@ export function createConnectFn<StateType>(
                 );
             });
         });
-    }
-
-    return connect;
+    };
 }

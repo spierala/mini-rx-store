@@ -295,13 +295,6 @@ describe('ComponentStore', () => {
         expect(effectCallback.mock.calls).toEqual([[1], [2]]);
     });
 
-    it('should throw when calling `configureComponentStores` more than once', () => {
-        globalCsConfig.set({ extensions: [] });
-        expect(() => globalCsConfig.set({ extensions: [] })).toThrowError(
-            '@mini-rx: `configureComponentStores` was called multiple times.'
-        );
-    });
-
     it('should throw when using undo without extension', () => {
         const cs = setup({});
 

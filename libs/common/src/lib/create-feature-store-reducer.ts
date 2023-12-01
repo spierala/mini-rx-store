@@ -7,9 +7,8 @@ export function createFeatureStoreReducer<StateType>(
     initialState: StateType
 ): Reducer<StateType> {
     return (state: StateType = initialState, action: Action): StateType => {
-        if (isMiniRxAction<StateType>(action) && action.featureId === featureId) {
-            return calcNextState(state, action.stateOrCallback);
-        }
-        return state;
+        return isMiniRxAction<StateType>(action) && action.featureId === featureId
+            ? calcNextState(state, action.stateOrCallback)
+            : state;
     };
 }

@@ -23,14 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import {
-    Inject,
-    InjectionToken,
-    ModuleWithProviders,
-    NgModule,
-    Optional,
-    Type,
-} from '@angular/core';
+import { Inject, ModuleWithProviders, NgModule, Optional, Type } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Action } from '@mini-rx/common';
 import {
@@ -39,8 +32,7 @@ import {
 } from '../effects-mapper';
 import { StoreFeatureModule, StoreRootModule } from './store.module';
 import { rxEffect } from '../store-core';
-
-const OBJECTS_WITH_EFFECTS = new InjectionToken('@mini-rx/objectsWithEffects');
+import { OBJECTS_WITH_EFFECTS } from '../injection-tokens';
 
 @NgModule()
 export class EffectsModule {
