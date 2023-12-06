@@ -12,7 +12,7 @@ import { ArtStore } from '../../state/art-store.service';
 export class PixelArtComponent {
     artStore = inject(ArtStore);
 
-    @HostListener('mouseover', ['$event']) onHover(e: MouseEvent) {
+    @HostListener('mouseover') onHover() {
         this.artStore.reset();
     }
 }

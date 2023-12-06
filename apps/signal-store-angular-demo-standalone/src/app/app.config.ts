@@ -30,6 +30,7 @@ export const appConfig: ApplicationConfig = {
                 put204: false,
             })
         ),
+        // 👇 MiniRx
         provideStore({
             reducers: {
                 products: productsReducer,
