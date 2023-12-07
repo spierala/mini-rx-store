@@ -3,15 +3,24 @@ import { Route } from '@angular/router';
 export const appRoutes: Route[] = [
     {
         path: 'todos-simple',
-        loadChildren: () => import('./todos-simple/routes').then(({ routes }) => routes),
+        loadComponent: () =>
+            import(
+                './todos-simple/components/todos-simple-shell/todos-simple-shell.component'
+            ).then((v) => v.TodosSimpleShellComponent),
     },
     {
         path: 'todos',
-        loadChildren: () => import('./todos/routes').then(({ routes }) => routes),
+        loadComponent: () =>
+            import('./todos/components/todos-shell/todos-shell.component').then(
+                (v) => v.TodosShellComponent
+            ),
     },
     {
         path: 'products',
-        loadChildren: () => import('./products/routes').then(({ routes }) => routes),
+        loadComponent: () =>
+            import('./products/components/products-shell/products-shell.component').then(
+                (v) => v.ProductsShellComponent
+            ),
     },
     {
         path: 'counters',
