@@ -121,7 +121,7 @@ Access the Signals in the Component template:
 ```
 StackBlitz demo: [ConnectDemoComponent](https://stackblitz.com/edit/stackblitz-starters-6mbywk?file=src%2Fconnect-demo%2Fconnect-demo.component.ts)
 
-## rxEffect
+### rxEffect
 
 The `effect` method has been renamed to `rxEffect` (to avoid confusion with the Angular Signal `effect` function).
 
@@ -211,47 +211,6 @@ Component template:
 </ng-container>
 ```
 StackBlitz demo: [EffectDemoComponent](https://stackblitz.com/edit/stackblitz-starters-6mbywk?file=src%2Feffect-demo%2Feffect-demo.component.ts)
-
-## Memoized Signal Selectors
-
-`createSelector`, `createFeatureStateSelector` and `createComponentStateSelector` return a **SignalSelector** function. 
-Signal Selector functions take a Signal and return a Signal.
-
-You can pass Signal Selectors to the `select` method of Store, Feature Store and Component Store.
-
-Signal Selectors are memoized for fewer computations of the projector function.
-
-**Fun fact**: Angular Signal `computed` is used to implement Signal Selectors.
-
-Example: Selecting state from the Redux Store
-
-```ts
-import { Component, inject, Signal } from "@angular/core";
-import { createFeatureStateSelector, createSelector, Store } from "@mini-rx/signal-store";
-import { Todo, TodosState } from "./todo-state";
-
-// Memoized SignalSelectors
-const getFeature = createFeatureStateSelector<TodosState>('todos');
-const getTodos = createSelector(getFeature, state => state.todos);
-const getTodosDone = createSelector(getTodos, todos => todos.filter(item => item.isDone))
-const getTodosNotDone = createSelector(getTodos, todos => todos.filter(item => !item.isDone))
-
-@Component({
-// ...
-})
-export class MemoizedSignalSelectorsDemoComponent {
-  private store = inject(Store); // Store is provided in the main.js file
-  todosDone: Signal<Todo[]> = this.store.select(getTodosDone);
-  todosNotDone: Signal<Todo[]> = this.store.select(getTodosNotDone);
-}
-```
-
-Access the Signals in the Component template:
-```html
-<pre>DONE: {{ todosDone() | json }}</pre>
-<pre>NOT DONE: {{ todosNotDone() | json }}</pre>
-```
-StackBlitz demo: [MemoizedSignalSelectorsDemoComponent](https://stackblitz.com/edit/stackblitz-starters-6mbywk?file=src%2Fmemoized-signal-selectors-demo%2Fmemoized-signal-selectors-demo.component.ts)
 
 ### Component Store destruction
 
@@ -346,6 +305,48 @@ export class ImmutableDemoComponent {
 }
 ```
 StackBlitz demo: [ImmutableDemoComponent](https://stackblitz.com/edit/stackblitz-starters-6mbywk?file=src%2Fimmutable-demo%2Fimmutable-demo.component.ts)
+
+## Memoized Signal Selectors
+
+`createSelector`, `createFeatureStateSelector` and `createComponentStateSelector` return a **SignalSelector** function.
+Signal Selector functions take a Signal and return a Signal.
+
+You can pass Signal Selectors to the `select` method of Store, Feature Store and Component Store.
+
+Signal Selectors are memoized for fewer computations of the projector function.
+
+**Fun fact**: Angular Signal `computed` is used to implement Signal Selectors.
+
+Example: Selecting state from the Redux Store
+
+```ts
+import { Component, inject, Signal } from "@angular/core";
+import { createFeatureStateSelector, createSelector, Store } from "@mini-rx/signal-store";
+import { Todo, TodosState } from "./todo-state";
+
+// Memoized SignalSelectors
+const getFeature = createFeatureStateSelector<TodosState>('todos');
+const getTodos = createSelector(getFeature, state => state.todos);
+const getTodosDone = createSelector(getTodos, todos => todos.filter(item => item.isDone))
+const getTodosNotDone = createSelector(getTodos, todos => todos.filter(item => !item.isDone))
+
+@Component({
+// ...
+})
+export class MemoizedSignalSelectorsDemoComponent {
+  private store = inject(Store); // Store is provided in the main.js file
+  todosDone: Signal<Todo[]> = this.store.select(getTodosDone);
+  todosNotDone: Signal<Todo[]> = this.store.select(getTodosNotDone);
+}
+```
+
+Access the Signals in the Component template:
+```html
+<pre>DONE: {{ todosDone() | json }}</pre>
+<pre>NOT DONE: {{ todosNotDone() | json }}</pre>
+```
+StackBlitz demo: [MemoizedSignalSelectorsDemoComponent](https://stackblitz.com/edit/stackblitz-starters-6mbywk?file=src%2Fmemoized-signal-selectors-demo%2Fmemoized-signal-selectors-demo.component.ts)
+
 
 ## Store (Redux)
 
