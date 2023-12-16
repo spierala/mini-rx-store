@@ -15,7 +15,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [16.x]
+                node-version: [18.x]
 
         steps:
             - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
             - run: yarn install --frozen-lockfile
-            - run: npm run build:all
-            - run: npm run test:all
+            - run: yarn run build:all
+            - run: yarn run test:all
               env:
                   CI: true
