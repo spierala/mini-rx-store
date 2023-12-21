@@ -20,11 +20,11 @@ This demo uses both the Redux API and the Feature Store API:
 
 ### Install dependencies
 
-`npm install`
+`yarn install`
 
 ### Run the demo
 
-`npm run start:angular-demo`
+`yarn start:angular-demo`
 
 ### NX
 
