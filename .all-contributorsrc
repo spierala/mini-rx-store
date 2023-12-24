@@ -77,6 +77,16 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "carlos-ds",
+      "name": "Karel De Smet",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20499950?v=4",
+      "profile": "https://www.kareldesmet.be",
+      "contributions": [
+        "code",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
