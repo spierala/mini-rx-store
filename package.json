@@ -17,9 +17,9 @@
         "test:mini-rx-store-ng": "nx test mini-rx-store-ng",
         "test:mini-rx-store-ng:watch": "nx test mini-rx-store-ng --watch",
         "test:mini-rx-store-ng:coverage": "nx test mini-rx-store-ng --codeCoverage",
-        "deploy:docs": "npm run deploy --prefix docs",
+        "deploy:docs": "cd docs && yarn deploy",
         "build:mini-rx-angular-demo:sourcemap": "nx build mini-rx-angular-demo --source-map",
-        "build:mini-rx-angular-demo:sourcemap:stats": "npm run build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
+        "build:mini-rx-angular-demo:sourcemap:stats": "yarn build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
         "prepare": "husky install"
     },
     "private": true,
