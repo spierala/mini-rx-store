@@ -354,6 +354,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mvmiert"><img src="https://avatars.githubusercontent.com/u/93150090?v=4?s=100" width="100px;" alt="mvmiert"/><br /><sub><b>mvmiert</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/pulls?q=is%3Apr+reviewed-by%3Amvmiert" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.kareldesmet.be"><img src="https://avatars.githubusercontent.com/u/20499950?v=4?s=100" width="100px;" alt="Karel De Smet"/><br /><sub><b>Karel De Smet</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=carlos-ds" title="Code">💻</a> <a href="https://github.com/spierala/mini-rx-store/pulls?q=is%3Apr+reviewed-by%3Acarlos-ds" title="Reviewed Pull Requests">👀</a></td>
     </tr>
   </tbody>
 </table>
