@@ -4,9 +4,13 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-blue.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
+> New Blogpost: [**MiniRx Signal Store for Angular - API Preview**](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
+
+> New Discussion: [**Angular Signal Store RFC**](https://github.com/spierala/mini-rx-store/discussions/188)
 
 # MiniRx Store 5
 
@@ -340,12 +344,16 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
-      <td align="center"><a href="https://github.com/PieterVanPoyer"><img src="https://avatars2.githubusercontent.com/u/33040889?v=4?s=100" width="100px;" alt="Pieter Van Poyer"/><br /><sub><b>Pieter Van Poyer</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=PieterVanPoyer" title="Code">💻</a></td>
-      <td align="center"><a href="https://www.florian-spier.be"><img src="https://avatars3.githubusercontent.com/u/1272446?v=4?s=100" width="100px;" alt="Florian Spier"/><br /><sub><b>Florian Spier</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=spierala" title="Code">💻</a> <a href="#ideas-spierala" title="Ideas, Planning, & Feedback">🤔</a></td>
-      <td align="center"><a href="https://github.com/Thocaten"><img src="https://avatars.githubusercontent.com/u/79323279?v=4?s=100" width="100px;" alt="Carsten"/><br /><sub><b>Carsten</b></sub></a><br /><a href="#design-Thocaten" title="Design">🎨</a></td>
-      <td align="center"><a href="https://github.com/M5150"><img src="https://avatars.githubusercontent.com/u/3443413?v=4?s=100" width="100px;" alt="Maximo Cudich-Sieburger"/><br /><sub><b>Maximo Cudich-Sieburger</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=M5150" title="Code">💻</a></td>
-      <td align="center"><a href="https://github.com/sashion"><img src="https://avatars.githubusercontent.com/u/1050641?v=4?s=100" width="100px;" alt="sashion"/><br /><sub><b>sashion</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=sashion" title="Code">💻</a></td>
-      <td align="center"><a href="http://www.braincrumbz.com"><img src="https://avatars.githubusercontent.com/u/3185573?v=4?s=100" width="100px;" alt="BrainCrumbz"/><br /><sub><b>BrainCrumbz</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=BrainCrumbz" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/PieterVanPoyer"><img src="https://avatars2.githubusercontent.com/u/33040889?v=4?s=100" width="100px;" alt="Pieter Van Poyer"/><br /><sub><b>Pieter Van Poyer</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=PieterVanPoyer" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.florian-spier.be"><img src="https://avatars3.githubusercontent.com/u/1272446?v=4?s=100" width="100px;" alt="Florian Spier"/><br /><sub><b>Florian Spier</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=spierala" title="Code">💻</a> <a href="#ideas-spierala" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Thocaten"><img src="https://avatars.githubusercontent.com/u/79323279?v=4?s=100" width="100px;" alt="Carsten"/><br /><sub><b>Carsten</b></sub></a><br /><a href="#design-Thocaten" title="Design">🎨</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/M5150"><img src="https://avatars.githubusercontent.com/u/3443413?v=4?s=100" width="100px;" alt="Maximo Cudich-Sieburger"/><br /><sub><b>Maximo Cudich-Sieburger</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=M5150" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/sashion"><img src="https://avatars.githubusercontent.com/u/1050641?v=4?s=100" width="100px;" alt="sashion"/><br /><sub><b>sashion</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=sashion" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.braincrumbz.com"><img src="https://avatars.githubusercontent.com/u/3185573?v=4?s=100" width="100px;" alt="BrainCrumbz"/><br /><sub><b>BrainCrumbz</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/commits?author=BrainCrumbz" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/vangenechtenbert"><img src="https://avatars.githubusercontent.com/u/63012822?v=4?s=100" width="100px;" alt="vangenechtenbert"/><br /><sub><b>vangenechtenbert</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/pulls?q=is%3Apr+reviewed-by%3Avangenechtenbert" title="Reviewed Pull Requests">👀</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mvmiert"><img src="https://avatars.githubusercontent.com/u/93150090?v=4?s=100" width="100px;" alt="mvmiert"/><br /><sub><b>mvmiert</b></sub></a><br /><a href="https://github.com/spierala/mini-rx-store/pulls?q=is%3Apr+reviewed-by%3Amvmiert" title="Reviewed Pull Requests">👀</a></td>
     </tr>
   </tbody>
 </table>
