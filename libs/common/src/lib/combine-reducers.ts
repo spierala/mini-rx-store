@@ -38,7 +38,7 @@ export function combineReducers(reducers: ReducerDictionary<any>): Reducer<any> 
 
         for (let i = 0; i < reducerKeyLength; i++) {
             const key = reducerKeys[i];
-            const reducer: any = reducers[key];
+            const reducer: Reducer<any> = reducers[key];
             const previousStateForKey = state[key];
             const nextStateForKey = reducer(previousStateForKey, action);
 
