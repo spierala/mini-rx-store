@@ -24,7 +24,6 @@ describe('deepFreeze', () => {
             return 42;
         };
         expect(() => deepFreeze(fn)).not.toThrow();
-        // Test that the function object is frozen
         expect(Object.isFrozen(fn)).toBe(true);
     });
 
@@ -43,7 +42,6 @@ describe('deepFreeze', () => {
     it('should freeze an array and its elements', () => {
         const arr = [1, 2, 3];
         expect(() => deepFreeze(arr)).not.toThrow();
-        // Test that the array and its elements are frozen
         expect(Object.isFrozen(arr)).toBe(true);
         expect(Object.isFrozen(arr[0])).toBe(true);
     });
