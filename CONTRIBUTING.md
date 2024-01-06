@@ -7,24 +7,24 @@ MiniRx Store uses [NX](https://nx.dev/) to manage several libraries and apps in 
 
 Install the dependencies:
 ```shell
-npm i
+yarn install
 ```
 
 ## Run
 
 Start the demo app with a watcher on the app and library code.
 ```shell
-npm run dev
+yarn dev
 ```
 
 ## Test
 
 ```shell
-npm run test:mini-rx-store:watch
+yarn test:mini-rx-store:watch
 ```
 
 ```shell
-npm run test:mini-rx-store-ng:watch
+yarn test:mini-rx-store-ng:watch
 ```
 
 ## Questions and requests for support
