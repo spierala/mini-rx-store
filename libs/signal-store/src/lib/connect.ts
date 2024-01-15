@@ -1,7 +1,6 @@
-import { EnvironmentInjector, inject, Signal } from '@angular/core';
+import { EnvironmentInjector, inject, isSignal, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OperationType, UpdateStateCallback } from '@mini-rx/common';
-import { miniRxIsSignal } from './utils';
 import { miniRxToObservable } from './mini-rx-to-observable';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
@@ -16,7 +15,7 @@ export function createConnectFn<StateType>(updateStateCallback: UpdateStateCallb
 
         keys.forEach((key) => {
             const observableOrSignal: Observable<ValueType> | Signal<ValueType> = dict[key];
-            const obs$ = miniRxIsSignal(observableOrSignal)
+            const obs$ = isSignal(observableOrSignal)
                 ? miniRxToObservable(observableOrSignal, { injector })
                 : observableOrSignal;
             subSink.sink = obs$.subscribe((v) => {
