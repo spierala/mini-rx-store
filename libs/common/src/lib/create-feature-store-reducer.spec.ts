@@ -1,6 +1,6 @@
 import { createFeatureStoreReducer } from './create-feature-store-reducer';
-import { createMiniRxActionType, OperationType } from './create-mini-rx-action-type';
-import { Action, MiniRxAction } from './models';
+import { createMiniRxActionType } from './create-mini-rx-action-type';
+import { Action, MiniRxAction, OperationType } from './models';
 
 interface CounterState {
     counter: number;

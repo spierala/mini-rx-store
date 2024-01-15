@@ -1,4 +1,5 @@
-import { createMiniRxActionType, OperationType } from './create-mini-rx-action-type';
+import { createMiniRxActionType } from './create-mini-rx-action-type';
+import { OperationType } from './models';
 
 describe('createMiniRxActionType', () => {
     it('should create a MiniRx Action Type', () => {

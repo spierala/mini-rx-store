@@ -1,17 +1,11 @@
 import { EnvironmentInjector, inject, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
+import { OperationType, UpdateStateCallback } from '@mini-rx/common';
 import { miniRxIsSignal } from './utils';
 import { miniRxToObservable } from './mini-rx-to-observable';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
-export function createConnectFn<StateType>(
-    updateStateCallback: (
-        stateOrCallback: StateOrCallback<StateType>,
-        operationType: OperationType,
-        name: string | undefined
-    ) => Action
-) {
+export function createConnectFn<StateType>(updateStateCallback: UpdateStateCallback<StateType>) {
     const subSink = createSignalStoreSubSink();
     const injector = inject(EnvironmentInjector);
 

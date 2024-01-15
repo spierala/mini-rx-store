@@ -10,6 +10,7 @@ import {
     OperationType,
     StateOrCallback,
     undo,
+    UpdateStateCallback,
 } from '@mini-rx/common';
 import { addFeature, dispatch, hasUndoExtension, removeFeature, select } from './store-core';
 import { createSelectableSignalState } from './selectable-signal-state';
@@ -27,7 +28,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
 
     state: Signal<StateType> = select((state) => state[this.featureKey]);
 
-    private updateState = (
+    private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined

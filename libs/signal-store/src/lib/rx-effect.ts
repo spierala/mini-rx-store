@@ -1,5 +1,5 @@
 import { EnvironmentInjector, inject, Signal } from '@angular/core';
-import { isObservable, Observable, Subject } from 'rxjs';
+import { isObservable, Observable, of, Subject } from 'rxjs';
 import { defaultEffectsErrorHandler } from '@mini-rx/common';
 import { miniRxIsSignal } from './utils';
 import { miniRxToObservable } from './mini-rx-to-observable';

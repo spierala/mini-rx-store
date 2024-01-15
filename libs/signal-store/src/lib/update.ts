@@ -1,12 +1,6 @@
-import { Action, OperationType, StateOrCallback } from '@mini-rx/common';
+import { Action, OperationType, StateOrCallback, UpdateStateCallback } from '@mini-rx/common';
 
-export function createUpdateFn<StateType>(
-    updateStateCallback: (
-        stateOrCallback: StateOrCallback<StateType>,
-        operationType: OperationType,
-        name: string | undefined
-    ) => Action
-) {
+export function createUpdateFn<StateType>(updateStateCallback: UpdateStateCallback<StateType>) {
     return (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
         return updateStateCallback(stateOrCallback, OperationType.SET_STATE, name);
     };

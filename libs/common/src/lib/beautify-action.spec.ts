@@ -1,6 +1,6 @@
 import { beautifyAction } from './beautify-action';
-import { MiniRxAction } from './models';
-import { createMiniRxActionType, OperationType } from './create-mini-rx-action-type';
+import { MiniRxAction, OperationType } from './models';
+import { createMiniRxActionType } from './create-mini-rx-action-type';
 
 describe('beautifyAction', () => {
     it('should remove extra fields from FeatureStore/ComponentStore Actions', () => {

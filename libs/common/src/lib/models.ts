@@ -66,3 +66,16 @@ export interface ReducerState {
     featureReducers: ReducerDictionary<AppState>;
     metaReducers: MetaReducer<AppState>[];
 }
+
+export const enum OperationType {
+    INIT = 'init',
+    DESTROY = 'destroy',
+    SET_STATE = 'set-state',
+    CONNECTION = 'connection',
+}
+
+export type UpdateStateCallback<StateType> = (
+    stateOrCallback: StateOrCallback<StateType>,
+    operationType: OperationType,
+    name: string | undefined
+) => Action;

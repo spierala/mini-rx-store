@@ -4,8 +4,8 @@ import {
 } from './abstract-redux-devtools-extension';
 import { ExtensionId } from '../../enums';
 import { Observable, Subject } from 'rxjs';
-import { Action, AppState } from '../../models';
-import { createMiniRxActionType, OperationType } from '../../create-mini-rx-action-type';
+import { Action, AppState, OperationType } from '../../models';
+import { createMiniRxActionType } from '../../create-mini-rx-action-type';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
