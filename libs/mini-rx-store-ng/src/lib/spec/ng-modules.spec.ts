@@ -1,3 +1,6 @@
+// TODO remove exports
+// TODO fix strange feature naming (should be counter1, counter2, counter3)
+
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
 import {
@@ -20,7 +23,7 @@ import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { EffectsModule } from '../effects.module';
-import { ComponentStoreModule } from 'mini-rx-store-ng';
+import { ComponentStoreModule } from '../component-store.module';
 import { NgReduxDevtoolsExtension } from '../ng-redux-devtools.extension';
 
 export const loadAction: Action = {
