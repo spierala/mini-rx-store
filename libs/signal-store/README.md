@@ -19,10 +19,14 @@ MiniRx Signal Store is exactly that.
 * Signal Store implements and promotes new **Angular best practices**:
     * **Signals** are used for **(synchronous) state**
     * **RxJS** is used for events and **asynchronous tasks**
-* Immutable Signal State: Immutability can be enforced with the Immutable State extension
 * Signal Store helps to streamline your usage of [RxJS](https://rxjs.dev/) and [Signals](https://angular.io/guide/signals): e.g. `connect` and `rxEffect` understand both Signals and Observables
 * Signal Store has first-class support for OOP style (e.g. `MyStore extends FeatureStore`), but offers also functional creation methods (e.g. `createFeatureStore`)
 * Simple refactor: If you used MiniRx Store before, refactor to Signal Store will be straight-forward: change the TypeScript imports, remove the Angular async pipes (and ugly non-null assertions (`!`)) from the template
+* Extensions
+    - Redux DevTools Extension: Inspect global state with the Redux DevTools
+    - Immutable Extension: Enforce Signal state immutability
+    - Undo Extension: Undo dispatched actions
+    - Logger Extension: console.log the current action and updated state
 
 ### Getting Started
 To install the @mini-rx/signal-store package, use your package manager of choice:
@@ -44,60 +48,11 @@ These are the typical use-cases:
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qj5anf3ibwrjw20yu6t0.png)
 
-## Store (Redux)
-Let's start with Redux... If you do not like Redux, do not run away! MiniRx Signal Store has first-class support for bypassing the infamous Redux boilerplate: Feature Stores.
+## Redux
 
-### Redux Pattern
+MiniRx Signal Store has a powerful Redux API:
 
-The Redux pattern is great to manage state at large scale. MiniRx Signal Store offers a powerful Redux API.
-
-#### The Redux ingredients
-Let's have a look at the basic building blocks of the Redux pattern:
-
-- Actions: objects which describe events with an optional payload
-- Reducers
-    - pure functions which know how to update state (based on the current state and a given action)
-    - reducers are run for every action in order to calculate the next state
-- Effects: listen to a specific action, run side effects like API calls and handle race conditions (with RxJS flattening operators)
-- Memoized selectors: pure functions which describe how to select state from the global state object
-- Store
-    - holds the global state object
-    - wires everything up (reducers, effects)
-    - exposes the public Store API (`dispatch`, `select`)
-
-You can see already, that these building blocks offer a nice separation of concerns.
-Every part does its own specialized thing, you can also split up your code more easily:
-
-![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ib6mnr0vmrq550muhys7.png)
-
-#### More benefits of Redux
-- Single source of truth for your state (one global state object)
-- Uni-directional data flow
-- Indirection of State and Actions
-    - State: state is updated via actions, state changes are propagated via new Signal values
-    - Actions: A single action can update state in one or many reducers. The same action can trigger async tasks in effects.
-- Tooling: Redux DevTools
-
-### Redux Store Implementation
-
-The MiniRx Signal Store makes use of both Signals and Observables. Let's see how the Redux Store is implemented...
-
-#### 🚦 Signals
-
-- The global state is implemented as Angular Signal, because Signals are great for state!
-- `Store.select` returns a Signal
-- Memoized selectors use Signal `computed` internally for memoization
-
-#### Observables
-
-- A RxJS Subject is the basis for the Actions stream, because Subjects are great for events!
-- In Effects the Observable Actions stream is used to trigger side effects like API calls. For that reason you can easily handle race-conditions with RxJS flattening operators (e.g. `switchMap`, `concatMap` etc.).
-
-### Redux API
-
-Let's have a look at some code examples to get known to the Signal Store Redux API...
-
-#### Memoized selectors
+### Memoized selectors
 
 Memoized selectors are used to select state from the global state object.
 You can compose selectors from other selectors, which makes code reuse easy.
@@ -132,7 +87,7 @@ export class ProductShellComponent implements OnInit {
 }
 ```
 
-#### Actions
+### Actions
 
 You define Actions like this:
 
@@ -154,7 +109,7 @@ export const deleteProduct = action(
 ```
 _FYI_ the powerful [ts-action](https://www.npmjs.com/package/ts-action) library is used to create actions with less boilerplate.
 
-#### Reducer
+### Reducer
 
 Defining a reducer looks like this:
 
@@ -184,7 +139,7 @@ export const productReducer = reducer(
 ```
 _FYI_ the powerful [ts-action](https://www.npmjs.com/package/ts-action) library is used to create reducers with less boilerplate.
 
-#### Effects
+### Effects
 
 You create an effect like this:
 - Listen to a specific action
@@ -228,7 +183,7 @@ export class ProductEffects {
 }
 ```
 
-#### Register reducers and effects
+### Register reducers and effects
 
 You can register reducers and effects with modern Angular standalone APIs (`provideStore`, `provideEffects`) when initializing the app:
 ```ts
@@ -259,7 +214,7 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-#### Register reducers and effects via a lazy loaded component
+### Register reducers and effects via a lazy loaded component
 
 It is possible to register reducers together with a lazy loaded component (see `provideFeature`).
 For registering effects you can use `provideEffects`.
@@ -287,7 +242,7 @@ export const productRoutes: Routes = [
 ];
 ```
 
-#### Component usage
+#### Redux Store usage in components
 
 Your components can read state from the store via the `select` method.
 
