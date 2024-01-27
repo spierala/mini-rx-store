@@ -4,7 +4,7 @@ With the arrival of [Signals](https://angular.io/guide/signals) in Angular 16, n
 
 Modern Angular needs modern state management which promotes **new Angular best practices** and **streamlines the usage of Signals and Observables**...
 
-MiniRx Signal Store is exactly that.
+MiniRx Signal Store does exactly that.
 
 ### Modern state management with MiniRx Signal Store:
 
@@ -14,19 +14,14 @@ MiniRx Signal Store is exactly that.
     * Manage **global** state at large scale with the **Store (Redux) API**
     * Manage **global** state with a minimum of boilerplate using **Feature Stores**
     * Manage **local** component state with **Component Stores**
-    * All combined in a single library
-    * MiniRx always tries to find the sweet spot between powerful, simple and [lightweight](https://github.com/spierala/angular-state-management-comparison)
+    * All combined in a single library!
+    * MiniRx always tries to find the sweet spot between powerful, simple and [lightweight](https://github.com/spierala/angular-state-management-comparison)!
 * Signal Store implements and promotes new **Angular best practices**:
     * **Signals** are used for **(synchronous) state**
     * **RxJS** is used for events and **asynchronous tasks**
 * Signal Store helps to streamline your usage of [RxJS](https://rxjs.dev/) and [Signals](https://angular.io/guide/signals): e.g. `connect` and `rxEffect` understand both Signals and Observables
 * Signal Store has first-class support for OOP style (e.g. `MyStore extends FeatureStore`), but offers also functional creation methods (e.g. `createFeatureStore`)
 * Simple refactor: If you used MiniRx Store before, refactor to Signal Store will be straight-forward: change the TypeScript imports, remove the Angular async pipes (and ugly non-null assertions (`!`)) from the template
-* Extensions
-    - Redux DevTools Extension: Inspect global state with the Redux DevTools
-    - Immutable Extension: Enforce Signal state immutability
-    - Undo Extension: Undo dispatched actions
-    - Logger Extension: console.log the current action and updated state
 
 ### Getting Started
 To install the @mini-rx/signal-store package, use your package manager of choice:
@@ -48,44 +43,20 @@ These are the typical use-cases:
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/qj5anf3ibwrjw20yu6t0.png)
 
-## Redux
+## Redux API
 
-MiniRx Signal Store has a powerful Redux API:
+The Redux pattern is great to manage state at large scale. MiniRx Signal Store offers a powerful Redux API.
 
-### Memoized selectors
-
-Memoized selectors are used to select state from the global state object.
-You can compose selectors from other selectors, which makes code reuse easy.
-Last but not least, memoized selectors can be good for performance, if you have to perform more complex computations for selecting state.
-
-```ts
-import {
-  createFeatureStateSelector,
-  createSelector,
-} from '@mini-rx/signal-store';
-import { Product } from '../models';
-
-// State interface
-export type ProductsState = {
-  list: Product[];
-}
-
-// Memoized selectors
-const getProductsFeature =
-  createFeatureStateSelector<ProductsState>('product');
-export const getProducts = createSelector(
-  getProductsFeature,
-  (state) => state.list,
-);
-```
-
-Usage of the selectors e.g. in a component:
-```ts
-export class ProductShellComponent implements OnInit {
-  private store = inject(Store);
-  products: Signal<Product[]> = this.store.select(getProducts);
-}
-```
+- Actions: objects which describe events with an optional payload
+- Reducers
+    - pure functions which know how to update state (based on the current state and a given action)
+    - reducers are run for every action in order to calculate the next state
+- Effects: listen to a specific action, run side effects like API calls and handle race conditions (with RxJS flattening operators)
+- Memoized selectors: pure functions which describe how to select state from the global state object
+- Store
+    - holds the global state object
+    - wires everything up (reducers, effects)
+    - exposes the public Store API (`dispatch`, `select`)
 
 ### Actions
 
@@ -242,7 +213,46 @@ export const productRoutes: Routes = [
 ];
 ```
 
-#### Redux Store usage in components
+### Memoized selectors
+
+Memoized selectors are used to select state from the global state object.
+You can compose selectors from other selectors, which makes code reuse easy.
+Last but not least, memoized selectors can be good for performance, if you have to perform more complex computations for selecting state.
+
+```ts
+import {
+  createFeatureStateSelector,
+  createSelector,
+} from '@mini-rx/signal-store';
+import { Product } from '../models';
+
+// State interface
+export type ProductsState = {
+  list: Product[];
+}
+
+// Memoized selectors
+const getProductsFeature =
+  createFeatureStateSelector<ProductsState>('product');
+export const getProducts = createSelector(
+  getProductsFeature,
+  (state) => state.list,
+);
+```
+
+_FYI_
+
+Memoized selectors use Signal `computed` internally to reduce the amount of calculations.
+
+Usage of the selectors e.g. in a component:
+```ts
+export class ProductShellComponent implements OnInit {
+  private store = inject(Store);
+  products: Signal<Product[]> = this.store.select(getProducts);
+}
+```
+
+### Redux Store usage in components
 
 Your components can read state from the store via the `select` method.
 
@@ -277,23 +287,19 @@ export class ProductShellComponent implements OnInit {
 }
 ```
 
-#### Redux DevTools
+### Redux DevTools
 
 Of course, MinRx Signal Store supports Redux DevTools. With Redux DevTools you can inspect the current state and see which actions have been dispatched.
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/bmnhd39ltnyzkvhdjkmq.png)
 
-#### What else
+### Extensions
+- Redux DevTools Extension: Inspect global state with the Redux DevTools
+- Immutable Extension: Enforce Signal state immutability
+- Undo Extension: Undo dispatched actions
+- Logger Extension: console.log the current action and updated state
 
-And there is more which we haven't covered:
-- Meta reducers
-- We can register extensions:
-    - Immutable State Extension (enforce state immutability)
-    - Undo Extension (Undo state changes)
-    - Logger Extension (Log actions and updated state in the JS console)
-- You can write your own extensions
-
-## Feature Store
+## Feature Store API
 
 Feature Store offers a more simple API to manage state, but it still uses the Redux store under the hood.
 
@@ -472,7 +478,7 @@ Destroy:
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/w4h1njkgz1wvvln0kl9p.png)
 
-## Component Store
+## Component Store API
 
 We have just seen, how Feature Stores can be used to manage local component state. But Feature Stores integrate into the global state object and make use of the Redux Store internally.
 
