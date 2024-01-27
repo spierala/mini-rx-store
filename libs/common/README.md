@@ -1,11 +1,10 @@
-# common
+# MiniRx Common
 
-This library was generated with [Nx](https://nx.dev).
+Library name: `@mini-rx/common`
 
-## Building
+MiniRx Common contains code which is shared between MiniRx Store and MiniRx Signal Store.
 
-Run `nx build common` to build the library.
+MiniRx Common will be installed as a dependency of MiniRx Store and MiniRx Signal Store.
 
-## Running unit tests
-
-Run `nx test common` to execute the unit tests via [Jest](https://jestjs.io).
+## Warning
+You should not import code directly from MiniRx Common in your project!
