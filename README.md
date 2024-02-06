@@ -8,44 +8,6 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-> New Blogpost: [**MiniRx Signal Store for Angular - API Preview**](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
-
-> New Discussion: [**Angular Signal Store RFC**](https://github.com/spierala/mini-rx-store/discussions/188)
-
-# MiniRx Store 5
-
-MiniRx Store 5 has been released (2023-04-17)!
-
-What's new?
-
-- **Component Store**: 
-  - Manage state independently of the global state object (which is used by Store and Feature Store)
-  - Component Store and Feature Store share the same API (`setState`, `select`, `effect`...)
-  - Component Store is perfect for managing smaller and local state (most times that is Component state)
-  - You can use most of the MiniRx extensions: Logger Extension, Undo Extension and Immutable Extension
-  - Extensions can be configured globally or individually for each Component Store instance 
-- **Tree-shakable**: even more lightweight!
-- **Lazy state initialisation** with `setInitialState`
-- **`setState` accepts also an Observable**: use an Observable to update state
-- `createFeatureSelector` has been deprecated. Use now `createFeatureStateSelector` which is more in line with `createComponentStateSelector`
-
-Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
-
-#### Angular Integration (mini-rx-store-ng)
-- `ComponentStoreModule`: Configure ComponentStore extensions globally with the `forRoot` static method
-- BREAKING CHANGE: `StoreDevtoolsModule` has been removed. You can use now the normal `ReduxDevtoolsExtension` from mini-rx-store with `StoreModule.forRoot`.
-
-Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store-ng/CHANGELOG.md) of the Angular Integration.
-
-### Installation
-`npm i mini-rx-store`
-
-Install the Angular Integration if you are using Angular:
-
-`npm i mini-rx-store-ng`
-
-The Angular Integration requires now Angular@12.
-
 # MiniRx Store
 
 MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/).
