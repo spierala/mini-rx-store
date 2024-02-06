@@ -1,7 +1,7 @@
 ![MiniRx - Logo](.github/images/mini-rx-logo-white-bg.png)
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-blue.svg?style=flat-square&color=blue)](https://github.com/semantic-release/semantic-release)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?color=blue)](../../LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?color=blue)](./LICENSE)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
