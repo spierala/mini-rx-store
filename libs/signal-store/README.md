@@ -1,8 +1,7 @@
-[![NPM](https://img.shields.io/npm/v/@mini-rx/signal-store)](https://www.npmjs.com/package/@mini-rx/signal-store)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-blue.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![NPM](https://img.shields.io/npm/v/@mini-rx/signal-store?color=blue)](https://www.npmjs.com/package/@mini-rx/signal-store)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-blue.svg?style=flat-square&color=blue)](https://github.com/semantic-release/semantic-release)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?color=blue)](../../LICENSE)
 [![Tests](https://github.com/spierala/mini-rx-store/workflows/Tests/badge.svg)](https://github.com/spierala/mini-rx-store/actions?query=workflow%3ATests)
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 [![Downloads](https://img.shields.io/npm/dm/@mini-rx/signal-store?color=orange)](https://npmcharts.com/compare/@mini-rx/signal-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
