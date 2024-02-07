@@ -1,31 +1,31 @@
 {
-  "name": "mini-rx-store",
-  "version": "5.1.0",
-  "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
-  "license": "MIT",
-  "homepage": "https://github.com/spierala/mini-rx-store",
-  "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
-  "description": "MiniRx: The Lightweight RxJS Redux Store",
-  "keywords": [
-    "RxJS",
-    "Redux",
-    "State Management",
-    "Angular",
-    "React",
-    "Vue",
-    "Svelte",
-    "Observable",
-    "Store",
-    "JavaScript"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spierala/mini-rx-store.git"
-  },
-  "bugs": {
-    "url": "https://github.com/spierala/mini-rx-store/issues"
-  },
-  "peerDependencies": {
-    "rxjs": "^6.4.0 || ^7.0.0"
-  }
+    "name": "mini-rx-store",
+    "version": "5.1.0",
+    "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
+    "license": "MIT",
+    "homepage": "https://github.com/spierala/mini-rx-store",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/README.md",
+    "description": "MiniRx: The Lightweight RxJS Redux Store",
+    "keywords": [
+        "RxJS",
+        "Redux",
+        "State Management",
+        "Angular",
+        "React",
+        "Vue",
+        "Svelte",
+        "Observable",
+        "Store",
+        "JavaScript"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/spierala/mini-rx-store.git"
+    },
+    "bugs": {
+        "url": "https://github.com/spierala/mini-rx-store/issues"
+    },
+    "peerDependencies": {
+        "rxjs": "^6.4.0 || ^7.0.0"
+    }
 }

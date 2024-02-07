@@ -18,6 +18,8 @@ Framework-agnostic reactive state management library based on RxJS.
 
 [README](libs/mini-rx-store/README.md)
 
+[Docs site: mini-rx.io](https://mini-rx.io/)
+
 ## MiniRx Signal Store
 
 [![NPM](https://img.shields.io/npm/v/@mini-rx/signal-store?color=blue)](https://www.npmjs.com/package/@mini-rx/signal-store)

@@ -1,10 +1,10 @@
 {
     "name": "@mini-rx/signal-store",
-    "version": "0.0.24",
+    "version": "1.0.0",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
-    "readme": "https://github.com/spierala/mini-rx-store/blob/master/README.md",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/libs/signal-store/README.md",
     "description": "Signal Store for Angular",
     "keywords": [
         "Angular",
@@ -24,10 +24,10 @@
     },
     "peerDependencies": {
         "@angular/core": ">= 16.0.0",
-        "rxjs": "^7.0.0"
+        "rxjs": "^7.4.0"
     },
     "dependencies": {
-        "@mini-rx/common": "^0.0.8",
+        "@mini-rx/common": "^1.0.0",
         "tslib": "^2.3.0"
     },
     "sideEffects": false
