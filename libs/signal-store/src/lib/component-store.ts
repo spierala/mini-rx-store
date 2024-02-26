@@ -35,6 +35,12 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
 
     private _state: WritableSignal<StateType> = signal(this.initialState);
     private selectableState = createSelectableSignalState(this._state);
+
+    /**
+     * @deprecated
+     * Use the `select` method without arguments to return a state Signal
+     * the `state` property will be replaced with a getter function which returns the raw state (like in the original MiniRx Store)
+     */
     state: Signal<StateType> = this.selectableState.select();
 
     private updateState: UpdateStateCallback<StateType> = (
