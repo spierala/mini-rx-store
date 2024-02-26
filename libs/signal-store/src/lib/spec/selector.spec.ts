@@ -139,5 +139,43 @@ describe('Selectors', () => {
             expect(selectorSpy).toHaveBeenCalledTimes(3);
             expect(projectSpy).toHaveBeenCalledTimes(2);
         });
+
+        it('should create a selector from selectors dictionary', () => {
+            interface State {
+                x: number;
+                y: string;
+            }
+
+            const selectX = (state: Signal<State>) => computed(() => state().x + 1);
+            const selectY = (state: Signal<State>) => computed(() => state().y);
+
+            const createdSelector = createSelector({
+                s: selectX,
+                m: selectY,
+            });
+
+            const signalState = signal({ x: 1, y: 'mini-rx' });
+            const selectedState = createdSelector(signalState);
+
+            expect(selectedState()).toEqual({
+                s: 2,
+                m: 'mini-rx',
+            });
+
+            signalState.set({ x: 2, y: 'mini-rx' });
+            expect(selectedState()).toEqual({
+                s: 3,
+                m: 'mini-rx',
+            });
+        });
+
+        it('should create a selector from empty dictionary', () => {
+            const createdSelector = createSelector({});
+
+            const signalState = signal({ x: 1, y: 'mini-rx' });
+            const selectedState = createdSelector(signalState);
+
+            expect(selectedState()).toEqual({});
+        });
     });
 });

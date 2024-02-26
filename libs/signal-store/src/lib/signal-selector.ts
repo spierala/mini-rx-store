@@ -105,7 +105,19 @@ export function createSelector<State, S1, S2, S3, S4, S5, S6, S7, S8, Result>(
     projector: (s1: S1, s2: S2, s3: S3, s4: S4, s5: S5, s6: S6, s7: S7, s8: S8) => Result
 ): SignalSelector<State, Result>;
 
+export function createSelector<
+    Selectors extends Record<string, Selector<State, unknown>>,
+    State = Selectors extends Record<string, Selector<infer S, unknown>> ? S : never,
+    Result extends Record<string, unknown> = {
+        [Key in keyof Selectors]: Selectors[Key] extends Selector<State, infer R> ? R : never;
+    }
+>(selectors: Selectors): Selector<State, Result>;
+
 export function createSelector(...args: any[]): SignalSelector<any, any> {
+    if (args.length === 1 && isSelectorsDictionary(args[0])) {
+        args = extractArgsFromSelectorsDictionary(args[0]);
+    }
+
     const selectors = args.slice(0, args.length - 1);
     const projector = args[args.length - 1];
 
@@ -157,4 +169,36 @@ export function addSignalSelectorKey<T, R>(s: Selector<T, R>): SignalSelector<T,
 
 export function isSignalSelector(v: any): v is SignalSelector<any, any> {
     return Object.hasOwn(v, SIGNAL_SELECTOR_KEY);
+}
+
+// TODO move to @mini-rx/common
+function isSelectorsDictionary(
+    selectors: unknown
+): selectors is Record<string, Selector<unknown, unknown>> {
+    return (
+        !!selectors &&
+        typeof selectors === 'object' &&
+        Object.values(selectors).every((selector) => typeof selector === 'function')
+    );
+}
+
+// TODO move to @mini-rx/common
+function extractArgsFromSelectorsDictionary(
+    selectorsDictionary: Record<string, Selector<unknown, unknown>>
+): [
+    ...selectors: Selector<unknown, unknown>[],
+    projector: (...selectorResults: unknown[]) => unknown
+] {
+    const selectors = Object.values(selectorsDictionary);
+    const resultKeys = Object.keys(selectorsDictionary);
+    const projector = (...selectorResults: unknown[]) =>
+        resultKeys.reduce(
+            (result, key, index) => ({
+                ...result,
+                [key]: selectorResults[index],
+            }),
+            {}
+        );
+
+    return [...selectors, projector];
 }
