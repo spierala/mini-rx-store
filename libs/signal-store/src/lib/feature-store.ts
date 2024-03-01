@@ -26,6 +26,11 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return this._featureKey;
     }
 
+    /**
+     * @deprecated
+     * Use the `select` method without arguments to return a state Signal
+     * the `state` property will be replaced with a getter function which returns the raw state (like in the original MiniRx Store)
+     */
     state: Signal<StateType> = select((state) => state[this.featureKey]);
 
     private updateState: UpdateStateCallback<StateType> = (
