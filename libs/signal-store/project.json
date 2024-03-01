@@ -42,6 +42,13 @@
             "options": {
                 "lintFilePatterns": ["libs/signal-store/**/*.ts", "libs/signal-store/**/*.html"]
             }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "commitMessageFormat": "chore(${projectName}): release version ${version}"
+            }
         }
     }
 }
