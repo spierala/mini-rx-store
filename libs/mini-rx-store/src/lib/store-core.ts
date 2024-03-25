@@ -6,20 +6,19 @@ import {
     CombineReducersFn,
     EFFECT_METADATA_KEY,
     EffectConfig,
-    ExtensionId,
     HasEffectMetadata,
     MetaReducer,
     Reducer,
     ReducerDictionary,
     StoreConfig,
-    StoreExtension,
 } from './models';
-import { combineMetaReducers, hasEffectMetaData, miniRxError, sortExtensions } from './utils';
+import { combineMetaReducers, hasEffectMetaData, miniRxError } from './utils';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 import { combineReducers as defaultCombineReducers } from './combine-reducers';
 import { createMiniRxAction, MiniRxActionType } from './actions';
 import { State } from './state';
 import { ActionsOnQueue } from './actions-on-queue';
+import { StoreExtension, sortExtensions, ExtensionId } from '@mini-rx/common';
 
 export let hasUndoExtension = false;
 let isStoreInitialized = false;

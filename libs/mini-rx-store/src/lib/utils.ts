@@ -7,7 +7,6 @@ import {
     MetaReducer,
     Reducer,
     StateOrCallback,
-    StoreExtension,
 } from './models';
 import { isComponentStoreSetStateAction, isFeatureStoreSetStateAction } from './actions';
 import { miniRxNameSpace } from './constants';
@@ -67,10 +66,4 @@ export function combineMetaReducers<T>(metaReducers: MetaReducer<T>[]): MetaRedu
             reducer
         );
     };
-}
-
-export function sortExtensions<T extends StoreExtension>(extensions: T[]): T[] {
-    return [...extensions].sort((a, b) => {
-        return a.sortOrder - b.sortOrder;
-    });
 }

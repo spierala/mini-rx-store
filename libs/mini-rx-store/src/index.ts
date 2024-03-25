@@ -24,17 +24,17 @@ export {
     StoreConfig,
     FeatureConfig,
     ComponentStoreConfig,
-    StoreExtension,
-    ExtensionId,
 } from './lib/models';
 export { ofType, hasEffectMetaData } from './lib/utils';
+export { ReduxDevtoolsExtension } from './lib/extensions/redux-devtools.extension';
 export {
-    ReduxDevtoolsExtension,
+    LoggerExtension,
     ReduxDevtoolsOptions,
-} from './lib/extensions/redux-devtools.extension';
-export { LoggerExtension } from './lib/extensions/logger.extension';
-export { ImmutableStateExtension } from './lib/extensions/immutable-state.extension';
-export { UndoExtension } from './lib/extensions/undo.extension';
+    UndoExtension,
+    ExtensionId,
+    StoreExtension,
+    ImmutableStateExtension,
+} from '@mini-rx/common';
 export { tapResponse } from './lib/tap-response';
 export { mapResponse } from './lib/map-response';
 export { createEffect } from './lib/create-effect';
