@@ -14,7 +14,7 @@
         "build:mini-rx-store-ng": "nx build mini-rx-store-ng",
         "build:signal-store": "nx build signal-store",
         "build:common": "nx build common",
-        "build:all": "nx build mini-rx-store && nx build mini-rx-store-ng && nx build mini-rx-angular-demo && nx build signal-store && nx build common",
+        "build:all": "nx build common && nx build mini-rx-store && nx build mini-rx-store-ng && nx build mini-rx-angular-demo && nx build signal-store",
         "test:mini-rx-store": "nx test mini-rx-store",
         "test:mini-rx-store:watch": "nx test mini-rx-store --watch",
         "test:mini-rx-store:coverage": "nx test mini-rx-store --codeCoverage",
