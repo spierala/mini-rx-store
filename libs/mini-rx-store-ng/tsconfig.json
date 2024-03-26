@@ -20,8 +20,7 @@
         "noPropertyAccessFromIndexSignature": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "esModuleInterop": true,
-        "target": "es2020"
+        "esModuleInterop": true
     },
     "angularCompilerOptions": {
         "strictInjectionParameters": true,
