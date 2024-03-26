@@ -1,13 +1,5 @@
 import { configureStore, Store } from '../store';
-import {
-    Action,
-    ActionWithPayload,
-    AppState,
-    ExtensionId,
-    Reducer,
-    ReducerDictionary,
-    StoreExtension,
-} from '../models';
+import { Action, ActionWithPayload, AppState, Reducer, ReducerDictionary } from '../models';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { ofType } from '../utils';
@@ -22,8 +14,8 @@ import {
     resetStoreConfig,
     store,
 } from './_spec-helpers';
-import { LoggerExtension } from '../extensions/logger.extension';
 import { createEffect } from '../create-effect';
+import { LoggerExtension, StoreExtension, ExtensionId } from '@mini-rx/common';
 import { combineReducers } from '../combine-reducers';
 import * as StoreCore from '../store-core';
 import { actions$ } from '../store-core';

@@ -4,12 +4,11 @@ import {
     ComponentStoreConfig,
     ComponentStoreExtension,
     ComponentStoreLike,
-    ExtensionId,
     MetaReducer,
     Reducer,
     StateOrCallback,
 } from './models';
-import { calcNewState, combineMetaReducers, miniRxError, sortExtensions } from './utils';
+import { calcNewState, combineMetaReducers, miniRxError } from './utils';
 import {
     ComponentStoreSetStateAction,
     createMiniRxAction,
@@ -20,6 +19,7 @@ import {
     undo,
 } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
+import { ExtensionId, sortExtensions } from '@mini-rx/common';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 

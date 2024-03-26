@@ -1,11 +1,9 @@
-import {
-    ReduxDevtoolsExtension,
-    ReduxDevtoolsOptions,
-} from '../extensions/redux-devtools.extension';
+import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { Action } from '../models';
 import { counterReducer, CounterState, store, userState, UserState } from './_spec-helpers';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import { addExtension, appState } from '../store-core';
+import { ReduxDevtoolsOptions } from '@mini-rx/common';
 
 const win = window as any;
 JSON.parse = jest.fn().mockImplementationOnce((data) => {
