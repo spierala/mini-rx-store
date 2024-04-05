@@ -4,12 +4,12 @@ import {
     createMiniRxActionType,
     FeatureStoreSetStateAction,
     isFeatureStoreSetStateAction,
-    MiniRxActionType,
     SetStateActionType,
     undo,
 } from './actions';
 import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
+import { OperationType } from '@mini-rx/common';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>
@@ -93,7 +93,7 @@ function createSetStateAction<T>(
     featureKey: string,
     name?: string
 ): FeatureStoreSetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
+    const miniRxActionType = OperationType.SET_STATE;
     return {
         setStateActionType: SetStateActionType.FEATURE_STORE,
         type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),

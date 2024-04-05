@@ -1,24 +1,28 @@
 import { Observable } from 'rxjs';
+import { createMiniRxAction } from './actions';
+import { State } from './state';
 import {
-    Action,
-    Actions,
+    StoreExtension,
+    sortExtensions,
+    ExtensionId,
+    ReducerDictionary,
     AppState,
-    CombineReducersFn,
-    EFFECT_METADATA_KEY,
-    EffectConfig,
-    HasEffectMetadata,
     MetaReducer,
     Reducer,
-    ReducerDictionary,
+    Actions,
     StoreConfig,
-} from './models';
-import { combineMetaReducers, hasEffectMetaData, miniRxError } from './utils';
-import { defaultEffectsErrorHandler } from './default-effects-error-handler';
-import { combineReducers as defaultCombineReducers } from './combine-reducers';
-import { createMiniRxAction, MiniRxActionType } from './actions';
-import { State } from './state';
-import { ActionsOnQueue } from './actions-on-queue';
-import { StoreExtension, sortExtensions, ExtensionId } from '@mini-rx/common';
+    HasEffectMetadata,
+    Action,
+    EffectConfig,
+    EFFECT_METADATA_KEY,
+    hasEffectMetaData,
+    defaultEffectsErrorHandler,
+    miniRxError,
+    createActionsOnQueue,
+    OperationType,
+    combineReducers,
+    combineMetaReducers,
+} from '@mini-rx/common';
 
 export let hasUndoExtension = false;
 let isStoreInitialized = false;
@@ -28,12 +32,11 @@ let isStoreInitialized = false;
 export const reducerState = new State<{
     featureReducers: ReducerDictionary<AppState>;
     metaReducers: MetaReducer<AppState>[];
-    combineReducersFn: CombineReducersFn<AppState>;
 }>();
 
 const reducer$: Observable<Reducer<AppState>> = reducerState.select((v) => {
     const combinedMetaReducer: MetaReducer<AppState> = combineMetaReducers(v.metaReducers);
-    const combinedReducer: Reducer<AppState> = v.combineReducersFn(v.featureReducers);
+    const combinedReducer: Reducer<AppState> = combineReducers(v.featureReducers);
     return combinedMetaReducer(combinedReducer);
 });
 
@@ -70,12 +73,8 @@ export function addMetaReducers(...reducers: MetaReducer<AppState>[]) {
     }));
 }
 
-function updateCombineReducersFn(combineReducersFn: CombineReducersFn<AppState>) {
-    reducerState.patch({ combineReducersFn });
-}
-
 // ACTIONS
-const actionsOnQueue = new ActionsOnQueue();
+const actionsOnQueue = createActionsOnQueue();
 export const actions$: Actions = actionsOnQueue.actions$;
 
 // APP STATE
@@ -91,7 +90,6 @@ function initStore() {
     reducerState.set({
         featureReducers: {},
         metaReducers: [],
-        combineReducersFn: defaultCombineReducers,
     });
 
     let reducer: Reducer<AppState>;
@@ -99,7 +97,7 @@ function initStore() {
     reducer$.subscribe((v) => (reducer = v));
 
     // Listen to the Actions stream and update state accordingly
-    actionsOnQueue.actions$.subscribe((action) => {
+    actions$.subscribe((action) => {
         const newState: AppState = reducer(
             appState.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
             action
@@ -117,10 +115,6 @@ export function configureStore(config: StoreConfig<AppState> = {}) {
         miniRxError(
             '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
         );
-    }
-
-    if (config.combineReducersFn) {
-        updateCombineReducersFn(config.combineReducersFn);
     }
 
     if (config.metaReducers?.length) {
@@ -142,7 +136,7 @@ export function configureStore(config: StoreConfig<AppState> = {}) {
         appState.set(config.initialState);
     }
 
-    dispatch(createMiniRxAction(MiniRxActionType.INIT));
+    dispatch(createMiniRxAction(OperationType.INIT));
 }
 
 export function addFeature<StateType>(
@@ -162,12 +156,12 @@ export function addFeature<StateType>(
     }
 
     addReducer(featureKey, reducer);
-    dispatch(createMiniRxAction(MiniRxActionType.INIT, featureKey));
+    dispatch(createMiniRxAction(OperationType.INIT, featureKey));
 }
 
 export function removeFeature(featureKey: string) {
     removeReducer(featureKey);
-    dispatch(createMiniRxAction(MiniRxActionType.DESTROY, featureKey));
+    dispatch(createMiniRxAction(OperationType.DESTROY, featureKey));
 }
 
 export function effect(effect$: Observable<any> & HasEffectMetadata): void;

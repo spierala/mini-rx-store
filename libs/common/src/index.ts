@@ -2,6 +2,7 @@ export { miniRxNameSpace } from './lib/constants';
 export { createSubSink } from './lib/sub-sink';
 export { createMiniRxActionType } from './lib/create-mini-rx-action-type';
 export { combineMetaReducers } from './lib/combine-meta-reducers';
+export { combineReducers } from './lib/combine-reducers';
 export { miniRxError } from './lib/mini-rx-error';
 export { sortExtensions } from './lib/sort-extensions';
 export { mapResponse } from './lib/map-response';

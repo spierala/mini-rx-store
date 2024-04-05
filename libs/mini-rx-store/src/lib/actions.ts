@@ -1,11 +1,6 @@
 import { Action, StateOrCallback } from './models';
 import { miniRxNameSpace } from './constants';
-
-export const enum MiniRxActionType {
-    INIT = 'init',
-    DESTROY = 'destroy',
-    SET_STATE = 'set-state',
-}
+import { OperationType } from '@mini-rx/common';
 
 export const enum SetStateActionType {
     FEATURE_STORE = '@mini-rx/feature-store',
@@ -29,12 +24,12 @@ export interface ComponentStoreSetStateAction<T> {
 // Union type
 export type SetStateAction<T> = FeatureStoreSetStateAction<T> | ComponentStoreSetStateAction<T>;
 
-export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
+export function createMiniRxActionType(miniRxActionType: OperationType, featureKey?: string) {
     return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
 }
 
 export function createMiniRxAction(
-    miniRxActionType: MiniRxActionType.INIT | MiniRxActionType.DESTROY,
+    miniRxActionType: OperationType.INIT | OperationType.DESTROY,
     featureKey?: string
 ): Action {
     return {
