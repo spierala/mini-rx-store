@@ -1,18 +1,14 @@
 import { ComponentStoreLike } from './models';
-import { calcNewState, miniRxError } from './utils';
-import {
-    FeatureStoreSetStateAction,
-    isFeatureStoreSetStateAction,
-    SetStateActionType,
-} from './actions';
+import { miniRxError } from './utils';
+import { FeatureStoreSetStateAction, SetStateActionType } from './actions';
 import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
 import {
     Action,
+    createFeatureStoreReducer,
     createMiniRxActionType,
     FeatureStoreConfig,
     generateId,
-    Reducer,
     StateOrCallback,
     OperationType,
     undo,
@@ -80,18 +76,6 @@ export class FeatureStore<StateType extends object>
         super.destroy();
         removeFeature(this._featureKey);
     }
-}
-
-function createFeatureStoreReducer<StateType>(
-    featureId: string,
-    initialState: StateType
-): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action): StateType => {
-        if (isFeatureStoreSetStateAction<StateType>(action) && action.featureId === featureId) {
-            return calcNewState(state, action.stateOrCallback);
-        }
-        return state;
-    };
 }
 
 function createSetStateAction<T>(
