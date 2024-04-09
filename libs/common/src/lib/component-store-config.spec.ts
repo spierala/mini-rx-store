@@ -10,6 +10,7 @@ describe('componentStoreConfig', () => {
             init(): MetaReducer<any> {
                 return (v) => v;
             },
+            hasCsSupport: true,
         };
         const config = componentStoreConfig();
         config.set({ extensions: [extension] });
