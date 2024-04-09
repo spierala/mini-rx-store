@@ -11,6 +11,7 @@ import {
     Action,
     createMiniRxActionType,
     FeatureStoreConfig,
+    generateId,
     Reducer,
     StateOrCallback,
     OperationType,
@@ -107,12 +108,6 @@ function createSetStateAction<T>(
         featureId,
         featureKey,
     };
-}
-
-// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
-// This isn't a real GUID!
-function generateId() {
-    return Math.random().toString(36).slice(2);
 }
 
 export function createFeatureStore<T extends object>(
