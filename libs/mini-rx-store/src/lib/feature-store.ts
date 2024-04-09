@@ -1,15 +1,21 @@
-import { Action, ComponentStoreLike, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
+import { ComponentStoreLike } from './models';
 import { calcNewState, miniRxError } from './utils';
 import {
-    createMiniRxActionType,
     FeatureStoreSetStateAction,
     isFeatureStoreSetStateAction,
     SetStateActionType,
-    undo,
 } from './actions';
 import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
-import { OperationType } from '@mini-rx/common';
+import {
+    Action,
+    createMiniRxActionType,
+    FeatureStoreConfig,
+    Reducer,
+    StateOrCallback,
+    OperationType,
+    undo,
+} from '@mini-rx/common';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>

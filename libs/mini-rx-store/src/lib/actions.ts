@@ -1,6 +1,4 @@
-import { Action, StateOrCallback } from './models';
-import { miniRxNameSpace } from './constants';
-import { OperationType } from '@mini-rx/common';
+import { Action, StateOrCallback, createMiniRxActionType, OperationType } from '@mini-rx/common';
 
 export const enum SetStateActionType {
     FEATURE_STORE = '@mini-rx/feature-store',
@@ -24,10 +22,6 @@ export interface ComponentStoreSetStateAction<T> {
 // Union type
 export type SetStateAction<T> = FeatureStoreSetStateAction<T> | ComponentStoreSetStateAction<T>;
 
-export function createMiniRxActionType(miniRxActionType: OperationType, featureKey?: string) {
-    return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
-}
-
 export function createMiniRxAction(
     miniRxActionType: OperationType.INIT | OperationType.DESTROY,
     featureKey?: string
@@ -50,13 +44,4 @@ export function isComponentStoreSetStateAction<StateType>(
     action: Action
 ): action is ComponentStoreSetStateAction<StateType> {
     return action[setStateActionTypeKey] === SetStateActionType.COMPONENT_STORE;
-}
-
-export const UNDO_ACTION = miniRxNameSpace + '/undo';
-
-export function undo(action: Action) {
-    return {
-        type: UNDO_ACTION,
-        payload: action,
-    };
 }

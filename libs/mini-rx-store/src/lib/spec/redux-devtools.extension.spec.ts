@@ -1,5 +1,5 @@
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
-import { Action } from '../models';
+import { Action } from '@mini-rx/common';
 import { counterReducer, CounterState, store, userState, UserState } from './_spec-helpers';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import { addExtension, appState } from '../store-core';

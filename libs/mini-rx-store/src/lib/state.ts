@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { calcNewState, select } from './utils';
-import { StateOrCallback } from './models';
+import { StateOrCallback } from '@mini-rx/common';
 
 export class State<StateType extends object> {
     private stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<

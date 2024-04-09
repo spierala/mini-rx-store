@@ -11,8 +11,7 @@ import {
     userState,
     UserState,
 } from './_spec-helpers';
-import { Action, Reducer } from '../models';
-import { tapResponse } from '../tap-response';
+import { Action, Reducer, tapResponse } from '@mini-rx/common';
 import { actions$, addMetaReducers } from '../store-core';
 
 const initialState: UserState = userState;

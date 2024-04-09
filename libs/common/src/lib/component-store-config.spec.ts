@@ -1,10 +1,10 @@
 import { componentStoreConfig } from './component-store-config';
 import { ExtensionId } from './enums';
-import { MetaReducer } from './models';
+import { ComponentStoreExtension, MetaReducer } from './models';
 
 describe('componentStoreConfig', () => {
     it('should set and get Component Store config', () => {
-        const extension = {
+        const extension: ComponentStoreExtension = {
             id: ExtensionId.LOGGER,
             sortOrder: 1,
             init(): MetaReducer<any> {

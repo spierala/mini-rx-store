@@ -1,8 +1,16 @@
-import { configureStore, Store } from '../store';
-import { Action, ActionWithPayload, AppState, Reducer, ReducerDictionary } from '../models';
+import { configureStore } from '../store';
+import {
+    Action,
+    createRxEffect as createEffect,
+    ofType,
+    LoggerExtension,
+    StoreExtension,
+    ExtensionId,
+    Reducer,
+} from '@mini-rx/common';
+import { ActionWithPayload } from '../models';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
-import { ofType } from '../utils';
 import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
 import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
@@ -14,9 +22,6 @@ import {
     resetStoreConfig,
     store,
 } from './_spec-helpers';
-import { createEffect } from '../create-effect';
-import { LoggerExtension, StoreExtension, ExtensionId } from '@mini-rx/common';
-import { combineReducers } from '../combine-reducers';
 import * as StoreCore from '../store-core';
 import { actions$ } from '../store-core';
 
@@ -394,27 +399,6 @@ describe('Store Config', () => {
                 expect.objectContaining({ metaTestFeature: 'abcxde' })
             );
         });
-    });
-
-    it('should call custom combineReducer fn', () => {
-        const combineReducersSpy = jest.fn();
-
-        function customCombineReducers(reducers: ReducerDictionary<AppState>) {
-            combineReducersSpy(reducers);
-
-            return combineReducers(reducers);
-        }
-
-        StoreCore.configureStore({
-            reducers: { user: userReducer },
-            combineReducersFn: customCombineReducers,
-        });
-
-        expect(combineReducersSpy).toBeCalledWith(
-            expect.objectContaining({
-                user: userReducer,
-            })
-        );
     });
 });
 
