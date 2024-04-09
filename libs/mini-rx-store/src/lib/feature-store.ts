@@ -1,5 +1,4 @@
 import { ComponentStoreLike } from './models';
-import { miniRxError } from './utils';
 import { FeatureStoreSetStateAction, SetStateActionType } from './actions';
 import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
@@ -9,6 +8,7 @@ import {
     createMiniRxActionType,
     FeatureStoreConfig,
     generateId,
+    miniRxError,
     StateOrCallback,
     OperationType,
     undo,

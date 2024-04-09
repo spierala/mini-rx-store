@@ -1,7 +1,6 @@
 import { isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { miniRxError } from './utils';
 import { SetStateParam, SetStateReturn } from './models';
-import { Action, defaultEffectsErrorHandler, StateOrCallback } from '@mini-rx/common';
+import { Action, defaultEffectsErrorHandler, miniRxError, StateOrCallback } from '@mini-rx/common';
 import { State } from './state';
 
 // BaseStore is extended by ComponentStore/FeatureStore

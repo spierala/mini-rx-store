@@ -1,5 +1,5 @@
 import { BaseStore } from './base-store';
-import { calcNewState, combineMetaReducers, miniRxError } from './utils';
+import { calcNewState } from './utils';
 import { ComponentStoreLike } from './models';
 import {
     ComponentStoreSetStateAction,
@@ -10,11 +10,13 @@ import {
 import { ActionsOnQueue } from './actions-on-queue';
 import {
     Action,
+    combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
     createMiniRxActionType,
     ExtensionId,
     MetaReducer,
+    miniRxError,
     OperationType,
     Reducer,
     sortExtensions,
