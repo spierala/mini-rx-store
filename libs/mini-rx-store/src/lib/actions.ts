@@ -19,9 +19,6 @@ export interface ComponentStoreSetStateAction<T> {
     type: string; // The action type visible in DevTools / Logging Extension (really only for logging!)
 }
 
-// Union type
-export type SetStateAction<T> = FeatureStoreSetStateAction<T> | ComponentStoreSetStateAction<T>;
-
 export function createMiniRxAction(
     miniRxActionType: OperationType.INIT | OperationType.DESTROY,
     featureKey?: string
@@ -29,19 +26,4 @@ export function createMiniRxAction(
     return {
         type: createMiniRxActionType(miniRxActionType, featureKey),
     };
-}
-
-const setStateActionTypeKey: keyof SetStateAction<any> = 'setStateActionType';
-
-// Type predicate
-export function isFeatureStoreSetStateAction<StateType>(
-    action: Action
-): action is FeatureStoreSetStateAction<StateType> {
-    return action[setStateActionTypeKey] === SetStateActionType.FEATURE_STORE;
-}
-
-export function isComponentStoreSetStateAction<StateType>(
-    action: Action
-): action is ComponentStoreSetStateAction<StateType> {
-    return action[setStateActionTypeKey] === SetStateActionType.COMPONENT_STORE;
 }

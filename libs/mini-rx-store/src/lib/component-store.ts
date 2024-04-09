@@ -1,18 +1,13 @@
 import { BaseStore } from './base-store';
-import { calcNewState } from './utils';
 import { ComponentStoreLike } from './models';
-import {
-    ComponentStoreSetStateAction,
-    createMiniRxAction,
-    isComponentStoreSetStateAction,
-    SetStateActionType,
-} from './actions';
+import { ComponentStoreSetStateAction, createMiniRxAction, SetStateActionType } from './actions';
 import { ActionsOnQueue } from './actions-on-queue';
 import {
     Action,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
+    createComponentStoreReducer,
     createMiniRxActionType,
     ExtensionId,
     MetaReducer,
@@ -152,15 +147,6 @@ function createSetStateAction<T>(
         setStateActionType: SetStateActionType.COMPONENT_STORE,
         type: createMiniRxActionType(miniRxActionType, csFeatureKey) + (name ? '/' + name : ''),
         stateOrCallback,
-    };
-}
-
-function createComponentStoreReducer<StateType>(initialState: StateType): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action) => {
-        if (isComponentStoreSetStateAction<StateType>(action)) {
-            return calcNewState(state, action.stateOrCallback);
-        }
-        return state;
     };
 }
 
