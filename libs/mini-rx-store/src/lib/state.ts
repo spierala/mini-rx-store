@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { calcNewState, select } from './utils';
-import { StateOrCallback } from '@mini-rx/common';
+import { select } from './utils';
+import { StateOrCallback, calcNextState } from '@mini-rx/common';
 
 export class State<StateType extends object> {
     private stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
@@ -29,7 +29,7 @@ export class State<StateType extends object> {
             throw new Error('State is not initialized.');
         }
 
-        this.stateSource.next(calcNewState(this.get()!, stateOrCallback));
+        this.stateSource.next(calcNextState(this.get()!, stateOrCallback));
     }
 
     select(): Observable<StateType>;
