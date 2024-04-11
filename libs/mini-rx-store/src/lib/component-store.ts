@@ -1,12 +1,12 @@
 import { BaseStore } from './base-store';
 import { ComponentStoreLike } from './models';
 import { ComponentStoreSetStateAction, createMiniRxAction, SetStateActionType } from './actions';
-import { ActionsOnQueue } from './actions-on-queue';
 import {
     Action,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
+    createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
     ExtensionId,
@@ -42,7 +42,7 @@ export class ComponentStore<StateType extends object>
     extends BaseStore<StateType>
     implements ComponentStoreLike<StateType>
 {
-    private actionsOnQueue = new ActionsOnQueue();
+    private actionsOnQueue = createActionsOnQueue();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
     private hasUndoExtension = false;

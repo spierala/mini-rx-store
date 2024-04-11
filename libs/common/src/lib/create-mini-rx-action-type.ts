@@ -1,4 +1,4 @@
-import { miniRxNameSpace } from '@mini-rx/common';
+import { miniRxNameSpace } from './constants';
 import { OperationType } from './models';
 
 export function createMiniRxActionType(
