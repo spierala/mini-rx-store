@@ -86,7 +86,7 @@ const getSomeFeatureSelector = createFeatureStateSelector<CounterState>('someFea
 class UserFeatureStore extends FeatureStore<UserState> {
     private injector = inject(EnvironmentInjector);
 
-    state$ = toObservable(this.state);
+    state$ = toObservable(this.select());
     firstName = this.select((state) => state.firstName);
     firstName$ = toObservable(this.firstName, { injector: this.injector });
     lastName = this.select((state) => state.lastName);
@@ -561,5 +561,15 @@ describe('FeatureStore', () => {
         counterFeatureStore.undo(incremented);
 
         expect(selectedState()).toBe(0);
+    });
+
+    it('should read state imperatively', () => {
+        setupCounterFeatureStore();
+
+        expect(counterFeatureStore.state).toEqual({ counter: 0 });
+
+        counterFeatureStore.increment();
+
+        expect(counterFeatureStore.state).toEqual({ counter: 1 });
     });
 });

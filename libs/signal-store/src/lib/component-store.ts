@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import {
     Action,
     calculateExtensions,
@@ -34,14 +34,9 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     private actionsOnQueue = createActionsOnQueue();
 
     private _state: WritableSignal<StateType> = signal(this.initialState);
-    private selectableState = createSelectableSignalState(this._state);
-
-    /**
-     * @deprecated
-     * Use the `select` method without arguments to return a state Signal
-     * the `state` property will be replaced with a getter function which returns the raw state (like in the original MiniRx Store)
-     */
-    state: Signal<StateType> = this.selectableState.select();
+    get state(): StateType {
+        return this._state();
+    }
 
     private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
@@ -69,7 +64,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
 
         const subSink = createSignalStoreSubSink();
         subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
-            const newState: StateType = reducer(this.state(), action);
+            const newState: StateType = reducer(this.state, action);
             this._state.set(newState);
         });
 
@@ -87,7 +82,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     setState = createUpdateFn(this.updateState);
     connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
-    select = this.selectableState.select;
+    select = createSelectableSignalState(this._state).select;
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension
