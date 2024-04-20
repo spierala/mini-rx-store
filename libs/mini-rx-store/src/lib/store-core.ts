@@ -5,7 +5,6 @@ import {
     StoreExtension,
     sortExtensions,
     ExtensionId,
-    ReducerDictionary,
     AppState,
     MetaReducer,
     Reducer,
@@ -21,16 +20,11 @@ import {
     OperationType,
     createReducerManager,
     ReducerManager,
+    miniRxError,
 } from '@mini-rx/common';
 
 export let hasUndoExtension = false;
 let actionSubscription: Subscription | undefined;
-
-// exported for testing purposes
-export const reducerState = new State<{
-    featureReducers: ReducerDictionary<AppState>;
-    metaReducers: MetaReducer<AppState>[];
-}>();
 
 // REDUCER MANAGER
 let reducerManager: ReducerManager | undefined;
@@ -39,12 +33,6 @@ function getReducerManager(): ReducerManager {
         reducerManager = createReducerManager();
     }
     return reducerManager;
-}
-
-export function addMetaReducers(...reducers: MetaReducer<AppState>[]) {
-    reducerState.patch((state) => ({
-        metaReducers: [...state.metaReducers, ...reducers],
-    }));
 }
 
 // ACTIONS
@@ -63,13 +51,19 @@ function initStore() {
 
     // Listen to the Actions stream and update state accordingly
     actionSubscription = actions$.subscribe((action) => {
-        const nextState: AppState = getReducerManager().reducer(appState, action);
+        const nextState: AppState = getReducerManager().reducer(appState.get()!, action);
         appState.set(nextState);
     });
 }
 
 export function configureStore(config: StoreConfig<AppState> = {}) {
     initStore();
+
+    if (getReducerManager().hasFeatureReducers()) {
+        miniRxError(
+            '`configureStore` detected reducers. Did you instantiate FeatureStores before calling `configureStore`?'
+        );
+    }
 
     if (config.metaReducers?.length) {
         getReducerManager().addMetaReducers(...config.metaReducers);

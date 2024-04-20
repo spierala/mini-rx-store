@@ -1,6 +1,10 @@
 import { configureStore, Store } from '../store';
-import { reducerState } from '../store-core';
 import { Action } from '@mini-rx/common';
+import { destroy } from '../store-core';
+
+export function destroyStore() {
+    destroy();
+}
 
 export interface UserState {
     firstName: string;
@@ -19,13 +23,6 @@ export const userState: UserState = {
 };
 
 export const store: Store = configureStore({});
-
-export function resetStoreConfig() {
-    reducerState.set({
-        metaReducers: [],
-        featureReducers: {},
-    });
-}
 
 export interface CounterState {
     counter: number;

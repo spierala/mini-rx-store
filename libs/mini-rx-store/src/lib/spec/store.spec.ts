@@ -7,6 +7,8 @@ import {
     StoreExtension,
     ExtensionId,
     Reducer,
+    AppState,
+    MetaReducer,
 } from '@mini-rx/common';
 import { ActionWithPayload } from '../models';
 import { createFeatureStateSelector, createSelector } from '../selector';
@@ -19,7 +21,7 @@ import {
     counterInitialState,
     counterReducer,
     CounterState,
-    resetStoreConfig,
+    destroyStore,
     store,
 } from './_spec-helpers';
 import * as StoreCore from '../store-core';
@@ -113,7 +115,7 @@ const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.cou
 
 describe('Store Config', () => {
     afterEach(() => {
-        resetStoreConfig();
+        destroyStore();
     });
 
     it('should initialize the store with an empty object', () => {
@@ -237,7 +239,7 @@ describe('Store Config', () => {
         it('should call root meta reducers from extensions depending on sortOrder', () => {
             const callOrder: string[] = [];
 
-            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta1');
                     return reducer(state, action);
@@ -247,12 +249,12 @@ describe('Store Config', () => {
             class Extension extends StoreExtension {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                init(): MetaReducer<AppState> {
+                    return rootMetaReducerForExtension;
                 }
             }
 
-            function rootMetaReducerForExtension2(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension2(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta2');
                     return reducer(state, action);
@@ -263,12 +265,12 @@ describe('Store Config', () => {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
                 sortOrder = 100;
 
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension2);
+                init(): MetaReducer<AppState> {
+                    return rootMetaReducerForExtension2;
                 }
             }
 
-            function rootMetaReducerForExtension3(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension3(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta3');
                     return reducer(state, action);
@@ -278,8 +280,8 @@ describe('Store Config', () => {
             class Extension3 extends StoreExtension {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension3);
+                init(): MetaReducer<AppState> {
+                    return rootMetaReducerForExtension3;
                 }
             }
 
@@ -297,7 +299,9 @@ describe('Store Config', () => {
                 '3.) feature meta reducers, ' +
                 '4.) feature reducer',
             () => {
-                function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+                function rootMetaReducerForExtension(
+                    reducer: Reducer<AppState>
+                ): Reducer<AppState> {
                     return (state, action) => {
                         if (action.type === 'metaTest') {
                             state = {
@@ -313,8 +317,8 @@ describe('Store Config', () => {
                 class Extension extends StoreExtension {
                     id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                    init(): void {
-                        StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                    init(): MetaReducer<AppState> {
+                        return rootMetaReducerForExtension;
                     }
                 }
 
@@ -380,7 +384,7 @@ describe('Store Config', () => {
                     extensions: [new Extension()],
                 });
 
-                StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
+                StoreCore.addFeature<any>('metaTestFeature', aFeatureReducer, {
                     metaReducers: [featureMetaReducer],
                 });
 
@@ -404,7 +408,7 @@ describe('Store Config', () => {
 
 describe('Store', () => {
     beforeAll(() => {
-        resetStoreConfig();
+        destroyStore();
 
         StoreCore.configureStore({
             reducers: { user: userReducer },
@@ -414,11 +418,7 @@ describe('Store', () => {
     it('should run the redux reducers when a new Feature state is added', () => {
         const reducerSpy = jest.fn();
 
-        function someReducer() {
-            reducerSpy();
-        }
-
-        store.feature('oneMoreFeature', someReducer);
+        store.feature('oneMoreFeature', reducerSpy);
         store.feature('oneMoreFeature2', (state) => state);
         expect(reducerSpy).toHaveBeenCalledTimes(2);
     });
