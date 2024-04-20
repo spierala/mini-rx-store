@@ -29,7 +29,7 @@ export function createReducerManager() {
         metaReducers: [],
     };
 
-    let reducer: Reducer<AppState> = (state) => state; // Simple default reducer (needed to initialize the store also if there are no reducers registered yet)
+    let reducer: Reducer<AppState> = (state = {}) => state; // Simple default reducer (needed to initialize the store also if there are no reducers registered yet)
 
     function _updateStateAndReducer(v: Partial<ReducerState>): void {
         state = {
