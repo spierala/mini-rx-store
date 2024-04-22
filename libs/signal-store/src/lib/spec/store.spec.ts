@@ -13,7 +13,7 @@ import {
     StoreExtension,
 } from '@mini-rx/common';
 import { createFeatureStateSelector, createSelector } from '../signal-selector';
-import { catchError, map, mapTo, mergeMap, Observable, of, take, tap } from 'rxjs';
+import { catchError, map, mergeMap, Observable, of, take, tap } from 'rxjs';
 import { cold, hot } from 'jest-marbles';
 import { FeatureStore } from '../feature-store';
 import {
@@ -760,9 +760,7 @@ describe('Store', () => {
         rxEffect(
             actions.pipe(
                 ofType('someAction'),
-                mergeMap(() => {
-                    return apiCallWithError().pipe(mapTo({ type: 'someActionSuccess' }));
-                })
+                mergeMap(() => apiCallWithError().pipe(map(() => ({ type: 'someActionSuccess' }))))
             )
         );
 
