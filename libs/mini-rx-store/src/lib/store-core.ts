@@ -36,7 +36,7 @@ function getReducerManager(): ReducerManager {
 }
 
 // ACTIONS
-const actionsOnQueue = createActionsOnQueue();
+const actionsOnQueue = createActionsOnQueue(); // TODO destructure directly into `actions$` and `dispatch`
 export const actions$: Actions = actionsOnQueue.actions$;
 
 // APP STATE
@@ -133,10 +133,12 @@ export function addExtension(extension: StoreExtension) {
     }
 
     if (extension.id === ExtensionId.UNDO) {
+        // TODO can be shorter (See Signal Store)
         hasUndoExtension = true;
     }
 }
 
+// TODO remove
 export function dispatch(action: Action) {
     actionsOnQueue.dispatch(action);
 }
