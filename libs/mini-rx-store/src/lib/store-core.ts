@@ -124,9 +124,8 @@ export function effect(effect$: any): void {
     });
 }
 
-// exported for testing purposes
-export function addExtension(extension: StoreExtension) {
-    const metaReducer: MetaReducer<any> | void = extension.init();
+function addExtension(extension: StoreExtension) {
+    const metaReducer: MetaReducer<AppState> | void = extension.init();
 
     if (metaReducer) {
         getReducerManager().addMetaReducers(metaReducer);
