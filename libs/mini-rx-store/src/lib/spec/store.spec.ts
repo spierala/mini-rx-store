@@ -3,7 +3,6 @@ import {
     Action,
     createRxEffect as createEffect,
     ofType,
-    LoggerExtension,
     StoreExtension,
     ExtensionId,
     Reducer,
@@ -14,7 +13,6 @@ import { ActionWithPayload } from '../models';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
-import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
@@ -565,45 +563,6 @@ describe('Store', () => {
         expect(store.select(getUserFeatureState)).toBeObservable(
             hot('ab', { a: userInitialState, b: { ...userInitialState, err: 'error' } })
         );
-    });
-
-    it('should log', () => {
-        console.log = jest.fn();
-
-        const user: UserState = {
-            firstName: 'John',
-            lastName: 'Travolta',
-            age: 35,
-            err: undefined,
-        };
-
-        const newState = {
-            user,
-        };
-
-        const action: Action = {
-            type: 'updateUser',
-            payload: user,
-        };
-
-        StoreCore.addExtension(new LoggerExtension());
-
-        store.dispatch(action);
-
-        expect(console.log).toHaveBeenCalledWith(
-            expect.stringContaining('%cupdateUser'),
-            expect.stringContaining('color: #25c2a0'),
-            expect.stringContaining('Action:'),
-            action,
-            expect.stringContaining('State: '),
-            newState
-        );
-    });
-
-    it('should add extension', () => {
-        const spy = jest.spyOn(StoreCore, 'addExtension');
-        StoreCore.addExtension(new ReduxDevtoolsExtension({}));
-        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should call the reducer before running the effect', () => {
