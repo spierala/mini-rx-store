@@ -42,7 +42,7 @@ export const actions$: Actions = actionsOnQueue.actions$;
 // APP STATE
 export const appState = new State<AppState>();
 
-// Wire up the Redux Store: Init reducer state, subscribe to the actions and reducer Observable
+// Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
 // Called by `configureStore` and `addReducer`
 function initStore() {
     if (actionSubscription) {
