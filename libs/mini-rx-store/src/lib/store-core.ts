@@ -51,7 +51,7 @@ function initStore() {
 
     // Listen to the Actions stream and update state accordingly
     actionSubscription = actions$.subscribe((action) => {
-        const nextState: AppState = getReducerManager().reducer(appState.get()!, action);
+        const nextState: AppState = getReducerManager().reducer(appState.get() ?? {}, action);
         appState.set(nextState);
     });
 }
