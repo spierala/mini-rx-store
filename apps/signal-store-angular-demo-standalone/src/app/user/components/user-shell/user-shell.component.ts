@@ -6,7 +6,7 @@ import { NgIf } from '@angular/common';
 @Component({
     selector: 'app-user-shell',
     templateUrl: './user-shell.component.html',
-    styleUrls: ['./user-shell.component.css'],
+    styleUrls: ['./user-shell.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [FormsModule, NgIf],

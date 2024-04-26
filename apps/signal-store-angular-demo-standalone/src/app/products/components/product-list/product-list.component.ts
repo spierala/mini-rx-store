@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
     selector: 'app-product-list',
     templateUrl: './product-list.component.html',
-    styleUrls: ['./product-list.component.css'],
+    styleUrls: ['./product-list.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [CurrencyPipe, NgClass, FormsModule, NgForOf, NgIf],

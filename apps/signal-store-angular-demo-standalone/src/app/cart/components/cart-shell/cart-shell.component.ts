@@ -4,7 +4,7 @@ import { CurrencyPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase } from '@angular/co
 
 @Component({
     templateUrl: './cart-shell.component.html',
-    styleUrls: ['./cart-shell.component.css'],
+    styleUrls: ['./cart-shell.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [NgSwitch, CurrencyPipe, NgForOf, NgIf, NgSwitchCase],

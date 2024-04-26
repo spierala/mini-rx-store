@@ -14,7 +14,7 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'app-product-filter',
     templateUrl: './product-filter.component.html',
-    styleUrls: ['./product-filter.component.css'],
+    styleUrls: ['./product-filter.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [ReactiveFormsModule],

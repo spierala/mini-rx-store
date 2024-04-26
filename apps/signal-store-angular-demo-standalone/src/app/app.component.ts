@@ -12,5 +12,5 @@ import { UserFacade } from './user/state/user-facade.service';
 })
 export class AppComponent {
     productsStore = inject(ProductsFacade);
-    userStore: UserFacade = inject(UserFacade);
+    userStore = inject(UserFacade);
 }

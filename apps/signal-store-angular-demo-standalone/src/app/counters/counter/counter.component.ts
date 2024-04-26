@@ -21,7 +21,7 @@ function createCounterStore() {
 @Component({
     selector: 'app-counter',
     templateUrl: './counter.component.html',
-    styleUrls: ['./counter.component.css'],
+    styleUrls: ['./counter.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

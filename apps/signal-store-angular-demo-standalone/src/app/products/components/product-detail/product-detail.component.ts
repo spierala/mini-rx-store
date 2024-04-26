@@ -7,7 +7,7 @@ import { NgIf } from '@angular/common';
 @Component({
     selector: 'app-product-detail',
     templateUrl: './product-detail.component.html',
-    styleUrls: ['./product-detail.component.css'],
+    styleUrls: ['./product-detail.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [FormsModule, NgIf],

@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 @Component({
     selector: 'app-filter',
     templateUrl: './todo-filter.component.html',
-    styleUrls: ['./todo-filter.component.css'],
+    styleUrls: ['./todo-filter.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule],

@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 @Component({
     imports: [TodoDetailComponent, TodoFilterComponent, TodoListComponent, CommonModule],
     templateUrl: './todos-simple-shell.component.html',
-    styleUrls: ['./todos-simple-shell.component.css'],
+    styleUrls: ['./todos-simple-shell.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
 })

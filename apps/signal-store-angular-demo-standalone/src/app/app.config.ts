@@ -4,7 +4,6 @@ import { appRoutes } from './app.routes';
 import {
     ImmutableStateExtension,
     LoggerExtension,
-    provideComponentStoreConfig,
     provideEffects,
     provideStore,
     ReduxDevtoolsExtension,
@@ -49,6 +48,5 @@ export const appConfig: ApplicationConfig = {
             ],
         }),
         provideEffects(ProductsEffects),
-        provideComponentStoreConfig({ extensions: [] }),
     ],
 };

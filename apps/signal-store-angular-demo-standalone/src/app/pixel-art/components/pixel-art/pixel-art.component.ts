@@ -4,7 +4,7 @@ import { ArtStore } from '../../state/art-store.service';
 @Component({
     selector: 'app-pixel-art',
     templateUrl: './pixel-art.component.html',
-    styleUrls: ['./pixel-art.component.css'],
+    styleUrls: ['./pixel-art.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ArtStore],

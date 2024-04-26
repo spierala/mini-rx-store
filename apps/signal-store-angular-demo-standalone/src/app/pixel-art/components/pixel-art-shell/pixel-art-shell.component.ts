@@ -4,7 +4,7 @@ import { NgForOf } from '@angular/common';
 
 @Component({
     templateUrl: './pixel-art-shell.component.html',
-    styleUrls: ['./pixel-art-shell.component.css'],
+    styleUrls: ['./pixel-art-shell.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [PixelArtComponent, NgForOf],

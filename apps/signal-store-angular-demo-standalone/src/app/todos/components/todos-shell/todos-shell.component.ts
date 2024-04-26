@@ -10,7 +10,7 @@ import { NgIf } from '@angular/common';
 
 @Component({
     templateUrl: './todos-shell.component.html',
-    styleUrls: ['./todos-shell.component.css'],
+    styleUrls: ['./todos-shell.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [TodoDetailComponent, TodoListComponent, TodoFilterComponent, NgIf],

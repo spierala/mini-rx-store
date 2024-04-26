@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
     imports: [FormsModule, CommonModule],
     selector: 'app-todo-detail',
     templateUrl: './todo-detail.component.html',
-    styleUrls: ['./todo-detail.component.css'],
+    styleUrls: ['./todo-detail.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

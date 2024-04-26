@@ -8,7 +8,7 @@ import { NgIf } from '@angular/common';
 
 @Component({
     templateUrl: './products-shell.component.html',
-    styleUrls: ['./products-shell.component.css'],
+    styleUrls: ['./products-shell.component.scss'],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [ProductListComponent, ProductDetailComponent, ProductFilterComponent, NgIf],
