@@ -39,5 +39,4 @@ export {
     UndoExtension,
     mapResponse,
     ReduxDevtoolsOptions,
-    ofType,
 } from '@mini-rx/common';
