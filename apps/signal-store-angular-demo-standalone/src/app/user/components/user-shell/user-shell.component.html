@@ -4,13 +4,13 @@
     </nav>
 
     <div class="container">
-        <ng-container *ngIf="userFacade.user()">
+        <ng-container *ngIf="userFacade.user() as user">
             <div class="form-group">
                 <label for="firstName">First name</label>
                 <input
                     class="form-control"
                     type="text"
-                    [ngModel]="userFacade.user().firstName"
+                    [ngModel]="user.firstName"
                     (ngModelChange)="userFacade.updateUser({ firstName: $event })"
                     id="firstName"
                     name="firstName"
@@ -22,7 +22,7 @@
                 <input
                     class="form-control"
                     type="text"
-                    [ngModel]="userFacade.user().lastName"
+                    [ngModel]="user.lastName"
                     (ngModelChange)="userFacade.updateUser({ lastName: $event })"
                     id="lastName"
                     name="lastName"

@@ -31,15 +31,14 @@ const initialState: UserState = {
     providedIn: 'root',
 })
 export class UserFacade extends FeatureStore<UserState> {
-    permissions: Signal<Permissions> = computed(() => this.state().permissions);
-    userFullName: Signal<string> = computed(() => {
-        const user = this.user();
+    permissions: Signal<Permissions> = this.select((state) => state.permissions);
+    userFullName: Signal<string> = this.select(({ user }) => {
         if (user.firstName === '' && user.lastName === '') {
             return 'John McClane';
         }
         return user.firstName + ' ' + user.lastName;
     });
-    user: Signal<User> = computed(() => this.state().user);
+    user: Signal<User> = this.select((state) => state.user);
 
     constructor() {
         super('user', initialState);
