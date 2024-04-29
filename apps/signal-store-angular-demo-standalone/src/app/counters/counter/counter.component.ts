@@ -5,8 +5,15 @@ const initialState = {
     count: 42,
 };
 
+// FYI This is an alternative way to create a FeatureStore
+// Of course you could extend FeatureStore in a service (as it is done in most examples) or use `createFeatureStore` directly in the component class
+// The benefits of this approach are: a minimum amount of boilerplate, no use of `this`, encapsulation of the store logic
 function createCounterStore() {
-    const { setState, select } = createFeatureStore('counter', initialState, { multi: true });
+    const { setState, select } = createFeatureStore(
+        'counter',
+        initialState,
+        { multi: true } // 'multi: true' to allow many instances of the feature store (using the same featureKey)
+    );
     return {
         count: select((state) => state.count),
         increment: () => {
