@@ -1,25 +1,25 @@
 import { Observable, Subscription } from 'rxjs';
-import { createMiniRxAction } from './actions';
 import { State } from './state';
 import {
-    StoreExtension,
-    sortExtensions,
-    ExtensionId,
-    AppState,
-    MetaReducer,
-    Reducer,
-    StoreConfig,
-    HasEffectMetadata,
     Action,
-    EffectConfig,
-    EFFECT_METADATA_KEY,
-    hasEffectMetaData,
-    defaultEffectsErrorHandler,
+    AppState,
     createActionsOnQueue,
-    OperationType,
+    createMiniRxActionType,
     createReducerManager,
-    ReducerManager,
+    defaultEffectsErrorHandler,
+    EFFECT_METADATA_KEY,
+    EffectConfig,
+    ExtensionId,
+    HasEffectMetadata,
+    hasEffectMetaData,
+    MetaReducer,
     miniRxError,
+    OperationType,
+    Reducer,
+    ReducerManager,
+    sortExtensions,
+    StoreConfig,
+    StoreExtension,
 } from '@mini-rx/common';
 
 export let hasUndoExtension = false;
@@ -79,7 +79,7 @@ export function configureStore(config: StoreConfig<AppState> = {}) {
         appState.set(config.initialState);
     }
 
-    dispatch(createMiniRxAction(OperationType.INIT));
+    dispatch({ type: createMiniRxActionType(OperationType.INIT) });
 }
 
 export function addFeature<StateType extends object>(
@@ -97,12 +97,12 @@ export function addFeature<StateType extends object>(
         config.metaReducers,
         config.initialState
     );
-    dispatch(createMiniRxAction(OperationType.INIT, featureKey));
+    dispatch({ type: createMiniRxActionType(OperationType.INIT, featureKey) });
 }
 
 export function removeFeature(featureKey: string) {
     getReducerManager().removeFeatureReducer(featureKey);
-    dispatch(createMiniRxAction(OperationType.DESTROY, featureKey));
+    dispatch({ type: createMiniRxActionType(OperationType.DESTROY, featureKey) });
 }
 
 export function effect(effect$: Observable<any> & HasEffectMetadata): void;

@@ -1,6 +1,5 @@
 import { BaseStore } from './base-store';
 import { ComponentStoreLike } from './models';
-import { ComponentStoreSetStateAction, createMiniRxAction, SetStateActionType } from './actions';
 import {
     Action,
     combineMetaReducers,
@@ -53,6 +52,7 @@ export class ComponentStore<StateType extends object>
 
         const metaReducers: MetaReducer<StateType>[] = [];
 
+        // TODO refactor extensions setup: use `calculateExtensions`
         if (config?.extensions) {
             if (config.extensions && componentStoreConfig?.extensions) {
                 this.extensions = mergeExtensions(
@@ -102,7 +102,9 @@ export class ComponentStore<StateType extends object>
         super.setInitialState(initialState);
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
-        this.dispatch(createMiniRxAction(OperationType.INIT, csFeatureKey));
+        this.dispatch({
+            type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
+        });
     }
 
     /** @internal
@@ -112,7 +114,10 @@ export class ComponentStore<StateType extends object>
         stateOrCallback: StateOrCallback<StateType>,
         name: string | undefined
     ): Action {
-        const action: Action = createSetStateAction(stateOrCallback, name);
+        const action: Action = {
+            type: createMiniRxActionType(OperationType.SET_STATE, csFeatureKey, name),
+            stateOrCallback,
+        };
         this.dispatch(action);
         return action;
     }
@@ -132,24 +137,15 @@ export class ComponentStore<StateType extends object>
         if (this.reducer) {
             // Dispatch an action really just for logging via LoggerExtension
             // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
-            this.dispatch(createMiniRxAction(OperationType.DESTROY, csFeatureKey));
+            this.dispatch({
+                type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
+            });
         }
         super.destroy();
     }
 }
 
-function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    name?: string
-): ComponentStoreSetStateAction<T> {
-    const miniRxActionType = OperationType.SET_STATE;
-    return {
-        setStateActionType: SetStateActionType.COMPONENT_STORE,
-        type: createMiniRxActionType(miniRxActionType, csFeatureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-    };
-}
-
+// TODO remove after `calculateExtensions` is used
 function mergeExtensions(
     global: ComponentStoreExtension[],
     local: ComponentStoreExtension[]
