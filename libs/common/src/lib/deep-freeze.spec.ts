@@ -1,6 +1,6 @@
 import { deepFreeze } from './deep-freeze';
 
-// Created a cool set of unit tests with ChatGPT: https://chat.openai.com/share/f2a078c9-e996-4d4e-8c4c-725ca2e9cafd
+// These unit tests were created with ChatGPT: https://chat.openai.com/share/f2a078c9-e996-4d4e-8c4c-725ca2e9cafd
 
 describe('deepFreeze', () => {
     it('should make object immutable', () => {
@@ -24,7 +24,6 @@ describe('deepFreeze', () => {
             return 42;
         };
         expect(() => deepFreeze(fn)).not.toThrow();
-        // Test that the function object is frozen
         expect(Object.isFrozen(fn)).toBe(true);
     });
 
@@ -43,7 +42,6 @@ describe('deepFreeze', () => {
     it('should freeze an array and its elements', () => {
         const arr = [1, 2, 3];
         expect(() => deepFreeze(arr)).not.toThrow();
-        // Test that the array and its elements are frozen
         expect(Object.isFrozen(arr)).toBe(true);
         expect(Object.isFrozen(arr[0])).toBe(true);
     });

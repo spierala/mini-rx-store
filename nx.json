@@ -4,7 +4,7 @@
         "defaultBase": "main"
     },
     "cli": {
-        "packageManager": "npm"
+        "packageManager": "yarn"
     },
     "tasksRunnerOptions": {
         "default": {

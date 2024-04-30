@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Todo } from '../../todos-shared/models/todo';
 import { TodoFilter } from '../../todos-shared/models/todo-filter';
-import { Observable, pipe } from 'rxjs';
+import { pipe } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 import {
@@ -12,6 +12,7 @@ import {
     tapResponse,
 } from 'mini-rx-store';
 import { TodosApiService } from '../../todos-shared/services/todos-api.service';
+import { cloneDeep } from 'lodash-es';
 
 // STATE INTERFACE
 interface TodosState {
@@ -36,7 +37,9 @@ const initialState: TodosState = {
 // MEMOIZED SELECTORS
 const getTodosFeatureSelector = createFeatureSelector<TodosState>();
 const getTodos = createSelector(getTodosFeatureSelector, (state) => state.todos);
-const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) => state.selectedTodo);
+const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) =>
+    cloneDeep(state.selectedTodo)
+);
 const getFilter = createSelector(getTodosFeatureSelector, (state) => state.filter);
 const getTodosFiltered = createSelector(getTodos, getFilter, (todos, filter) => {
     return todos.filter((item) => {
@@ -53,16 +56,19 @@ const getTodosDone = createSelector(getTodosFiltered, (todos) =>
 const getTodosNotDone = createSelector(getTodosFiltered, (todos) =>
     todos.filter((todo) => !todo.isDone)
 );
+const getVm = createSelector({
+    todosDone: getTodosDone,
+    todosNotDone: getTodosNotDone,
+    filter: getFilter,
+    selectedTodo: getSelectedTodo,
+});
 
 @Injectable({
     providedIn: 'root',
 })
 export class TodosStore extends FeatureStore<TodosState> {
     // STATE OBSERVABLES
-    todosDone$: Observable<Todo[]> = this.select(getTodosDone);
-    todosNotDone$: Observable<Todo[]> = this.select(getTodosNotDone);
-    filter$: Observable<TodoFilter> = this.select(getFilter);
-    selectedTodo$: Observable<Todo | undefined> = this.select(getSelectedTodo);
+    vm$ = this.select(getVm);
 
     constructor(private apiService: TodosApiService) {
         super('todos', initialState);

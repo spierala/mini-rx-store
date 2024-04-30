@@ -49,7 +49,7 @@ function reducer3(state: any, action: Action): any {
     }
 }
 
-describe('combine Reducers', () => {
+describe('combineReducers', () => {
     it('should combine reducers', () => {
         const combinedReducer: Reducer<any> = combineReducers({
             feature1: reducer1,

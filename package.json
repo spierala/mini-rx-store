@@ -28,9 +28,9 @@
         "test:common:watch": "nx test common --watch",
         "test:common:coverage": "nx test common --codeCoverage",
         "test:all": "nx test mini-rx-store && nx test mini-rx-store-ng && nx test signal-store && nx test common",
-        "deploy:docs": "npm run deploy --prefix docs",
+        "deploy:docs": "cd docs && yarn deploy",
         "build:mini-rx-angular-demo:sourcemap": "nx build mini-rx-angular-demo --source-map",
-        "build:mini-rx-angular-demo:sourcemap:stats": "npm run build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
+        "build:mini-rx-angular-demo:sourcemap:stats": "yarn build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
         "prepare": "husky install"
     },
     "private": true,
@@ -88,9 +88,9 @@
         "eslint-config-prettier": "8.1.0",
         "eslint-plugin-cypress": "^2.10.3",
         "husky": "^7.0.4",
-        "jest": "29.4.3",
-        "jest-environment-jsdom": "29.4.3",
-        "jest-jasmine2": "29.4.3",
+        "jest": "^29.4.3",
+        "jest-environment-jsdom": "^29.4.3",
+        "jest-jasmine2": "^29.4.3",
         "jest-marbles": "^3.0.2",
         "jest-preset-angular": "13.1.1",
         "lint-staged": "^12.3.7",
@@ -113,5 +113,10 @@
             "git add"
         ],
         "*.format:write": "prettier --write"
+    },
+    "engines": {
+        "node": ">=18.13.0",
+        "yarn": ">=1.22.4 <2",
+        "npm": "Please use yarn instead of NPM to install dependencies"
     }
 }

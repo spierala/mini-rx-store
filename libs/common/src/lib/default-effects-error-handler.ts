@@ -30,21 +30,21 @@ import { miniRxConsoleError } from './mini-rx-console-error';
 // Prevent effect to unsubscribe from the actions stream
 export function defaultEffectsErrorHandler<T>(
     observable$: Observable<T>,
-    retryAttemptLeft = 10
+    retryAttemptsLeft = 10
 ): Observable<T> {
     return observable$.pipe(
         catchError((error) => {
             miniRxConsoleError(
                 `An error occurred in the Effect. MiniRx resubscribed the Effect automatically and will do so ${
-                    retryAttemptLeft - 1
+                    retryAttemptsLeft - 1
                 } more times.\nPlease provide error handling inside the Effect using \`catchError\` or \`tapResponse\`.`,
                 error
             );
-            if (retryAttemptLeft <= 1) {
+            if (retryAttemptsLeft <= 1) {
                 return observable$; // last attempt
             }
             // Return observable that produces this particular effect
-            return defaultEffectsErrorHandler(observable$, retryAttemptLeft - 1);
+            return defaultEffectsErrorHandler(observable$, retryAttemptsLeft - 1);
         })
     );
 }

@@ -1,11 +1,5 @@
 import { miniRxNameSpace } from './constants';
-
-export const enum OperationType {
-    INIT = 'init',
-    DESTROY = 'destroy',
-    SET_STATE = 'set-state',
-    CONNECTION = 'connection',
-}
+import { OperationType } from './models';
 
 export function createMiniRxActionType(
     operationType: OperationType,

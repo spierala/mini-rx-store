@@ -10,6 +10,7 @@ import {
     OperationType,
     StateOrCallback,
     undo,
+    UpdateStateCallback,
 } from '@mini-rx/common';
 import { addFeature, dispatch, hasUndoExtension, removeFeature, select } from './store-core';
 import { createSelectableSignalState } from './selectable-signal-state';
@@ -25,9 +26,12 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return this._featureKey;
     }
 
-    state: Signal<StateType> = select((state) => state[this.featureKey]);
+    private _state: Signal<StateType> = select((state) => state[this.featureKey]);
+    get state(): StateType {
+        return this._state();
+    }
 
-    private updateState = (
+    private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
@@ -60,7 +64,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     setState = createUpdateFn(this.updateState);
     connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
-    select = createSelectableSignalState(this.state).select;
+    select = createSelectableSignalState(this._state).select;
 
     private destroy(): void {
         removeFeature(this._featureKey);

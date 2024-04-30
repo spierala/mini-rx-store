@@ -11,7 +11,6 @@
                 "outputPath": "dist/libs/common",
                 "main": "libs/common/src/index.ts",
                 "tsConfig": "libs/common/tsconfig.lib.json",
-                "assets": [],
                 "project": "libs/common/package.json",
                 "format": ["esm", "cjs"],
                 "globals": [
@@ -22,6 +21,13 @@
                     {
                         "global": "Rx",
                         "moduleId": "rxjs/operators"
+                    }
+                ],
+                "assets": [
+                    {
+                        "glob": "libs/common/README.md",
+                        "input": ".",
+                        "output": "."
                     }
                 ]
             }

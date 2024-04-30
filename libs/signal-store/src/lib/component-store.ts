@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import {
     Action,
     calculateExtensions,
@@ -16,6 +16,7 @@ import {
     OperationType,
     StateOrCallback,
     undo,
+    UpdateStateCallback,
 } from '@mini-rx/common';
 import { createSelectableSignalState } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
@@ -33,19 +34,20 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     private actionsOnQueue = createActionsOnQueue();
 
     private _state: WritableSignal<StateType> = signal(this.initialState);
-    private selectableState = createSelectableSignalState(this._state);
-    state: Signal<StateType> = this.selectableState.select();
+    get state(): StateType {
+        return this._state();
+    }
 
-    private updateState(
+    private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
-    ): MiniRxAction<StateType> {
+    ): MiniRxAction<StateType> => {
         return this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(operationType, csFeatureKey, name),
             stateOrCallback,
         });
-    }
+    };
 
     constructor(private initialState: StateType, config?: ComponentStoreConfig) {
         inject(DestroyRef).onDestroy(() => this.destroy());
@@ -62,7 +64,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
 
         const subSink = createSignalStoreSubSink();
         subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
-            const newState: StateType = reducer(this.state(), action);
+            const newState: StateType = reducer(this.state, action);
             this._state.set(newState);
         });
 
@@ -77,10 +79,10 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    setState = createUpdateFn(this.updateState.bind(this));
-    connect = createConnectFn(this.updateState.bind(this));
+    setState = createUpdateFn(this.updateState);
+    connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
-    select = this.selectableState.select;
+    select = createSelectableSignalState(this._state).select;
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension

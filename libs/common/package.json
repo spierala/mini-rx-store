@@ -1,6 +1,25 @@
 {
     "name": "@mini-rx/common",
-    "version": "0.0.8",
+    "version": "1.0.0",
+    "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
+    "license": "MIT",
+    "homepage": "https://github.com/spierala/mini-rx-store",
+    "readme": "https://github.com/spierala/mini-rx-store/blob/master/libs/common/README.md",
+    "description": "Shared code of MiniRx Store and MiniRx Signal Store",
+    "keywords": [
+        "RxJS",
+        "Observable",
+        "Redux",
+        "Store",
+        "State Management"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/spierala/mini-rx-store.git"
+    },
+    "bugs": {
+        "url": "https://github.com/spierala/mini-rx-store/issues"
+    },
     "peerDependencies": {
         "rxjs": "^6.4.0 || ^7.0.0"
     },

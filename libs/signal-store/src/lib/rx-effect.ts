@@ -1,7 +1,6 @@
-import { EnvironmentInjector, inject, Signal } from '@angular/core';
-import { isObservable, Observable, Subject } from 'rxjs';
+import { EnvironmentInjector, inject, isSignal, Signal } from '@angular/core';
+import { isObservable, Observable, of, Subject } from 'rxjs';
 import { defaultEffectsErrorHandler } from '@mini-rx/common';
-import { miniRxIsSignal } from './utils';
 import { miniRxToObservable } from './mini-rx-to-observable';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
@@ -34,7 +33,7 @@ export function createRxEffectFn() {
             observableOrValue?: ObservableType | Observable<ObservableType> | Signal<ObservableType>
         ) => {
             // If we detect a Signal: convert Signal to Observable
-            observableOrValue = miniRxIsSignal(observableOrValue)
+            observableOrValue = isSignal(observableOrValue)
                 ? miniRxToObservable(observableOrValue, { injector })
                 : observableOrValue;
 
