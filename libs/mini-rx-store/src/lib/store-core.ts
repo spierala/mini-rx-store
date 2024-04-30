@@ -8,7 +8,6 @@ import {
     AppState,
     MetaReducer,
     Reducer,
-    Actions,
     StoreConfig,
     HasEffectMetadata,
     Action,
@@ -36,8 +35,7 @@ function getReducerManager(): ReducerManager {
 }
 
 // ACTIONS
-const actionsOnQueue = createActionsOnQueue(); // TODO destructure directly into `actions$` and `dispatch`
-export const actions$: Actions = actionsOnQueue.actions$;
+export const { dispatch, actions$ } = createActionsOnQueue();
 
 // APP STATE
 export const appState = new State<AppState>();
@@ -131,15 +129,7 @@ function addExtension(extension: StoreExtension) {
         getReducerManager().addMetaReducers(metaReducer);
     }
 
-    if (extension.id === ExtensionId.UNDO) {
-        // TODO can be shorter (See Signal Store)
-        hasUndoExtension = true;
-    }
-}
-
-// TODO remove
-export function dispatch(action: Action) {
-    actionsOnQueue.dispatch(action);
+    hasUndoExtension = extension.id === ExtensionId.UNDO;
 }
 
 // Used for testing
