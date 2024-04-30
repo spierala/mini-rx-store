@@ -7,13 +7,13 @@ import {
     counterInitialState,
     counterReducer,
     CounterState,
+    destroyStore,
     store,
     userState,
     UserState,
 } from './_spec-helpers';
-import { Action, Reducer } from '../models';
-import { tapResponse } from '../tap-response';
-import { actions$, addMetaReducers } from '../store-core';
+import { Action, Reducer, tapResponse } from '@mini-rx/common';
+import { actions$, configureStore } from '../store-core';
 
 const initialState: UserState = userState;
 
@@ -113,14 +113,6 @@ const userFeature: UserFeatureStore = new UserFeatureStore();
 const counterFeature: CounterFeature = new CounterFeature();
 
 describe('FeatureStore', () => {
-    const reducerSpy = jest.fn();
-
-    function someReducer() {
-        reducerSpy();
-    }
-
-    store.feature('someReduxReducer', someReducer);
-
     it('should initialize the feature', () => {
         const spy = jest.fn();
         userFeature.select().subscribe(spy);
@@ -340,12 +332,13 @@ describe('FeatureStore', () => {
             };
         }
 
-        addMetaReducers(metaReducer);
+        destroyStore();
+        configureStore({ metaReducers: [metaReducer] });
 
         userFeature.updateCity('NY');
         counterFeature.increment();
 
-        expect(metaReducerSpy).toHaveBeenCalledTimes(2);
+        expect(metaReducerSpy).toHaveBeenCalledTimes(3);
     });
 
     it('should create a Feature Store with functional creation methods', () => {

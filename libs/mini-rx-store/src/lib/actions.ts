@@ -1,11 +1,4 @@
-import { Action, StateOrCallback } from './models';
-import { miniRxNameSpace } from './constants';
-
-export const enum MiniRxActionType {
-    INIT = 'init',
-    DESTROY = 'destroy',
-    SET_STATE = 'set-state',
-}
+import { Action, StateOrCallback, createMiniRxActionType, OperationType } from '@mini-rx/common';
 
 export const enum SetStateActionType {
     FEATURE_STORE = '@mini-rx/feature-store',
@@ -26,42 +19,11 @@ export interface ComponentStoreSetStateAction<T> {
     type: string; // The action type visible in DevTools / Logging Extension (really only for logging!)
 }
 
-// Union type
-export type SetStateAction<T> = FeatureStoreSetStateAction<T> | ComponentStoreSetStateAction<T>;
-
-export function createMiniRxActionType(miniRxActionType: MiniRxActionType, featureKey?: string) {
-    return miniRxNameSpace + (featureKey ? '/' + featureKey : '') + '/' + miniRxActionType;
-}
-
 export function createMiniRxAction(
-    miniRxActionType: MiniRxActionType.INIT | MiniRxActionType.DESTROY,
+    miniRxActionType: OperationType.INIT | OperationType.DESTROY,
     featureKey?: string
 ): Action {
     return {
         type: createMiniRxActionType(miniRxActionType, featureKey),
-    };
-}
-
-const setStateActionTypeKey: keyof SetStateAction<any> = 'setStateActionType';
-
-// Type predicate
-export function isFeatureStoreSetStateAction<StateType>(
-    action: Action
-): action is FeatureStoreSetStateAction<StateType> {
-    return action[setStateActionTypeKey] === SetStateActionType.FEATURE_STORE;
-}
-
-export function isComponentStoreSetStateAction<StateType>(
-    action: Action
-): action is ComponentStoreSetStateAction<StateType> {
-    return action[setStateActionTypeKey] === SetStateActionType.COMPONENT_STORE;
-}
-
-export const UNDO_ACTION = miniRxNameSpace + '/undo';
-
-export function undo(action: Action) {
-    return {
-        type: UNDO_ACTION,
-        payload: action,
     };
 }

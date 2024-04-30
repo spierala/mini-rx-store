@@ -1,15 +1,18 @@
-import { Action, ComponentStoreLike, FeatureStoreConfig, Reducer, StateOrCallback } from './models';
-import { calcNewState, miniRxError } from './utils';
-import {
-    createMiniRxActionType,
-    FeatureStoreSetStateAction,
-    isFeatureStoreSetStateAction,
-    MiniRxActionType,
-    SetStateActionType,
-    undo,
-} from './actions';
+import { ComponentStoreLike } from './models';
+import { FeatureStoreSetStateAction, SetStateActionType } from './actions';
 import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
+import {
+    Action,
+    createFeatureStoreReducer,
+    createMiniRxActionType,
+    FeatureStoreConfig,
+    generateId,
+    miniRxError,
+    StateOrCallback,
+    OperationType,
+    undo,
+} from '@mini-rx/common';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>
@@ -75,25 +78,13 @@ export class FeatureStore<StateType extends object>
     }
 }
 
-function createFeatureStoreReducer<StateType>(
-    featureId: string,
-    initialState: StateType
-): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action): StateType => {
-        if (isFeatureStoreSetStateAction<StateType>(action) && action.featureId === featureId) {
-            return calcNewState(state, action.stateOrCallback);
-        }
-        return state;
-    };
-}
-
 function createSetStateAction<T>(
     stateOrCallback: StateOrCallback<T>,
     featureId: string,
     featureKey: string,
     name?: string
 ): FeatureStoreSetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
+    const miniRxActionType = OperationType.SET_STATE;
     return {
         setStateActionType: SetStateActionType.FEATURE_STORE,
         type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
@@ -101,12 +92,6 @@ function createSetStateAction<T>(
         featureId,
         featureKey,
     };
-}
-
-// Simple alpha numeric ID: https://stackoverflow.com/a/12502559/453959
-// This isn't a real GUID!
-function generateId() {
-    return Math.random().toString(36).slice(2);
 }
 
 export function createFeatureStore<T extends object>(

@@ -1,77 +1,8 @@
 import { Observable } from 'rxjs';
-import { StoreExtension } from '@mini-rx/common';
-
-export type AppState = Record<string, any>;
-
-export interface HasComponentStoreSupport {
-    hasCsSupport: true;
-
-    init(): MetaReducer<any>;
-}
-
-export type ComponentStoreExtension = StoreExtension & HasComponentStoreSupport;
-
-export interface ComponentStoreConfig {
-    extensions: ComponentStoreExtension[];
-}
-
-export interface Action {
-    type: string;
-    // Allows any extra properties to be defined in an action.
-    [x: string]: any;
-}
+import { Action, StateOrCallback } from '@mini-rx/common';
 
 export interface ActionWithPayload extends Action {
     payload?: any;
-}
-
-export interface StoreConfig<T> {
-    reducers?: ReducerDictionary<T>;
-    initialState?: T;
-    metaReducers?: MetaReducer<AppState>[];
-    extensions?: StoreExtension[];
-    combineReducersFn?: CombineReducersFn<AppState>;
-}
-
-// Used for the Redux API: Store.feature / StoreModule.forFeature
-export interface FeatureConfig<StateType> {
-    initialState: StateType;
-    metaReducers?: MetaReducer<StateType>[];
-}
-
-// Used for createFeatureStore, new FeatureStore
-export interface FeatureStoreConfig {
-    multi?: boolean;
-}
-
-export class Actions extends Observable<Action> {}
-
-export type Reducer<StateType> = (state: StateType, action: Action) => StateType;
-
-export type MetaReducer<StateType> = (reducer: Reducer<StateType>) => Reducer<StateType>;
-
-export type ReducerDictionary<T> = {
-    [p in keyof T]: Reducer<T[p]>;
-};
-
-export type CombineReducersFn<T> = (reducers: ReducerDictionary<T>) => Reducer<T>;
-
-export type StateOrCallback<StateType> =
-    | Partial<StateType>
-    | ((state: StateType) => Partial<StateType>);
-
-export const EFFECT_METADATA_KEY = '@mini-rx/effectMetaData';
-
-export interface EffectConfig {
-    /**
-     * Determines if the action emitted by the effect is dispatched to the store.
-     * If false, effect does not need to return type `Observable<Action>`.
-     */
-    dispatch?: boolean;
-}
-
-export interface HasEffectMetadata {
-    [EFFECT_METADATA_KEY]: EffectConfig;
 }
 
 export type SetStateParam<T> = StateOrCallback<T> | Observable<Partial<T>>;
