@@ -1,41 +1,8 @@
 import { Observable } from 'rxjs';
-import {
-    Action,
-    StoreExtension,
-    StateOrCallback,
-    MetaReducer,
-    ReducerDictionary,
-} from '@mini-rx/common';
-
-export type AppState = Record<string, any>;
-
-export interface HasComponentStoreSupport {
-    hasCsSupport: true;
-
-    init(): MetaReducer<any>;
-}
-
-export type ComponentStoreExtension = StoreExtension & HasComponentStoreSupport;
-
-export interface ComponentStoreConfig {
-    extensions: ComponentStoreExtension[];
-}
+import { Action, StateOrCallback } from '@mini-rx/common';
 
 export interface ActionWithPayload extends Action {
     payload?: any;
-}
-
-export interface StoreConfig<T> {
-    reducers?: ReducerDictionary<T>;
-    initialState?: T;
-    metaReducers?: MetaReducer<AppState>[];
-    extensions?: StoreExtension[];
-}
-
-// Used for the Redux API: Store.feature / StoreModule.forFeature
-export interface FeatureConfig<StateType> {
-    initialState: StateType;
-    metaReducers?: MetaReducer<StateType>[];
 }
 
 export type SetStateParam<T> = StateOrCallback<T> | Observable<Partial<T>>;

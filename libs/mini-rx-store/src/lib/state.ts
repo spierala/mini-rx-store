@@ -1,6 +1,5 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { select } from './utils';
+import { BehaviorSubject, Observable, pipe } from 'rxjs';
+import { filter, map, distinctUntilChanged } from 'rxjs/operators';
 import { StateOrCallback, calcNextState } from '@mini-rx/common';
 
 export class State<StateType extends object> {
@@ -40,4 +39,8 @@ export class State<StateType extends object> {
         }
         return this.state$.pipe(select(mapFn));
     }
+}
+
+function select<T, R>(mapFn: (state: T) => R) {
+    return pipe(map(mapFn), distinctUntilChanged());
 }

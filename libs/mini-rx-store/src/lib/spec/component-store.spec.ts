@@ -8,13 +8,13 @@ import { counterInitialState, CounterState, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../selector';
-import { ComponentStoreExtension } from '../models';
 import {
     ExtensionId,
     StoreExtension,
     ImmutableStateExtension,
     LoggerExtension,
     UndoExtension,
+    ComponentStoreExtension,
 } from '@mini-rx/common';
 
 describe('ComponentStore', () => {
