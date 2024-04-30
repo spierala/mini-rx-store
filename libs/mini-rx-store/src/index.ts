@@ -16,7 +16,7 @@ export {
     createFeatureStateSelector,
     createComponentStateSelector,
 } from './lib/selector';
-export { StoreConfig, FeatureConfig, ComponentStoreConfig } from './lib/models';
+export { StoreConfig, FeatureConfig, ComponentStoreConfig } from '@mini-rx/common';
 export { ReduxDevtoolsExtension } from './lib/extensions/redux-devtools.extension';
 export {
     LoggerExtension,
