@@ -30,7 +30,7 @@ export class ProductFilterComponent implements OnInit, OnDestroy {
     @Output()
     searchChanged = new EventEmitter<string>();
 
-    searchInput: FormControl = new FormControl();
+    private searchInput: FormControl = new FormControl();
     formGroup: FormGroup = new FormGroup({
         search: this.searchInput,
     });

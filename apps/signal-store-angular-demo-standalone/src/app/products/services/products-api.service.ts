@@ -36,10 +36,9 @@ export class ProductsApiService {
     }
 
     createProduct(product: Product): Observable<Product> {
-        const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         // Product Id must be null for the Web API to assign an Id
         const newProduct = { ...product, id: null };
-        return this.http.post<Product>(apiUrl, newProduct, { headers }).pipe(
+        return this.http.post<Product>(apiUrl, newProduct).pipe(
             tap((data) => {
                 console.log('createProduct: ' + JSON.stringify(data));
                 this.toastr.success('Product created');
@@ -48,11 +47,10 @@ export class ProductsApiService {
         );
     }
 
-    deleteProduct(id: number): Observable<{}> {
-        const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    deleteProduct(id: number): Observable<void> {
         const url = `${apiUrl}/${id}`;
-        return this.http.delete<Product>(url, { headers }).pipe(
-            tap((data) => {
+        return this.http.delete<void>(url).pipe(
+            tap(() => {
                 console.log('deleteProduct: ' + id);
                 this.toastr.success('Product deleted');
             }),
@@ -61,9 +59,8 @@ export class ProductsApiService {
     }
 
     updateProduct(product: Product): Observable<Product> {
-        const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         const url = `${apiUrl}/${product.id}`;
-        return this.http.put<Product>(url, product, { headers }).pipe(
+        return this.http.put<Product>(url, product).pipe(
             tap(() => {
                 console.log('updateProduct: ' + product.id);
                 this.toastr.success('Product updated');
