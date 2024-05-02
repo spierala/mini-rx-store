@@ -2,6 +2,7 @@ import { BaseStore } from './base-store';
 import { ComponentStoreLike } from './models';
 import {
     Action,
+    calculateExtensions,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
@@ -45,28 +46,15 @@ export class ComponentStore<StateType extends object>
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
     private hasUndoExtension = false;
-    private extensions: ComponentStoreExtension[] = []; // This is a class property just for testing purposes
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
 
-        const metaReducers: MetaReducer<StateType>[] = [];
-
-        // TODO refactor extensions setup: use `calculateExtensions`
-        if (config?.extensions) {
-            if (config.extensions && componentStoreConfig?.extensions) {
-                this.extensions = mergeExtensions(
-                    componentStoreConfig.extensions,
-                    config.extensions
-                );
-            } else {
-                this.extensions = config.extensions;
-            }
-        } else if (componentStoreConfig?.extensions) {
-            this.extensions = componentStoreConfig.extensions;
-        }
-
-        sortExtensions(this.extensions).forEach((ext) => {
+        const extensions: ComponentStoreExtension[] = calculateExtensions(
+            config,
+            componentStoreConfig
+        );
+        extensions.forEach((ext) => {
             if (!ext.hasCsSupport) {
                 miniRxError(
                     `Extension "${ext.constructor.name}" is not supported by Component Store.`
@@ -79,6 +67,8 @@ export class ComponentStore<StateType extends object>
                 this.hasUndoExtension = true;
             }
         });
+
+        const metaReducers: MetaReducer<StateType>[] = [];
 
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
