@@ -20,13 +20,6 @@ import {
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
-/** @internal
- * This function exists for testing purposes only
- */
-export function _resetConfig() {
-    componentStoreConfig = undefined;
-}
-
 export function configureComponentStores(config: ComponentStoreConfig) {
     if (!componentStoreConfig) {
         componentStoreConfig = config;
@@ -44,7 +37,7 @@ export class ComponentStore<StateType extends object>
     private actionsOnQueue = createActionsOnQueue();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
-    private hasUndoExtension = false;
+    private readonly hasUndoExtension: boolean = false;
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
@@ -53,22 +46,15 @@ export class ComponentStore<StateType extends object>
             config,
             componentStoreConfig
         );
-        extensions.forEach((ext) => {
+        const metaReducers: MetaReducer<StateType>[] = extensions.map((ext) => {
             if (!ext.hasCsSupport) {
                 miniRxError(
                     `Extension "${ext.constructor.name}" is not supported by Component Store.`
                 );
             }
-
-            metaReducers.push(ext.init()!); // Non-null assertion: Here we know for sure: init will return a MetaReducer
-
-            if (ext.id === ExtensionId.UNDO) {
-                this.hasUndoExtension = true;
-            }
+            return ext.init();
         });
-
-        const metaReducers: MetaReducer<StateType>[] = [];
-
+        this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
         this._sub.add(
