@@ -4,20 +4,17 @@
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
 import {
+    _StoreCore,
     Action,
     Actions,
     createComponentStore,
     createEffect,
     FeatureStore,
-    ImmutableStateExtension,
-    LoggerExtension,
     ofType,
     Reducer,
     ReduxDevtoolsExtension,
     Store,
     StoreExtension,
-    UndoExtension,
-    _StoreCore,
 } from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
@@ -25,6 +22,7 @@ import { of } from 'rxjs';
 import { EffectsModule } from '../effects.module';
 import { ComponentStoreModule } from '../component-store.module';
 import { NgReduxDevtoolsExtension } from '../ng-redux-devtools.extension';
+import { ComponentStoreExtension, MetaReducer } from '@mini-rx/common';
 
 export const loadAction: Action = {
     type: 'LOAD',
@@ -56,6 +54,10 @@ export const loadFailAction: Action = {
 
 interface CounterState {
     counter: number;
+}
+
+interface StringState {
+    value: string;
 }
 
 const counterInitialState: CounterState = {
@@ -148,8 +150,6 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 }
 
-const globalCsExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
-
 const reduxDevToolsExtension = new ReduxDevtoolsExtension({ name: 'Test Redux DevTools' });
 const stateFromReduxDevTools = {
     someProp: 'someValue',
@@ -179,6 +179,49 @@ describe(`Ng Modules`, () => {
         }
     }
 
+    function metaReducerForLocalCsExtension(reducer: Reducer<StringState>): Reducer<StringState> {
+        return (state, action) => {
+            if (Object.hasOwn(action, 'stateOrCallback')) {
+                state = {
+                    ...state,
+                    value: state.value + 'local',
+                };
+            }
+            return reducer(state, action);
+        };
+    }
+
+    class LocalCsExtension extends StoreExtension implements ComponentStoreExtension {
+        id = 1;
+        hasCsSupport = true as const;
+
+        init(): MetaReducer<StringState> {
+            return metaReducerForLocalCsExtension;
+        }
+    }
+
+    function metaReducerForGlobalCsExtension(reducer: Reducer<StringState>): Reducer<StringState> {
+        return (state, action) => {
+            if (Object.hasOwn(action, 'stateOrCallback')) {
+                state = {
+                    ...state,
+                    value: state.value + 'global',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    class GlobalCsExtension extends StoreExtension implements ComponentStoreExtension {
+        id = 2;
+        hasCsSupport = true as const;
+
+        init(): MetaReducer<StringState> {
+            return metaReducerForGlobalCsExtension;
+        }
+    }
+
     beforeAll(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -196,7 +239,7 @@ describe(`Ng Modules`, () => {
                 }),
                 Counter5Module,
                 ComponentStoreModule.forRoot({
-                    extensions: globalCsExtensions,
+                    extensions: [new GlobalCsExtension()],
                 }),
             ],
         });
@@ -310,13 +353,16 @@ describe(`Ng Modules`, () => {
         // For the other aspects of the config we can rely on the ComponentStore tests
 
         it('should merge global config with local config', () => {
-            const localCsExtensions = [new UndoExtension()];
-
-            const cs = createComponentStore(undefined, { extensions: localCsExtensions });
-
-            expect(cs['extensions'][0]).toBe(localCsExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalCsExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalCsExtensions[1]);
+            const spy = jest.fn();
+            const cs = createComponentStore<StringState>(
+                { value: 'a' },
+                { extensions: [new LocalCsExtension()] }
+            );
+            cs.select((state) => state.value).subscribe(spy);
+            expect(spy).toHaveBeenCalledWith('a');
+            cs.setState((state) => ({ value: state.value + 'b' }));
+            cs.select((state) => state.value).subscribe(spy);
+            expect(spy).toHaveBeenCalledWith('alocalglobalb');
         });
     });
 
