@@ -1,8 +1,8 @@
 import { BaseStore } from './base-store';
 import { ComponentStoreLike } from './models';
-import { ComponentStoreSetStateAction, createMiniRxAction, SetStateActionType } from './actions';
 import {
     Action,
+    calculateExtensions,
     combineMetaReducers,
     ComponentStoreConfig,
     ComponentStoreExtension,
@@ -14,19 +14,11 @@ import {
     miniRxError,
     OperationType,
     Reducer,
-    sortExtensions,
     StateOrCallback,
     undo,
 } from '@mini-rx/common';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
-
-/** @internal
- * This function exists for testing purposes only
- */
-export function _resetConfig() {
-    componentStoreConfig = undefined;
-}
 
 export function configureComponentStores(config: ComponentStoreConfig) {
     if (!componentStoreConfig) {
@@ -45,41 +37,24 @@ export class ComponentStore<StateType extends object>
     private actionsOnQueue = createActionsOnQueue();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
-    private hasUndoExtension = false;
-    private extensions: ComponentStoreExtension[] = []; // This is a class property just for testing purposes
+    private readonly hasUndoExtension: boolean = false;
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
 
-        const metaReducers: MetaReducer<StateType>[] = [];
-
-        if (config?.extensions) {
-            if (config.extensions && componentStoreConfig?.extensions) {
-                this.extensions = mergeExtensions(
-                    componentStoreConfig.extensions,
-                    config.extensions
-                );
-            } else {
-                this.extensions = config.extensions;
-            }
-        } else if (componentStoreConfig?.extensions) {
-            this.extensions = componentStoreConfig.extensions;
-        }
-
-        sortExtensions(this.extensions).forEach((ext) => {
+        const extensions: ComponentStoreExtension[] = calculateExtensions(
+            config,
+            componentStoreConfig
+        );
+        const metaReducers: MetaReducer<StateType>[] = extensions.map((ext) => {
             if (!ext.hasCsSupport) {
                 miniRxError(
                     `Extension "${ext.constructor.name}" is not supported by Component Store.`
                 );
             }
-
-            metaReducers.push(ext.init()!); // Non-null assertion: Here we know for sure: init will return a MetaReducer
-
-            if (ext.id === ExtensionId.UNDO) {
-                this.hasUndoExtension = true;
-            }
+            return ext.init();
         });
-
+        this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
         this._sub.add(
@@ -102,7 +77,9 @@ export class ComponentStore<StateType extends object>
         super.setInitialState(initialState);
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
-        this.dispatch(createMiniRxAction(OperationType.INIT, csFeatureKey));
+        this.dispatch({
+            type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
+        });
     }
 
     /** @internal
@@ -112,7 +89,10 @@ export class ComponentStore<StateType extends object>
         stateOrCallback: StateOrCallback<StateType>,
         name: string | undefined
     ): Action {
-        const action: Action = createSetStateAction(stateOrCallback, name);
+        const action: Action = {
+            type: createMiniRxActionType(OperationType.SET_STATE, csFeatureKey, name),
+            stateOrCallback,
+        };
         this.dispatch(action);
         return action;
     }
@@ -132,53 +112,12 @@ export class ComponentStore<StateType extends object>
         if (this.reducer) {
             // Dispatch an action really just for logging via LoggerExtension
             // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
-            this.dispatch(createMiniRxAction(OperationType.DESTROY, csFeatureKey));
+            this.dispatch({
+                type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
+            });
         }
         super.destroy();
     }
-}
-
-function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    name?: string
-): ComponentStoreSetStateAction<T> {
-    const miniRxActionType = OperationType.SET_STATE;
-    return {
-        setStateActionType: SetStateActionType.COMPONENT_STORE,
-        type: createMiniRxActionType(miniRxActionType, csFeatureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-    };
-}
-
-function mergeExtensions(
-    global: ComponentStoreExtension[],
-    local: ComponentStoreExtension[]
-): ComponentStoreExtension[] {
-    // Local extensions overwrite the global extensions
-    // If extension is global and local => use local
-    // If extension is only global => use global
-    // If extension is only local => use local
-
-    const extensions: ComponentStoreExtension[] = [];
-    let globalCopy = [...global];
-    let localCopy = [...local];
-
-    global.forEach((globalExt) => {
-        local.forEach((localExt) => {
-            if (localExt.id === globalExt.id) {
-                // Found extension which is global and local
-                extensions.push(localExt); // Use local!
-                localCopy = localCopy.filter((item) => item.id !== localExt.id); // Remove found extension from local
-                globalCopy = globalCopy.filter((item) => item.id !== globalExt.id); // Remove found extension from global
-            }
-        });
-    });
-
-    return [
-        ...extensions, // Extensions which are global and local, but use local
-        ...localCopy, // Local only
-        ...globalCopy, // Global only
-    ];
 }
 
 export function createComponentStore<T extends object>(

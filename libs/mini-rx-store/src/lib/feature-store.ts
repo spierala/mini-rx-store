@@ -1,5 +1,4 @@
 import { ComponentStoreLike } from './models';
-import { FeatureStoreSetStateAction, SetStateActionType } from './actions';
 import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
 import {
@@ -9,8 +8,8 @@ import {
     FeatureStoreConfig,
     generateId,
     miniRxError,
-    StateOrCallback,
     OperationType,
+    StateOrCallback,
     undo,
 } from '@mini-rx/common';
 
@@ -60,7 +59,11 @@ export class FeatureStore<StateType extends object>
         stateOrCallback: StateOrCallback<StateType>,
         name: string | undefined
     ): Action {
-        const action = createSetStateAction(stateOrCallback, this.featureId, this.featureKey, name);
+        const action = {
+            type: createMiniRxActionType(OperationType.SET_STATE, this.featureKey, name),
+            stateOrCallback,
+            featureId: this.featureId,
+        };
         dispatch(action);
         return action;
     }
@@ -76,22 +79,6 @@ export class FeatureStore<StateType extends object>
         super.destroy();
         removeFeature(this._featureKey);
     }
-}
-
-function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    featureId: string,
-    featureKey: string,
-    name?: string
-): FeatureStoreSetStateAction<T> {
-    const miniRxActionType = OperationType.SET_STATE;
-    return {
-        setStateActionType: SetStateActionType.FEATURE_STORE,
-        type: createMiniRxActionType(miniRxActionType, featureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-        featureId,
-        featureKey,
-    };
 }
 
 export function createFeatureStore<T extends object>(
