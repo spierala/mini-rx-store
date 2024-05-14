@@ -1,5 +1,3 @@
-import { Action, AppState, FeatureConfig, Reducer, StoreConfig } from './models';
-import { miniRxError } from './utils';
 import { Observable } from 'rxjs';
 import {
     addFeature,
@@ -8,11 +6,19 @@ import {
     dispatch,
     effect,
 } from './store-core';
+import {
+    Action,
+    Reducer,
+    FeatureConfig,
+    StoreConfig,
+    AppState,
+    miniRxError,
+} from '@mini-rx/common';
 
 export abstract class Store {
     // Abstract class for Angular Dependency injection
     // mini-rx-store itself uses `Store` just as a type (return type of `configureStore`)
-    abstract feature<StateType>(
+    abstract feature<StateType extends object>(
         featureKey: string,
         reducer: Reducer<StateType>,
         config?: FeatureConfig<StateType>

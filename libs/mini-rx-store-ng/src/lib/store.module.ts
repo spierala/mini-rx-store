@@ -22,7 +22,7 @@ export const FEATURE_CONFIGS = new InjectionToken<FeatureConfig<any>[]>(
 export function storeFactory(config: StoreConfig<Record<string, any>>, injector: Injector) {
     config.extensions =
         config.extensions && config.extensions.length
-            ? config.extensions.map((ext) => {
+            ? config.extensions.map((ext: any) => {
                   if (ext.id === ExtensionId.REDUX_DEVTOOLS) {
                       // Use NgReduxDevtoolsExtension which uses NgZone.run (to make sure that Angular updates the View when using time-travel)
                       // TODO check if this is still necessary in newer Angular versions (it works without NgZone in Angular 13)

@@ -99,6 +99,9 @@
             "options": {
                 "commands": [
                     {
+                        "command": "nx build common --watch"
+                    },
+                    {
                         "command": "nx build mini-rx-store --watch"
                     },
                     {

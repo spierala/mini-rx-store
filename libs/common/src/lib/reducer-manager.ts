@@ -84,11 +84,16 @@ export function createReducerManager() {
         });
     }
 
+    function hasFeatureReducers(): boolean {
+        return !!Object.keys(state.featureReducers).length;
+    }
+
     return {
         setFeatureReducers,
         addFeatureReducer,
         removeFeatureReducer,
         addMetaReducers,
+        hasFeatureReducers,
         get reducer(): Reducer<AppState> {
             return reducer;
         },
