@@ -1,18 +1,16 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, Signal } from '@angular/core';
 import { Todo } from '../../todos-shared/models/todo';
 import { TodoFilter } from '../../todos-shared/models/todo-filter';
 import { pipe } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { v4 as uuid } from 'uuid';
 import {
     Action,
-    createFeatureSelector,
+    createFeatureStateSelector,
     createSelector,
     FeatureStore,
     tapResponse,
-} from 'mini-rx-store';
+} from '@mini-rx/signal-store';
 import { TodosApiService } from '../../todos-shared/services/todos-api.service';
-import { cloneDeep } from 'lodash-es';
 
 // STATE INTERFACE
 interface TodosState {
@@ -35,11 +33,9 @@ const initialState: TodosState = {
 };
 
 // MEMOIZED SELECTORS
-const getTodosFeatureSelector = createFeatureSelector<TodosState>();
+const getTodosFeatureSelector = createFeatureStateSelector<TodosState>();
 const getTodos = createSelector(getTodosFeatureSelector, (state) => state.todos);
-const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) =>
-    cloneDeep(state.selectedTodo)
-);
+const getSelectedTodo = createSelector(getTodosFeatureSelector, (state) => state.selectedTodo);
 const getFilter = createSelector(getTodosFeatureSelector, (state) => state.filter);
 const getTodosFiltered = createSelector(getTodos, getFilter, (todos, filter) => {
     return todos.filter((item) => {
@@ -56,21 +52,20 @@ const getTodosDone = createSelector(getTodosFiltered, (todos) =>
 const getTodosNotDone = createSelector(getTodosFiltered, (todos) =>
     todos.filter((todo) => !todo.isDone)
 );
-const getVm = createSelector({
-    todosDone: getTodosDone,
-    todosNotDone: getTodosNotDone,
-    filter: getFilter,
-    selectedTodo: getSelectedTodo,
-});
 
 @Injectable({
     providedIn: 'root',
 })
-export class TodosStore extends FeatureStore<TodosState> {
-    // STATE OBSERVABLES
-    vm$ = this.select(getVm);
+export class TodosFacade extends FeatureStore<TodosState> {
+    private apiService = inject(TodosApiService);
 
-    constructor(private apiService: TodosApiService) {
+    // STATE SIGNALS
+    todosDone: Signal<Todo[]> = this.select(getTodosDone);
+    todosNotDone: Signal<Todo[]> = this.select(getTodosNotDone);
+    filter: Signal<TodoFilter> = this.select(getFilter);
+    selectedTodo: Signal<Todo | undefined> = this.select(getSelectedTodo);
+
+    constructor() {
         super('todos', initialState);
 
         this.load();
@@ -83,7 +78,7 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     initNewTodo() {
         const newTodo = new Todo();
-        newTodo.tempId = uuid();
+        newTodo.tempId = crypto.randomUUID();
         this.setState({ selectedTodo: newTodo }, 'initNewTodo');
     }
 
@@ -110,7 +105,7 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     // API CALLS...
     // Effect using the RxJS standalone pipe
-    load = this.effect<void>(
+    load = this.rxEffect<void>(
         pipe(
             mergeMap(() =>
                 this.apiService.getTodos().pipe(
@@ -127,7 +122,7 @@ export class TodosStore extends FeatureStore<TodosState> {
 
     // Effect + optimistic update / undo
     // We can skip the standalone pipe when using just one RxJS operator
-    create = this.effect<Todo>(
+    create = this.rxEffect<Todo>(
         mergeMap((todo) => {
             const optimisticUpdate: Action = this.setState((state) => {
                 // Create a new Todo object to prevent the Immutable Extension from making the current form model immutable
@@ -161,7 +156,7 @@ export class TodosStore extends FeatureStore<TodosState> {
     );
 
     // Classic subscribe + optimistic update / undo
-    update(todo: Todo) {
+    updateTodo(todo: Todo) {
         const optimisticUpdate: Action = this.setState(
             (state) => ({
                 todos: updateTodoInList(state.todos, todo),

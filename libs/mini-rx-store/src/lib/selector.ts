@@ -98,19 +98,15 @@ export function createSelector<State, S1, S2, S3, S4, S5, S6, S7, S8, Result>(
 
 export function createSelector<
     Selectors extends Record<string, Selector<State, unknown>>,
-    State = Selectors extends Record<string, Selector<infer S, unknown>>
-        ? S
-        : never,
+    State = Selectors extends Record<string, Selector<infer S, unknown>> ? S : never,
     Result extends Record<string, unknown> = {
-        [Key in keyof Selectors]: Selectors[Key] extends Selector<State, infer R>
-            ? R
-            : never;
+        [Key in keyof Selectors]: Selectors[Key] extends Selector<State, infer R> ? R : never;
     }
 >(selectors: Selectors): Selector<State, Result>;
 
 export function createSelector(...args: any[]): Selector<any, any> {
     if (args.length === 1 && isSelectorsDictionary(args[0])) {
-        args = extractArgsFromSelectorsDictionary(args[0])
+        args = extractArgsFromSelectorsDictionary(args[0]);
     }
     const selectors = args.slice(0, args.length - 1);
     const projector = args[args.length - 1];
