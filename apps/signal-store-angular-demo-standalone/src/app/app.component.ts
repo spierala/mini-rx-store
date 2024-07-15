@@ -11,6 +11,6 @@ import { UserFacade } from './user/state/user-facade.service';
     styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-    productsStore = inject(ProductsFacade);
-    userStore = inject(UserFacade);
+    productsFacade = inject(ProductsFacade);
+    userFacade = inject(UserFacade);
 }

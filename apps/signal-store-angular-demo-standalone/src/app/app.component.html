@@ -28,7 +28,7 @@
             <li class="nav-item" [routerLinkActive]="'active'">
                 <a class="nav-link d-flex align-items-center" [routerLink]="'/user'">
                     <i class="bi bi-person-circle mr-1"></i>
-                    {{ userStore.userFullName() }}
+                    {{ userFacade.userFullName() }}
                 </a>
             </li>
             <li class="nav-item" [routerLinkActive]="'active'">
@@ -36,7 +36,7 @@
                     <i class="bi bi-cart-fill mr-1"></i>
                     <span class="mr-2">Cart</span>
                     <span class="badge badge-light">
-                        {{ productsStore.cartItemsAmount() }}
+                        {{ productsFacade.cartItemsAmount() }}
                     </span>
                 </a>
             </li>

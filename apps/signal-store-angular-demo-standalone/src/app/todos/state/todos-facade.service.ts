@@ -3,7 +3,6 @@ import { Todo } from '../../todos-shared/models/todo';
 import { TodoFilter } from '../../todos-shared/models/todo-filter';
 import { pipe } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { v4 as uuid } from 'uuid';
 import {
     Action,
     createFeatureStateSelector,
@@ -79,7 +78,7 @@ export class TodosFacade extends FeatureStore<TodosState> {
 
     initNewTodo() {
         const newTodo = new Todo();
-        newTodo.tempId = uuid();
+        newTodo.tempId = crypto.randomUUID();
         this.setState({ selectedTodo: newTodo }, 'initNewTodo');
     }
 

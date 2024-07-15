@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
 import { Todo } from '../../../todos-shared/models/todo';
-import { cloneDeep } from 'lodash-es';
 import { TodoFilter } from '../../../todos-shared/models/todo-filter';
 import { TodosSimpleFacade } from '../../state/todos-simple-facade.service';
 import { TodoDetailComponent } from '../../../todos-shared/components/todo-detail/todo-detail.component';
@@ -21,7 +20,7 @@ export class TodosSimpleShellComponent {
     todosDone: Signal<Todo[]> = this.todosSimpleFacade.todosDone;
     todosNotDone: Signal<Todo[]> = this.todosSimpleFacade.todosNotDone;
     selectedTodo: Signal<Todo | undefined> = computed(() => {
-        return cloneDeep(this.todosSimpleFacade.selectedTodo());
+        return structuredClone(this.todosSimpleFacade.selectedTodo());
     });
     filter: Signal<TodoFilter> = this.todosSimpleFacade.filter;
 }

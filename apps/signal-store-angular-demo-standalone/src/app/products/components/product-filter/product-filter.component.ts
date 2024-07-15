@@ -3,13 +3,12 @@ import {
     Component,
     EventEmitter,
     Input,
-    OnDestroy,
     OnInit,
     Output,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-product-filter',
@@ -19,9 +18,7 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [ReactiveFormsModule],
 })
-export class ProductFilterComponent implements OnInit, OnDestroy {
-    private unsubscribe$: Subject<void> = new Subject();
-
+export class ProductFilterComponent implements OnInit {
     @Input()
     set search(search: string) {
         this.formGroup.setValue({ search }, { emitEvent: false });
@@ -37,14 +34,9 @@ export class ProductFilterComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.searchInput.valueChanges
-            .pipe(debounceTime(350), takeUntil(this.unsubscribe$))
+            .pipe(debounceTime(350), takeUntilDestroyed())
             .subscribe((value) => {
                 this.searchChanged.emit(value);
             });
-    }
-
-    ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
     }
 }

@@ -1,4 +1,4 @@
-import { computed, Injectable, Signal } from '@angular/core';
+import { Injectable, Signal } from '@angular/core';
 import { FeatureStore } from '@mini-rx/signal-store';
 
 export const featureKeyUser = 'user';

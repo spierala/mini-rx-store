@@ -3,15 +3,14 @@ import {
     Component,
     EventEmitter,
     Input,
-    OnDestroy,
     OnInit,
     Output,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { TodoFilter } from '../../models/todo-filter';
-import { debounceTime, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-filter',
@@ -21,7 +20,7 @@ import { CommonModule } from '@angular/common';
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule],
 })
-export class TodoFilterComponent implements OnInit, OnDestroy {
+export class TodoFilterComponent implements OnInit {
     @Input()
     set filter(filter: TodoFilter) {
         this.formGroup.setValue(filter, { emitEvent: false });
@@ -38,13 +37,11 @@ export class TodoFilterComponent implements OnInit, OnDestroy {
         }),
     });
 
-    private unsubscribe$: Subject<void> = new Subject();
-
     ngOnInit(): void {
         // Debounce just the text input
         this.formGroup
             .get('search')!
-            .valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(350))
+            .valueChanges.pipe(takeUntilDestroyed(), debounceTime(350))
             .subscribe((value) => {
                 this.filterUpdate.emit({
                     ...this.formGroup.value,
@@ -54,17 +51,12 @@ export class TodoFilterComponent implements OnInit, OnDestroy {
 
         this.formGroup
             .get('category')!
-            .valueChanges.pipe(takeUntil(this.unsubscribe$))
+            .valueChanges.pipe(takeUntilDestroyed())
             .subscribe((value) => {
                 this.filterUpdate.emit({
                     ...this.formGroup.value,
                     category: value,
                 });
             });
-    }
-
-    ngOnDestroy(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
     }
 }

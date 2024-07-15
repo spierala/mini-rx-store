@@ -15,5 +15,5 @@ import { NgIf } from '@angular/common';
 })
 export class ProductsShellComponent {
     productsFacade = inject(ProductsFacade);
-    userStore = inject(UserFacade);
+    userFacade = inject(UserFacade);
 }
