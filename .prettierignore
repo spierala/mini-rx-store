@@ -6,3 +6,8 @@
 /docs
 
 .angular
+
+package.json
+yarn.lock
+
+/.nx/cache

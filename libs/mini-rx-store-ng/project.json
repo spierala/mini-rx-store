@@ -4,6 +4,7 @@
     "projectType": "library",
     "sourceRoot": "libs/mini-rx-store-ng/src",
     "prefix": "mini-rx",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@nx/angular:package",
@@ -25,18 +26,11 @@
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/libs/mini-rx-store-ng"],
             "options": {
-                "jestConfig": "libs/mini-rx-store-ng/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "libs/mini-rx-store-ng/jest.config.ts"
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "options": {
-                "lintFilePatterns": [
-                    "libs/mini-rx-store-ng/src/**/*.ts",
-                    "libs/mini-rx-store-ng/src/**/*.html"
-                ]
-            }
+            "executor": "@nx/eslint:lint"
         },
         "version": {
             "executor": "@jscutlery/semver:version",
@@ -45,6 +39,5 @@
                 "commitMessageFormat": "chore(${projectName}): release version ${version}"
             }
         }
-    },
-    "tags": []
+    }
 }

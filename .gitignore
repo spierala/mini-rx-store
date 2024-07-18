@@ -42,3 +42,5 @@ Thumbs.db
 
 /docs/node_modules
 /docs/.docusaurus
+
+.nx/cache

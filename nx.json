@@ -1,19 +1,6 @@
 {
-    "npmScope": "mini-rx",
-    "affected": {
-        "defaultBase": "main"
-    },
     "cli": {
         "packageManager": "yarn"
-    },
-    "tasksRunnerOptions": {
-        "default": {
-            "runner": "nx-cloud",
-            "options": {
-                "cacheableOperations": ["build", "lint", "test", "e2e"],
-                "accessToken": "MzM5NDg2OTMtY2M5YS00OTZkLTgwYTctYjUwZTA1MDNjMTlkfHJlYWQtd3JpdGU="
-            }
-        }
     },
     "generators": {
         "@nx/angular:application": {
@@ -35,16 +22,29 @@
     "targetDefaults": {
         "build": {
             "dependsOn": ["^build"],
-            "inputs": ["production", "^production"]
-        },
-        "lint": {
-            "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
+            "inputs": ["production", "^production"],
+            "cache": true
         },
         "e2e": {
-            "inputs": ["default", "^production"]
+            "inputs": ["default", "^production"],
+            "cache": true
         },
-        "test": {
-            "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+        "@nx/jest:jest": {
+            "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+            "cache": true,
+            "options": {
+                "passWithNoTests": true
+            },
+            "configurations": {
+                "ci": {
+                    "ci": true,
+                    "codeCoverage": true
+                }
+            }
+        },
+        "@nx/eslint:lint": {
+            "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+            "cache": true
         }
     },
     "namedInputs": {
@@ -55,7 +55,11 @@
             "!{projectRoot}/.eslintrc.json",
             "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
             "!{projectRoot}/tsconfig.spec.json",
-            "!{projectRoot}/jest.config.[jt]s"
+            "!{projectRoot}/jest.config.[jt]s",
+            "!{projectRoot}/src/test-setup.[jt]s"
         ]
-    }
+    },
+    "nxCloudAccessToken": "MzM5NDg2OTMtY2M5YS00OTZkLTgwYTctYjUwZTA1MDNjMTlkfHJlYWQtd3JpdGU=",
+    "useInferencePlugins": false,
+    "defaultBase": "main"
 }
