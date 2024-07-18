@@ -39,8 +39,9 @@ type EffectType<OT> = Observable<OT>;
 export function createEffect<
     C extends EffectConfig,
     DT extends DispatchType<C>,
-    OT extends ObservableType<DT, OT>,
-    R extends EffectType<OT>
+    OTP,
+    R extends EffectType<OT>,
+    OT extends ObservableType<DT, OTP>
 >(v: R, config?: C): R & HasEffectMetadata {
     const value: EffectConfig = {
         ...DEFAULT_EFFECT_CONFIG,
