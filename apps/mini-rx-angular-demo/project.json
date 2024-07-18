@@ -4,6 +4,7 @@
     "projectType": "application",
     "sourceRoot": "apps/mini-rx-angular-demo/src",
     "prefix": "app",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@angular-devkit/build-angular:browser",
@@ -63,10 +64,10 @@
             "executor": "@angular-devkit/build-angular:dev-server",
             "configurations": {
                 "production": {
-                    "browserTarget": "mini-rx-angular-demo:build:production"
+                    "buildTarget": "mini-rx-angular-demo:build:production"
                 },
                 "development": {
-                    "browserTarget": "mini-rx-angular-demo:build:development"
+                    "buildTarget": "mini-rx-angular-demo:build:development"
                 }
             },
             "defaultConfiguration": "development"
@@ -74,24 +75,17 @@
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
             "options": {
-                "browserTarget": "mini-rx-angular-demo:build"
+                "buildTarget": "mini-rx-angular-demo:build"
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "options": {
-                "lintFilePatterns": [
-                    "apps/mini-rx-angular-demo/src/**/*.ts",
-                    "apps/mini-rx-angular-demo/src/**/*.html"
-                ]
-            }
+            "executor": "@nx/eslint:lint"
         },
         "test": {
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/mini-rx-angular-demo"],
             "options": {
-                "jestConfig": "apps/mini-rx-angular-demo/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "apps/mini-rx-angular-demo/jest.config.ts"
             }
         },
         "serveAppAndWatchLibs": {
@@ -110,6 +104,5 @@
                 ]
             }
         }
-    },
-    "tags": []
+    }
 }
