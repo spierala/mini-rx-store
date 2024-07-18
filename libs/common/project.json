@@ -47,6 +47,13 @@
             "options": {
                 "jestConfig": "libs/common/jest.config.ts"
             }
+        },
+        "version": {
+            "executor": "@jscutlery/semver:version",
+            "options": {
+                "preset": "conventional",
+                "commitMessageFormat": "chore(${projectName}): release version ${version}"
+            }
         }
     }
 }
