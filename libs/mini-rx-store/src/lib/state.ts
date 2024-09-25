@@ -1,6 +1,5 @@
 import { BehaviorSubject, Observable, pipe } from 'rxjs';
 import { filter, map, distinctUntilChanged } from 'rxjs/operators';
-import { StateOrCallback, calcNextState } from '@mini-rx/common';
 
 export class State<StateType extends object> {
     private stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
@@ -21,14 +20,6 @@ export class State<StateType extends object> {
 
     set(v: StateType) {
         this.stateSource.next(v);
-    }
-
-    patch(stateOrCallback: StateOrCallback<StateType>) {
-        if (!this.get()) {
-            throw new Error('State is not initialized.');
-        }
-
-        this.stateSource.next(calcNextState(this.get()!, stateOrCallback));
     }
 
     select(): Observable<StateType>;

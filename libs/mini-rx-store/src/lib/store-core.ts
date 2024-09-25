@@ -63,11 +63,11 @@ export function configureStore(config: StoreConfig<AppState> = {}) {
         );
     }
 
-    if (config.metaReducers?.length) {
+    if (config.metaReducers) {
         getReducerManager().addMetaReducers(...config.metaReducers);
     }
 
-    if (config.extensions?.length) {
+    if (config.extensions) {
         sortExtensions(config.extensions).forEach((extension) => addExtension(extension));
     }
 
