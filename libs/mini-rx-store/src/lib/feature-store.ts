@@ -8,12 +8,15 @@ import {
     createSubSink,
     FeatureStoreConfig,
     generateId,
+    MiniRxAction,
     miniRxError,
     OperationType,
     StateOrCallback,
     undo,
+    UpdateStateCallback,
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
+import { createUpdateFn } from './update';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>
@@ -26,6 +29,18 @@ export class FeatureStore<StateType extends object>
     }
 
     private subSink = createSubSink();
+
+    private updateState: UpdateStateCallback<StateType> = (
+        stateOrCallback: StateOrCallback<StateType>,
+        operationType: OperationType,
+        name: string | undefined
+    ): MiniRxAction<StateType> => {
+        return dispatch({
+            type: createMiniRxActionType(operationType, this.featureKey, name),
+            stateOrCallback,
+            featureId: this.featureId,
+        });
+    };
 
     constructor(
         featureKey: string,
@@ -55,22 +70,6 @@ export class FeatureStore<StateType extends object>
         );
     }
 
-    /** @internal
-     * Implementation of abstract method from BaseStore
-     */
-    _dispatchSetStateAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        name: string | undefined
-    ): Action {
-        const action = {
-            type: createMiniRxActionType(OperationType.SET_STATE, this.featureKey, name),
-            stateOrCallback,
-            featureId: this.featureId,
-        };
-        dispatch(action);
-        return action;
-    }
-
     // Implementation of abstract method from BaseStore
     undo(action: Action): void {
         hasUndoExtension
@@ -79,6 +78,7 @@ export class FeatureStore<StateType extends object>
     }
 
     effect = createEffectFn(this.subSink);
+    setState = createUpdateFn(this.updateState);
 
     override destroy() {
         super.destroy();

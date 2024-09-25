@@ -12,13 +12,16 @@ import {
     createSubSink,
     ExtensionId,
     MetaReducer,
+    MiniRxAction,
     miniRxError,
     OperationType,
     Reducer,
     StateOrCallback,
     undo,
+    UpdateStateCallback,
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
+import { createUpdateFn } from './update';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -42,6 +45,18 @@ export class ComponentStore<StateType extends object>
     private readonly hasUndoExtension: boolean = false;
 
     private subSink = createSubSink();
+
+    private updateState: UpdateStateCallback<StateType> = (
+        stateOrCallback: StateOrCallback<StateType>,
+        operationType: OperationType,
+        name: string | undefined
+    ): MiniRxAction<StateType> => {
+        this.assertStateIsInitialized();
+        return this.actionsOnQueue.dispatch({
+            type: createMiniRxActionType(operationType, csFeatureKey, name),
+            stateOrCallback,
+        });
+    };
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
@@ -81,44 +96,26 @@ export class ComponentStore<StateType extends object>
         super.setInitialState(initialState);
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
-        this.dispatch({
+        this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
         });
-    }
-
-    /** @internal
-     * Implementation of abstract method from BaseStore
-     */
-    _dispatchSetStateAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        name: string | undefined
-    ): Action {
-        const action: Action = {
-            type: createMiniRxActionType(OperationType.SET_STATE, csFeatureKey, name),
-            stateOrCallback,
-        };
-        this.dispatch(action);
-        return action;
-    }
-
-    private dispatch(action: Action) {
-        this.actionsOnQueue.dispatch(action);
     }
 
     // Implementation of abstract method from BaseStore
     undo(action: Action) {
         this.hasUndoExtension
-            ? this.dispatch(undo(action))
+            ? this.actionsOnQueue.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
+    setState = createUpdateFn(this.updateState);
     effect = createEffectFn(this.subSink);
 
     override destroy() {
         if (this.reducer) {
             // Dispatch an action really just for logging via LoggerExtension
             // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
-            this.dispatch({
+            this.actionsOnQueue.dispatch({
                 type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
             });
         }

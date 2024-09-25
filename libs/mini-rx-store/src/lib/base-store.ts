@@ -1,6 +1,5 @@
-import { isObservable, Observable, Subject, Subscription } from 'rxjs';
-import { SetStateParam, SetStateReturn } from './models';
-import { Action, defaultEffectsErrorHandler, miniRxError, StateOrCallback } from '@mini-rx/common';
+import { Observable, Subscription } from 'rxjs';
+import { miniRxError } from '@mini-rx/common';
 import { State } from './state';
 
 // BaseStore is extended by ComponentStore/FeatureStore
@@ -32,31 +31,7 @@ export abstract class BaseStore<StateType extends object> {
         // Update state happens in ComponentStore/FeatureStore
     }
 
-    setState<P extends SetStateParam<StateType>>(
-        stateOrCallback: P,
-        name?: string
-    ): SetStateReturn<StateType, P> {
-        const dispatchFn = (stateOrCallback: StateOrCallback<StateType>, name?: string): Action => {
-            this.assertStateIsInitialized();
-            return this._dispatchSetStateAction(stateOrCallback, name);
-        };
-
-        return (
-            isObservable(stateOrCallback)
-                ? this._sub.add(stateOrCallback.subscribe((v) => dispatchFn(v, name)))
-                : dispatchFn(stateOrCallback as StateOrCallback<StateType>, name)
-        ) as SetStateReturn<StateType, P>;
-    }
-
-    /** @internal
-     * Implemented by ComponentStore/FeatureStore
-     */
-    abstract _dispatchSetStateAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        name?: string
-    ): Action;
-
-    private assertStateIsInitialized(): void {
+    protected assertStateIsInitialized(): void {
         if (!this.isStateInitialized) {
             miniRxError(this.notInitializedErrorMessage);
         }
