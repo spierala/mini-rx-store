@@ -5,6 +5,7 @@ import {
     Action,
     createFeatureStoreReducer,
     createMiniRxActionType,
+    createSubSink,
     FeatureStoreConfig,
     generateId,
     miniRxError,
@@ -12,17 +13,19 @@ import {
     StateOrCallback,
     undo,
 } from '@mini-rx/common';
+import { createEffectFn } from './effect';
 
 export class FeatureStore<StateType extends object>
     extends BaseStore<StateType>
     implements ComponentStoreLike<StateType>
 {
+    private readonly featureId: string;
     private readonly _featureKey: string;
     get featureKey(): string {
         return this._featureKey;
     }
 
-    private readonly featureId: string;
+    private subSink = createSubSink();
 
     constructor(
         featureKey: string,
@@ -75,8 +78,11 @@ export class FeatureStore<StateType extends object>
             : miniRxError('UndoExtension is not initialized.');
     }
 
+    effect = createEffectFn(this.subSink);
+
     override destroy() {
         super.destroy();
+        this.subSink.unsubscribe();
         removeFeature(this._featureKey);
     }
 }

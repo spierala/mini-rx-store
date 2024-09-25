@@ -9,6 +9,7 @@ import {
     createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
+    createSubSink,
     ExtensionId,
     MetaReducer,
     miniRxError,
@@ -17,6 +18,7 @@ import {
     StateOrCallback,
     undo,
 } from '@mini-rx/common';
+import { createEffectFn } from './effect';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -38,6 +40,8 @@ export class ComponentStore<StateType extends object>
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
     private readonly hasUndoExtension: boolean = false;
+
+    private subSink = createSubSink();
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
         super();
@@ -108,6 +112,8 @@ export class ComponentStore<StateType extends object>
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
+    effect = createEffectFn(this.subSink);
+
     override destroy() {
         if (this.reducer) {
             // Dispatch an action really just for logging via LoggerExtension
@@ -117,6 +123,7 @@ export class ComponentStore<StateType extends object>
             });
         }
         super.destroy();
+        this.subSink.unsubscribe();
     }
 }
 
