@@ -22,6 +22,9 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
+import { State } from './state';
+import { Observable } from 'rxjs';
+import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -35,10 +38,7 @@ export function configureComponentStores(config: ComponentStoreConfig) {
 
 const csFeatureKey = 'component-store';
 
-export class ComponentStore<StateType extends object>
-    extends BaseStore<StateType>
-    implements ComponentStoreLike<StateType>
-{
+export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private actionsOnQueue = createActionsOnQueue();
     private readonly combinedMetaReducer: MetaReducer<StateType>;
     private reducer: Reducer<StateType> | undefined;
@@ -46,12 +46,19 @@ export class ComponentStore<StateType extends object>
 
     private subSink = createSubSink();
 
+    private _state = new State<StateType>();
+    state$: Observable<StateType> = this._state.select();
+    get state(): StateType {
+        assertStateIsInitialized(this._state, this.constructor.name);
+        return this._state.get()!;
+    }
+
     private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
-        this.assertStateIsInitialized();
+        assertStateIsInitialized(this._state, this.constructor.name);
         return this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(operationType, csFeatureKey, name),
             stateOrCallback,
@@ -59,8 +66,6 @@ export class ComponentStore<StateType extends object>
     };
 
     constructor(initialState?: StateType, config?: ComponentStoreConfig) {
-        super();
-
         const extensions: ComponentStoreExtension[] = calculateExtensions(
             config,
             componentStoreConfig
@@ -76,7 +81,7 @@ export class ComponentStore<StateType extends object>
         this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
-        this._sub.add(
+        this.subSink.sink(
             this.actionsOnQueue.actions$.subscribe((action) => {
                 const newState: StateType = this.reducer!(
                     // We are sure, there is a reducer!
@@ -92,8 +97,8 @@ export class ComponentStore<StateType extends object>
         }
     }
 
-    override setInitialState(initialState: StateType): void {
-        super.setInitialState(initialState);
+    setInitialState(initialState: StateType): void {
+        assertStateIsNotInitialized(this._state, this.constructor.name);
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
         this.actionsOnQueue.dispatch({
@@ -110,8 +115,9 @@ export class ComponentStore<StateType extends object>
 
     setState = createUpdateFn(this.updateState);
     effect = createEffectFn(this.subSink);
+    select = this._state.select;
 
-    override destroy() {
+    destroy() {
         if (this.reducer) {
             // Dispatch an action really just for logging via LoggerExtension
             // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
@@ -119,7 +125,6 @@ export class ComponentStore<StateType extends object>
                 type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
             });
         }
-        super.destroy();
         this.subSink.unsubscribe();
     }
 }
