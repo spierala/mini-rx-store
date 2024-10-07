@@ -18,11 +18,11 @@ export function createEffectFn(subSink: ReturnType<typeof createSubSink>) {
         const effect$ = effectFn(subject as OriginType);
         const effectWithDefaultErrorHandler = defaultEffectsErrorHandler(effect$);
 
-        subSink.sink(effectWithDefaultErrorHandler.subscribe());
+        subSink.sink = effectWithDefaultErrorHandler.subscribe();
 
         return ((observableOrValue?: ObservableType | Observable<ObservableType>) => {
             isObservable(observableOrValue)
-                ? subSink.sink(observableOrValue.subscribe((v) => subject.next(v)))
+                ? (subSink.sink = observableOrValue.subscribe((v) => subject.next(v)))
                 : subject.next(observableOrValue as ObservableType);
         }) as unknown as ReturnType;
     }

@@ -78,18 +78,17 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             return ext.init();
         });
         this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
+
         this.combinedMetaReducer = combineMetaReducers(metaReducers);
 
-        this.subSink.sink(
-            this.actionsOnQueue.actions$.subscribe((action) => {
-                const newState: StateType = this.reducer!(
-                    // We are sure, there is a reducer!
-                    this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
-                    action
-                );
-                this._state.set(newState);
-            })
-        );
+        this.subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
+            const newState: StateType = this.reducer!(
+                // We are sure, there is a reducer!
+                this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                action
+            );
+            this._state.set(newState);
+        });
 
         if (initialState) {
             this.setInitialState(initialState);

@@ -70,9 +70,9 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
             createFeatureStoreReducer(this.featureId, initialState)
         );
 
-        this.subSink.sink(
-            appState.select((state) => state[this.featureKey]).subscribe((v) => this._state.set(v))
-        );
+        this.subSink.sink = appState
+            .select((state) => state[this.featureKey])
+            .subscribe((v) => this._state.set(v));
     }
 
     // Implementation of abstract method from BaseStore
