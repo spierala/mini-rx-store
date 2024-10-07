@@ -332,4 +332,14 @@ describe('ComponentStore', () => {
 
         expect(selectedState()).toBe(1);
     });
+
+    it('should read state imperatively', () => {
+        const cs = setup({ counter: 0 });
+
+        expect(cs.state).toEqual({ counter: 0 });
+
+        cs.setState((state) => ({ counter: state.counter + 1 }));
+
+        expect(cs.state).toEqual({ counter: 1 });
+    });
 });
