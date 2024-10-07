@@ -1,37 +1,41 @@
 import { BehaviorSubject, Observable, pipe } from 'rxjs';
 import { filter, map, distinctUntilChanged } from 'rxjs/operators';
 
-export class State<StateType extends object> {
-    private stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
+export function createState<StateType extends object>(initialState?: StateType) {
+    const stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
         StateType | undefined
-    >(this.initialState);
-    state$: Observable<StateType> = this.stateSource.asObservable().pipe(
+    >(initialState);
+    const state$: Observable<StateType> = stateSource.asObservable().pipe(
         // Skip the first (undefined) value of the BehaviorSubject
         // Very similar to a ReplaySubject(1), but more lightweight
         // Emits a state object (when calling the `set` method)
         filter((v) => !!v)
     ) as Observable<StateType>;
 
-    constructor(private initialState?: StateType) {}
-
-    get(): StateType | undefined {
-        return this.stateSource.value;
-    }
-
-    set(v: StateType) {
-        this.stateSource.next(v);
-    }
-
-    select(): Observable<StateType>;
-    select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    select(mapFn?: any): Observable<any> {
+    function select(): Observable<StateType>;
+    function select<R>(mapFn: (state: StateType) => R): Observable<R>;
+    function select(mapFn?: any): Observable<any> {
         if (!mapFn) {
-            return this.state$;
+            return state$;
         }
-        return this.state$.pipe(select(mapFn));
+        return state$.pipe(selectOperator(mapFn));
     }
+
+    function get(): StateType | undefined {
+        return stateSource.value;
+    }
+
+    function set(v: StateType) {
+        stateSource.next(v);
+    }
+
+    return {
+        select,
+        get,
+        set,
+    };
 }
 
-function select<T, R>(mapFn: (state: T) => R) {
+function selectOperator<T, R>(mapFn: (state: T) => R) {
     return pipe(map(mapFn), distinctUntilChanged());
 }

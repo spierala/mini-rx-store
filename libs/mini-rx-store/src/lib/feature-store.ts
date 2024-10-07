@@ -16,7 +16,7 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
-import { State } from './state';
+import { createState } from './state';
 import { Observable } from 'rxjs';
 import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
 
@@ -29,7 +29,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
 
     private subSink = createSubSink();
 
-    private _state = new State<StateType>();
+    private _state = createState<StateType>();
     state$: Observable<StateType> = this._state.select();
     get state(): StateType {
         assertStateIsInitialized(this._state, this.constructor.name);

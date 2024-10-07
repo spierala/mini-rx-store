@@ -1,5 +1,5 @@
 import { Observable, Subscription } from 'rxjs';
-import { State } from './state';
+import { createState } from './state';
 import {
     Action,
     AppState,
@@ -38,7 +38,7 @@ function getReducerManager(): ReducerManager {
 export const { dispatch, actions$ } = createActionsOnQueue();
 
 // APP STATE
-export const appState = new State<AppState>();
+export const appState = createState<AppState>();
 
 // Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
 // Called by `configureStore` and `addReducer`
