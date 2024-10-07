@@ -1,5 +1,4 @@
 import { ComponentStoreLike } from './models';
-import { BaseStore } from './base-store';
 import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
 import {
     Action,
@@ -17,11 +16,11 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
+import { State } from './state';
+import { Observable } from 'rxjs';
+import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
 
-export class FeatureStore<StateType extends object>
-    extends BaseStore<StateType>
-    implements ComponentStoreLike<StateType>
-{
+export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly featureId: string;
     private readonly _featureKey: string;
     get featureKey(): string {
@@ -30,11 +29,19 @@ export class FeatureStore<StateType extends object>
 
     private subSink = createSubSink();
 
+    private _state = new State<StateType>();
+    state$: Observable<StateType> = this._state.select();
+    get state(): StateType {
+        assertStateIsInitialized(this._state, this.constructor.name);
+        return this._state.get()!;
+    }
+
     private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
+        assertStateIsInitialized(this._state, this.constructor.name);
         return dispatch({
             type: createMiniRxActionType(operationType, this.featureKey, name),
             stateOrCallback,
@@ -47,8 +54,6 @@ export class FeatureStore<StateType extends object>
         initialState: StateType | undefined,
         config: FeatureStoreConfig = {}
     ) {
-        super();
-
         this.featureId = generateId();
         this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
 
@@ -57,15 +62,15 @@ export class FeatureStore<StateType extends object>
         }
     }
 
-    override setInitialState(initialState: StateType): void {
-        super.setInitialState(initialState);
+    setInitialState(initialState: StateType): void {
+        assertStateIsNotInitialized(this._state, this.constructor.name);
 
         addFeature<StateType>(
             this._featureKey,
             createFeatureStoreReducer(this.featureId, initialState)
         );
 
-        this._sub.add(
+        this.subSink.sink(
             appState.select((state) => state[this.featureKey]).subscribe((v) => this._state.set(v))
         );
     }
@@ -77,13 +82,21 @@ export class FeatureStore<StateType extends object>
             : miniRxError('UndoExtension is not initialized.');
     }
 
-    effect = createEffectFn(this.subSink);
     setState = createUpdateFn(this.updateState);
+    effect = createEffectFn(this.subSink);
+    select = this._state.select;
 
-    override destroy() {
-        super.destroy();
+    destroy() {
         this.subSink.unsubscribe();
         removeFeature(this._featureKey);
+    }
+
+    /**
+     * @internal
+     * Can be called by Angular if ComponentStore/FeatureStore is provided in a component
+     */
+    ngOnDestroy() {
+        this.destroy();
     }
 }
 

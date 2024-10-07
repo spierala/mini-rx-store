@@ -1,4 +1,3 @@
-import { BaseStore } from './base-store';
 import { ComponentStoreLike } from './models';
 import {
     Action,
@@ -126,6 +125,14 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             });
         }
         this.subSink.unsubscribe();
+    }
+
+    /**
+     * @internal
+     * Can be called by Angular if ComponentStore/FeatureStore is provided in a component
+     */
+    ngOnDestroy() {
+        this.destroy();
     }
 }
 

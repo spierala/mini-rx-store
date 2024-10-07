@@ -1,7 +1,7 @@
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import { mergeMap, tap } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
-import { createFeatureSelector, createSelector } from '../selector';
+import { createFeatureStateSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import {
     counterInitialState,
@@ -33,14 +33,13 @@ function fakeApiWithError(): Observable<UserState> {
     return cold('-#');
 }
 
-const getUserFeatureState = createFeatureSelector<UserState>('user2'); // Select From App State
+const getUserFeatureState = createFeatureStateSelector<UserState>('user'); // Select From App State
 const getCity = createSelector(getUserFeatureState, (state) => state.city);
 
-const getUserFeatureState2 = createFeatureSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
+const getUserFeatureState2 = createFeatureStateSelector<UserState>(); // Select directly from Feature State by omitting the Feature name
 const getCountry = createSelector(getUserFeatureState2, (state) => state.country);
 
-store.feature<CounterState>('someFeature', counterReducer);
-const getSomeFeatureSelector = createFeatureSelector<CounterState>('someFeature');
+const getSomeFeatureSelector = createFeatureStateSelector<CounterState>('someFeature');
 
 class UserFeatureStore extends FeatureStore<UserState> {
     firstName$ = this.select((state) => state.firstName);
@@ -69,7 +68,7 @@ class UserFeatureStore extends FeatureStore<UserState> {
     );
 
     constructor() {
-        super('user2', initialState);
+        super('user', initialState);
     }
 
     updateFirstName(firstName: string) {
@@ -100,7 +99,7 @@ class CounterFeature extends FeatureStore<CounterState> {
     counter$: Observable<number> = this.select((state) => state.counter);
 
     constructor() {
-        super('counterFeature', { counter: 0 });
+        super('counter', { counter: 0 });
     }
 
     increment() {
@@ -109,84 +108,119 @@ class CounterFeature extends FeatureStore<CounterState> {
     }
 }
 
-const userFeature: UserFeatureStore = new UserFeatureStore();
-const counterFeature: CounterFeature = new CounterFeature();
+let userFeatureStore: UserFeatureStore;
+function setupUserFeatureStore() {
+    userFeatureStore = new UserFeatureStore();
+}
+
+let counterFeatureStore: CounterFeature;
+function setupCounterFeatureStore(): void {
+    counterFeatureStore = new CounterFeature();
+}
 
 describe('FeatureStore', () => {
+    beforeEach(() => {
+        destroyStore();
+    });
+
     it('should initialize the feature', () => {
+        setupUserFeatureStore();
+
         const spy = jest.fn();
-        userFeature.select().subscribe(spy);
+        userFeatureStore.select().subscribe(spy);
         expect(spy).toHaveBeenCalledWith(initialState);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should expose the feature key', () => {
-        expect(userFeature.featureKey).toBe('user2');
+        setupUserFeatureStore();
+
+        expect(userFeatureStore.featureKey).toBe('user');
     });
 
     it('should update state', () => {
-        userFeature.updateFirstName('Nicolas');
+        setupUserFeatureStore();
+
+        userFeatureStore.updateFirstName('Nicolas');
         const spy = jest.fn();
-        userFeature.firstName$.subscribe(spy);
+        userFeatureStore.firstName$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('Nicolas');
         expect(spy).toHaveBeenCalledTimes(1);
 
         spy.mockReset();
 
-        userFeature.updateLastName('Cage');
-        userFeature.lastName$.subscribe(spy);
+        userFeatureStore.updateLastName('Cage');
+        userFeatureStore.lastName$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('Cage');
         expect(spy).toHaveBeenCalledTimes(1);
 
         spy.mockReset();
 
-        userFeature.updateCountry('Belgium'); // Test updating state using `this.state`
-        userFeature.country$.subscribe(spy);
+        userFeatureStore.updateCountry('Belgium'); // Test updating state using `this.state`
+        userFeatureStore.country$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('Belgium');
         expect(spy).toHaveBeenCalledTimes(1);
-
-        userFeature.resetState();
     });
 
     it('should update state using callback', () => {
+        setupCounterFeatureStore();
+
         const spy = jest.fn();
-        counterFeature.counter$.subscribe(spy);
+        counterFeatureStore.counter$.subscribe(spy);
 
         expect(spy).toHaveBeenCalledWith(0);
         expect(spy).toHaveBeenCalledTimes(1);
 
-        counterFeature.increment();
+        counterFeatureStore.increment();
         expect(spy).toHaveBeenCalledWith(1);
         expect(spy).toHaveBeenCalledTimes(2);
     });
 
     it('should select state from App State', () => {
+        setupUserFeatureStore();
+
         const spy = jest.fn();
-        userFeature.city$.subscribe(spy);
+        userFeatureStore.city$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('LA');
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should select state from Feature State', () => {
+        setupUserFeatureStore();
+
         const spy = jest.fn();
-        userFeature.country$.subscribe(spy);
+        userFeatureStore.country$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith('United States');
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should select state from another Feature (created with Store.feature)', () => {
+        configureStore({
+            reducers: {
+                someFeature: counterReducer,
+            },
+        });
+
+        setupUserFeatureStore();
+
         const spy = jest.fn();
-        userFeature.someFeatureState$.subscribe(spy);
+        userFeatureStore.someFeatureState$.subscribe(spy);
         expect(spy).toHaveBeenCalledWith(counterInitialState);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should create and execute an effect', () => {
-        userFeature.loadFn();
-        expect(userFeature.firstName$).toBeObservable(hot('a--b', { a: 'Bruce', b: 'Steven' }));
+        setupUserFeatureStore();
+
+        userFeatureStore.loadFn();
+        expect(userFeatureStore.firstName$).toBeObservable(
+            hot('a--b', { a: 'Bruce', b: 'Steven' })
+        );
     });
 
     it('should invoke effect via Observable or imperatively', () => {
+        setupUserFeatureStore();
+
         const spy = jest.fn();
 
         function apiCall(param: number) {
@@ -194,7 +228,7 @@ describe('FeatureStore', () => {
             return of('someValue');
         }
 
-        const effect = userFeature.effect<number>(mergeMap((v) => apiCall(v)));
+        const effect = userFeatureStore.effect<number>(mergeMap((v) => apiCall(v)));
         effect(1);
 
         const source = new Subject<number>();
@@ -218,9 +252,11 @@ describe('FeatureStore', () => {
     });
 
     it('should create and execute an effect and handle error', () => {
-        userFeature.resetState();
-        userFeature.loadFnWithError();
-        expect(userFeature.select()).toBeObservable(
+        setupUserFeatureStore();
+
+        userFeatureStore.resetState();
+        userFeatureStore.loadFnWithError();
+        expect(userFeatureStore.select()).toBeObservable(
             hot('ab', { a: initialState, b: { ...initialState, err: 'error' } })
         );
     });
@@ -306,14 +342,14 @@ describe('FeatureStore', () => {
     });
 
     it('should dispatch a set-state action', () => {
-        userFeature.resetState();
+        setupUserFeatureStore();
 
         const spy = jest.fn();
         actions$.subscribe(spy);
-        userFeature.updateCity('NY');
+        userFeatureStore.updateCity('NY');
         expect(spy).toHaveBeenCalledWith(
             expect.objectContaining({
-                type: '@mini-rx/user2/set-state/updateCity',
+                type: '@mini-rx/user/set-state/updateCity',
                 stateOrCallback: { city: 'NY' },
                 featureId: expect.any(String),
             })
@@ -325,19 +361,36 @@ describe('FeatureStore', () => {
 
         function metaReducer(reducer: Reducer<any>): Reducer<any> {
             return (state, action: Action) => {
-                metaReducerSpy();
-
+                metaReducerSpy(action);
                 return reducer(state, action);
             };
         }
 
-        destroyStore();
-        configureStore({ metaReducers: [metaReducer] });
+        configureStore({
+            metaReducers: [metaReducer],
+        });
 
-        userFeature.updateCity('NY');
-        counterFeature.increment();
+        setupUserFeatureStore();
+        setupCounterFeatureStore();
 
-        expect(metaReducerSpy).toHaveBeenCalledTimes(3);
+        userFeatureStore.updateCity('NY');
+        counterFeatureStore.increment();
+
+        expect(metaReducerSpy.mock.calls).toEqual([
+            [{ type: '@mini-rx/init' }],
+            [
+                {
+                    type: '@mini-rx/user/init',
+                },
+            ],
+            [
+                {
+                    type: '@mini-rx/counter/init',
+                },
+            ],
+            [expect.objectContaining({ type: '@mini-rx/user/set-state/updateCity' })],
+            [expect.objectContaining({ type: '@mini-rx/counter/set-state' })],
+        ]);
     });
 
     it('should create a Feature Store with functional creation methods', () => {
@@ -346,7 +399,7 @@ describe('FeatureStore', () => {
             counterInitialState
         );
 
-        const getFeatureState = createFeatureSelector<CounterState>();
+        const getFeatureState = createFeatureStateSelector<CounterState>();
         const getCounter = createSelector(getFeatureState, (state) => state.counter);
 
         const counter$: Observable<number> = fs.select(getCounter);
@@ -430,15 +483,15 @@ describe('FeatureStore', () => {
         const spy3 = jest.fn();
 
         const fs2FeatureKey = fs1.featureKey;
-        const getFs2Feature = createFeatureSelector<CounterState>(fs2FeatureKey);
+        const getFs2Feature = createFeatureStateSelector<CounterState>(fs2FeatureKey);
         const getFs2Counter = createSelector(getFs2Feature, (state) => state?.counter);
 
         const fs3FeatureKey = fs2.featureKey;
-        const getFs3Feature = createFeatureSelector<CounterState>(fs3FeatureKey);
+        const getFs3Feature = createFeatureStateSelector<CounterState>(fs3FeatureKey);
         const getFs3Counter = createSelector(getFs3Feature, (state) => state?.counter);
 
         const fs4FeatureKey = fs3.featureKey;
-        const getFs4Feature = createFeatureSelector<CounterState>(fs4FeatureKey);
+        const getFs4Feature = createFeatureStateSelector<CounterState>(fs4FeatureKey);
         const getFs4Counter = createSelector(getFs4Feature, (state) => state?.counter);
 
         store.select(getFs2Counter).subscribe(spy);
