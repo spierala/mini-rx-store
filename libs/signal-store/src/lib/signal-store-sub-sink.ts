@@ -1,10 +1,13 @@
 import { DestroyRef, inject } from '@angular/core';
 import { createSubSink } from '@mini-rx/common';
+import { Subscription } from 'rxjs';
 
 export function createSignalStoreSubSink() {
-    const { unsubscribe, sink } = createSubSink();
-    inject(DestroyRef).onDestroy(unsubscribe);
+    const subSink = createSubSink();
+    inject(DestroyRef).onDestroy(subSink.unsubscribe);
     return {
-        sink,
+        set sink(sub: Subscription) {
+            subSink.sink = sub;
+        },
     };
 }
