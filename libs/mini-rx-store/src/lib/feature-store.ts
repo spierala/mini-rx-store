@@ -19,6 +19,7 @@ import { createUpdateFn } from './update';
 import { createState } from './state';
 import { Observable } from 'rxjs';
 import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
+import { createConnectFn } from './connect';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly featureId: string;
@@ -83,6 +84,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     }
 
     setState = createUpdateFn(this.updateState);
+    connect = createConnectFn(this.updateState, this.subSink);
     effect = createEffectFn(this.subSink);
     select = this._state.select;
 

@@ -6,16 +6,14 @@ export interface ActionWithPayload extends Action {
 }
 
 export type SetStateParam<T> = StateOrCallback<T> | Observable<Partial<T>>;
-export type SetStateReturn<T, P extends SetStateParam<T>> = P extends Observable<Partial<T>>
-    ? void
-    : Action;
 
 export interface ComponentStoreLike<StateType> {
-    setInitialState(initialState: StateType): void;
-    setState(stateOrCallback: SetStateParam<StateType>, name?: string): void;
     get state(): StateType;
-    select(mapFn?: any): Observable<any>;
-    effect(effectFn: (origin$: Observable<any>) => Observable<any>): () => void;
+    setState(stateOrCallback: SetStateParam<StateType>, name?: string): void;
+    setInitialState(initialState: StateType): void;
+    connect(dict: Record<string, Observable<unknown>>): void;
+    effect(effectFn: (origin$: Observable<unknown>) => Observable<unknown>): () => void;
+    select(mapFn?: (state: unknown) => unknown): Observable<unknown>;
     undo(action: Action): void;
     destroy(): void;
 }

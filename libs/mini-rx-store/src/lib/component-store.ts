@@ -24,6 +24,7 @@ import { createUpdateFn } from './update';
 import { createState } from './state';
 import { Observable } from 'rxjs';
 import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
+import { createConnectFn } from './connect';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -112,6 +113,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     }
 
     setState = createUpdateFn(this.updateState);
+    connect = createConnectFn(this.updateState, this.subSink);
     effect = createEffectFn(this.subSink);
     select = this._state.select;
 

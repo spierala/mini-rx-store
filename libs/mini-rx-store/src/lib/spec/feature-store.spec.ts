@@ -1,6 +1,6 @@
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import { mergeMap, tap } from 'rxjs/operators';
-import { Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { cold, hot } from 'jest-marbles';
 import {
@@ -515,5 +515,25 @@ describe('FeatureStore', () => {
 
         expect(fs2FeatureKey).toContain('multi-counter-');
         expect(fs3FeatureKey).toContain('multi-counter-');
+    });
+
+    it('should connect state with an Observable', () => {
+        setupCounterFeatureStore();
+
+        const spy = jest.fn();
+        counterFeatureStore.counter$.subscribe(spy);
+
+        expect(spy).toHaveBeenCalledWith(0);
+
+        const counterSource = new BehaviorSubject(1);
+
+        // connect with Observable
+        counterFeatureStore.connect({ counter: counterSource });
+
+        expect(spy).toHaveBeenCalledWith(1);
+
+        counterSource.next(2);
+
+        expect(spy).toHaveBeenCalledWith(2);
     });
 });
