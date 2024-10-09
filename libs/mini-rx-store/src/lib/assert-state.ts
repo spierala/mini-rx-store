@@ -1,25 +1,28 @@
 import { miniRxError } from '@mini-rx/common';
 
-export function assertStateIsInitialized(
-    state: { get: () => object | undefined },
-    name: string
-): void | never {
-    const notInitializedErrorMessage =
-        `${name} has no initialState yet. ` +
-        `Please provide an initialState before updating/getting state.`;
+type State = { get: () => object | undefined };
 
-    if (!state.get()) {
-        miniRxError(notInitializedErrorMessage);
+export function createAssertState(constructorName: string, state: State) {
+    function isInitialized(): void | never {
+        const notInitializedErrorMessage =
+            `${constructorName} has no initialState yet. ` +
+            `Please provide an initialState before updating/getting state.`;
+
+        if (!state.get()) {
+            miniRxError(notInitializedErrorMessage);
+        }
     }
-}
 
-export function assertStateIsNotInitialized(
-    state: { get: () => object | undefined },
-    name: string
-): void | never {
-    const initializedErrorMessage = `${name} has initialState already.`;
+    function isNotInitialized(): void | never {
+        const initializedErrorMessage = `${constructorName} has initialState already.`;
 
-    if (state.get()) {
-        miniRxError(initializedErrorMessage);
+        if (state.get()) {
+            miniRxError(initializedErrorMessage);
+        }
     }
+
+    return {
+        isInitialized,
+        isNotInitialized,
+    };
 }

@@ -23,8 +23,8 @@ import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
 import { createState } from './state';
 import { Observable } from 'rxjs';
-import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
 import { createConnectFn } from './connect';
+import { createAssertState } from './assert-state';
 
 let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
 
@@ -47,9 +47,10 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     private subSink = createSubSink();
 
     private _state = createState<StateType>();
+    private assertState = createAssertState(this.constructor.name, this._state);
     state$: Observable<StateType> = this._state.select();
     get state(): StateType {
-        assertStateIsInitialized(this._state, this.constructor.name);
+        this.assertState.isInitialized();
         return this._state.get()!;
     }
 
@@ -58,7 +59,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
-        assertStateIsInitialized(this._state, this.constructor.name);
+        this.assertState.isInitialized();
         return this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(operationType, csFeatureKey, name),
             stateOrCallback,
@@ -97,7 +98,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     }
 
     setInitialState(initialState: StateType): void {
-        assertStateIsNotInitialized(this._state, this.constructor.name);
+        this.assertState.isNotInitialized();
 
         this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
         this.actionsOnQueue.dispatch({

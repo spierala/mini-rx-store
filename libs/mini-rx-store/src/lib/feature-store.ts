@@ -18,7 +18,7 @@ import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
 import { createState } from './state';
 import { Observable } from 'rxjs';
-import { assertStateIsInitialized, assertStateIsNotInitialized } from './assert-state';
+import { createAssertState } from './assert-state';
 import { createConnectFn } from './connect';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
@@ -31,9 +31,10 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     private subSink = createSubSink();
 
     private _state = createState<StateType>();
+    private assertState = createAssertState(this.constructor.name, this._state);
     state$: Observable<StateType> = this._state.select();
     get state(): StateType {
-        assertStateIsInitialized(this._state, this.constructor.name);
+        this.assertState.isInitialized();
         return this._state.get()!;
     }
 
@@ -42,7 +43,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
-        assertStateIsInitialized(this._state, this.constructor.name);
+        this.assertState.isInitialized();
         return dispatch({
             type: createMiniRxActionType(operationType, this.featureKey, name),
             stateOrCallback,
@@ -64,7 +65,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     }
 
     setInitialState(initialState: StateType): void {
-        assertStateIsNotInitialized(this._state, this.constructor.name);
+        this.assertState.isNotInitialized();
 
         addFeature<StateType>(
             this._featureKey,
