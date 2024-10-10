@@ -6,6 +6,7 @@ import {
     createMiniRxActionType,
     createSubSink,
     FeatureStoreConfig,
+    generateFeatureKey,
     generateId,
     MiniRxAction,
     miniRxError,
@@ -17,7 +18,6 @@ import {
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
 import { createState } from './state';
-import { Observable } from 'rxjs';
 import { createAssertState } from './assert-state';
 import { createConnectFn } from './connect';
 
@@ -28,11 +28,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return this._featureKey;
     }
 
-    private subSink = createSubSink();
-
     private _state = createState<StateType>();
-    private assertState = createAssertState(this.constructor.name, this._state);
-    state$: Observable<StateType> = this._state.select();
     get state(): StateType {
         this.assertState.isInitialized();
         return this._state.get()!;
@@ -51,13 +47,16 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         });
     };
 
+    private subSink = createSubSink();
+    private assertState = createAssertState(this.constructor.name, this._state);
+
     constructor(
         featureKey: string,
         initialState: StateType | undefined,
         config: FeatureStoreConfig = {}
     ) {
         this.featureId = generateId();
-        this._featureKey = config.multi ? featureKey + '-' + generateId() : featureKey;
+        this._featureKey = generateFeatureKey(featureKey, config.multi);
 
         if (initialState) {
             this.setInitialState(initialState);
@@ -77,7 +76,6 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
             .subscribe((v) => this._state.set(v));
     }
 
-    // Implementation of abstract method from BaseStore
     undo(action: Action): void {
         hasUndoExtension
             ? dispatch(undo(action))

@@ -2,7 +2,7 @@ import { ComponentStoreLike } from './models';
 import {
     Action,
     calculateExtensions,
-    combineMetaReducers,
+    componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
     createActionsOnQueue,
@@ -10,7 +10,6 @@ import {
     createMiniRxActionType,
     createSubSink,
     ExtensionId,
-    MetaReducer,
     MiniRxAction,
     miniRxError,
     OperationType,
@@ -22,33 +21,28 @@ import {
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
 import { createState } from './state';
-import { Observable } from 'rxjs';
 import { createConnectFn } from './connect';
 import { createAssertState } from './assert-state';
 
-let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
-
+const csFeatureKey = 'component-store';
+const globalCsConfig = componentStoreConfig();
+// Keep configureComponentStores for backwards compatibility (mini-rx-store-ng)
 export function configureComponentStores(config: ComponentStoreConfig) {
-    if (!componentStoreConfig) {
-        componentStoreConfig = config;
-        return;
-    }
-    miniRxError('`configureComponentStores` was called multiple times.');
+    globalCsConfig.set(config);
 }
 
-const csFeatureKey = 'component-store';
-
 export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
-    private actionsOnQueue = createActionsOnQueue();
-    private readonly combinedMetaReducer: MetaReducer<StateType>;
-    private reducer: Reducer<StateType> | undefined;
-    private readonly hasUndoExtension: boolean = false;
+    private readonly extensions: ComponentStoreExtension[] = calculateExtensions(
+        this.config,
+        globalCsConfig.get()
+    );
+    private readonly hasUndoExtension: boolean = this.extensions.some(
+        (ext) => ext.id === ExtensionId.UNDO
+    );
 
-    private subSink = createSubSink();
+    private actionsOnQueue = createActionsOnQueue();
 
     private _state = createState<StateType>();
-    private assertState = createAssertState(this.constructor.name, this._state);
-    state$: Observable<StateType> = this._state.select();
     get state(): StateType {
         this.assertState.isInitialized();
         return this._state.get()!;
@@ -66,32 +60,10 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         });
     };
 
-    constructor(initialState?: StateType, config?: ComponentStoreConfig) {
-        const extensions: ComponentStoreExtension[] = calculateExtensions(
-            config,
-            componentStoreConfig
-        );
-        const metaReducers: MetaReducer<StateType>[] = extensions.map((ext) => {
-            if (!ext.hasCsSupport) {
-                miniRxError(
-                    `Extension "${ext.constructor.name}" is not supported by Component Store.`
-                );
-            }
-            return ext.init();
-        });
-        this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
+    private subSink = createSubSink();
+    private assertState = createAssertState(this.constructor.name, this._state);
 
-        this.combinedMetaReducer = combineMetaReducers(metaReducers);
-
-        this.subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
-            const newState: StateType = this.reducer!(
-                // We are sure, there is a reducer!
-                this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
-                action
-            );
-            this._state.set(newState);
-        });
-
+    constructor(initialState?: StateType, private config?: ComponentStoreConfig) {
         if (initialState) {
             this.setInitialState(initialState);
         }
@@ -100,14 +72,26 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     setInitialState(initialState: StateType): void {
         this.assertState.isNotInitialized();
 
-        this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
+        const reducer: Reducer<StateType> = createComponentStoreReducer(
+            initialState,
+            this.extensions
+        );
+
+        this.subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
+            const newState: StateType = reducer(
+                // We are sure, there is a reducer!
+                this._state.get() as StateType, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                action
+            );
+            this._state.set(newState);
+        });
+
         this.actionsOnQueue.dispatch({
             type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
         });
     }
 
-    // Implementation of abstract method from BaseStore
-    undo(action: Action) {
+    undo(action: Action): void {
         this.hasUndoExtension
             ? this.actionsOnQueue.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
@@ -119,9 +103,9 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     select = this._state.select;
 
     destroy() {
-        if (this.reducer) {
+        if (this._state.get()) {
             // Dispatch an action really just for logging via LoggerExtension
-            // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
+            // Only dispatch if an initial state was provided or setInitialState was called
             this.actionsOnQueue.dispatch({
                 type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
             });

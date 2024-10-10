@@ -2,7 +2,6 @@ import { DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import {
     Action,
     calculateExtensions,
-    combineMetaReducers,
     componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
@@ -10,7 +9,6 @@ import {
     createComponentStoreReducer,
     createMiniRxActionType,
     ExtensionId,
-    MetaReducer,
     MiniRxAction,
     miniRxError,
     OperationType,
@@ -29,7 +27,13 @@ const csFeatureKey = 'component-store';
 export const globalCsConfig = componentStoreConfig();
 
 export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
-    private readonly hasUndoExtension: boolean = false;
+    private readonly extensions: ComponentStoreExtension[] = calculateExtensions(
+        this.config,
+        globalCsConfig.get()
+    );
+    private readonly hasUndoExtension: boolean = this.extensions.some(
+        (ext) => ext.id === ExtensionId.UNDO
+    );
 
     private actionsOnQueue = createActionsOnQueue();
 
@@ -49,18 +53,10 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         });
     };
 
-    constructor(private initialState: StateType, config?: ComponentStoreConfig) {
+    constructor(private initialState: StateType, private config?: ComponentStoreConfig) {
         inject(DestroyRef).onDestroy(() => this.destroy());
 
-        const extensions: ComponentStoreExtension[] = calculateExtensions(
-            config,
-            globalCsConfig.get()
-        );
-        const metaReducers: MetaReducer<StateType>[] = extensions.map((ext) => ext.init());
-        this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
-
-        const combinedMetaReducer = combineMetaReducers(metaReducers);
-        const reducer = combinedMetaReducer(createComponentStoreReducer(initialState));
+        const reducer = createComponentStoreReducer(initialState, this.extensions);
 
         const subSink = createSignalStoreSubSink();
         subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {

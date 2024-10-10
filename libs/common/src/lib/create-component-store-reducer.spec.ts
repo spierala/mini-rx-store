@@ -7,7 +7,7 @@ interface CounterState {
 }
 
 describe('createComponentStoreReducer', () => {
-    const reducer = createComponentStoreReducer<CounterState>({ counter: 1 });
+    const reducer = createComponentStoreReducer<CounterState>({ counter: 1 }, []);
 
     it('should update state', () => {
         const action: MiniRxAction<CounterState> = {

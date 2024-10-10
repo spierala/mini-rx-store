@@ -28,6 +28,7 @@ export {
 export { createFeatureStoreReducer } from './lib/create-feature-store-reducer';
 export { createComponentStoreReducer } from './lib/create-component-store-reducer';
 export { generateId } from './lib/generate-id';
+export { generateFeatureKey } from './lib/generate-feature-key';
 export { calculateExtensions } from './lib/calculate-extensions';
 export { calcNextState } from './lib/calc-next-state';
 export { createReducerManager, ReducerManager } from './lib/reducer-manager';

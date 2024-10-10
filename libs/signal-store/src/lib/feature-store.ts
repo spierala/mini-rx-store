@@ -4,6 +4,7 @@ import {
     createFeatureStoreReducer,
     createMiniRxActionType,
     FeatureStoreConfig,
+    generateFeatureKey,
     generateId,
     MiniRxAction,
     miniRxError,
@@ -45,7 +46,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
 
     constructor(featureKey: string, initialState: StateType, config: FeatureStoreConfig = {}) {
         this.featureId = generateId();
-        this._featureKey = config.multi ? featureKey + '-' + this.featureId : featureKey;
+        this._featureKey = generateFeatureKey(featureKey, config.multi);
 
         addFeature<StateType>(
             this._featureKey,

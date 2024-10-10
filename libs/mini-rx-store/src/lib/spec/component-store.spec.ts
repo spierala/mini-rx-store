@@ -1,9 +1,9 @@
 import { ComponentStore, configureComponentStores, createComponentStore } from '../component-store';
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
-import { Observable, of, pipe, Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { pipe, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../selector';
-import { ExtensionId, StoreExtension, ComponentStoreExtension } from '@mini-rx/common';
+import { ComponentStoreExtension, ExtensionId, StoreExtension } from '@mini-rx/common';
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
@@ -44,26 +44,6 @@ describe('ComponentStore', () => {
         expect(spy).toHaveBeenCalledWith({ ...userState, firstName: 'Nicolas' });
         expect(spy).toHaveBeenCalledTimes(1);
     });
-    //
-    // it('should update state using an Observable', () => {
-    //     const cs = createComponentStore(counterInitialState);
-    //
-    //     const counterState$: Observable<CounterState> = of(2, 3, 4, 5).pipe(
-    //         map((v) => ({ counter: v }))
-    //     );
-    //
-    //     const subscribeCallback = jest.fn<void, [number]>();
-    //     cs.select((state) => state.counter).subscribe(subscribeCallback);
-    //
-    //     // setState with Observable
-    //     cs.setState(counterState$);
-    //
-    //     // "normal" setState
-    //     cs.setState((state) => ({ counter: state.counter + 1 }));
-    //     cs.setState((state) => ({ counter: state.counter + 1 }));
-    //
-    //     expect(subscribeCallback.mock.calls).toEqual([[1], [2], [3], [4], [5], [6], [7]]);
-    // });
 
     it('should select state with memoized selectors', () => {
         const getCounterSpy = jest.fn<void, [number]>();
@@ -93,15 +73,6 @@ describe('ComponentStore', () => {
         expect(getSquareCounterSpy.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
 
-    it('should select component state with the `state$` property', () => {
-        const spy = jest.fn();
-
-        const cs = createComponentStore(counterInitialState);
-        cs.state$.subscribe(spy);
-
-        expect(spy).toHaveBeenCalledWith(counterInitialState);
-    });
-
     it('should dispatch an Action when updating state', () => {
         const cs = createComponentStore(counterInitialState);
 
@@ -127,27 +98,6 @@ describe('ComponentStore', () => {
         expect(spy).toHaveBeenCalledTimes(1);
 
         spy.mockReset();
-
-        // With setState name (when passing an Observable to setState)
-        // cs.setState(of(1, 2).pipe(map((v) => ({ counter: v }))), 'updateCounterFromObservable');
-        // expect(spy.mock.calls).toEqual([
-        //     [
-        //         {
-        //             type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
-        //             stateOrCallback: {
-        //                 counter: 1,
-        //             },
-        //         },
-        //     ],
-        //     [
-        //         {
-        //             type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
-        //             stateOrCallback: {
-        //                 counter: 2,
-        //             },
-        //         },
-        //     ],
-        // ]);
     });
 
     it('should dispatch an Action on destroy (only if initial state has been set)', () => {
@@ -289,7 +239,7 @@ describe('ComponentStore', () => {
     it('should throw when calling `configureComponentStores` more than once', () => {
         configureComponentStores({ extensions: [] });
         expect(() => configureComponentStores({ extensions: [] })).toThrowError(
-            '@mini-rx: `configureComponentStores` was called multiple times.'
+            '@mini-rx: ComponentStore config was set multiple times.'
         );
     });
 
