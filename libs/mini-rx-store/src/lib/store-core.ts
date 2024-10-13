@@ -1,17 +1,12 @@
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { createState } from './state';
 import {
-    Action,
     AppState,
     createActionsOnQueue,
     createMiniRxActionType,
     createReducerManager,
-    defaultEffectsErrorHandler,
-    EFFECT_METADATA_KEY,
-    EffectConfig,
+    createRxEffectForStore,
     ExtensionId,
-    HasEffectMetadata,
-    hasEffectMetaData,
     MetaReducer,
     miniRxError,
     OperationType,
@@ -35,26 +30,26 @@ function getReducerManager(): ReducerManager {
 }
 
 // ACTIONS
-export const { dispatch, actions$ } = createActionsOnQueue();
+export const { actions$, dispatch } = createActionsOnQueue();
 
 // APP STATE
 export const appState = createState<AppState>();
 
 // Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
 // Called by `configureStore` and `addReducer`
-function initStore() {
+function initStore(): void {
     if (actionSubscription) {
         return;
     }
 
-    // Listen to the Actions stream and update state accordingly
+    // Listen to the Actions stream and update state
     actionSubscription = actions$.subscribe((action) => {
         const nextState: AppState = getReducerManager().reducer(appState.get() ?? {}, action);
         appState.set(nextState);
     });
 }
 
-export function configureStore(config: StoreConfig<AppState> = {}) {
+export function configureStore(config: StoreConfig<AppState> = {}): void {
     initStore();
 
     if (getReducerManager().hasFeatureReducers()) {
@@ -100,29 +95,14 @@ export function addFeature<StateType extends object>(
     dispatch({ type: createMiniRxActionType(OperationType.INIT, featureKey) });
 }
 
-export function removeFeature(featureKey: string) {
+export function removeFeature(featureKey: string): void {
     getReducerManager().removeFeatureReducer(featureKey);
     dispatch({ type: createMiniRxActionType(OperationType.DESTROY, featureKey) });
 }
 
-export function effect(effect$: Observable<any> & HasEffectMetadata): void;
-export function effect(effect$: Observable<Action>): void;
-export function effect(effect$: any): void {
-    const effectWithErrorHandler$: Observable<Action> = defaultEffectsErrorHandler(effect$);
-    effectWithErrorHandler$.subscribe((action) => {
-        let shouldDispatch = true;
-        if (hasEffectMetaData(effect$)) {
-            const metaData: EffectConfig = effect$[EFFECT_METADATA_KEY];
-            shouldDispatch = !!metaData.dispatch;
-        }
+export const effect = createRxEffectForStore(dispatch);
 
-        if (shouldDispatch) {
-            dispatch(action);
-        }
-    });
-}
-
-function addExtension(extension: StoreExtension) {
+function addExtension(extension: StoreExtension): void {
     const metaReducer: MetaReducer<AppState> | void = extension.init();
 
     if (metaReducer) {

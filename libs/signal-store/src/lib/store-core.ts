@@ -1,17 +1,12 @@
 import { signal, WritableSignal } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import {
-    Action,
     AppState,
     createActionsOnQueue,
     createMiniRxActionType,
     createReducerManager,
-    defaultEffectsErrorHandler,
-    EFFECT_METADATA_KEY,
-    EffectConfig,
+    createRxEffectForStore,
     ExtensionId,
-    HasEffectMetadata,
-    hasEffectMetaData,
     MetaReducer,
     OperationType,
     Reducer,
@@ -61,12 +56,15 @@ export function configureStore(config: StoreConfig<AppState> = {}): void {
     if (config.metaReducers) {
         getReducerManager().addMetaReducers(...config.metaReducers);
     }
+
     if (config.extensions) {
         sortExtensions(config.extensions).forEach((extension) => addExtension(extension));
     }
+
     if (config.reducers) {
         getReducerManager().setFeatureReducers(config.reducers);
     }
+
     if (config.initialState) {
         appState.set(config.initialState);
     }
@@ -97,21 +95,7 @@ export function removeFeature(featureKey: string): void {
     dispatch({ type: createMiniRxActionType(OperationType.DESTROY, featureKey) });
 }
 
-export function rxEffect(effect$: Observable<any> & HasEffectMetadata): void;
-export function rxEffect(effect$: Observable<Action>): void;
-export function rxEffect(effect$: any): void {
-    const effectWithErrorHandler$: Observable<Action | any> = defaultEffectsErrorHandler(effect$);
-    effectWithErrorHandler$.subscribe((action) => {
-        let shouldDispatch = true;
-        if (hasEffectMetaData(effect$)) {
-            const metaData: EffectConfig = effect$[EFFECT_METADATA_KEY];
-            shouldDispatch = !!metaData.dispatch;
-        }
-        if (shouldDispatch) {
-            dispatch(action);
-        }
-    });
-}
+export const rxEffect = createRxEffectForStore(dispatch);
 
 function addExtension(extension: StoreExtension): void {
     const metaReducer: MetaReducer<AppState> | void = extension.init();
