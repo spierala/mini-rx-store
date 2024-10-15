@@ -20,7 +20,7 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
-import { createState } from './state';
+import { createLazyState } from './state';
 import { createConnectFn } from './connect';
 import { createAssertState } from './assert-state';
 
@@ -42,7 +42,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
 
     private actionsOnQueue = createActionsOnQueue();
 
-    private _state = createState<StateType>();
+    private _state = createLazyState<StateType>();
     get state(): StateType {
         this.assertState.isInitialized();
         return this._state.get()!;

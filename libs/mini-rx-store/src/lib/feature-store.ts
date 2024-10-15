@@ -17,7 +17,7 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
-import { createState } from './state';
+import { createLazyState } from './state';
 import { createAssertState } from './assert-state';
 import { createConnectFn } from './connect';
 
@@ -28,7 +28,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return this._featureKey;
     }
 
-    private _state = createState<StateType>();
+    private _state = createLazyState<StateType>();
     get state(): StateType {
         this.assertState.isInitialized();
         return this._state.get()!;

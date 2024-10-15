@@ -1,7 +1,39 @@
 import { BehaviorSubject, Observable, pipe } from 'rxjs';
 import { filter, map, distinctUntilChanged } from 'rxjs/operators';
 
-export function createState<StateType extends object>(initialState?: StateType) {
+function createSelectFn<StateType>(state$: Observable<StateType>) {
+    function select(): Observable<StateType>;
+    function select<R>(mapFn: (state: StateType) => R): Observable<R>;
+    function select(mapFn?: any): Observable<any> {
+        if (!mapFn) {
+            return state$;
+        }
+        return state$.pipe(selectOperator(mapFn));
+    }
+
+    return select;
+}
+
+export function createState<StateType extends object>(initialState: StateType) {
+    const stateSource: BehaviorSubject<StateType> = new BehaviorSubject<StateType>(initialState);
+    const state$: Observable<StateType> = stateSource.asObservable();
+
+    function get(): StateType {
+        return stateSource.value;
+    }
+
+    function set(v: StateType) {
+        stateSource.next(v);
+    }
+
+    return {
+        select: createSelectFn(state$),
+        get,
+        set,
+    };
+}
+
+export function createLazyState<StateType extends object>(initialState?: StateType) {
     const stateSource: BehaviorSubject<StateType | undefined> = new BehaviorSubject<
         StateType | undefined
     >(initialState);
@@ -12,15 +44,6 @@ export function createState<StateType extends object>(initialState?: StateType) 
         filter((v) => !!v)
     ) as Observable<StateType>;
 
-    function select(): Observable<StateType>;
-    function select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    function select(mapFn?: any): Observable<any> {
-        if (!mapFn) {
-            return state$;
-        }
-        return state$.pipe(selectOperator(mapFn));
-    }
-
     function get(): StateType | undefined {
         return stateSource.value;
     }
@@ -30,7 +53,7 @@ export function createState<StateType extends object>(initialState?: StateType) 
     }
 
     return {
-        select,
+        select: createSelectFn(state$),
         get,
         set,
     };
