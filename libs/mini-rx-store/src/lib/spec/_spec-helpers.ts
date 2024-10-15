@@ -1,9 +1,9 @@
 import { configureStore, Store } from '../store';
 import { Action } from '@mini-rx/common';
-import { destroy } from '../store-core';
+import { storeCore } from "../store-core";
 
 export function destroyStore() {
-    destroy();
+    storeCore.destroy();
 }
 
 export interface UserState {

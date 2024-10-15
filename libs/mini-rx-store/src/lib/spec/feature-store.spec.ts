@@ -13,7 +13,7 @@ import {
     UserState,
 } from './_spec-helpers';
 import { Action, Reducer, tapResponse } from '@mini-rx/common';
-import { actions$, configureStore } from '../store-core';
+import { actions$, storeCore } from '../store-core';
 
 const initialState: UserState = userState;
 
@@ -195,7 +195,7 @@ describe('FeatureStore', () => {
     });
 
     it('should select state from another Feature (created with Store.feature)', () => {
-        configureStore({
+        storeCore.configureStore({
             reducers: {
                 someFeature: counterReducer,
             },
@@ -366,7 +366,7 @@ describe('FeatureStore', () => {
             };
         }
 
-        configureStore({
+        storeCore.configureStore({
             metaReducers: [metaReducer],
         });
 

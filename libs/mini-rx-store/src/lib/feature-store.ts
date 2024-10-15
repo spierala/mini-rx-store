@@ -1,5 +1,4 @@
 import { ComponentStoreLike } from './models';
-import { addFeature, appState, dispatch, hasUndoExtension, removeFeature } from './store-core';
 import {
     Action,
     createFeatureStoreReducer,
@@ -20,6 +19,7 @@ import { createUpdateFn } from './update';
 import { createState } from './state';
 import { createAssertState } from './assert-state';
 import { createConnectFn } from './connect';
+import { storeCore } from "./store-core";
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly featureId: string;
@@ -40,7 +40,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         name: string | undefined
     ): MiniRxAction<StateType> => {
         this.assertState.isInitialized();
-        return dispatch({
+        return storeCore.dispatch({
             type: createMiniRxActionType(operationType, this.featureKey, name),
             stateOrCallback,
             featureId: this.featureId,
@@ -66,19 +66,19 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     setInitialState(initialState: StateType): void {
         this.assertState.isNotInitialized();
 
-        addFeature<StateType>(
+        storeCore.addFeature<StateType>(
             this._featureKey,
             createFeatureStoreReducer(this.featureId, initialState)
         );
 
-        this.subSink.sink = appState
+        this.subSink.sink = storeCore.appState
             .select((state) => state[this.featureKey])
             .subscribe((v) => this._state.set(v));
     }
 
     undo(action: Action): void {
-        hasUndoExtension
-            ? dispatch(undo(action))
+        storeCore.hasUndoExtension
+            ? storeCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
 
@@ -89,7 +89,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
 
     destroy() {
         this.subSink.unsubscribe();
-        removeFeature(this._featureKey);
+        storeCore.removeFeature(this._featureKey);
     }
 
     /**

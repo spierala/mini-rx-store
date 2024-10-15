@@ -1,10 +1,6 @@
 import { Observable } from 'rxjs';
 import {
-    addFeature,
-    appState,
-    configureStore as _configureStore,
-    dispatch,
-    effect,
+    storeCore
 } from './store-core';
 import {
     Action,
@@ -32,14 +28,14 @@ let isStoreConfigured = false;
 
 export function configureStore(config: StoreConfig<AppState>): Store | never {
     if (!isStoreConfigured) {
-        _configureStore(config);
+        storeCore.configureStore(config);
         isStoreConfigured = true;
 
         return {
-            feature: addFeature,
-            select: appState.select.bind(appState),
-            dispatch,
-            effect,
+            feature: storeCore.addFeature,
+            select: storeCore.appState.select,
+            dispatch: storeCore.dispatch,
+            effect: storeCore.effect
         };
     }
     miniRxError('`configureStore` was called multiple times.');

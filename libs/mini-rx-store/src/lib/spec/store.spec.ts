@@ -22,7 +22,8 @@ import {
     destroyStore,
     store,
 } from './_spec-helpers';
-import * as StoreCore from '../store-core';
+import {storeCore as StoreCore
+} from '../store-core';
 import { actions$ } from '../store-core';
 
 const asyncUser: Partial<UserState> = {
