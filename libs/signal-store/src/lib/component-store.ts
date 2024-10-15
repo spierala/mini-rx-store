@@ -16,7 +16,7 @@ import {
     undo,
     UpdateStateCallback,
 } from '@mini-rx/common';
-import { createSelectableSignalState } from './selectable-signal-state';
+import { createSelectableSignal, createSelectableWritableSignal } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';
@@ -37,9 +37,9 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
 
     private actionsOnQueue = createActionsOnQueue();
 
-    private _state: WritableSignal<StateType> = signal(this.initialState);
+    private _state = createSelectableWritableSignal(signal(this.initialState));
     get state(): StateType {
-        return this._state();
+        return this._state.get();
     }
 
     private updateState: UpdateStateCallback<StateType> = (
@@ -78,7 +78,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     setState = createUpdateFn(this.updateState);
     connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
-    select = createSelectableSignalState(this._state).select;
+    select = this._state.select;
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension

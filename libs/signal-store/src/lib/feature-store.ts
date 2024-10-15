@@ -13,8 +13,8 @@ import {
     undo,
     UpdateStateCallback,
 } from '@mini-rx/common';
-import { addFeature, dispatch, hasUndoExtension, removeFeature, select } from './store-core';
-import { createSelectableSignalState } from './selectable-signal-state';
+import { storeCore } from './store-core';
+import { createSelectableSignal } from './selectable-signal-state';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';
@@ -27,7 +27,9 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         return this._featureKey;
     }
 
-    private _state: Signal<StateType> = select((state) => state[this.featureKey]);
+    private _state: Signal<StateType> = storeCore.appState.select(
+        (state) => state[this.featureKey]
+    );
     get state(): StateType {
         return this._state();
     }
@@ -37,7 +39,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         operationType: OperationType,
         name: string | undefined
     ): MiniRxAction<StateType> => {
-        return dispatch({
+        return storeCore.dispatch({
             type: createMiniRxActionType(operationType, this.featureKey, name),
             stateOrCallback,
             featureId: this.featureId,
@@ -48,7 +50,7 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
         this.featureId = generateId();
         this._featureKey = generateFeatureKey(featureKey, config.multi);
 
-        addFeature<StateType>(
+        storeCore.addFeature<StateType>(
             this._featureKey,
             createFeatureStoreReducer(this.featureId, initialState)
         );
@@ -57,18 +59,18 @@ export class FeatureStore<StateType extends object> implements ComponentStoreLik
     }
 
     undo(action: Action): void {
-        hasUndoExtension
-            ? dispatch(undo(action))
+        storeCore.hasUndoExtension
+            ? storeCore.dispatch(undo(action))
             : miniRxError('UndoExtension is not initialized.');
     }
 
     setState = createUpdateFn(this.updateState);
     connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
-    select = createSelectableSignalState(this._state).select;
+    select = createSelectableSignal(this._state).select;
 
     private destroy(): void {
-        removeFeature(this._featureKey);
+        storeCore.removeFeature(this._featureKey);
     }
 }
 

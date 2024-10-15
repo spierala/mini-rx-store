@@ -47,7 +47,7 @@ export function createStore<SelectFnType>(selectableState: {
 
         // Listen to the Actions stream and update state
         actionSubscription = actions$.subscribe((action) => {
-            const nextState = getReducerManager().reducer(appState.get() ?? {}, action);
+            const nextState = getReducerManager().reducer(appState.get(), action);
             appState.set(nextState);
         });
     }
@@ -121,7 +121,12 @@ export function createStore<SelectFnType>(selectableState: {
     }
 
     return {
-        hasUndoExtension,
+        set hasUndoExtension(v: boolean) {
+            hasUndoExtension = v;
+        },
+        get hasUndoExtension(): boolean {
+            return hasUndoExtension;
+        },
         actions$,
         dispatch,
         appState, // TODO select?

@@ -1,10 +1,10 @@
-import { computed, Signal } from '@angular/core';
+import { computed, Signal, WritableSignal } from '@angular/core';
 import { isSignalSelector, SignalSelector } from './signal-selector';
 import { defaultSignalEquality } from './utils';
 
 type StateSelector<T, R> = (state: T) => R;
 
-export function createSelectableSignalState<StateType extends object>(state: Signal<StateType>) {
+function createSelectFn<StateType extends object>(state: Signal<StateType>) {
     function select(): Signal<StateType>;
     function select<R>(mapFn: SignalSelector<StateType, R>): Signal<R>;
     function select<R>(mapFn: StateSelector<StateType, R>): Signal<R>;
@@ -25,7 +25,28 @@ export function createSelectableSignalState<StateType extends object>(state: Sig
         );
     }
 
+    return select;
+}
+
+export function createSelectableSignal<StateType extends object>(state: Signal<StateType>) {
     return {
-        select,
+        select: createSelectFn(state),
+        get: () => {
+            return state();
+        },
+    };
+}
+
+export function createSelectableWritableSignal<StateType extends object>(
+    state: WritableSignal<StateType>
+) {
+    return {
+        select: createSelectFn(state),
+        get: (): StateType => {
+            return state();
+        },
+        set: (v: StateType): void => {
+            state.set(v);
+        },
     };
 }

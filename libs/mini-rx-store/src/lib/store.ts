@@ -1,7 +1,5 @@
 import { Observable } from 'rxjs';
-import {
-    storeCore
-} from './store-core';
+import { rxEffect, storeCore } from './store-core';
 import {
     Action,
     Reducer,
@@ -35,7 +33,7 @@ export function configureStore(config: StoreConfig<AppState>): Store | never {
             feature: storeCore.addFeature,
             select: storeCore.appState.select,
             dispatch: storeCore.dispatch,
-            effect: storeCore.effect
+            effect: rxEffect,
         };
     }
     miniRxError('`configureStore` was called multiple times.');

@@ -15,7 +15,7 @@ import {
     Reducer,
     StoreConfig,
 } from '@mini-rx/common';
-import { actions$, addFeature, rxEffect } from './store-core';
+import { storeCore, rxEffect } from './store-core';
 import { Store } from './store';
 import { globalCsConfig } from './component-store';
 import {
@@ -54,7 +54,7 @@ export function provideStore<T>(config: StoreConfig<T>): EnvironmentProviders {
         },
         {
             provide: Actions,
-            useValue: actions$,
+            useValue: storeCore.actions$,
         },
         { provide: STORE_PROVIDER, useFactory: rootStoreProviderFactory },
         {
@@ -74,7 +74,7 @@ function featureProviderFactory(): void {
     const configs = inject(FEATURE_CONFIGS);
 
     featureNames.forEach((featureName, index) => {
-        addFeature(featureName, reducers[index], configs[index]);
+        storeCore.addFeature(featureName, reducers[index], configs[index]);
     });
 }
 

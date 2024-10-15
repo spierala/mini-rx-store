@@ -1,5 +1,4 @@
-import { BehaviorSubject, Observable, pipe } from 'rxjs';
-import { filter, map, distinctUntilChanged } from 'rxjs/operators';
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, pipe } from 'rxjs';
 
 function createSelectFn<StateType>(state$: Observable<StateType>) {
     function select(): Observable<StateType>;
