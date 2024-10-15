@@ -17,6 +17,7 @@ export {
     EffectConfig,
     EFFECT_METADATA_KEY,
 } from './lib/create-rx-effect';
+export { createStore } from './lib/create-store';
 export { createRxEffectForStore } from './lib/rx-effect';
 export { LoggerExtension } from './lib/extensions/logger/logger.extension';
 export { UndoExtension } from './lib/extensions/undo/undo-extension';
