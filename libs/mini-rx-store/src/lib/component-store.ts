@@ -20,7 +20,7 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
-import { createLazyState } from './state';
+import { createLazyState } from './create-state';
 import { createConnectFn } from './connect';
 import { createAssertState } from './assert-state';
 

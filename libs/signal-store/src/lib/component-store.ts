@@ -16,7 +16,7 @@ import {
     undo,
     UpdateStateCallback,
 } from '@mini-rx/common';
-import { createSelectableSignal, createSelectableWritableSignal } from './selectable-signal-state';
+import { createSelectableSignal, createSelectableWritableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';

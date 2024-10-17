@@ -14,7 +14,7 @@ import {
     UpdateStateCallback,
 } from '@mini-rx/common';
 import { storeCore } from './store-core';
-import { createSelectableSignal } from './selectable-signal-state';
+import { createSelectableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';

@@ -14,7 +14,7 @@ import { sortExtensions } from './sort-extensions';
 import { createMiniRxActionType } from './create-mini-rx-action-type';
 import { ExtensionId } from './enums';
 
-export function createStore<SelectFnType>(selectableState: {
+export function createStore<SelectFnType>(appState: {
     get: () => AppState;
     set: (v: AppState) => void;
     select: SelectFnType;
@@ -34,9 +34,6 @@ export function createStore<SelectFnType>(selectableState: {
 
     // ACTIONS
     const { actions$, dispatch } = createActionsOnQueue();
-
-    // APP STATE
-    const appState = selectableState;
 
     // Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
     // Called by `configureStore` and `addReducer`
@@ -121,6 +118,7 @@ export function createStore<SelectFnType>(selectableState: {
     }
 
     return {
+        appState,
         set hasUndoExtension(v: boolean) {
             hasUndoExtension = v;
         },
@@ -129,11 +127,10 @@ export function createStore<SelectFnType>(selectableState: {
         },
         actions$,
         dispatch,
-        appState, // TODO select?
+        configureStore,
         addFeature,
         removeFeature,
         addExtension,
-        configureStore,
         destroy,
     };
 }

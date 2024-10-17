@@ -16,10 +16,10 @@ import {
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
 import { createUpdateFn } from './update';
-import { createLazyState } from './state';
+import { createLazyState } from './create-state';
 import { createAssertState } from './assert-state';
 import { createConnectFn } from './connect';
-import { storeCore } from "./store-core";
+import { storeCore } from './store-core';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly featureId: string;

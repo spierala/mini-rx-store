@@ -1,4 +1,4 @@
-import { createState } from './state';
+import { createState } from './create-state';
 import { AppState, createRxEffectForStore, createStore } from '@mini-rx/common';
 
 export const storeCore = createStore(createState<AppState>({}));
