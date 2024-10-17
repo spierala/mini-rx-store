@@ -5,7 +5,7 @@ export function createSubSink() {
     let subs: Subscription | undefined = new Subscription();
 
     return {
-        sink(sub: Subscription) {
+        set sink(sub: Subscription) {
             if (!subs) {
                 miniRxError('Store has already been destroyed.');
             }

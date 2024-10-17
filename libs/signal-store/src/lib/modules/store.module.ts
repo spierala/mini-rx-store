@@ -1,7 +1,7 @@
 import { inject, ModuleWithProviders, NgModule } from '@angular/core';
 import { Actions, AppState, FeatureConfig, Reducer, StoreConfig } from '@mini-rx/common';
 import { Store } from '../store';
-import { actions$, addFeature } from '../store-core';
+import { storeCore } from '../store-core';
 import {
     FEATURE_CONFIGS,
     FEATURE_NAMES,
@@ -27,7 +27,7 @@ export class StoreFeatureModule {
         const configs: FeatureConfig<any>[] = inject(FEATURE_CONFIGS);
 
         featureNames.forEach((featureName, index) => {
-            addFeature(featureName, reducers[index], configs[index]);
+            storeCore.addFeature(featureName, reducers[index], configs[index]);
         });
     }
 }
@@ -46,7 +46,7 @@ export class StoreModule {
                 },
                 {
                     provide: Actions,
-                    useValue: actions$,
+                    useValue: storeCore.actions$,
                 },
             ],
         };

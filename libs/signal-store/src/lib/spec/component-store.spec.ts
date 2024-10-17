@@ -1,4 +1,4 @@
-import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
+import { ComponentStore, createComponentStore } from '../component-store';
 import { counterInitialState, CounterState, MockUndoExtension, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';

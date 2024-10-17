@@ -25,7 +25,7 @@ import {
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
-import { addFeature, removeFeature, rxEffect } from '../store-core';
+import { storeCore, rxEffect } from '../store-core';
 
 interface ActionWithPayload extends Action {
     payload?: any;
@@ -460,7 +460,7 @@ describe('Store', () => {
         const spy = jest.fn();
         actions.subscribe(spy);
 
-        addFeature('products', (state) => state);
+        storeCore.addFeature('products', (state) => state);
 
         expect(spy).toHaveBeenCalledWith({ type: '@mini-rx/products/init' });
     });
@@ -799,11 +799,11 @@ describe('Store', () => {
     it('should add and remove reducers', () => {
         const featureKey = 'tempCounter';
 
-        addFeature<CounterState>(featureKey, counterReducer);
+        storeCore.addFeature<CounterState>(featureKey, counterReducer);
         const selectedState = store.select((state) => state);
         expect(selectedState()).toEqual({ tempCounter: counterInitialState });
 
-        removeFeature(featureKey);
+        storeCore.removeFeature(featureKey);
         expect(selectedState()).toEqual({});
     });
 });
