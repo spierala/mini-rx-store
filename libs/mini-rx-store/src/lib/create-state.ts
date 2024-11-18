@@ -1,5 +1,9 @@
 import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, pipe } from 'rxjs';
 
+function selectOperator<T, R>(mapFn: (state: T) => R) {
+    return pipe(map(mapFn), distinctUntilChanged());
+}
+
 function createSelectFn<StateType>(state$: Observable<StateType>) {
     function select(): Observable<StateType>;
     function select<R>(mapFn: (state: StateType) => R): Observable<R>;
@@ -56,8 +60,4 @@ export function createLazyState<StateType extends object>(initialState?: StateTy
         get,
         set,
     };
-}
-
-function selectOperator<T, R>(mapFn: (state: T) => R) {
-    return pipe(map(mapFn), distinctUntilChanged());
 }

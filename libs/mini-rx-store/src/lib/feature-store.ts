@@ -15,10 +15,10 @@ import {
     undo,
     UpdateStateCallback,
 } from '@mini-rx/common';
-import { createEffectFn } from './effect';
+import { createEffectFn } from './create-effect-fn';
 import { createLazyState } from './create-state';
 import { createAssertState } from './assert-state';
-import { createConnectFn } from './connect';
+import { createConnectFn } from './create-connect-fn';
 import { storeCore } from './store-core';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {

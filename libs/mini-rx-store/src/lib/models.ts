@@ -1,10 +1,6 @@
 import { Observable } from 'rxjs';
 import { Action, StateOrCallback } from '@mini-rx/common';
 
-export interface ActionWithPayload extends Action {
-    payload?: any;
-}
-
 export type SetStateParam<T> = StateOrCallback<T> | Observable<Partial<T>>;
 
 export interface ComponentStoreLike<StateType> {

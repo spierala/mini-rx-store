@@ -17,8 +17,8 @@ import {
 import { storeCore } from './store-core';
 import { createSelectableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
-import { createRxEffectFn } from './rx-effect';
-import { createConnectFn } from './connect';
+import { createRxEffectFn } from './create-rx-effect-fn';
+import { createConnectFn } from './create-connect-fn';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly featureId: string;

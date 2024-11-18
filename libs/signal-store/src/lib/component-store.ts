@@ -19,8 +19,8 @@ import {
 } from '@mini-rx/common';
 import { createSelectableWritableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
-import { createRxEffectFn } from './rx-effect';
-import { createConnectFn } from './connect';
+import { createRxEffectFn } from './create-rx-effect-fn';
+import { createConnectFn } from './create-connect-fn';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 const csFeatureKey = 'component-store';

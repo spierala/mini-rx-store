@@ -9,7 +9,6 @@ import {
     Reducer,
     StoreExtension,
 } from '@mini-rx/common';
-import { ActionWithPayload } from '../models';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
 import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
@@ -23,6 +22,10 @@ import {
     store,
 } from './_spec-helpers';
 import { actions$, storeCore as StoreCore } from '../store-core';
+
+export interface ActionWithPayload extends Action {
+    payload?: any;
+}
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
