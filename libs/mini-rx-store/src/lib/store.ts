@@ -2,11 +2,11 @@ import { Observable } from 'rxjs';
 import { rxEffect, storeCore } from './store-core';
 import {
     Action,
-    Reducer,
-    FeatureConfig,
-    StoreConfig,
     AppState,
+    FeatureConfig,
     miniRxError,
+    Reducer,
+    StoreConfig,
 } from '@mini-rx/common';
 
 export abstract class Store {

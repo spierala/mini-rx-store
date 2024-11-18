@@ -15,7 +15,7 @@ import {
     Reducer,
     StoreConfig,
 } from '@mini-rx/common';
-import { storeCore, rxEffect } from './store-core';
+import { rxEffect, storeCore } from './store-core';
 import { Store } from './store';
 import { globalCsConfig } from './component-store';
 import {

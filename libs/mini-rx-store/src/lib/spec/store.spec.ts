@@ -1,13 +1,13 @@
 import { configureStore } from '../store';
 import {
     Action,
-    createRxEffect as createEffect,
-    ofType,
-    StoreExtension,
-    ExtensionId,
-    Reducer,
     AppState,
+    createRxEffect as createEffect,
+    ExtensionId,
     MetaReducer,
+    ofType,
+    Reducer,
+    StoreExtension,
 } from '@mini-rx/common';
 import { ActionWithPayload } from '../models';
 import { createFeatureStateSelector, createSelector } from '../selector';
@@ -22,9 +22,7 @@ import {
     destroyStore,
     store,
 } from './_spec-helpers';
-import {storeCore as StoreCore
-} from '../store-core';
-import { actions$ } from '../store-core';
+import { actions$, storeCore as StoreCore } from '../store-core';
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',

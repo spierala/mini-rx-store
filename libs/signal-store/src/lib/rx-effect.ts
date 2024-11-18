@@ -1,5 +1,5 @@
 import { EnvironmentInjector, inject, isSignal, Signal } from '@angular/core';
-import { isObservable, Observable, of, Subject } from 'rxjs';
+import { isObservable, Observable, Subject } from 'rxjs';
 import { defaultEffectsErrorHandler } from '@mini-rx/common';
 import { miniRxToObservable } from './mini-rx-to-observable';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';

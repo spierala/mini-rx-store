@@ -25,7 +25,7 @@ import {
 } from './_spec-helpers';
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../modules/store.module';
-import { storeCore, rxEffect } from '../store-core';
+import { rxEffect, storeCore } from '../store-core';
 
 interface ActionWithPayload extends Action {
     payload?: any;

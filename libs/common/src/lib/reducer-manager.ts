@@ -1,4 +1,4 @@
-import { AppState, MetaReducer, Reducer, ReducerDictionary, Action, ReducerState } from './models';
+import { Action, AppState, MetaReducer, Reducer, ReducerDictionary, ReducerState } from './models';
 import { combineMetaReducers } from './combine-meta-reducers';
 import { miniRxError } from './mini-rx-error';
 import { combineReducers } from './combine-reducers';
