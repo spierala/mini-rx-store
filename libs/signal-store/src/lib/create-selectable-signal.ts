@@ -1,6 +1,5 @@
 import { computed, Signal, WritableSignal } from '@angular/core';
 import { isSignalSelector, SignalSelector } from './signal-selector';
-import { defaultSignalEquality } from './utils';
 
 type StateSelector<T, R> = (state: T) => R;
 
@@ -17,12 +16,9 @@ function createSelectFn<StateType extends object>(state: Signal<StateType>) {
             return mapFn(state);
         }
 
-        return computed(
-            () => {
-                return mapFn(state());
-            },
-            { equal: defaultSignalEquality }
-        );
+        return computed(() => {
+            return mapFn(state());
+        });
     }
 
     return select;
