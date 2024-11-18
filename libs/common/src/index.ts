@@ -45,6 +45,7 @@ export {
     ComponentStoreConfig,
     ComponentStoreExtension,
     AppState,
+    ReducerDictionary,
     UpdateStateCallback,
     OperationType,
 } from './lib/models';
