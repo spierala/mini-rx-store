@@ -9,6 +9,7 @@ import {
     createComponentStoreReducer,
     createMiniRxActionType,
     createSubSink,
+    createUpdateFn,
     ExtensionId,
     MiniRxAction,
     miniRxError,
@@ -19,7 +20,6 @@ import {
     UpdateStateCallback,
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
-import { createUpdateFn } from './update';
 import { createLazyState } from './create-state';
 import { createConnectFn } from './connect';
 import { createAssertState } from './assert-state';

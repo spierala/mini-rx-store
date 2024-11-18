@@ -4,6 +4,7 @@ import {
     createFeatureStoreReducer,
     createMiniRxActionType,
     createSubSink,
+    createUpdateFn,
     FeatureStoreConfig,
     generateFeatureKey,
     generateId,
@@ -15,7 +16,6 @@ import {
     UpdateStateCallback,
 } from '@mini-rx/common';
 import { createEffectFn } from './effect';
-import { createUpdateFn } from './update';
 import { createLazyState } from './create-state';
 import { createAssertState } from './assert-state';
 import { createConnectFn } from './connect';

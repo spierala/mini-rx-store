@@ -3,6 +3,7 @@ import {
     Action,
     createFeatureStoreReducer,
     createMiniRxActionType,
+    createUpdateFn,
     FeatureStoreConfig,
     generateFeatureKey,
     generateId,
@@ -18,7 +19,6 @@ import { createSelectableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';
-import { createUpdateFn } from './update';
 
 export class FeatureStore<StateType extends object> implements ComponentStoreLike<StateType> {
     private readonly featureId: string;

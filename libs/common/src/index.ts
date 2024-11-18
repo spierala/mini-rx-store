@@ -30,6 +30,7 @@ export { generateId } from './lib/generate-id';
 export { generateFeatureKey } from './lib/generate-feature-key';
 export { calculateExtensions } from './lib/calculate-extensions';
 export { componentStoreConfig } from './lib/component-store-config';
+export { createUpdateFn } from './lib/create-update-fn';
 export { ExtensionId } from './lib/enums';
 export {
     Action,

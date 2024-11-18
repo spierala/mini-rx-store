@@ -8,6 +8,7 @@ import {
     createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
+    createUpdateFn,
     ExtensionId,
     MiniRxAction,
     miniRxError,
@@ -20,7 +21,6 @@ import { createSelectableWritableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
 import { createRxEffectFn } from './rx-effect';
 import { createConnectFn } from './connect';
-import { createUpdateFn } from './update';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 const csFeatureKey = 'component-store';
