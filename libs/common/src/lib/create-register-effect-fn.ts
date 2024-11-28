@@ -8,10 +8,10 @@ import {
 import { Action } from './models';
 import { defaultEffectsErrorHandler } from './default-effects-error-handler';
 
-export function createRxEffectForStore(dispatchFn: (action: Action) => void) {
-    function rxEffect(effect$: Observable<any> & HasEffectMetadata): void;
-    function rxEffect(effect$: Observable<Action>): void;
-    function rxEffect(effect$: any): void {
+export function createRegisterEffectFn(dispatchFn: (action: Action) => void) {
+    function registerEffect(effect$: Observable<any> & HasEffectMetadata): void;
+    function registerEffect(effect$: Observable<Action>): void;
+    function registerEffect(effect$: any): void {
         const effectWithErrorHandler$: Observable<Action | any> =
             defaultEffectsErrorHandler(effect$);
         effectWithErrorHandler$.subscribe((action) => {
@@ -26,5 +26,5 @@ export function createRxEffectForStore(dispatchFn: (action: Action) => void) {
         });
     }
 
-    return rxEffect;
+    return registerEffect;
 }

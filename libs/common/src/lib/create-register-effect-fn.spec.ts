@@ -1,9 +1,9 @@
-import { Action, createRxEffect, createRxEffectForStore } from '@mini-rx/common';
+import { Action, createRxEffect, createRegisterEffectFn } from '@mini-rx/common';
 import { Subject } from 'rxjs';
 
-describe('createRxEffectForStore', () => {
+describe('createRegisterEffectFn', () => {
     const dispatchFn = jest.fn<void, [Action]>();
-    const registerEffect = createRxEffectForStore(dispatchFn);
+    const registerEffect = createRegisterEffectFn(dispatchFn);
 
     beforeEach(() => {
         dispatchFn.mockReset();

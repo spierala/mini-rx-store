@@ -1,6 +1,6 @@
 import { createState } from './create-state';
-import { AppState, createRxEffectForStore, createStore } from '@mini-rx/common';
+import { AppState, createRegisterEffectFn, createStore } from '@mini-rx/common';
 
 export const storeCore = createStore(createState<AppState>({}));
 export const actions$ = storeCore.actions$;
-export const rxEffect = createRxEffectForStore(storeCore.dispatch);
+export const rxEffect = createRegisterEffectFn(storeCore.dispatch);
