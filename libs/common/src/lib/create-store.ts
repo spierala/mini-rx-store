@@ -119,9 +119,6 @@ export function createStore<SelectFnType>(appState: {
 
     return {
         appState,
-        set hasUndoExtension(v: boolean) {
-            hasUndoExtension = v;
-        },
         get hasUndoExtension(): boolean {
             return hasUndoExtension;
         },
