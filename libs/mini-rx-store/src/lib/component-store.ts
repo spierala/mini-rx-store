@@ -79,8 +79,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
 
         this.subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
             const newState: StateType = reducer(
-                // We are sure, there is a reducer!
-                this._state.get() as StateType, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
                 action
             );
             this._state.set(newState);
