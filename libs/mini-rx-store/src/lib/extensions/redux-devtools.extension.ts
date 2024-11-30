@@ -1,5 +1,5 @@
 import { AbstractReduxDevtoolsExtension, Action, AppState } from '@mini-rx/common';
-import { actions$, appState } from '../store-core';
+import { actions$, storeCore } from '../store-core';
 import { Observable } from 'rxjs';
 
 export class ReduxDevtoolsExtension extends AbstractReduxDevtoolsExtension {
@@ -8,10 +8,10 @@ export class ReduxDevtoolsExtension extends AbstractReduxDevtoolsExtension {
     }
 
     readState(): AppState {
-        return appState.get()!;
+        return storeCore.appState.get();
     }
 
     updateState(state: AppState): void {
-        appState.set(state);
+        storeCore.appState.set(state);
     }
 }

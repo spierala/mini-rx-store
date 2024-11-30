@@ -1,4 +1,4 @@
-import { ComponentStore, createComponentStore, globalCsConfig } from '../component-store';
+import { ComponentStore, createComponentStore } from '../component-store';
 import { counterInitialState, CounterState, MockUndoExtension, userState } from './_spec-helpers';
 import { Observable, of, pipe, Subject, tap } from 'rxjs';
 import { createComponentStateSelector, createSelector } from '../signal-selector';
@@ -331,5 +331,15 @@ describe('ComponentStore', () => {
         cs.undo(incremented);
 
         expect(selectedState()).toBe(1);
+    });
+
+    it('should read state imperatively', () => {
+        const cs = setup({ counter: 0 });
+
+        expect(cs.state).toEqual({ counter: 0 });
+
+        cs.setState((state) => ({ counter: state.counter + 1 }));
+
+        expect(cs.state).toEqual({ counter: 1 });
     });
 });

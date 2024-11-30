@@ -1,4 +1,4 @@
-import { EMPTY, from, Observable, of, catchError, map, mergeMap } from 'rxjs';
+import { catchError, EMPTY, from, map, mergeMap, Observable, of } from 'rxjs';
 import { Action } from '../lib/models';
 
 export function mapResponse<R1 extends Action, R2 extends Action, T>(

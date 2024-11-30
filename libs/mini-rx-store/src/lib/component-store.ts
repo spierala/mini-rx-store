@@ -1,195 +1,124 @@
-import { BaseStore } from './base-store';
+import { ComponentStoreLike } from './models';
 import {
     Action,
+    calculateExtensions,
+    componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
-    ComponentStoreLike,
-    MetaReducer,
+    createActionsOnQueue,
+    createComponentStoreReducer,
+    createMiniRxActionType,
+    createSubSink,
+    createUpdateFn,
+    ExtensionId,
+    MiniRxAction,
+    miniRxError,
+    OperationType,
     Reducer,
     StateOrCallback,
-} from './models';
-import { calcNewState, combineMetaReducers, miniRxError } from './utils';
-import {
-    ComponentStoreSetStateAction,
-    createMiniRxAction,
-    createMiniRxActionType,
-    isComponentStoreSetStateAction,
-    MiniRxActionType,
-    SetStateActionType,
     undo,
-} from './actions';
-import { ActionsOnQueue } from './actions-on-queue';
-import { ExtensionId, sortExtensions } from '@mini-rx/common';
-
-let componentStoreConfig: ComponentStoreConfig | undefined = undefined;
-
-/** @internal
- * This function exists for testing purposes only
- */
-export function _resetConfig() {
-    componentStoreConfig = undefined;
-}
-
-export function configureComponentStores(config: ComponentStoreConfig) {
-    if (!componentStoreConfig) {
-        componentStoreConfig = config;
-        return;
-    }
-    miniRxError('`configureComponentStores` was called multiple times.');
-}
+    UpdateStateCallback,
+} from '@mini-rx/common';
+import { createEffectFn } from './create-effect-fn';
+import { createLazyState } from './create-state';
+import { createConnectFn } from './create-connect-fn';
+import { createAssertState } from './assert-state';
 
 const csFeatureKey = 'component-store';
+const globalCsConfig = componentStoreConfig();
+// Keep configureComponentStores for backwards compatibility (mini-rx-store-ng)
+export function configureComponentStores(config: ComponentStoreConfig) {
+    globalCsConfig.set(config);
+}
 
-export class ComponentStore<StateType extends object>
-    extends BaseStore<StateType>
-    implements ComponentStoreLike<StateType>
-{
-    private actionsOnQueue = new ActionsOnQueue();
-    private readonly combinedMetaReducer: MetaReducer<StateType>;
-    private reducer: Reducer<StateType> | undefined;
-    private hasUndoExtension = false;
-    private extensions: ComponentStoreExtension[] = []; // This is a class property just for testing purposes
+export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
+    private readonly extensions: ComponentStoreExtension[] = calculateExtensions(
+        this.config,
+        globalCsConfig.get()
+    );
+    private readonly hasUndoExtension: boolean = this.extensions.some(
+        (ext) => ext.id === ExtensionId.UNDO
+    );
 
-    constructor(initialState?: StateType, config?: ComponentStoreConfig) {
-        super();
+    private actionsOnQueue = createActionsOnQueue();
 
-        const metaReducers: MetaReducer<StateType>[] = [];
+    private _state = createLazyState<StateType>();
+    get state(): StateType {
+        this.assertState.isInitialized();
+        return this._state.get()!;
+    }
 
-        if (config?.extensions) {
-            if (config.extensions && componentStoreConfig?.extensions) {
-                this.extensions = mergeExtensions(
-                    componentStoreConfig.extensions,
-                    config.extensions
-                );
-            } else {
-                this.extensions = config.extensions;
-            }
-        } else if (componentStoreConfig?.extensions) {
-            this.extensions = componentStoreConfig.extensions;
-        }
-
-        sortExtensions(this.extensions).forEach((ext) => {
-            if (!ext.hasCsSupport) {
-                miniRxError(
-                    `Extension "${ext.constructor.name}" is not supported by Component Store.`
-                );
-            }
-
-            metaReducers.push(ext.init()!); // Non-null assertion: Here we know for sure: init will return a MetaReducer
-
-            if (ext.id === ExtensionId.UNDO) {
-                this.hasUndoExtension = true;
-            }
+    private updateState: UpdateStateCallback<StateType> = (
+        stateOrCallback: StateOrCallback<StateType>,
+        operationType: OperationType,
+        name: string | undefined
+    ): MiniRxAction<StateType> => {
+        this.assertState.isInitialized();
+        return this.actionsOnQueue.dispatch({
+            type: createMiniRxActionType(operationType, csFeatureKey, name),
+            stateOrCallback,
         });
+    };
 
-        this.combinedMetaReducer = combineMetaReducers(metaReducers);
+    private subSink = createSubSink();
+    private assertState = createAssertState(this.constructor.name, this._state);
 
-        this._sub.add(
-            this.actionsOnQueue.actions$.subscribe((action) => {
-                const newState: StateType = this.reducer!(
-                    // We are sure, there is a reducer!
-                    this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
-                    action
-                );
-                this._state.set(newState);
-            })
-        );
-
+    constructor(initialState?: StateType, private config?: ComponentStoreConfig) {
         if (initialState) {
             this.setInitialState(initialState);
         }
     }
 
-    override setInitialState(initialState: StateType): void {
-        super.setInitialState(initialState);
+    setInitialState(initialState: StateType): void {
+        this.assertState.isNotInitialized();
 
-        this.reducer = this.combinedMetaReducer(createComponentStoreReducer(initialState));
-        this.dispatch(createMiniRxAction(MiniRxActionType.INIT, csFeatureKey));
+        const reducer: Reducer<StateType> = createComponentStoreReducer(
+            initialState,
+            this.extensions
+        );
+
+        this.subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
+            const newState: StateType = reducer(
+                this._state.get()!, // Initially undefined, but the reducer can handle undefined (by falling back to initial state)
+                action
+            );
+            this._state.set(newState);
+        });
+
+        this.actionsOnQueue.dispatch({
+            type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
+        });
     }
 
-    /** @internal
-     * Implementation of abstract method from BaseStore
-     */
-    _dispatchSetStateAction(
-        stateOrCallback: StateOrCallback<StateType>,
-        name: string | undefined
-    ): Action {
-        const action: Action = createSetStateAction(stateOrCallback, name);
-        this.dispatch(action);
-        return action;
-    }
-
-    private dispatch(action: Action) {
-        this.actionsOnQueue.dispatch(action);
-    }
-
-    // Implementation of abstract method from BaseStore
-    undo(action: Action) {
+    undo(action: Action): void {
         this.hasUndoExtension
-            ? this.dispatch(undo(action))
+            ? this.actionsOnQueue.dispatch(undo(action))
             : miniRxError(`${this.constructor.name} has no UndoExtension yet.`);
     }
 
-    override destroy() {
-        if (this.reducer) {
+    setState = createUpdateFn(this.updateState);
+    connect = createConnectFn(this.updateState, this.subSink);
+    effect = createEffectFn(this.subSink);
+    select = this._state.select;
+
+    destroy() {
+        if (this._state.get()) {
             // Dispatch an action really just for logging via LoggerExtension
-            // Only dispatch if a reducer exists (if an initial state was provided or setInitialState was called)
-            this.dispatch(createMiniRxAction(MiniRxActionType.DESTROY, csFeatureKey));
+            // Only dispatch if an initial state was provided or setInitialState was called
+            this.actionsOnQueue.dispatch({
+                type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
+            });
         }
-        super.destroy();
+        this.subSink.unsubscribe();
     }
-}
 
-function createSetStateAction<T>(
-    stateOrCallback: StateOrCallback<T>,
-    name?: string
-): ComponentStoreSetStateAction<T> {
-    const miniRxActionType = MiniRxActionType.SET_STATE;
-    return {
-        setStateActionType: SetStateActionType.COMPONENT_STORE,
-        type: createMiniRxActionType(miniRxActionType, csFeatureKey) + (name ? '/' + name : ''),
-        stateOrCallback,
-    };
-}
-
-function createComponentStoreReducer<StateType>(initialState: StateType): Reducer<StateType> {
-    return (state: StateType = initialState, action: Action) => {
-        if (isComponentStoreSetStateAction<StateType>(action)) {
-            return calcNewState(state, action.stateOrCallback);
-        }
-        return state;
-    };
-}
-
-function mergeExtensions(
-    global: ComponentStoreExtension[],
-    local: ComponentStoreExtension[]
-): ComponentStoreExtension[] {
-    // Local extensions overwrite the global extensions
-    // If extension is global and local => use local
-    // If extension is only global => use global
-    // If extension is only local => use local
-
-    const extensions: ComponentStoreExtension[] = [];
-    let globalCopy = [...global];
-    let localCopy = [...local];
-
-    global.forEach((globalExt) => {
-        local.forEach((localExt) => {
-            if (localExt.id === globalExt.id) {
-                // Found extension which is global and local
-                extensions.push(localExt); // Use local!
-                localCopy = localCopy.filter((item) => item.id !== localExt.id); // Remove found extension from local
-                globalCopy = globalCopy.filter((item) => item.id !== globalExt.id); // Remove found extension from global
-            }
-        });
-    });
-
-    return [
-        ...extensions, // Extensions which are global and local, but use local
-        ...localCopy, // Local only
-        ...globalCopy, // Global only
-    ];
+    /**
+     * @internal
+     * Can be called by Angular if ComponentStore/FeatureStore is provided in a component
+     */
+    ngOnDestroy() {
+        this.destroy();
+    }
 }
 
 export function createComponentStore<T extends object>(

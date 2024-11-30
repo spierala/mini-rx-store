@@ -1,16 +1,15 @@
-import { DestroyRef, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { DestroyRef, inject, signal } from '@angular/core';
 import {
     Action,
     calculateExtensions,
-    combineMetaReducers,
     componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
     createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
+    createUpdateFn,
     ExtensionId,
-    MetaReducer,
     MiniRxAction,
     miniRxError,
     OperationType,
@@ -18,30 +17,30 @@ import {
     undo,
     UpdateStateCallback,
 } from '@mini-rx/common';
-import { createSelectableSignalState } from './selectable-signal-state';
+import { createSelectableWritableSignal } from './create-selectable-signal';
 import { ComponentStoreLike } from './models';
-import { createRxEffectFn } from './rx-effect';
-import { createConnectFn } from './connect';
-import { createUpdateFn } from './update';
+import { createRxEffectFn } from './create-rx-effect-fn';
+import { createConnectFn } from './create-connect-fn';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
 const csFeatureKey = 'component-store';
 export const globalCsConfig = componentStoreConfig();
 
 export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
-    private readonly hasUndoExtension: boolean = false;
+    private readonly extensions: ComponentStoreExtension[] = calculateExtensions(
+        this.config,
+        globalCsConfig.get()
+    );
+    private readonly hasUndoExtension: boolean = this.extensions.some(
+        (ext) => ext.id === ExtensionId.UNDO
+    );
 
     private actionsOnQueue = createActionsOnQueue();
 
-    private _state: WritableSignal<StateType> = signal(this.initialState);
-    private selectableState = createSelectableSignalState(this._state);
-
-    /**
-     * @deprecated
-     * Use the `select` method without arguments to return a state Signal
-     * the `state` property will be replaced with a getter function which returns the raw state (like in the original MiniRx Store)
-     */
-    state: Signal<StateType> = this.selectableState.select();
+    private _state = createSelectableWritableSignal(signal(this.initialState));
+    get state(): StateType {
+        return this._state.get();
+    }
 
     private updateState: UpdateStateCallback<StateType> = (
         stateOrCallback: StateOrCallback<StateType>,
@@ -54,22 +53,14 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         });
     };
 
-    constructor(private initialState: StateType, config?: ComponentStoreConfig) {
+    constructor(private initialState: StateType, private config?: ComponentStoreConfig) {
         inject(DestroyRef).onDestroy(() => this.destroy());
 
-        const extensions: ComponentStoreExtension[] = calculateExtensions(
-            config,
-            globalCsConfig.get()
-        );
-        const metaReducers: MetaReducer<StateType>[] = extensions.map((ext) => ext.init());
-        this.hasUndoExtension = extensions.some((ext) => ext.id === ExtensionId.UNDO);
-
-        const combinedMetaReducer = combineMetaReducers(metaReducers);
-        const reducer = combinedMetaReducer(createComponentStoreReducer(initialState));
+        const reducer = createComponentStoreReducer(initialState, this.extensions);
 
         const subSink = createSignalStoreSubSink();
         subSink.sink = this.actionsOnQueue.actions$.subscribe((action) => {
-            const newState: StateType = reducer(this.state(), action);
+            const newState: StateType = reducer(this.state, action);
             this._state.set(newState);
         });
 
@@ -87,7 +78,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     setState = createUpdateFn(this.updateState);
     connect = createConnectFn(this.updateState);
     rxEffect = createRxEffectFn();
-    select = this.selectableState.select;
+    select = this._state.select;
 
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension

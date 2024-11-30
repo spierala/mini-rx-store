@@ -1,0 +1,30 @@
+{
+    "name": "signal-store-angular-demo-standalone-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/signal-store-angular-demo-standalone-e2e/src",
+    "projectType": "application",
+    "tags": [],
+    "implicitDependencies": ["signal-store-angular-demo-standalone"],
+    "targets": {
+        "e2e": {
+            "executor": "@nx/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/signal-store-angular-demo-standalone-e2e/cypress.config.ts",
+                "devServerTarget": "signal-store-angular-demo-standalone:serve:development",
+                "testingType": "e2e"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "signal-store-angular-demo-standalone:serve:production"
+                },
+                "ci": {
+                    "devServerTarget": "signal-store-angular-demo-standalone:serve-static"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
+        }
+    }
+}

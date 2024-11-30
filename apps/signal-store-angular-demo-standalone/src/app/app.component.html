@@ -1,0 +1,61 @@
+<div class="w-100 h-100 d-flex flex-column">
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand">
+            <img
+                src="assets/mini-rx-logo.svg"
+                width="48"
+                alt="Mini Rx Store Logo"
+                class="d-inline-block align-top mr-2"
+            />
+            MiniRx Signal Store Demo
+        </a>
+        <ul class="d-flex flex-grow-1 navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item" [routerLinkActive]="'active'">
+                <a class="nav-link" [routerLink]="'/todos-simple'">Todos Simple</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="'active'">
+                <a class="nav-link" [routerLink]="'/todos'">Todos</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="'active'">
+                <a class="nav-link" [routerLink]="'/products'">Products</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="'active'">
+                <a class="nav-link" [routerLink]="'/counters'">Counters</a>
+            </li>
+            <li class="nav-item mr-auto" [routerLinkActive]="'active'">
+                <a class="nav-link" [routerLink]="'/art'">Pixel Art</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="'active'">
+                <a class="nav-link d-flex align-items-center" [routerLink]="'/user'">
+                    <i class="bi bi-person-circle mr-1"></i>
+                    {{ userFacade.userFullName() }}
+                </a>
+            </li>
+            <li class="nav-item" [routerLinkActive]="'active'">
+                <a class="nav-link d-flex align-items-center" [routerLink]="'/cart'">
+                    <i class="bi bi-cart-fill mr-1"></i>
+                    <span class="mr-2">Cart</span>
+                    <span class="badge badge-light">
+                        {{ productsFacade.cartItemsAmount() }}
+                    </span>
+                </a>
+            </li>
+        </ul>
+        <a
+            href="https://github.com/spierala/mini-rx-store/tree/master/apps/signal-store-angular-demo-standalone"
+            title="Go to the Angular MiniRx demo on Github"
+            target="_blank"
+        >
+            <img
+                src="assets/github-logo.svg"
+                height="32"
+                width="32"
+                alt="MiniRx Store Logo"
+                class="ml-3"
+            />
+        </a>
+    </nav>
+    <div class="flex-grow-1">
+        <router-outlet></router-outlet>
+    </div>
+</div>

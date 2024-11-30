@@ -3,6 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "libs/mini-rx-store/src",
     "projectType": "library",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@nx/rollup:rollup",
@@ -33,18 +34,14 @@
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "outputs": ["{options.outputFile}"],
-            "options": {
-                "lintFilePatterns": ["libs/mini-rx-store/**/*.ts"]
-            }
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
         },
         "test": {
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/libs/mini-rx-store"],
             "options": {
-                "jestConfig": "libs/mini-rx-store/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "libs/mini-rx-store/jest.config.ts"
             }
         },
         "version": {
@@ -54,6 +51,5 @@
                 "commitMessageFormat": "chore(${projectName}): release version ${version}"
             }
         }
-    },
-    "tags": []
+    }
 }

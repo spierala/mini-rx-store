@@ -1,0 +1,12 @@
+:host {
+    width: 20px;
+    height: 20px;
+    border: 1px solid white;
+}
+
+.inner {
+    background: #a4c400;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.2s;
+}

@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Observable, catchError } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
 import { miniRxConsoleError } from './mini-rx-console-error';
 
 // Prevent effect to unsubscribe from the actions stream

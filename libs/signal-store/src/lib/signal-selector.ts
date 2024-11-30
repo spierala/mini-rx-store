@@ -26,7 +26,6 @@
 
 import { computed, Signal } from '@angular/core';
 import { AppState } from '@mini-rx/common';
-import { defaultSignalEquality } from './utils';
 
 export const SIGNAL_SELECTOR_KEY = '@mini-rx/signalSelector';
 
@@ -115,13 +114,10 @@ export function createSelector(...args: any[]): SignalSelector<any, any> {
         });
 
         // Return computed Signal which recalculates when one of the `signalsFromSelectors` notifies about changes
-        return computed(
-            () => {
-                const results: any[] = signalsFromSelectors.map((aSignal) => aSignal());
-                return projector(...results);
-            },
-            { equal: defaultSignalEquality } // Notify about changes only if there is a new primitive / object reference
-        );
+        return computed(() => {
+            const results: any[] = signalsFromSelectors.map((aSignal) => aSignal());
+            return projector(...results);
+        });
     };
 
     return addSignalSelectorKey(selector);

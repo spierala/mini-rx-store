@@ -1,9 +1,9 @@
 import { Action, ComponentStoreExtension, ExtensionId, MetaReducer } from '@mini-rx/common';
-import { destroy } from '../store-core';
+import { storeCore } from '../store-core';
 import { v4 as uuid } from 'uuid';
 
 export function destroyStore() {
-    destroy();
+    storeCore.destroy();
 }
 
 export interface UserState {

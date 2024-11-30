@@ -1,24 +1,31 @@
-import { configureStore, Store } from '../store';
-import { Action, ActionWithPayload, AppState, Reducer, ReducerDictionary } from '../models';
+import { configureStore } from '../store';
+import {
+    Action,
+    AppState,
+    createRxEffect as createEffect,
+    ExtensionId,
+    MetaReducer,
+    ofType,
+    Reducer,
+    StoreExtension,
+} from '@mini-rx/common';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
-import { ofType } from '../utils';
 import { catchError, map, mergeMap, take, withLatestFrom } from 'rxjs/operators';
-import { ReduxDevtoolsExtension } from '../extensions/redux-devtools.extension';
 import { cold, hot } from 'jest-marbles';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
     counterInitialState,
     counterReducer,
     CounterState,
-    resetStoreConfig,
+    destroyStore,
     store,
 } from './_spec-helpers';
-import { createEffect } from '../create-effect';
-import { LoggerExtension, StoreExtension, ExtensionId } from '@mini-rx/common';
-import { combineReducers } from '../combine-reducers';
-import * as StoreCore from '../store-core';
-import { actions$ } from '../store-core';
+import { actions$, storeCore as StoreCore } from '../store-core';
+
+export interface ActionWithPayload extends Action {
+    payload?: any;
+}
 
 const asyncUser: Partial<UserState> = {
     firstName: 'Steven',
@@ -108,7 +115,7 @@ const getCounter3 = createSelector(getCounter3FeatureState, (state) => state.cou
 
 describe('Store Config', () => {
     afterEach(() => {
-        resetStoreConfig();
+        destroyStore();
     });
 
     it('should initialize the store with an empty object', () => {
@@ -232,7 +239,7 @@ describe('Store Config', () => {
         it('should call root meta reducers from extensions depending on sortOrder', () => {
             const callOrder: string[] = [];
 
-            function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta1');
                     return reducer(state, action);
@@ -242,12 +249,12 @@ describe('Store Config', () => {
             class Extension extends StoreExtension {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                init(): MetaReducer<AppState> {
+                    return rootMetaReducerForExtension;
                 }
             }
 
-            function rootMetaReducerForExtension2(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension2(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta2');
                     return reducer(state, action);
@@ -258,12 +265,12 @@ describe('Store Config', () => {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
                 sortOrder = 100;
 
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension2);
+                init(): MetaReducer<AppState> {
+                    return rootMetaReducerForExtension2;
                 }
             }
 
-            function rootMetaReducerForExtension3(reducer: Reducer<any>): Reducer<any> {
+            function rootMetaReducerForExtension3(reducer: Reducer<AppState>): Reducer<AppState> {
                 return (state, action) => {
                     callOrder.push('meta3');
                     return reducer(state, action);
@@ -273,8 +280,8 @@ describe('Store Config', () => {
             class Extension3 extends StoreExtension {
                 id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                init(): void {
-                    StoreCore.addMetaReducers(rootMetaReducerForExtension3);
+                init(): MetaReducer<AppState> {
+                    return rootMetaReducerForExtension3;
                 }
             }
 
@@ -292,7 +299,9 @@ describe('Store Config', () => {
                 '3.) feature meta reducers, ' +
                 '4.) feature reducer',
             () => {
-                function rootMetaReducerForExtension(reducer: Reducer<any>): Reducer<any> {
+                function rootMetaReducerForExtension(
+                    reducer: Reducer<AppState>
+                ): Reducer<AppState> {
                     return (state, action) => {
                         if (action.type === 'metaTest') {
                             state = {
@@ -308,8 +317,8 @@ describe('Store Config', () => {
                 class Extension extends StoreExtension {
                     id = ExtensionId.LOGGER; // id does not matter, but it has to be implemented
 
-                    init(): void {
-                        StoreCore.addMetaReducers(rootMetaReducerForExtension);
+                    init(): MetaReducer<AppState> {
+                        return rootMetaReducerForExtension;
                     }
                 }
 
@@ -375,7 +384,7 @@ describe('Store Config', () => {
                     extensions: [new Extension()],
                 });
 
-                StoreCore.addFeature<string>('metaTestFeature', aFeatureReducer, {
+                StoreCore.addFeature<any>('metaTestFeature', aFeatureReducer, {
                     metaReducers: [featureMetaReducer],
                 });
 
@@ -395,32 +404,11 @@ describe('Store Config', () => {
             );
         });
     });
-
-    it('should call custom combineReducer fn', () => {
-        const combineReducersSpy = jest.fn();
-
-        function customCombineReducers(reducers: ReducerDictionary<AppState>) {
-            combineReducersSpy(reducers);
-
-            return combineReducers(reducers);
-        }
-
-        StoreCore.configureStore({
-            reducers: { user: userReducer },
-            combineReducersFn: customCombineReducers,
-        });
-
-        expect(combineReducersSpy).toBeCalledWith(
-            expect.objectContaining({
-                user: userReducer,
-            })
-        );
-    });
 });
 
 describe('Store', () => {
     beforeAll(() => {
-        resetStoreConfig();
+        destroyStore();
 
         StoreCore.configureStore({
             reducers: { user: userReducer },
@@ -430,11 +418,7 @@ describe('Store', () => {
     it('should run the redux reducers when a new Feature state is added', () => {
         const reducerSpy = jest.fn();
 
-        function someReducer() {
-            reducerSpy();
-        }
-
-        store.feature('oneMoreFeature', someReducer);
+        store.feature('oneMoreFeature', reducerSpy);
         store.feature('oneMoreFeature2', (state) => state);
         expect(reducerSpy).toHaveBeenCalledTimes(2);
     });
@@ -581,45 +565,6 @@ describe('Store', () => {
         expect(store.select(getUserFeatureState)).toBeObservable(
             hot('ab', { a: userInitialState, b: { ...userInitialState, err: 'error' } })
         );
-    });
-
-    it('should log', () => {
-        console.log = jest.fn();
-
-        const user: UserState = {
-            firstName: 'John',
-            lastName: 'Travolta',
-            age: 35,
-            err: undefined,
-        };
-
-        const newState = {
-            user,
-        };
-
-        const action: Action = {
-            type: 'updateUser',
-            payload: user,
-        };
-
-        StoreCore.addExtension(new LoggerExtension());
-
-        store.dispatch(action);
-
-        expect(console.log).toHaveBeenCalledWith(
-            expect.stringContaining('%cupdateUser'),
-            expect.stringContaining('color: #25c2a0'),
-            expect.stringContaining('Action:'),
-            action,
-            expect.stringContaining('State: '),
-            newState
-        );
-    });
-
-    it('should add extension', () => {
-        const spy = jest.spyOn(StoreCore, 'addExtension');
-        StoreCore.addExtension(new ReduxDevtoolsExtension({}));
-        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('should call the reducer before running the effect', () => {

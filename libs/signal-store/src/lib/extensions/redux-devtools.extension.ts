@@ -1,18 +1,17 @@
 import { AbstractReduxDevtoolsExtension, Action, AppState } from '@mini-rx/common';
 import { Observable } from 'rxjs';
-import { actions$, select, updateAppState } from '../store-core';
+import { storeCore } from '../store-core';
 
 export class ReduxDevtoolsExtension extends AbstractReduxDevtoolsExtension {
     get actions$(): Observable<Action> {
-        return actions$;
+        return storeCore.actions$;
     }
 
     readState(): AppState {
-        const signalState = select();
-        return signalState();
+        return storeCore.appState.get();
     }
 
     updateState(state: AppState): void {
-        updateAppState(state);
+        storeCore.appState.set(state);
     }
 }

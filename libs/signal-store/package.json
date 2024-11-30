@@ -1,6 +1,6 @@
 {
     "name": "@mini-rx/signal-store",
-    "version": "1.0.1",
+    "version": "3.0.0-alpha.1",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
@@ -23,11 +23,11 @@
         "url": "https://github.com/spierala/mini-rx-store/issues"
     },
     "peerDependencies": {
-        "@angular/core": ">= 16.0.0",
+        "@angular/core": ">= 17.0.0",
         "rxjs": "^7.4.0"
     },
     "dependencies": {
-        "@mini-rx/common": "^1.0.0",
+        "@mini-rx/common": "^2.0.0-alpha.1",
         "tslib": "^2.3.0"
     },
     "sideEffects": false

@@ -1,4 +1,4 @@
-import { StoreExtension, MetaReducer } from './models';
+import { MetaReducer, StoreExtension } from './models';
 import { sortExtensions } from './sort-extensions';
 
 describe('sortExtensions', () => {

@@ -11,8 +11,8 @@ describe('subSink', () => {
         const subject2 = new Subject<void>();
         const spy2 = jest.fn();
 
-        subSink.sink(subject1.subscribe(spy1));
-        subSink.sink(subject2.subscribe(spy2));
+        subSink.sink = subject1.subscribe(spy1);
+        subSink.sink = subject2.subscribe(spy2);
 
         subject1.next();
         subject2.next();
@@ -40,10 +40,10 @@ describe('subSink', () => {
 
         const subject = new Subject();
 
-        subSink.sink(subject.subscribe());
+        subSink.sink = subject.subscribe();
 
         subSink.unsubscribe();
 
-        expect(() => subSink.sink(subject.subscribe())).toThrow();
+        expect(() => (subSink.sink = subject.subscribe())).toThrow();
     });
 });

@@ -24,6 +24,10 @@ This repository includes a file "selector.ts" originally copied from
 https://github.com/ngrx/platform/blob/8.6.0/modules/store/src/selector.ts, MIT licensed.
 See the file for details.
 
+This repository includes a file "signal-selector.ts" originally copied from
+https://github.com/ngrx/platform/blob/8.6.0/modules/store/src/selector.ts, MIT licensed.
+See the file for details.
+
 This repository includes a file "effects-mapper.ts" originally copied from
 https://github.com/markostanimirovic/juliette/blob/1.2.0/projects/juliette-ng/src/lib/effects.mapper.ts, MIT licensed.
 See the file for details.
@@ -32,7 +36,7 @@ This repository includes a file "effects.module.ts" originally copied from
 https://github.com/markostanimirovic/juliette/blob/1.2.0/projects/juliette-ng/src/lib/effects.module.ts, MIT licensed.
 See the file for details.
 
-This repository includes a file "undo.extension.ts" originally copied from
+This repository includes a file "undo-extension.ts" originally copied from
 https://github.com/brechtbilliet/ngrx-undo, MIT licensed.
 See the file for details.
 
@@ -44,11 +48,15 @@ This repository includes a file "combine-reducers.ts" originally copied from
 https://github.com/ngrx/platform/blob/12.0.0/modules/store/src/utils.ts, MIT licensed.
 See the file for details.
 
+This repository includes a file "default-effects-error-handler.ts" originally copied from
+https://github.com/ngrx/platform/blob/9.2.0/modules/effects/src/effects_error_handler.ts, MIT licensed.
+See the file for details.
+
 This repository includes a file "tap-response.ts" originally copied from
 https://github.com/ngrx/platform/blob/13.2.0/modules/component-store/src/tap-response.ts, MIT licensed.
 See the file for details.
 
-This repository includes a file "create-effect.ts" originally copied from
+This repository includes a file "create-rx-effect.ts" originally copied from
 https://github.com/ngrx/platform/blob/14.3.0/modules/effects/src/effect_creator.ts, MIT licensed.
 See the file for details.
 
