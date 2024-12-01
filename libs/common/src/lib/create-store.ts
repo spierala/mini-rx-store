@@ -36,7 +36,7 @@ export function createStore<SelectFnType>(appState: {
     const { actions$, dispatch } = createActionsOnQueue();
 
     // Wire up the Redux Store: subscribe to the actions stream, calc next state for every action
-    // Called by `configureStore` and `addReducer`
+    // Called by `configureStore` and `addFeature`
     function initStore(): void {
         if (actionSubscription) {
             return;

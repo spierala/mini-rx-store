@@ -67,7 +67,7 @@ describe('createStore', () => {
         });
     });
 
-    it('should add a reducer with addFeature', () => {
+    it('should remove a reducer with removeFeature', () => {
         store.removeFeature('counter2');
         expect(store.appState.get()).toEqual({
             counter: {
