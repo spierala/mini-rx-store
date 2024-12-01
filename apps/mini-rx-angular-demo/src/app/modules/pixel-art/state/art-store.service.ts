@@ -18,14 +18,12 @@ export class ArtStoreService extends ComponentStore<ArtState> {
     constructor() {
         super(initialState);
 
-        // This Observable is passed to setState: therefore the Observable has to emit ArtState
-        // FYI: the typing of setState would also allow Observable<Partial<ArtState>>
         const delayedOpacity$: Observable<number> = timer(Math.random() * 5000).pipe(
             map(() => Math.random())
         );
 
         // You could use JS setTimeout, but that approach would require some cleanup code to cancel the timer when the component destroys
-        // setState with Observable manages cleanup (of subscriptions) internally
+        // `connect` with Observable manages cleanup (of subscriptions) internally
         this.connect({ opacity: delayedOpacity$ });
     }
 
