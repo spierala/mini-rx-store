@@ -11,7 +11,7 @@ import {
 } from '@mini-rx/common';
 import { createFeatureStateSelector, createSelector } from '../selector';
 import { Observable, of } from 'rxjs';
-import { catchError, map, mapTo, mergeMap, take, withLatestFrom } from 'rxjs/operators';
+import { catchError, map, mergeMap, take, withLatestFrom } from 'rxjs/operators';
 import { cold, hot } from 'jest-marbles';
 import { createFeatureStore, FeatureStore } from '../feature-store';
 import {
@@ -698,9 +698,7 @@ describe('Store', () => {
         store.effect(
             actions$.pipe(
                 ofType('someAction3'),
-                mergeMap(() => {
-                    return apiCallWithError().pipe(mapTo({ type: 'someActionSuccess' }));
-                })
+                mergeMap(() => apiCallWithError().pipe(map(() => ({ type: 'someActionSuccess' }))))
             )
         );
 
