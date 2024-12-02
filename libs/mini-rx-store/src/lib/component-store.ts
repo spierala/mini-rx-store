@@ -26,7 +26,7 @@ import { createAssertState } from './assert-state';
 
 const csFeatureKey = 'component-store';
 const globalCsConfig = componentStoreConfig();
-// Keep configureComponentStores for backwards compatibility (mini-rx-store-ng)
+
 export function configureComponentStores(config: ComponentStoreConfig) {
     globalCsConfig.set(config);
 }
