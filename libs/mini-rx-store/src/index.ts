@@ -38,7 +38,3 @@ export {
     hasEffectMetaData,
     ofType,
 } from '@mini-rx/common';
-
-// Attention: The API of StoreCore is meant of internal use, e.g. for the Angular `NgReduxDevtoolsService`
-// The StoreCore API can change anytime soon!
-export { storeCore as _StoreCore } from './lib/store-core'; // export as `_StoreCore` to stay backwards compatible (for mini-rx-store-ng)
