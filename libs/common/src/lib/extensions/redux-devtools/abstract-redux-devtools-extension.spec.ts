@@ -61,7 +61,7 @@ describe('AbstractReduxDevtoolsExtension', () => {
         sendFn.mockReset();
     });
 
-    it('should support ComponentStore', () => {
+    it('should not support ComponentStore', () => {
         expect(extension).not.toHaveProperty('hasCsSupport');
     });
 
