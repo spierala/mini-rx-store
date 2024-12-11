@@ -1,4 +1,4 @@
-import { Action, createStore, LoggerExtension, UndoExtension } from '@mini-rx/common';
+import { Action, createStore, UndoExtension } from '@mini-rx/common';
 
 interface CounterState {
     counter: number;
