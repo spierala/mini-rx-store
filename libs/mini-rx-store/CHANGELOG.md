@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [6.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.1.0...mini-rx-store-6.0.0-alpha.0) (2024-12-11)
+
+
+### Features
+
+* **mini-rx-store:** add connect method for FeatureStore and ComponentStore ([ea63e83](https://github.com/spierala/mini-rx-store/commit/ea63e837e724a4c9ed9625ac77f36a185f1da646))
+* **signal-store:** common: tests ([c1663a8](https://github.com/spierala/mini-rx-store/commit/c1663a8439181780f1aa2cbc2c0c9dc144d8a25b))
+
+
+### Bug Fixes
+
+* **mini-rx-store:** make createEffect work with TS 5.3 ([876ca48](https://github.com/spierala/mini-rx-store/commit/876ca480a448ca9c48e9a4d2e6c5173996e989fa)), closes [#216](https://github.com/spierala/mini-rx-store/issues/216)
+
 ## [5.1.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.0.1...mini-rx-store-5.1.0) (2023-06-29)
 
 
