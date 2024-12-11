@@ -9,7 +9,7 @@ export interface ComponentStoreLike<StateType> {
     setInitialState(initialState: StateType): void;
     connect(dict: Record<string, Observable<unknown>>): void;
     effect(effectFn: (origin$: Observable<unknown>) => Observable<unknown>): () => void;
-    select(mapFn?: (state: unknown) => unknown): Observable<unknown>;
+    select<R>(mapFn?: (state: StateType) => R): Observable<R | StateType>;
     undo(action: Action): void;
     destroy(): void;
 }

@@ -7,6 +7,6 @@ export interface ComponentStoreLike<StateType> {
     setState(stateOrCallback: StateOrCallback<StateType>, name?: string): void;
     connect(dict: Record<string, Observable<any> | Signal<any>>): void;
     rxEffect(effectFn: (origin$: Observable<any>) => Observable<any>): () => void;
-    select(mapFn?: any): Signal<any>;
+    select<R>(mapFn?: (state: StateType) => R): Signal<R | StateType>;
     undo(action: Action): void;
 }
