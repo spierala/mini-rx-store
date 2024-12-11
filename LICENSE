@@ -75,3 +75,7 @@ See the file for details.
 This repository includes a file "mini-rx-to-observable.ts" originally copied from
 https://github.com/angular/angular/blob/16.2.10/packages/core/rxjs-interop/src/to_observable.ts, MIT style licensed.
 See the file for details.
+
+This repository includes a file "generate-id.ts" originally copied from
+https://github.com/ai/nanoid/blob/main/non-secure/index.js, MIT licensed.
+See the file for details.
