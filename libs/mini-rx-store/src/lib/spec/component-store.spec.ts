@@ -128,29 +128,6 @@ describe('ComponentStore', () => {
         ]);
     });
 
-    // it('should unsubscribe from setState Observable on destroy', () => {
-    //     const cs = createComponentStore(counterInitialState);
-    //
-    //     const counterSource = new Subject<number>();
-    //     const counterState$: Observable<CounterState> = counterSource.pipe(
-    //         map((v) => ({ counter: v }))
-    //     );
-    //
-    //     const subscribeCallback = jest.fn<void, [number]>();
-    //     cs.select((state) => state.counter).subscribe(subscribeCallback);
-    //
-    //     cs.setState(counterState$);
-    //
-    //     counterSource.next(1);
-    //     counterSource.next(2);
-    //
-    //     cs.destroy();
-    //
-    //     counterSource.next(3);
-    //
-    //     expect(subscribeCallback.mock.calls).toEqual([[1], [2]]);
-    // });
-
     it('should unsubscribe an effect on destroy', () => {
         const effectCallback = jest.fn<void, [number]>();
 
