@@ -5,6 +5,7 @@ import {
     componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
+    componentStoreFeatureKey,
     createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
@@ -23,7 +24,6 @@ import { createRxEffectFn } from './create-rx-effect-fn';
 import { createConnectFn } from './create-connect-fn';
 import { createSignalStoreSubSink } from './signal-store-sub-sink';
 
-const csFeatureKey = 'component-store';
 export const globalCsConfig = componentStoreConfig();
 
 export class ComponentStore<StateType extends object> implements ComponentStoreLike<StateType> {
@@ -48,7 +48,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         name: string | undefined
     ): MiniRxAction<StateType> => {
         return this.actionsOnQueue.dispatch({
-            type: createMiniRxActionType(operationType, csFeatureKey, name),
+            type: createMiniRxActionType(operationType, componentStoreFeatureKey, name),
             stateOrCallback,
         });
     };
@@ -65,7 +65,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         });
 
         this.actionsOnQueue.dispatch({
-            type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
+            type: createMiniRxActionType(OperationType.INIT, componentStoreFeatureKey),
         });
     }
 
@@ -83,7 +83,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     private destroy(): void {
         // Dispatch an action really just for logging via LoggerExtension
         this.actionsOnQueue.dispatch({
-            type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
+            type: createMiniRxActionType(OperationType.DESTROY, componentStoreFeatureKey),
         });
     }
 }

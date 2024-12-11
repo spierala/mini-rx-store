@@ -1,4 +1,4 @@
-export { miniRxNameSpace } from './lib/constants';
+export { miniRxNameSpace, componentStoreFeatureKey } from './lib/constants';
 export { createSubSink } from './lib/sub-sink';
 export { createMiniRxActionType } from './lib/create-mini-rx-action-type';
 export { miniRxError } from './lib/mini-rx-error';

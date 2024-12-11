@@ -5,6 +5,7 @@ import {
     componentStoreConfig,
     ComponentStoreConfig,
     ComponentStoreExtension,
+    componentStoreFeatureKey,
     createActionsOnQueue,
     createComponentStoreReducer,
     createMiniRxActionType,
@@ -24,7 +25,6 @@ import { createLazyState } from './create-state';
 import { createConnectFn } from './create-connect-fn';
 import { createAssertState } from './assert-state';
 
-const csFeatureKey = 'component-store';
 const globalCsConfig = componentStoreConfig();
 
 export function configureComponentStores(config: ComponentStoreConfig) {
@@ -55,7 +55,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
     ): MiniRxAction<StateType> => {
         this.assertState.isInitialized();
         return this.actionsOnQueue.dispatch({
-            type: createMiniRxActionType(operationType, csFeatureKey, name),
+            type: createMiniRxActionType(operationType, componentStoreFeatureKey, name),
             stateOrCallback,
         });
     };
@@ -86,7 +86,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
         });
 
         this.actionsOnQueue.dispatch({
-            type: createMiniRxActionType(OperationType.INIT, csFeatureKey),
+            type: createMiniRxActionType(OperationType.INIT, componentStoreFeatureKey),
         });
     }
 
@@ -106,7 +106,7 @@ export class ComponentStore<StateType extends object> implements ComponentStoreL
             // Dispatch an action really just for logging via LoggerExtension
             // Only dispatch if an initial state was provided or setInitialState was called
             this.actionsOnQueue.dispatch({
-                type: createMiniRxActionType(OperationType.DESTROY, csFeatureKey),
+                type: createMiniRxActionType(OperationType.DESTROY, componentStoreFeatureKey),
             });
         }
         this.subSink.unsubscribe();
