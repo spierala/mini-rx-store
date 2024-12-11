@@ -1,6 +1,6 @@
 {
     "name": "@mini-rx/signal-store",
-    "version": "3.0.0-alpha.1",
+    "version": "3.0.0-alpha.2",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
