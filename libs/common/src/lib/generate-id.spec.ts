@@ -1,7 +1,7 @@
 import { generateId, urlAlphabet } from './generate-id';
 
 describe('generateId', () => {
-    it('should generate an id of 6 characters long if no argument was passed', () => {
+    it('should generate an id of 6 characters long', () => {
         const id = generateId();
 
         expect(id.length).toEqual(6);
