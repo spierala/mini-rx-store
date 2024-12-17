@@ -118,12 +118,9 @@ export function createSelector(...args: any[]): Selector<any, any> {
     });
 }
 
-/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
-export function createFeatureSelector<T>(featureKey?: string): Selector<object, T>;
-/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
-export function createFeatureSelector<T, V>(featureKey: keyof T): Selector<T, V>;
-/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
-export function createFeatureSelector(featureKey?: any): Selector<any, any> {
+export function createFeatureStateSelector<T>(featureKey?: string): Selector<object, T>;
+export function createFeatureStateSelector<T, V>(featureKey: keyof T): Selector<T, V>;
+export function createFeatureStateSelector(featureKey?: any): Selector<any, any> {
     if (featureKey) {
         return createSelector(
             (state: any) => state[featureKey],
@@ -133,7 +130,15 @@ export function createFeatureSelector(featureKey?: any): Selector<any, any> {
     return (state) => state; // Do not memoize: when used with FeatureStore there is a new state object created for every `setState`
 }
 
-export const createFeatureStateSelector = createFeatureSelector;
+/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
+export function createFeatureSelector<T>(featureKey?: string): Selector<object, T>;
+/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
+export function createFeatureSelector<T, V>(featureKey: keyof T): Selector<T, V>;
+/** @deprecated Use `createFeatureStateSelector` which is more in line with `createComponentStateSelector` */
+export function createFeatureSelector(featureKey?: any): Selector<any, any> {
+    return createFeatureStateSelector(featureKey);
+}
+
 export function createComponentStateSelector<T>(): Selector<T, T> {
     return (state: T) => state;
 }
