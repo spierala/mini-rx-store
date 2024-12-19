@@ -2,7 +2,7 @@
     "name": "signal-store-angular-demo-standalone",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
-    "prefix": "mini-rx",
+    "prefix": "app",
     "sourceRoot": "apps/signal-store-angular-demo-standalone/src",
     "tags": [],
     "targets": {
