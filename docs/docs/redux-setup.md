@@ -106,7 +106,7 @@ With meta reducers we can pre-process actions and state.
 
 :::info
 Most MiniRx Extensions like the Undo Extension, Logger Extension or the Immutable Extension are implemented with a meta reducer.
-:::info
+:::
 
 A meta reducer is a function which takes a reducer and returns a new reducer.
 

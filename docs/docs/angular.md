@@ -120,7 +120,7 @@ It can be used in the root module and in feature modules.
 
 :::warning
 When using `EffectsModule.register`, you **must** write the effect with `createEffect`. Otherwise, the effect will be ignored.
-:::warning
+:::
 
 ### Get hold of the store and actions via the Angular dependency injection
 After we registered the StoreModule in the AppModule, we can use Angular DI to access `Store` and `Actions`.
