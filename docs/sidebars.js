@@ -32,6 +32,7 @@ module.exports = {
                 'fs-quick-start',
                 'fs-setup',
                 'fs-set-state',
+                'fs-connect',
                 'fs-select',
                 'fs-effect',
                 'fs-config',
