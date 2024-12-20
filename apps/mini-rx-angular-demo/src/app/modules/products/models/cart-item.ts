@@ -1,6 +1,6 @@
 export class CartItem {
     productId: number | undefined;
-    amount: number = 0;
+    amount = 0;
 
     // UI only
     productName?: string;
