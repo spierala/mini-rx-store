@@ -1,4 +1,6 @@
-import { Action, createRegisterEffectFn, createRxEffect } from '@mini-rx/common';
+import { Action } from './models';
+import { createRegisterEffectFn } from './create-register-effect-fn';
+import { createRxEffect } from './create-rx-effect';
 import { Subject } from 'rxjs';
 
 describe('createRegisterEffectFn', () => {

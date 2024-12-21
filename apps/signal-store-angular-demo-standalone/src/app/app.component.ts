@@ -6,7 +6,7 @@ import { UserFacade } from './user/state/user-facade.service';
 @Component({
     standalone: true,
     imports: [RouterModule],
-    selector: 'mini-rx-root',
+    selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
 })

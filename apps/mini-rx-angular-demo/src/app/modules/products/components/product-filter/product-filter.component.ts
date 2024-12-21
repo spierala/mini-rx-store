@@ -33,8 +33,6 @@ export class ProductFilterComponent implements OnInit, OnDestroy {
         search: this.searchInput,
     });
 
-    constructor() {}
-
     ngOnInit(): void {
         this.searchInput.valueChanges
             .pipe(debounceTime(350), takeUntil(this.unsubscribe$))
