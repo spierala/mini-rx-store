@@ -62,7 +62,9 @@ describe('deepFreeze', () => {
             str: 'immutable',
             num: 42,
             bool: true,
-            fn: function () {},
+            fn: function () {
+                return;
+            },
             nested: {
                 arr: [1, 2, { objProp: 'value' }],
             },
