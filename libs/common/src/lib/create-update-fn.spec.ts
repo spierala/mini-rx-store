@@ -1,10 +1,6 @@
-import {
-    Action,
-    createMiniRxActionType,
-    createUpdateFn,
-    OperationType,
-    StateOrCallback,
-} from '@mini-rx/common';
+import { Action, OperationType, StateOrCallback } from './models';
+import { createMiniRxActionType } from './create-mini-rx-action-type';
+import { createUpdateFn } from './create-update-fn';
 
 describe('createUpdateFn', () => {
     it('should create a setState function using OperationType.SET_STATE', () => {
