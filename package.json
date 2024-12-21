@@ -29,6 +29,7 @@
         "test:common:coverage": "nx test common --codeCoverage",
         "test:all": "nx run-many --all --target=test",
         "lint:all": "nx run-many --all --target=lint",
+        "lint:all:errors-only": "nx run-many --all --target=lint --quiet",
         "deploy:docs": "cd docs && yarn deploy",
         "build:mini-rx-angular-demo:sourcemap": "nx build mini-rx-angular-demo --source-map",
         "build:mini-rx-angular-demo:sourcemap:stats": "yarn build:mini-rx-angular-demo:sourcemap && source-map-explorer dist/apps/mini-rx-angular-demo/**/*.js",
