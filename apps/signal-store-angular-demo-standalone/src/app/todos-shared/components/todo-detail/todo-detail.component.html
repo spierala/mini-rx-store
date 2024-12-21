@@ -1,7 +1,7 @@
 <div class="card h-100">
     <div class="card-header">
         <span>{{ todo.id ? 'Edit Todo' : 'Create Todo' }}</span>
-        <button (click)="close.emit()" type="button" class="close" aria-label="Close">
+        <button (click)="closed.emit()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
