@@ -62,7 +62,7 @@ describe('deepFreeze', () => {
             str: 'immutable',
             num: 42,
             bool: true,
-            fn: function () {
+            fn: () => {
                 return;
             },
             nested: {
