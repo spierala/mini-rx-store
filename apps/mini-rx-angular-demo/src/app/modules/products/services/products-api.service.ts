@@ -54,7 +54,7 @@ export class ProductsApiService {
         const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         const url = `${apiUrl}/${id}`;
         return this.http.delete<Product>(url, { headers }).pipe(
-            tap((data) => {
+            tap(() => {
                 console.log('deleteProduct: ' + id);
                 this.toastr.success('Product deleted');
             }),
