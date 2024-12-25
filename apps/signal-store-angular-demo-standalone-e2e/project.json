@@ -3,7 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "apps/signal-store-angular-demo-standalone-e2e/src",
     "projectType": "application",
-    "tags": ["signal-store-angular-demo-standalone-e2e"],
+    "tags": ["scope:signal-store-angular-demo-standalone-e2e"],
     "implicitDependencies": ["signal-store-angular-demo-standalone"],
     "targets": {
         "e2e": {
