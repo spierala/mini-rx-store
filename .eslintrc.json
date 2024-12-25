@@ -13,7 +13,30 @@
                         "allow": [],
                         "depConstraints": [
                             {
-                                "sourceTag": "*",
+                                "sourceTag": "scope:signal-store",
+                                "onlyDependOnLibsWithTags": ["scope:common"]
+                            },
+                            {
+                                "sourceTag": "scope:mini-rx-store",
+                                "onlyDependOnLibsWithTags": ["scope:common"]
+                            },
+                            {
+                                "sourceTag": "scope:signal-store-angular-demo-standalone",
+                                "onlyDependOnLibsWithTags": ["scope:signal-store"]
+                            },
+                            {
+                                "sourceTag": "scope:mini-rx-store-demo",
+                                "onlyDependOnLibsWithTags": [
+                                    "scope:mini-rx-store",
+                                    "scope:mini-rx-store-ng"
+                                ]
+                            },
+                            {
+                                "sourceTag": "scope:mini-rx-store-ng",
+                                "onlyDependOnLibsWithTags": ["*"]
+                            },
+                            {
+                                "sourceTag": "scope:mini-rx-angular-demo",
                                 "onlyDependOnLibsWithTags": ["*"]
                             }
                         ]

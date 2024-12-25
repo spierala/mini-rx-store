@@ -3,7 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "apps/mini-rx-angular-demo-e2e/src",
     "projectType": "application",
-    "tags": [],
+    "tags": ["scope:mini-rx-angular-demo-e2e"],
     "implicitDependencies": ["mini-rx-angular-demo"],
     "targets": {
         "e2e": {

@@ -4,7 +4,7 @@
     "sourceRoot": "libs/signal-store/src",
     "prefix": "mini-rx",
     "projectType": "library",
-    "tags": [],
+    "tags": ["scope:signal-store"],
     "targets": {
         "build": {
             "executor": "@nx/angular:package",

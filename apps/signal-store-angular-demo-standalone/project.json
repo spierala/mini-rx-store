@@ -4,7 +4,7 @@
     "projectType": "application",
     "prefix": "app",
     "sourceRoot": "apps/signal-store-angular-demo-standalone/src",
-    "tags": [],
+    "tags": ["scope:signal-store-angular-demo-standalone"],
     "targets": {
         "build": {
             "executor": "@angular-devkit/build-angular:browser",
