@@ -25,7 +25,7 @@
                                 "onlyDependOnLibsWithTags": ["scope:signal-store"]
                             },
                             {
-                                "sourceTag": "scope:mini-rx-store-demo",
+                                "sourceTag": "scope:mini-rx-angular-demo",
                                 "onlyDependOnLibsWithTags": [
                                     "scope:mini-rx-store",
                                     "scope:mini-rx-store-ng"
@@ -33,11 +33,7 @@
                             },
                             {
                                 "sourceTag": "scope:mini-rx-store-ng",
-                                "onlyDependOnLibsWithTags": ["*"]
-                            },
-                            {
-                                "sourceTag": "scope:mini-rx-angular-demo",
-                                "onlyDependOnLibsWithTags": ["*"]
+                                "onlyDependOnLibsWithTags": ["scope:mini-rx-store"]
                             }
                         ]
                     }
