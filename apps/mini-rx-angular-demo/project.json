@@ -4,7 +4,7 @@
     "projectType": "application",
     "sourceRoot": "apps/mini-rx-angular-demo/src",
     "prefix": "app",
-    "tags": [],
+    "tags": ["scope:mini-rx-angular-demo"],
     "targets": {
         "build": {
             "executor": "@angular-devkit/build-angular:browser",
