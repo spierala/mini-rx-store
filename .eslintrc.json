@@ -33,7 +33,13 @@
                             },
                             {
                                 "sourceTag": "scope:mini-rx-store-ng",
-                                "onlyDependOnLibsWithTags": ["scope:mini-rx-store"]
+                                "onlyDependOnLibsWithTags": ["scope:mini-rx-store", "scope:common"],
+                                "allowedExternalImports": [
+                                    "@angular/*",
+                                    "rxjs",
+                                    "rxjs/*",
+                                    "jest-preset-angular/*"
+                                ]
                             }
                         ]
                     }
