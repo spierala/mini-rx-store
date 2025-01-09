@@ -2,9 +2,9 @@
     "name": "signal-store-angular-demo-standalone",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
-    "prefix": "mini-rx",
+    "prefix": "app",
     "sourceRoot": "apps/signal-store-angular-demo-standalone/src",
-    "tags": [],
+    "tags": ["scope:signal-store-angular-demo-standalone"],
     "targets": {
         "build": {
             "executor": "@angular-devkit/build-angular:browser",
@@ -57,10 +57,10 @@
             "executor": "@angular-devkit/build-angular:dev-server",
             "configurations": {
                 "production": {
-                    "browserTarget": "signal-store-angular-demo-standalone:build:production"
+                    "buildTarget": "signal-store-angular-demo-standalone:build:production"
                 },
                 "development": {
-                    "browserTarget": "signal-store-angular-demo-standalone:build:development"
+                    "buildTarget": "signal-store-angular-demo-standalone:build:development"
                 }
             },
             "defaultConfiguration": "development"
@@ -68,31 +68,18 @@
         "extract-i18n": {
             "executor": "@angular-devkit/build-angular:extract-i18n",
             "options": {
-                "browserTarget": "signal-store-angular-demo-standalone:build"
+                "buildTarget": "signal-store-angular-demo-standalone:build"
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "outputs": ["{options.outputFile}"],
-            "options": {
-                "lintFilePatterns": [
-                    "apps/signal-store-angular-demo-standalone/**/*.ts",
-                    "apps/signal-store-angular-demo-standalone/**/*.html"
-                ]
-            }
+            "executor": "@nx/eslint:lint",
+            "outputs": ["{options.outputFile}"]
         },
         "test": {
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
             "options": {
-                "jestConfig": "apps/signal-store-angular-demo-standalone/jest.config.ts",
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
-                }
+                "jestConfig": "apps/signal-store-angular-demo-standalone/jest.config.ts"
             }
         },
         "serve-static": {

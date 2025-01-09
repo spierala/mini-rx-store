@@ -11,6 +11,8 @@ export abstract class StoreExtension {
 }
 
 export interface ComponentStoreExtension extends StoreExtension {
+    hasCsSupport: true;
+
     init(): MetaReducer<any>;
 }
 

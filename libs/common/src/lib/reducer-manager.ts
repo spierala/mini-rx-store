@@ -1,4 +1,4 @@
-import { AppState, MetaReducer, Reducer, ReducerDictionary, Action, ReducerState } from './models';
+import { Action, AppState, MetaReducer, Reducer, ReducerDictionary, ReducerState } from './models';
 import { combineMetaReducers } from './combine-meta-reducers';
 import { miniRxError } from './mini-rx-error';
 import { combineReducers } from './combine-reducers';
@@ -84,11 +84,16 @@ export function createReducerManager() {
         });
     }
 
+    function hasFeatureReducers(): boolean {
+        return !!Object.keys(state.featureReducers).length;
+    }
+
     return {
         setFeatureReducers,
         addFeatureReducer,
         removeFeatureReducer,
         addMetaReducers,
+        hasFeatureReducers,
         get reducer(): Reducer<AppState> {
             return reducer;
         },

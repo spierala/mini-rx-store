@@ -1,17 +1,9 @@
-import {
-    _resetConfig,
-    ComponentStore,
-    configureComponentStores,
-    createComponentStore,
-} from '../component-store';
+import { ComponentStore, configureComponentStores, createComponentStore } from '../component-store';
 import { counterInitialState, CounterState, userState } from './_spec-helpers';
-import { Observable, of, pipe, Subject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { pipe, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { createComponentStateSelector, createSelector } from '../selector';
-import { LoggerExtension } from '../extensions/logger.extension';
-import { ImmutableStateExtension } from '../extensions/immutable-state.extension';
-import { UndoExtension } from '../extensions/undo.extension';
-import { ComponentStoreExtension, ExtensionId, StoreExtension } from '../models';
+import { ComponentStoreExtension, ExtensionId, StoreExtension } from '@mini-rx/common';
 
 describe('ComponentStore', () => {
     it('should initialize the store', () => {
@@ -53,26 +45,6 @@ describe('ComponentStore', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('should update state using an Observable', () => {
-        const cs = createComponentStore(counterInitialState);
-
-        const counterState$: Observable<CounterState> = of(2, 3, 4, 5).pipe(
-            map((v) => ({ counter: v }))
-        );
-
-        const subscribeCallback = jest.fn<void, [number]>();
-        cs.select((state) => state.counter).subscribe(subscribeCallback);
-
-        // setState with Observable
-        cs.setState(counterState$);
-
-        // "normal" setState
-        cs.setState((state) => ({ counter: state.counter + 1 }));
-        cs.setState((state) => ({ counter: state.counter + 1 }));
-
-        expect(subscribeCallback.mock.calls).toEqual([[1], [2], [3], [4], [5], [6], [7]]);
-    });
-
     it('should select state with memoized selectors', () => {
         const getCounterSpy = jest.fn<void, [number]>();
         const getSquareCounterSpy = jest.fn<void, [number]>();
@@ -101,15 +73,6 @@ describe('ComponentStore', () => {
         expect(getSquareCounterSpy.mock.calls).toEqual([[1], [2], [3], [4]]);
     });
 
-    it('should select component state with the `state$` property', () => {
-        const spy = jest.fn();
-
-        const cs = createComponentStore(counterInitialState);
-        cs.state$.subscribe(spy);
-
-        expect(spy).toHaveBeenCalledWith(counterInitialState);
-    });
-
     it('should dispatch an Action when updating state', () => {
         const cs = createComponentStore(counterInitialState);
 
@@ -119,7 +82,6 @@ describe('ComponentStore', () => {
         const setStateCallback = (state: CounterState) => ({ counter: state.counter + 1 });
         cs.setState(setStateCallback);
         expect(spy).toHaveBeenCalledWith({
-            setStateActionType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state',
             stateOrCallback: setStateCallback,
         });
@@ -130,36 +92,12 @@ describe('ComponentStore', () => {
         // With setState name
         cs.setState(setStateCallback, 'increment');
         expect(spy).toHaveBeenCalledWith({
-            setStateActionType: '@mini-rx/component-store',
             type: '@mini-rx/component-store/set-state/increment',
             stateOrCallback: setStateCallback,
         });
         expect(spy).toHaveBeenCalledTimes(1);
 
         spy.mockReset();
-
-        // With setState name (when passing an Observable to setState)
-        cs.setState(of(1, 2).pipe(map((v) => ({ counter: v }))), 'updateCounterFromObservable');
-        expect(spy.mock.calls).toEqual([
-            [
-                {
-                    setStateActionType: '@mini-rx/component-store',
-                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
-                    stateOrCallback: {
-                        counter: 1,
-                    },
-                },
-            ],
-            [
-                {
-                    setStateActionType: '@mini-rx/component-store',
-                    type: '@mini-rx/component-store/set-state/updateCounterFromObservable',
-                    stateOrCallback: {
-                        counter: 2,
-                    },
-                },
-            ],
-        ]);
     });
 
     it('should dispatch an Action on destroy (only if initial state has been set)', () => {
@@ -188,29 +126,6 @@ describe('ComponentStore', () => {
                 },
             ],
         ]);
-    });
-
-    it('should unsubscribe from setState Observable on destroy', () => {
-        const cs = createComponentStore(counterInitialState);
-
-        const counterSource = new Subject<number>();
-        const counterState$: Observable<CounterState> = counterSource.pipe(
-            map((v) => ({ counter: v }))
-        );
-
-        const subscribeCallback = jest.fn<void, [number]>();
-        cs.select((state) => state.counter).subscribe(subscribeCallback);
-
-        cs.setState(counterState$);
-
-        counterSource.next(1);
-        counterSource.next(2);
-
-        cs.destroy();
-
-        counterSource.next(3);
-
-        expect(subscribeCallback.mock.calls).toEqual([[1], [2]]);
     });
 
     it('should unsubscribe an effect on destroy', () => {
@@ -301,7 +216,7 @@ describe('ComponentStore', () => {
     it('should throw when calling `configureComponentStores` more than once', () => {
         configureComponentStores({ extensions: [] });
         expect(() => configureComponentStores({ extensions: [] })).toThrowError(
-            '@mini-rx: `configureComponentStores` was called multiple times.'
+            '@mini-rx: ComponentStore config was set multiple times.'
         );
     });
 
@@ -368,50 +283,5 @@ describe('ComponentStore', () => {
 
         expect(counter1Spy.mock.calls).toEqual([[1], [2]]);
         expect(counter1Spy.mock.calls).toEqual([[1], [2]]); // Without queuing the actions we would see here: [[1], [2], [1]]
-    });
-
-    describe('Extensions', () => {
-        beforeEach(() => {
-            _resetConfig();
-        });
-
-        it('should be local', () => {
-            const extensions = [new LoggerExtension(), new UndoExtension()];
-            const cs = createComponentStore(undefined, { extensions });
-
-            expect(cs['extensions']).toBe(extensions);
-        });
-
-        it('should be global', () => {
-            const extensions = [new LoggerExtension(), new UndoExtension()];
-
-            configureComponentStores({ extensions });
-            const cs = createComponentStore(undefined);
-
-            expect(cs['extensions']).toBe(extensions);
-        });
-
-        it('should be merged', () => {
-            const globalExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
-            const localExtensions = [new UndoExtension()];
-
-            configureComponentStores({ extensions: globalExtensions });
-            const cs = createComponentStore(undefined, { extensions: localExtensions });
-
-            expect(cs['extensions'][0]).toBe(localExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalExtensions[1]);
-        });
-
-        it('should be merged (use local if extension is used globally and locally)', () => {
-            const globalExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
-            const localExtensions = [new LoggerExtension()];
-
-            configureComponentStores({ extensions: globalExtensions });
-            const cs = createComponentStore(undefined, { extensions: localExtensions });
-
-            expect(cs['extensions'][0]).toBe(localExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalExtensions[1]);
-        });
     });
 });

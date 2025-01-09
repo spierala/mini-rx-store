@@ -1,5 +1,6 @@
 import { ComponentStoreConfig, ComponentStoreExtension } from './models';
 import { sortExtensions } from './sort-extensions';
+import { miniRxError } from './mini-rx-error';
 
 function mergeComponentStoreExtensions(
     globalExtensions: ComponentStoreExtension[],
@@ -31,5 +32,10 @@ export function calculateExtensions(
         globalConfig?.extensions ?? [],
         localConfig?.extensions ?? []
     );
+    extensions.forEach((ext) => {
+        if (!ext.hasCsSupport) {
+            miniRxError(`Extension "${ext.constructor.name}" is not supported by Component Store.`);
+        }
+    });
     return sortExtensions(extensions);
 }

@@ -21,6 +21,7 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "paths": {
+            "@mini-rx/common": ["dist/libs/common"],
             "mini-rx-store": ["dist/libs/mini-rx-store"],
             "mini-rx-store-ng": ["dist/libs/mini-rx-store-ng"]
         },

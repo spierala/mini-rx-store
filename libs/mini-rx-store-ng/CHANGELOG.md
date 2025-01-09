@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [5.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0...mini-rx-store-ng-5.0.0-alpha.0) (2024-12-11)
+
+### ⚠ BREAKING CHANGES
+
+* **mini-rx-store-ng:** require Angular 17 and mini-rx-store 6
+
 ## [4.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-rc.0...mini-rx-store-ng-4.0.0) (2023-04-17)
 
 ## [4.0.0-rc.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-alpha.3...mini-rx-store-ng-4.0.0-rc.0) (2023-04-13)

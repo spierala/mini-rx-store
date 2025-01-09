@@ -1,18 +1,18 @@
-import { Action, AppState, FeatureConfig, Reducer, StoreConfig } from './models';
-import { miniRxError } from './utils';
 import { Observable } from 'rxjs';
+import { rxEffect, storeCore } from './store-core';
 import {
-    addFeature,
-    appState,
-    configureStore as _configureStore,
-    dispatch,
-    effect,
-} from './store-core';
+    Action,
+    AppState,
+    FeatureConfig,
+    miniRxError,
+    Reducer,
+    StoreConfig,
+} from '@mini-rx/common';
 
 export abstract class Store {
     // Abstract class for Angular Dependency injection
     // mini-rx-store itself uses `Store` just as a type (return type of `configureStore`)
-    abstract feature<StateType>(
+    abstract feature<StateType extends object>(
         featureKey: string,
         reducer: Reducer<StateType>,
         config?: FeatureConfig<StateType>
@@ -26,14 +26,14 @@ let isStoreConfigured = false;
 
 export function configureStore(config: StoreConfig<AppState>): Store | never {
     if (!isStoreConfigured) {
-        _configureStore(config);
+        storeCore.configureStore(config);
         isStoreConfigured = true;
 
         return {
-            feature: addFeature,
-            select: appState.select.bind(appState),
-            dispatch,
-            effect,
+            feature: storeCore.addFeature,
+            select: storeCore.appState.select,
+            dispatch: storeCore.dispatch,
+            effect: rxEffect,
         };
     }
     miniRxError('`configureStore` was called multiple times.');

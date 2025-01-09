@@ -6,6 +6,7 @@ import {
     counterInitialState,
     counterReducer,
     CounterState,
+    destroyStore,
     userState,
     UserState,
 } from './_spec-helpers';
@@ -161,6 +162,9 @@ function setupCounterFeatureStore(): void {
 }
 
 describe('FeatureStore', () => {
+    beforeEach(() => {
+        destroyStore();
+    });
     it('should initialize the feature', () => {
         setupUserFeatureStore();
         const selectedState = userFeatureStore.select();

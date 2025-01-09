@@ -1,6 +1,3 @@
-// TODO remove exports
-// TODO fix strange feature naming (should be counter1, counter2, counter3)
-
 import { TestBed } from '@angular/core/testing';
 import { StoreModule } from '../store.module';
 import {
@@ -9,15 +6,11 @@ import {
     createComponentStore,
     createEffect,
     FeatureStore,
-    ImmutableStateExtension,
-    LoggerExtension,
     ofType,
     Reducer,
     ReduxDevtoolsExtension,
     Store,
     StoreExtension,
-    UndoExtension,
-    _StoreCore,
 } from 'mini-rx-store';
 import { Injectable, NgModule } from '@angular/core';
 import { catchError, map, mergeMap } from 'rxjs/operators';
@@ -25,37 +18,44 @@ import { of } from 'rxjs';
 import { EffectsModule } from '../effects.module';
 import { ComponentStoreModule } from '../component-store.module';
 import { NgReduxDevtoolsExtension } from '../ng-redux-devtools.extension';
+import { ComponentStoreExtension, MetaReducer } from '@mini-rx/common';
 
-export const loadAction: Action = {
+jest.mock('../ng-redux-devtools.extension'); // is now a mock constructor
+
+const loadAction: Action = {
     type: 'LOAD',
 };
 
-export const loadAction2: Action = {
+const loadAction2: Action = {
     type: 'LOAD_2',
 };
 
-export const loadAction3: Action = {
+const loadAction3: Action = {
     type: 'LOAD_3',
 };
 
-export const loadSuccessAction: Action = {
+const loadSuccessAction: Action = {
     type: 'LOAD_SUCCESS',
 };
 
-export const loadSuccessAction2: Action = {
+const loadSuccessAction2: Action = {
     type: 'LOAD_SUCCESS_2',
 };
 
-export const loadSuccessAction3: Action = {
+const loadSuccessAction3: Action = {
     type: 'LOAD_SUCCESS_3',
 };
 
-export const loadFailAction: Action = {
+const loadFailAction: Action = {
     type: 'LOAD_FAIL',
 };
 
 interface CounterState {
     counter: number;
+}
+
+interface StringState {
+    value: string;
 }
 
 const counterInitialState: CounterState = {
@@ -75,7 +75,7 @@ function counterReducer(state: CounterState = counterInitialState, action: Actio
 }
 
 @NgModule({
-    imports: [StoreModule.forFeature<CounterState>('counter4', counterReducer)],
+    imports: [StoreModule.forFeature<CounterState>('counter2', counterReducer)],
 })
 class Counter4Module {}
 
@@ -90,7 +90,7 @@ function featureMetaReducer(reducer: Reducer<any>): Reducer<any> {
 
 @NgModule({
     imports: [
-        StoreModule.forFeature<CounterState>('counter5', counterReducer, {
+        StoreModule.forFeature<CounterState>('counter3', counterReducer, {
             initialState: {
                 counter: 555,
             },
@@ -148,8 +148,6 @@ class CounterFeatureStore extends FeatureStore<CounterState> {
     }
 }
 
-const globalCsExtensions = [new LoggerExtension(), new ImmutableStateExtension()];
-
 const reduxDevToolsExtension = new ReduxDevtoolsExtension({ name: 'Test Redux DevTools' });
 const stateFromReduxDevTools = {
     someProp: 'someValue',
@@ -160,7 +158,6 @@ describe(`Ng Modules`, () => {
     let store: Store;
 
     const rootMetaReducerSpy = jest.fn();
-    const configureStoreSpy = jest.spyOn(_StoreCore, 'configureStore');
 
     function rootMetaReducer(reducer: Reducer<any>): Reducer<any> {
         return (state, action) => {
@@ -176,6 +173,49 @@ describe(`Ng Modules`, () => {
 
         init(): void {
             extensionSpy();
+        }
+    }
+
+    function metaReducerForLocalCsExtension(reducer: Reducer<StringState>): Reducer<StringState> {
+        return (state, action) => {
+            if (Object.hasOwn(action, 'stateOrCallback')) {
+                state = {
+                    ...state,
+                    value: state.value + 'local',
+                };
+            }
+            return reducer(state, action);
+        };
+    }
+
+    class LocalCsExtension extends StoreExtension implements ComponentStoreExtension {
+        id = 1;
+        hasCsSupport = true as const;
+
+        init(): MetaReducer<StringState> {
+            return metaReducerForLocalCsExtension;
+        }
+    }
+
+    function metaReducerForGlobalCsExtension(reducer: Reducer<StringState>): Reducer<StringState> {
+        return (state, action) => {
+            if (Object.hasOwn(action, 'stateOrCallback')) {
+                state = {
+                    ...state,
+                    value: state.value + 'global',
+                };
+            }
+
+            return reducer(state, action);
+        };
+    }
+
+    class GlobalCsExtension extends StoreExtension implements ComponentStoreExtension {
+        id = 2;
+        hasCsSupport = true as const;
+
+        init(): MetaReducer<StringState> {
+            return metaReducerForGlobalCsExtension;
         }
     }
 
@@ -196,7 +236,7 @@ describe(`Ng Modules`, () => {
                 }),
                 Counter5Module,
                 ComponentStoreModule.forRoot({
-                    extensions: globalCsExtensions,
+                    extensions: [new GlobalCsExtension()],
                 }),
             ],
         });
@@ -214,8 +254,8 @@ describe(`Ng Modules`, () => {
         store.select((state) => state).subscribe(spy);
         expect(spy).toHaveBeenCalledWith({
             counter1: { counter: 111 }, // Reducer initial state is overwritten by initial state from forRoot config
-            counter4: { counter: 1 },
-            counter5: { counter: 555 }, // forFeature config initial state
+            counter2: { counter: 1 },
+            counter3: { counter: 555 }, // forFeature config initial state
         });
         expect(spy).toHaveBeenCalledTimes(1);
 
@@ -235,8 +275,8 @@ describe(`Ng Modules`, () => {
 
         expect(spy).toHaveBeenCalledWith({
             counter1: { counter: 112 },
-            counter4: { counter: 2 },
-            counter5: { counter: 556 },
+            counter2: { counter: 2 },
+            counter3: { counter: 556 },
         });
 
         expect(rootMetaReducerSpy).toHaveBeenCalledTimes(4);
@@ -286,8 +326,8 @@ describe(`Ng Modules`, () => {
             expect(spy).toHaveBeenCalledWith({
                 counter1: { counter: 112 },
                 counterFs: { counter: 1 },
-                counter4: { counter: 2 },
-                counter5: { counter: 556 },
+                counter2: { counter: 2 },
+                counter3: { counter: 556 },
             });
         });
 
@@ -299,8 +339,8 @@ describe(`Ng Modules`, () => {
             expect(spy).toHaveBeenCalledWith({
                 counter1: { counter: 112 },
                 counterFs: { counter: 2 },
-                counter4: { counter: 2 },
-                counter5: { counter: 556 },
+                counter2: { counter: 2 },
+                counter3: { counter: 556 },
             });
         });
     });
@@ -310,41 +350,33 @@ describe(`Ng Modules`, () => {
         // For the other aspects of the config we can rely on the ComponentStore tests
 
         it('should merge global config with local config', () => {
-            const localCsExtensions = [new UndoExtension()];
-
-            const cs = createComponentStore(undefined, { extensions: localCsExtensions });
-
-            expect(cs['extensions'][0]).toBe(localCsExtensions[0]);
-            expect(cs['extensions'][1]).toBe(globalCsExtensions[0]);
-            expect(cs['extensions'][2]).toBe(globalCsExtensions[1]);
+            const spy = jest.fn();
+            const cs = createComponentStore<StringState>(
+                { value: 'a' },
+                { extensions: [new LocalCsExtension()] }
+            );
+            cs.select((state) => state.value).subscribe(spy);
+            expect(spy).toHaveBeenCalledWith('a');
+            cs.setState((state) => ({ value: state.value + 'b' }));
+            cs.select((state) => state.value).subscribe(spy);
+            expect(spy).toHaveBeenCalledWith('alocalglobalb');
         });
     });
 
     describe(`Redux DevTools extension`, () => {
         it('should initialize NgReduxDevtoolsExtension', () => {
-            const devToolsExtensionFromConfig: NgReduxDevtoolsExtension = configureStoreSpy.mock
-                .calls[0][0]!['extensions']![1] as NgReduxDevtoolsExtension;
-
-            // It would have been nicer to spy on addExtension, but that did not work without refactor of StoreCore (https://medium.com/@DavideRama/mock-spy-exported-functions-within-a-single-module-in-jest-cdf2b61af642)
-            expect(devToolsExtensionFromConfig).toBeInstanceOf(NgReduxDevtoolsExtension);
-            expect(devToolsExtensionFromConfig['options']).toEqual(
-                expect.objectContaining({
-                    name: 'Test Redux DevTools',
-                    traceLimit: 25,
-                })
-            );
+            expect(NgReduxDevtoolsExtension).toHaveBeenCalledWith({
+                name: 'Test Redux DevTools',
+                traceLimit: 25,
+            });
         });
 
         it('should update the Store state', () => {
-            const devToolsExtensionFromConfig: NgReduxDevtoolsExtension = configureStoreSpy.mock
-                .calls[0][0]!['extensions']![1] as NgReduxDevtoolsExtension;
-
-            const spy = jest.spyOn(_StoreCore.appState, 'set');
             JSON.parse = jest.fn().mockImplementationOnce((data) => {
                 return data;
             });
 
-            devToolsExtensionFromConfig['onDevToolsMessage']({
+            reduxDevToolsExtension['onDevToolsMessage']({
                 type: 'DISPATCH',
                 payload: {
                     type: 'JUMP_TO_STATE',
@@ -352,12 +384,14 @@ describe(`Ng Modules`, () => {
                 state: stateFromReduxDevTools,
             });
 
-            expect(spy).toHaveBeenCalledTimes(1);
+            const spy = jest.fn();
+            store.select((state) => state).subscribe(spy);
+
             expect(spy).toHaveBeenCalledWith(stateFromReduxDevTools);
 
             spy.mockReset();
 
-            devToolsExtensionFromConfig['onDevToolsMessage']({
+            reduxDevToolsExtension['onDevToolsMessage']({
                 type: 'NOT_SUPPORTED_TYPE',
                 payload: {},
                 state: {},

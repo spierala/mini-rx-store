@@ -21,7 +21,7 @@ export class TodoDetailComponent {
     delete = new EventEmitter<Todo>();
 
     @Output()
-    close = new EventEmitter<void>();
+    closed = new EventEmitter<void>();
 
     submit() {
         if (this.todo.id) {

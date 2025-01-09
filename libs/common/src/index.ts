@@ -1,9 +1,7 @@
-export { miniRxNameSpace } from './lib/constants';
+export { miniRxNameSpace, componentStoreFeatureKey } from './lib/constants';
 export { createSubSink } from './lib/sub-sink';
 export { createMiniRxActionType } from './lib/create-mini-rx-action-type';
-export { combineMetaReducers } from './lib/combine-meta-reducers';
 export { miniRxError } from './lib/mini-rx-error';
-export { sortExtensions } from './lib/sort-extensions';
 export { mapResponse } from './lib/map-response';
 export { tapResponse } from './lib/tap-response';
 export { ofType } from './lib/of-type';
@@ -16,6 +14,8 @@ export {
     EffectConfig,
     EFFECT_METADATA_KEY,
 } from './lib/create-rx-effect';
+export { createStore } from './lib/create-store';
+export { createRegisterEffectFn } from './lib/create-register-effect-fn';
 export { LoggerExtension } from './lib/extensions/logger/logger.extension';
 export { UndoExtension } from './lib/extensions/undo/undo-extension';
 export { undo } from './lib/extensions/undo/undo';
@@ -27,9 +27,10 @@ export {
 export { createFeatureStoreReducer } from './lib/create-feature-store-reducer';
 export { createComponentStoreReducer } from './lib/create-component-store-reducer';
 export { generateId } from './lib/generate-id';
+export { generateFeatureKey } from './lib/generate-feature-key';
 export { calculateExtensions } from './lib/calculate-extensions';
-export { createReducerManager, ReducerManager } from './lib/reducer-manager';
 export { componentStoreConfig } from './lib/component-store-config';
+export { createUpdateFn } from './lib/create-update-fn';
 export { ExtensionId } from './lib/enums';
 export {
     Action,
@@ -46,7 +47,6 @@ export {
     ComponentStoreExtension,
     AppState,
     ReducerDictionary,
-    ReducerState,
     UpdateStateCallback,
     OperationType,
 } from './lib/models';

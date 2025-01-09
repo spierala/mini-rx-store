@@ -23,7 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { EMPTY, identity, Observable, catchError, finalize, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, identity, Observable, tap } from 'rxjs';
 import { miniRxConsoleError } from './mini-rx-console-error';
 import { isFunction } from './is-function';
 

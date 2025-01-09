@@ -1,5 +1,5 @@
 import { createUndoMetaReducer } from './undo-meta-reducer';
-import { Reducer, Action } from '../../models';
+import { Action, Reducer } from '../../models';
 import { undo } from './undo';
 
 interface ActionWithPayload extends Action {

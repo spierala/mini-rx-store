@@ -1,4 +1,4 @@
-import { queueScheduler, Subject, observeOn } from 'rxjs';
+import { observeOn, queueScheduler, Subject } from 'rxjs';
 import { Action } from './models';
 
 export function createActionsOnQueue() {

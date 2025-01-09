@@ -1,6 +1,6 @@
 {
     "name": "@mini-rx/common",
-    "version": "1.0.0",
+    "version": "2.0.0-alpha.2",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
@@ -21,7 +21,7 @@
         "url": "https://github.com/spierala/mini-rx-store/issues"
     },
     "peerDependencies": {
-        "rxjs": "^6.4.0 || ^7.0.0"
+        "rxjs": "^7.8.1"
     },
     "sideEffects": false
 }

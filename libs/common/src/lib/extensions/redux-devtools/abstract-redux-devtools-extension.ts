@@ -30,9 +30,7 @@ export abstract class AbstractReduxDevtoolsExtension extends StoreExtension {
     private devtoolsConnection: any;
     private readonly _optionsForNgExtension: Partial<ReduxDevtoolsOptions>;
 
-    // sounds to much like Angular ;)
     // Used only in mini-rx-store-ng
-    // TODO create a normal getter for options: get options()
     get optionsForNgExtension(): Partial<ReduxDevtoolsOptions> {
         return this._optionsForNgExtension;
     }
@@ -44,14 +42,14 @@ export abstract class AbstractReduxDevtoolsExtension extends StoreExtension {
             miniRxError('The Redux DevTools are only supported in browser environments.');
         }
 
-        this._optionsForNgExtension = options;
-
         this.devtoolsExtension = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
 
         this.options = {
             ...defaultOptions,
             ...this.options,
         };
+
+        this._optionsForNgExtension = this.options;
     }
 
     init(): void {

@@ -1,8 +1,6 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "lib": ["es2022", "dom"],
-        "target": "ES2022",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "noImplicitOverride": true,
