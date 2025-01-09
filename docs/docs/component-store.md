@@ -38,6 +38,7 @@ The MiniRx `ComponentStore` API:
 - `setInitialState()` initialize state lazily
 - `select()` select state as RxJS Observable
 - `effect()` run side effects like API calls and update state
+- `connect()` connect external Observables to your Component Store
 - `undo()` easily undo setState actions (requires the UndoExtension)
 - `destroy()` clean up all internal Observable subscriptions (e.g. from effects)
 - `tapResponse` operator: handle the response in Component Store `effect` consistently and with less boilerplate

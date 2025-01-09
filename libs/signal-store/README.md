@@ -28,10 +28,10 @@ Welcome to **MiniRx Signal Store**, the new state management library from [MiniR
 ### Getting Started
 
 #### Requirements
-* Angular >= 16
-* RxJS >= 7.4.0
+* Angular >= 17
+* RxJS >= 7.8.1
 
-#### Install
+#### Installation
 To install the @mini-rx/signal-store package, use your package manager of choice:
 
 `npm install @mini-rx/signal-store`
