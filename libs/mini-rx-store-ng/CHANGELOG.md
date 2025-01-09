@@ -4,11 +4,9 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## [5.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0...mini-rx-store-ng-5.0.0-alpha.0) (2024-12-11)
 
+### ⚠ BREAKING CHANGES
 
-### Features
-
-* **signal-store:** signal store: ng-modules tests ([19db071](https://github.com/spierala/mini-rx-store/commit/19db071dcd16413e6d16f5a502467ae7654d3ce0))
-* **signal-store:** signal store: ng-modules tests ([fac802e](https://github.com/spierala/mini-rx-store/commit/fac802e255e73f44e9350a854d312638d835d8ef))
+* **mini-rx-store-ng:** require Angular 17 and mini-rx-store 6
 
 ## [4.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-ng-4.0.0-rc.0...mini-rx-store-ng-4.0.0) (2023-04-17)
 
