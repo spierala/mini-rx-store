@@ -1,4 +1,6 @@
-import { Action, createStore, UndoExtension } from '@mini-rx/common';
+import { Action } from './models';
+import { createStore } from './create-store';
+import { UndoExtension } from './extensions/undo/undo-extension';
 
 interface CounterState {
     counter: number;

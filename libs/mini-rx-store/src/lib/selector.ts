@@ -114,7 +114,7 @@ export function createSelector(...args: any[]): Selector<any, any> {
 
     return memoizeOne((state) => {
         const selectorResults = selectors.map((fn) => fn(state));
-        return memoizedProjector.apply(null, selectorResults);
+        return memoizedProjector(...selectorResults);
     });
 }
 

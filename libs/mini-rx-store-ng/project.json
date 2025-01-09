@@ -4,7 +4,7 @@
     "projectType": "library",
     "sourceRoot": "libs/mini-rx-store-ng/src",
     "prefix": "mini-rx",
-    "tags": [],
+    "tags": ["scope:mini-rx-store-ng"],
     "targets": {
         "build": {
             "executor": "@nx/angular:package",

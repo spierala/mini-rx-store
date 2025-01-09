@@ -37,8 +37,6 @@ export class TodoFilterComponent implements OnInit, OnDestroy {
 
     private unsubscribe$: Subject<void> = new Subject();
 
-    constructor() {}
-
     ngOnInit(): void {
         // Debounce just the text input
         this.formGroup

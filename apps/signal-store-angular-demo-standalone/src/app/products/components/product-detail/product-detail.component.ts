@@ -32,7 +32,7 @@ export class ProductDetailComponent {
     delete = new EventEmitter<Product>();
 
     @Output()
-    close = new EventEmitter<void>();
+    closed = new EventEmitter<void>();
 
     submit(form: NgForm) {
         const newProduct: Product = {

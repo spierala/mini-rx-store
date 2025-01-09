@@ -28,10 +28,10 @@ describe('toObservable()', () => {
         template: '',
         standalone: true,
     })
-    class Cmp {}
+    class SomeComponent {}
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(Cmp);
+        fixture = TestBed.createComponent(SomeComponent);
         injector = TestBed.inject(EnvironmentInjector);
     });
 
@@ -73,8 +73,8 @@ describe('toObservable()', () => {
 
         const counter$ = toObservable(counter, { injector });
 
-        let currentValue: number = 0;
-        let currentError: any = null;
+        let currentValue = 0;
+        let currentError = null;
 
         const sub = counter$.subscribe({
             next: (value) => (currentValue = value),

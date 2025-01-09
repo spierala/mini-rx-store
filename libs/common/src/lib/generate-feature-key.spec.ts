@@ -1,4 +1,4 @@
-import { generateFeatureKey } from '@mini-rx/common';
+import { generateFeatureKey } from './generate-feature-key';
 
 describe('generateFeatureKey', () => {
     it('should generate a feature key', () => {
