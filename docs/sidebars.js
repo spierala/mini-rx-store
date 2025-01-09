@@ -9,10 +9,6 @@ module.exports = {
             id: 'installation',
         },
         {
-            type: 'doc',
-            id: 'setup',
-        },
-        {
             type: 'category',
             label: 'Store (Redux)',
             items: [

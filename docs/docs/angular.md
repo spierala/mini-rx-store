@@ -7,6 +7,11 @@ sidebar_label: Angular Integration
 
 [![npm version](https://badge.fury.io/js/mini-rx-store-ng.svg)](https://www.npmjs.com/package/mini-rx-store-ng)
 
+:::tip
+For modern Angular (with Signals and standalone) we recommend to use the [MiniRx Signal Store](https://github.com/spierala/mini-rx-store/blob/master/libs/signal-store/README.md).
+Signal Store comes with first-class support for Signals and standalone APIs.
+:::
+
 With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can use MiniRx Store the Angular way:
 
 - [Configure the store](#configure-the-store-in-the-app-module) using `StoreModule.forRoot()`
@@ -17,7 +22,7 @@ With [mini-rx-store-ng](https://www.npmjs.com/package/mini-rx-store-ng) we can u
 ## Usage
 
 ### Requirements
-- Angular >= 12 
+- Angular >= 17 
 
 ### Installation
 
