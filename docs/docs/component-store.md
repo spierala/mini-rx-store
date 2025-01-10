@@ -30,7 +30,7 @@ Component Store is great for the mentioned use-cases. However, in most other cas
 - It is even possible to manage local state with Feature Stores (see [Local Component State with Feature Store](fs-config)).
 
 But don't worry, your Component Store can be easily migrated to a Feature Store and vice versa!  
-:::info
+:::
 
 ## What's Included
 The MiniRx `ComponentStore` API:
@@ -38,6 +38,7 @@ The MiniRx `ComponentStore` API:
 - `setInitialState()` initialize state lazily
 - `select()` select state as RxJS Observable
 - `effect()` run side effects like API calls and update state
+- `connect()` connect external Observables to your Component Store
 - `undo()` easily undo setState actions (requires the UndoExtension)
 - `destroy()` clean up all internal Observable subscriptions (e.g. from effects)
 - `tapResponse` operator: handle the response in Component Store `effect` consistently and with less boilerplate
@@ -93,7 +94,7 @@ const counterCs: ComponentStore<CounterState> = createComponentStore<CounterStat
 ## Destroy
 :::warning
 If you manage local component state with Component Store..., please make sure to destroy the Component Store when the corresponding component is destroyed! 
-:::warning
+:::
 
 You can destroy a Component Store with the `destroy` method. The `destroy` method will unsubscribe all internal RxJS subscriptions (e.g. from effects).
 
@@ -154,7 +155,7 @@ Like this, every Component Store can benefit from immutable state.
 The LoggerExtension can be added to individual Component Stores for debugging purposes (["Local extensions setup"](#local-extensions-setup)).
 
 Regarding the `undo` API: It is recommended to add the UndoExtension to the Component Stores which need the undo functionality (["Local extensions setup"](#local-extensions-setup)). 
-:::info
+:::
 
 ## Memoized selectors
 

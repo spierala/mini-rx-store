@@ -11,11 +11,6 @@ Install from the NPM repository using npm:
 npm install mini-rx-store
 ```
 
-Install the RxJS peer dependency:
-```bash
-npm install rxjs
-```
-
 ## TypeScript Config
 
 MiniRx itself is written in TypeScript with `compilerOptions.strict = true`.

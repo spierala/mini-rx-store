@@ -10,9 +10,14 @@ Use MiniRx Store the Angular way:
 - Use Angular Dependency Injection for `Store` and `Actions`
 - Redux Devtools Extension
 
-## Installation:
+### Getting Started
+
+#### Requirements
+* Angular >= 17
+
+#### Installation
 
 `npm i mini-rx-store-ng`
 
-## Docs
+#### Docs
 - 🤓 Learn more about the MiniRx Angular Integration on the [docs site](https://spierala.github.io/mini-rx-store/docs/angular)

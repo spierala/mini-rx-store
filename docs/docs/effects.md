@@ -60,7 +60,7 @@ The effect needs to be registered using `store.effect`.
 :::warning
 It is important to handle possible API errors with `catchError`, to make sure that the effect source does not complete.
 A completed effect source will stop listening to actions, and the effect does not work anymore.
-:::warning
+:::
 
 ## `mapResponse`
 

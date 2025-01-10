@@ -18,6 +18,7 @@ The MiniRx `FeatureStore` API:
 - `setInitialState()` initialize feature state lazily
 - `select()` select state from the feature state object as RxJS Observable
 - `effect()` run side effects like API calls and update feature state
+- `connect()` connect external Observables to your Feature Store
 - `undo()` easily undo setState actions (requires the UndoExtension)
 - `destroy()` remove the feature state from the global state object
 - `tapResponse` operator: handle the response in Feature Store `effect` consistently and with less boilerplate

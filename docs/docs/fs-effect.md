@@ -60,12 +60,12 @@ With RxJS flattening operators (mergeMap, switchMap, concatMap, exhaustMap) we c
 
 Inside the RxJS `tap` and `catchError` operators we can call `this.setState()` to update state.
 
-:::warning
+:::danger
 It is important to handle possible API errors with `catchError` to make sure that the effect source does not complete. Otherwise, the effect will not work anymore. 
 
 The `tapResponse` operator will help you to enforce error handling with less boilerplate. 
 [Read more about tapResponse](fs-effect.md#tapresponse).
-:::warning
+:::
 
 :::info
 We can skip the RxJS standalone `pipe` if we use only one RxJS operator:
@@ -78,7 +78,7 @@ loadTodoById = this.effect<number>(
   )
 );
 ```
-:::info
+:::
 
 ### Trigger the effect with an Observable
 
@@ -134,4 +134,4 @@ loadTodos = this.effect<void>(
 :::info
 `tapResponse` accepts an optional third parameter for handling the `finalize` case. 
 For example, it could be used to set a loading state to `false` if the API call succeeds **or** fails.
-:::info
+:::

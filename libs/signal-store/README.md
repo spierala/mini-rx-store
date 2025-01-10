@@ -5,6 +5,19 @@
 [![Downloads](https://img.shields.io/npm/dm/@mini-rx/signal-store?color=orange)](https://npmcharts.com/compare/@mini-rx/signal-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
+# MiniRx Signal Store 3 (alpha)
+
+MiniRx Signal Store 3 (alpha) has been released (2024-12-11)!
+
+What's new?
+
+- Bugfix: make `createEffect` work with TypeScript 5.3
+- Compatible with Angular 17+
+- Internal refactorings and optimizations
+
+### Installation
+`npm i @mini-rx/signal-store@alpha`
+
 # MiniRx Signal Store
 Welcome to **MiniRx Signal Store**, the new state management library from [MiniRx](https://mini-rx.io/).
 
@@ -28,10 +41,10 @@ Welcome to **MiniRx Signal Store**, the new state management library from [MiniR
 ### Getting Started
 
 #### Requirements
-* Angular >= 16
-* RxJS >= 7.4.0
+* Angular >= 17
+* RxJS >= 7.8.1
 
-#### Install
+#### Installation
 To install the @mini-rx/signal-store package, use your package manager of choice:
 
 `npm install @mini-rx/signal-store`
