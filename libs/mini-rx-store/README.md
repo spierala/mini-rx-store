@@ -13,7 +13,7 @@ MiniRx Store 6 (alpha) has been released (2024-12-11)!
 
 What's new?
 
-- **Connect external Observables with Feature Store or Component Store** using the new `connect` method
+- Connect external Observables with Feature Store or Component Store using the new `connect` method
 - Internal refactor: MiniRx Store uses @mini-rx/common which is also used by the MiniRx Signal Store
 
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
