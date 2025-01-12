@@ -7,6 +7,20 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
+# MiniRx Store 6 (alpha)
+
+MiniRx Store 6 (alpha) has been released (2024-12-11)!
+
+What's new?
+
+- Connect external Observables with Feature Store or Component Store using the new `connect` method
+- Internal refactor: MiniRx Store uses @mini-rx/common which is also used by the MiniRx Signal Store
+
+Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
+
+### Installation
+`npm i mini-rx-store@alpha`
+
 # MiniRx Store
 
 MiniRx Store provides **Reactive State Management**, powered by [**RxJS**](https://rxjs.dev/).
@@ -40,6 +54,7 @@ MiniRx always tries to find the sweet spot between **powerful, simple and lightw
     - `setInitialState()` initialize state lazily
     - `select()` select state from the feature state object as RxJS Observable
     - `effect()` run side effects like API calls and update feature state
+    - `connect()` connect external Observables to your Feature Store
     - `undo()` easily undo setState actions (requires the UndoExtension)
     - `destroy()` remove the feature state from the global state object
     - `tapResponse` operator: handle the side effect response in Feature Store `effect`

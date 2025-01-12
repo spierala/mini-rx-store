@@ -9,10 +9,6 @@ module.exports = {
             id: 'installation',
         },
         {
-            type: 'doc',
-            id: 'setup',
-        },
-        {
             type: 'category',
             label: 'Store (Redux)',
             items: [
@@ -32,6 +28,7 @@ module.exports = {
                 'fs-quick-start',
                 'fs-setup',
                 'fs-set-state',
+                'fs-connect',
                 'fs-select',
                 'fs-effect',
                 'fs-config',

@@ -62,4 +62,4 @@ export class TodoFeatureStore extends FeatureStore<TodoState> {
 ```
 :::warning
 An error will be thrown, if you call `setState` before an initial state was set (via the constructor or `setInitialState`).
-:::warning
+:::
