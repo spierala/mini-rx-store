@@ -4,16 +4,6 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 ## [3.0.0](https://github.com/spierala/mini-rx-store/compare/signal-store-3.0.0-alpha.2...signal-store-3.0.0) (2025-01-27)
 
-
-### Features
-
-* **general:** enforce module boundaries with nx ([8d5e184](https://github.com/spierala/mini-rx-store/commit/8d5e18403f76bb0497ed7028786f4f1d5b21e3b9))
-
-
-### Bug Fixes
-
-* **all:** component class names should end with 'Component' ([57c6e0e](https://github.com/spierala/mini-rx-store/commit/57c6e0ee6810c15a183b186bbf6a8d653ba11d14))
-
 ## [3.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/signal-store-3.0.0-alpha.1...signal-store-3.0.0-alpha.2) (2024-12-11)
 
 
