@@ -744,7 +744,9 @@ MiniRx was successfully tested in these projects:
 - [MiniRx Signal Store Demo](https://signal-store-demo.mini-rx.io/)
 
 ## Blog Posts:
-[MiniRx Signal Store for Angular - API Preview](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
+* [10 Reasons for MiniRx Signal Store](https://dev.to/this-is-angular/10-reasons-for-minirx-signal-store-p8b)
+* [Introducing MiniRx Signal Store](https://dev.to/this-is-angular/introducing-minirx-signal-store-cbo)
+* [MiniRx Signal Store for Angular - API Preview](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
 
 ## License
 MIT
