@@ -5,9 +5,9 @@
 [![Downloads](https://img.shields.io/npm/dm/@mini-rx/signal-store?color=orange)](https://npmcharts.com/compare/@mini-rx/signal-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Signal Store 3 (alpha)
+# MiniRx Signal Store 3
 
-MiniRx Signal Store 3 (alpha) has been released (2024-12-11)!
+MiniRx Signal Store 3 has been released (2025-01-27)!
 
 What's new?
 
@@ -16,7 +16,7 @@ What's new?
 - Internal refactorings and optimizations
 
 ### Installation
-`npm i @mini-rx/signal-store@alpha`
+`npm i @mini-rx/signal-store`
 
 # MiniRx Signal Store
 Welcome to **MiniRx Signal Store**, the new state management library from [MiniRx](https://mini-rx.io/).
@@ -61,7 +61,7 @@ Depending on the use-case, you can choose the state container which suits your n
 
 These are the typical use-cases:
 
-![use-cases.png](readme-assets%2Fuse-cases.png)
+![use-cases.png](/libs/signal-store/readme-assets/use-cases.png)
 
 ## Redux API
 The Redux pattern is great to manage state at large scale. MiniRx Signal Store offers a powerful Redux API.
@@ -319,7 +319,7 @@ _FYI_ You can also write your own extensions!
 #### Redux DevTools 
 Inspect global state with the Redux DevTools:
 
-![devtools-redux-api.png](readme-assets%2Fdevtools-redux-api.png)
+![devtools-redux-api.png](/libs/signal-store/readme-assets/devtools-redux-api.png)
 
 #### Immutable State
 By default, it is possible in Angular to mutate the state of a Signal.
@@ -409,14 +409,14 @@ Feature Stores use Redux under the hood and their state becomes part of the glob
 
 For that reason you can easily debug your Feature Stores with the Redux DevTools.
 
-![devtools-feature-store-api.png](readme-assets%2Fdevtools-feature-store-api.png)
+![devtools-feature-store-api.png](/libs/signal-store/readme-assets/devtools-feature-store-api.png)
 
 _FYI_ Provide a `name` parameter to `setState` in order to trace the corresponding action in the Redux DevTools:
 
 ```ts
 this.setState({ list: todos }, 'loadTodosSuccess');
 ```
-![devtools-feature-store-api--trace.png](readme-assets%2Fdevtools-feature-store-api--trace.png)
+![devtools-feature-store-api--trace.png](/libs/signal-store/readme-assets/devtools-feature-store-api--trace.png)
 
 ### Advanced Feature Stores
 When your state becomes more complex, Feature Store will scale with your state management needs.
@@ -512,11 +512,11 @@ In the Redux DevTools you will see that the "todo" Feature Store had been create
 
 Create:
 
-![devtools-feature-store-api--init.png](readme-assets%2Fdevtools-feature-store-api--init.png)
+![devtools-feature-store-api--init.png](/libs/signal-store/readme-assets/devtools-feature-store-api--init.png)
 
 Destroy:
 
-![devtools-feature-store-api--destroy.png](readme-assets%2Fdevtools-feature-store-api--destroy.png)
+![devtools-feature-store-api--destroy.png](/libs/signal-store/readme-assets/devtools-feature-store-api--destroy.png)
 
 ## Component Store API
 We have just seen, how Feature Stores can be used to manage local component state. 
@@ -744,7 +744,9 @@ MiniRx was successfully tested in these projects:
 - [MiniRx Signal Store Demo](https://signal-store-demo.mini-rx.io/)
 
 ## Blog Posts:
-[MiniRx Signal Store for Angular - API Preview](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
+* [10 Reasons for MiniRx Signal Store](https://dev.to/this-is-angular/10-reasons-for-minirx-signal-store-p8b)
+* [Introducing MiniRx Signal Store](https://dev.to/this-is-angular/introducing-minirx-signal-store-cbo)
+* [MiniRx Signal Store for Angular - API Preview](https://dev.to/this-is-angular/minirx-signal-store-for-angular-api-preview-4e16)
 
 ## License
 MIT

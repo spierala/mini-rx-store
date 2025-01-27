@@ -2,6 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.0](https://github.com/spierala/mini-rx-store/compare/common-2.0.0-alpha.2...common-2.0.0) (2025-01-27)
+
 ## [2.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/common-2.0.0-alpha.1...common-2.0.0-alpha.2) (2024-12-11)
 
 

@@ -7,9 +7,9 @@
 [![Downloads](https://img.shields.io/npm/dm/mini-rx-store?color=orange)](https://npmcharts.com/compare/mini-rx-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Store 6 (alpha)
+# MiniRx Store 6
 
-MiniRx Store 6 (alpha) has been released (2024-12-11)!
+MiniRx Store 6 has been released (2025-01-27)!
 
 What's new?
 
@@ -19,7 +19,7 @@ What's new?
 Read more in the [CHANGELOG](https://github.com/spierala/mini-rx-store/blob/master/libs/mini-rx-store/CHANGELOG.md) about the changes and the very few BREAKING CHANGES.
 
 ### Installation
-`npm i mini-rx-store@alpha`
+`npm i mini-rx-store`
 
 # MiniRx Store
 
@@ -89,11 +89,6 @@ Install from the NPM repository using npm:
 
 ```
 npm install mini-rx-store
-```
-
-Install the RxJS peer dependency:
-```
-npm install rxjs
 ```
 
 ## Basic Tutorial

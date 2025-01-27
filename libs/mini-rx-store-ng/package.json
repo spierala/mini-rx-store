@@ -1,6 +1,6 @@
 {
     "name": "mini-rx-store-ng",
-    "version": "5.0.0-alpha.0",
+    "version": "5.0.0",
     "author": "Florian Spier <mail@florian-spier.be> (https://florian-spier.be)",
     "license": "MIT",
     "homepage": "https://github.com/spierala/mini-rx-store",
@@ -23,7 +23,7 @@
     },
     "peerDependencies": {
         "@angular/core": ">= 17.0.0",
-        "mini-rx-store": ">= 6.0.0-alpha.0"
+        "mini-rx-store": ">= 6.0.0"
     },
     "dependencies": {
         "tslib": "^2.3.0"

@@ -7,4 +7,4 @@ MiniRx Common contains code which is shared between MiniRx Store and MiniRx Sign
 MiniRx Common will be installed as a dependency of MiniRx Store and MiniRx Signal Store.
 
 ## Warning
-You should not import code directly from MiniRx Common in your project!
+You should not import code directly from MiniRx Common (`@mini-rx/common`) in your project!

@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [6.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-6.0.0-alpha.0...mini-rx-store-6.0.0) (2025-01-27)
+
+
+### Bug Fixes
+
+* **mini-rx-store:** fix wrong deprecation warning ([dcf58c4](https://github.com/spierala/mini-rx-store/commit/dcf58c43b3b3b2674e9da4b266a40a13a3363e94))
+
 ## [6.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.1.0...mini-rx-store-6.0.0-alpha.0) (2024-12-11)
 
 ### ⚠ BREAKING CHANGES

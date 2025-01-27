@@ -2,6 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [3.0.0](https://github.com/spierala/mini-rx-store/compare/signal-store-3.0.0-alpha.2...signal-store-3.0.0) (2025-01-27)
+
 ## [3.0.0-alpha.2](https://github.com/spierala/mini-rx-store/compare/signal-store-3.0.0-alpha.1...signal-store-3.0.0-alpha.2) (2024-12-11)
 
 
