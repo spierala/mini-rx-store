@@ -23,7 +23,7 @@
     },
     "peerDependencies": {
         "@angular/core": ">= 17.0.0",
-        "mini-rx-store": ">= 6.0.0-alpha.0"
+        "mini-rx-store": ">= 6.0.0"
     },
     "dependencies": {
         "tslib": "^2.3.0"
