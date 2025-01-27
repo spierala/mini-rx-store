@@ -61,7 +61,7 @@ Depending on the use-case, you can choose the state container which suits your n
 
 These are the typical use-cases:
 
-![use-cases.png](readme-assets%2Fuse-cases.png)
+![use-cases.png](/libs/signal-store/readme-assets/use-cases.png)
 
 ## Redux API
 The Redux pattern is great to manage state at large scale. MiniRx Signal Store offers a powerful Redux API.
@@ -319,7 +319,7 @@ _FYI_ You can also write your own extensions!
 #### Redux DevTools 
 Inspect global state with the Redux DevTools:
 
-![devtools-redux-api.png](readme-assets%2Fdevtools-redux-api.png)
+![devtools-redux-api.png](/libs/signal-store/readme-assets/devtools-redux-api.png)
 
 #### Immutable State
 By default, it is possible in Angular to mutate the state of a Signal.
@@ -409,14 +409,14 @@ Feature Stores use Redux under the hood and their state becomes part of the glob
 
 For that reason you can easily debug your Feature Stores with the Redux DevTools.
 
-![devtools-feature-store-api.png](readme-assets%2Fdevtools-feature-store-api.png)
+![devtools-feature-store-api.png](/libs/signal-store/readme-assets/devtools-feature-store-api.png)
 
 _FYI_ Provide a `name` parameter to `setState` in order to trace the corresponding action in the Redux DevTools:
 
 ```ts
 this.setState({ list: todos }, 'loadTodosSuccess');
 ```
-![devtools-feature-store-api--trace.png](readme-assets%2Fdevtools-feature-store-api--trace.png)
+![devtools-feature-store-api--trace.png](/libs/signal-store/readme-assets/devtools-feature-store-api--trace.png)
 
 ### Advanced Feature Stores
 When your state becomes more complex, Feature Store will scale with your state management needs.
@@ -512,11 +512,11 @@ In the Redux DevTools you will see that the "todo" Feature Store had been create
 
 Create:
 
-![devtools-feature-store-api--init.png](readme-assets%2Fdevtools-feature-store-api--init.png)
+![devtools-feature-store-api--init.png](/libs/signal-store/readme-assets/devtools-feature-store-api--init.png)
 
 Destroy:
 
-![devtools-feature-store-api--destroy.png](readme-assets%2Fdevtools-feature-store-api--destroy.png)
+![devtools-feature-store-api--destroy.png](/libs/signal-store/readme-assets/devtools-feature-store-api--destroy.png)
 
 ## Component Store API
 We have just seen, how Feature Stores can be used to manage local component state. 
