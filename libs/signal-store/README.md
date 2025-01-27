@@ -5,9 +5,9 @@
 [![Downloads](https://img.shields.io/npm/dm/@mini-rx/signal-store?color=orange)](https://npmcharts.com/compare/@mini-rx/signal-store?interval=30)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-# MiniRx Signal Store 3 (alpha)
+# MiniRx Signal Store 3
 
-MiniRx Signal Store 3 (alpha) has been released (2024-12-11)!
+MiniRx Signal Store 3 has been released (2025-01-27)!
 
 What's new?
 
@@ -16,7 +16,7 @@ What's new?
 - Internal refactorings and optimizations
 
 ### Installation
-`npm i @mini-rx/signal-store@alpha`
+`npm i @mini-rx/signal-store`
 
 # MiniRx Signal Store
 Welcome to **MiniRx Signal Store**, the new state management library from [MiniRx](https://mini-rx.io/).
