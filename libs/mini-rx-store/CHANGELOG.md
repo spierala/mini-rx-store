@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [6.0.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-6.0.0-alpha.0...mini-rx-store-6.0.0) (2025-01-27)
+
+
+### Features
+
+* **general:** enforce module boundaries with nx ([8d5e184](https://github.com/spierala/mini-rx-store/commit/8d5e18403f76bb0497ed7028786f4f1d5b21e3b9))
+
+
+### Bug Fixes
+
+* **all:** prefer-spread ([858a2a2](https://github.com/spierala/mini-rx-store/commit/858a2a21b95cfd2831a6105512242a585e549d1c))
+* **mini-rx-store:** fix wrong deprecation warning ([dcf58c4](https://github.com/spierala/mini-rx-store/commit/dcf58c43b3b3b2674e9da4b266a40a13a3363e94))
+
 ## [6.0.0-alpha.0](https://github.com/spierala/mini-rx-store/compare/mini-rx-store-5.1.0...mini-rx-store-6.0.0-alpha.0) (2024-12-11)
 
 ### ⚠ BREAKING CHANGES
