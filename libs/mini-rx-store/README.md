@@ -1,4 +1,4 @@
-![MiniRx - Logo](../../.github/images/mini-rx-logo-white-bg.png)
+![MiniRx - Logo](/libs/mini-rx-store/readme-assets/mini-rx-logo-white-bg.png)
 
 [![NPM](https://img.shields.io/npm/v/mini-rx-store?color=blue)](https://www.npmjs.com/package/mini-rx-store)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-blue.svg?style=flat-square&color=blue)](https://github.com/semantic-release/semantic-release)
