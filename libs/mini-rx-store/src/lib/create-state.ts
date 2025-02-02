@@ -1,17 +1,13 @@
-import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, pipe } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable } from 'rxjs';
 
-function selectOperator<T, R>(mapFn: (state: T) => R) {
-    return pipe(map(mapFn), distinctUntilChanged());
-}
-
-function createSelectFn<StateType>(state$: Observable<StateType>) {
+function createSelectFn<StateType extends object>(state$: Observable<StateType>) {
     function select(): Observable<StateType>;
     function select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    function select(mapFn?: any): Observable<any> {
+    function select(mapFn?: (state: any) => unknown): Observable<unknown> {
         if (!mapFn) {
             return state$;
         }
-        return state$.pipe(selectOperator(mapFn));
+        return state$.pipe(map(mapFn), distinctUntilChanged());
     }
 
     return select;
