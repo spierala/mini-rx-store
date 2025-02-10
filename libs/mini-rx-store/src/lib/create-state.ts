@@ -1,13 +1,20 @@
 import { BehaviorSubject, distinctUntilChanged, filter, map, Observable } from 'rxjs';
+import { isKey } from '@mini-rx/common';
 
 function createSelectFn<StateType extends object>(state$: Observable<StateType>) {
     function select(): Observable<StateType>;
     function select<R>(mapFn: (state: StateType) => R): Observable<R>;
-    function select(mapFn?: (state: any) => unknown): Observable<unknown> {
-        if (!mapFn) {
+    function select<KeyType extends keyof StateType>(key: KeyType): Observable<StateType[KeyType]>;
+    function select(mapFnOrKey?: any): Observable<any> {
+        if (!mapFnOrKey) {
             return state$;
         }
-        return state$.pipe(map(mapFn), distinctUntilChanged());
+        return state$.pipe(
+            map((state) => {
+                return isKey(state, mapFnOrKey) ? state[mapFnOrKey] : mapFnOrKey(state);
+            }),
+            distinctUntilChanged()
+        );
     }
 
     return select;

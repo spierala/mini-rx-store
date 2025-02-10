@@ -45,6 +45,20 @@ describe('ComponentStore', () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
+    it('should select state with key', () => {
+        const spy = jest.fn();
+        const cs = createComponentStore(userState);
+        cs.select('firstName').subscribe(spy);
+        expect(spy).toHaveBeenCalledWith('Bruce');
+    });
+
+    it('should select state with callback', () => {
+        const spy = jest.fn();
+        const cs = createComponentStore(userState);
+        cs.select((state) => state.firstName).subscribe(spy);
+        expect(spy).toHaveBeenCalledWith('Bruce');
+    });
+
     it('should select state with memoized selectors', () => {
         const getCounterSpy = jest.fn<void, [number]>();
         const getSquareCounterSpy = jest.fn<void, [number]>();

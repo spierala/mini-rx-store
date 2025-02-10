@@ -101,6 +101,18 @@ describe('ComponentStore', () => {
         expect(component.selectedCounterState()).toBe(3); // From signal.set
     });
 
+    it('should select state with key', () => {
+        const cs = setup(counterInitialState);
+        const selectedState = cs.select('counter');
+        expect(selectedState()).toBe(1);
+    });
+
+    it('should select state with callback', () => {
+        const cs = setup(counterInitialState);
+        const selectedState = cs.select((state) => state.counter);
+        expect(selectedState()).toBe(1);
+    });
+
     it('should select state with memoized selectors', () => {
         const getCounterSpy = jest.fn<void, [number]>();
         const getSquareCounterSpy = jest.fn<void, [number]>();
