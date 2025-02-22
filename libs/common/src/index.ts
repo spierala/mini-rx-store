@@ -31,6 +31,7 @@ export { generateFeatureKey } from './lib/generate-feature-key';
 export { calculateExtensions } from './lib/calculate-extensions';
 export { componentStoreConfig } from './lib/component-store-config';
 export { createUpdateFn } from './lib/create-update-fn';
+export { isKey } from './lib/is-key';
 export { ExtensionId } from './lib/enums';
 export {
     Action,

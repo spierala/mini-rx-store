@@ -88,11 +88,11 @@ class UserFeatureStore extends FeatureStore<UserState> {
     private injector = inject(EnvironmentInjector);
 
     state$ = toObservable(this.select());
-    firstName = this.select((state) => state.firstName);
+    firstName = this.select('firstName'); // Select state by key
     firstName$ = toObservable(this.firstName, { injector: this.injector });
-    lastName = this.select((state) => state.lastName);
-    country = this.select(getCountry);
-    city = store?.select(getCity);
+    lastName = this.select((state) => state.lastName); // Select state with selector fn
+    country = this.select(getCountry); // Select state with memoized selector fn
+    city = store?.select(getCity); // Select state with memoized selector fn
     someFeatureState = store?.select(getSomeFeatureSelector);
 
     loadFn = this.rxEffect((payload$) =>
@@ -206,6 +206,7 @@ describe('FeatureStore', () => {
 
     it('should select state from the Feature Store', () => {
         setupUserFeatureStore();
+        expect(userFeatureStore.firstName()).toBe('Bruce');
         expect(userFeatureStore.country()).toBe('United States');
     });
 

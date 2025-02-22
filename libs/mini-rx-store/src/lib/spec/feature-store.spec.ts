@@ -42,10 +42,10 @@ const getCountry = createSelector(getUserFeatureState2, (state) => state.country
 const getSomeFeatureSelector = createFeatureStateSelector<CounterState>('someFeature');
 
 class UserFeatureStore extends FeatureStore<UserState> {
-    firstName$ = this.select((state) => state.firstName);
-    lastName$ = this.select((state) => state.lastName);
-    country$ = this.select(getCountry);
-    city$ = store.select(getCity);
+    firstName$ = this.select('firstName'); // Select state by key
+    lastName$ = this.select((state) => state.lastName); // Select state with selector fn
+    country$ = this.select(getCountry); // Select state with memoized selector fn
+    city$ = store.select(getCity); // Select state with memoized selector fn
     someFeatureState$ = store.select(getSomeFeatureSelector);
 
     loadFn = this.effect((payload$) =>
